@@ -1,0 +1,8 @@
+{
+  "language": "Français",
+  "dir": "ltr",
+  "title": "Assistant de Roulement de la Torah",
+  "routes": {
+    "home": "Accueil"
+  }
+}
