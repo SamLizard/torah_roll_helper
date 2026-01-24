@@ -2,7 +2,28 @@
   "language": "English",
   "dir": "ltr",
   "title": "Torah Roll Assistant",
-  "routes": {
-    "home": "Home"
-  }
+  "routes": { "home": "Home" },
+  "directions": { "forward": "Forward", "backward": "Backward" },
+  "home": {
+    "from": { "title": "FROM", "subtitle": "Current location (photo or manual)" },
+    "to": {
+      "title": "TO",
+      "subtitle": "Target reading (select upcoming or full list)",
+      "canUsePhoto": "You may use photo for TO (optional)"
+    },
+    "actions": { "photo": "Take photo", "choose": "Choose manually", "clear": "Clear" },
+    "selected": "Selected",
+    "noSelection": "No page selected"
+  },
+  "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode" },
+  "actions": { "close": "Close", "search": "Search..." },
+  "result": {
+    "title": "Roll instruction",
+    "noData": "Select both FROM and TO to compute roll",
+    "from": "From",
+    "to": "To",
+    "direction": { "forward": "Forward", "backward": "Backward" }
+  },
+  "page": "Page",
+  "noResults": "No results found"
 }

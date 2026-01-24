@@ -1,8 +1,8 @@
 <template>
   <v-app>
-    <nav-bar :key="$router.currentRoute.value.fullPath" />
+    <nav-bar />
     <v-main class="mt-6">
-      <router-view :key="$router.currentRoute.value.fullPath" />
+      <router-view />
     </v-main>
   </v-app>
 </template>

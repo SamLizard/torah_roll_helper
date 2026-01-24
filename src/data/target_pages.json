@@ -1,0 +1,981 @@
+[
+  {
+    "en": "Bereshit",
+    "he": "בראשית",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 1,
+      "verse": 1,
+      "page": 1
+    }
+  },
+  {
+    "en": "Noach",
+    "he": "נח",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 6,
+      "verse": 9,
+      "page": 6
+    }
+  },
+  {
+    "en": "Lech Lecha",
+    "he": "לך לך",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 12,
+      "verse": 1,
+      "page": 12
+    }
+  },
+  {
+    "en": "Vayera",
+    "he": "וירא",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 18,
+      "verse": 1,
+      "page": 17
+    }
+  },
+  {
+    "en": "Chayei Sara",
+    "he": "חיי שרה",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 23,
+      "verse": 1,
+      "page": 23
+    }
+  },
+  {
+    "en": "Toldot",
+    "he": "תולדות",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 25,
+      "verse": 19,
+      "page": 27
+    }
+  },
+  {
+    "en": "Vayetzei",
+    "he": "ויצא",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 28,
+      "verse": 10,
+      "page": 31
+    }
+  },
+  {
+    "en": "Vayishlach",
+    "he": "וישלח",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 32,
+      "verse": 4,
+      "page": 37
+    }
+  },
+  {
+    "en": "Vayeshev",
+    "he": "וישב",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 37,
+      "verse": 1,
+      "page": 42
+    }
+  },
+  {
+    "en": "Miketz",
+    "he": "מקץ",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 41,
+      "verse": 1,
+      "page": 47
+    }
+  },
+  {
+    "en": "Vayigash",
+    "he": "ויגש",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 44,
+      "verse": 18,
+      "page": 53
+    }
+  },
+  {
+    "en": "Vayechi",
+    "he": "ויחי",
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 47,
+      "verse": 28,
+      "page": 57
+    }
+  },
+  {
+    "en": "Shemot",
+    "he": "שמות",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 1,
+      "verse": 1,
+      "page": 61
+    }
+  },
+  {
+    "en": "Vaera",
+    "he": "וארא",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 6,
+      "verse": 2,
+      "page": 66
+    }
+  },
+  {
+    "en": "Bo",
+    "he": "בא",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 10,
+      "verse": 1,
+      "page": 71
+    }
+  },
+  {
+    "en": "Beshalach",
+    "he": "בשלח",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 17,
+      "page": 76
+    }
+  },
+  {
+    "en": "Yitro",
+    "he": "יתרו",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 18,
+      "verse": 1,
+      "page": 81
+    }
+  },
+  {
+    "en": "Mishpatim",
+    "he": "משפטים",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 21,
+      "verse": 1,
+      "page": 84
+    }
+  },
+  {
+    "en": "Terumah",
+    "he": "תרומה",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 25,
+      "verse": 1,
+      "page": 89
+    }
+  },
+  {
+    "en": "Tetzaveh",
+    "he": "תצוה",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 27,
+      "verse": 20,
+      "page": 92
+    }
+  },
+  {
+    "en": "Ki Tisa",
+    "he": "כי תשא",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 30,
+      "verse": 11,
+      "page": 97
+    }
+  },
+  {
+    "en": "Vayakhel",
+    "he": "ויקהל",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 35,
+      "verse": 1,
+      "page": 103
+    }
+  },
+  {
+    "en": "Pekudei",
+    "he": "פקודי",
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 38,
+      "verse": 21,
+      "page": 108
+    }
+  },
+  {
+    "en": "Vayikra",
+    "he": "ויקרא",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 1,
+      "verse": 1,
+      "page": 111
+    }
+  },
+  {
+    "en": "Tzav",
+    "he": "צו",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 6,
+      "verse": 1,
+      "page": 117
+    }
+  },
+  {
+    "en": "Shmini",
+    "he": "שמיני",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 9,
+      "verse": 1,
+      "page": 121
+    }
+  },
+  {
+    "en": "Tazria",
+    "he": "תזריע",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 12,
+      "verse": 1,
+      "page": 124
+    }
+  },
+  {
+    "en": "Metzora",
+    "he": "מצורע",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 14,
+      "verse": 1,
+      "page": 127
+    }
+  },
+  {
+    "en": "Achrei Mot",
+    "he": "אחרי מות",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 16,
+      "verse": 1,
+      "page": 131
+    }
+  },
+  {
+    "en": "Kedoshim",
+    "he": "קדושים",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 19,
+      "verse": 1,
+      "page": 135
+    }
+  },
+  {
+    "en": "Emor",
+    "he": "אמור",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 21,
+      "verse": 1,
+      "page": 137
+    }
+  },
+  {
+    "en": "Behar",
+    "he": "בהר",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 25,
+      "verse": 1,
+      "page": 143
+    }
+  },
+  {
+    "en": "Bechukotai",
+    "he": "בחקתי",
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 26,
+      "verse": 3,
+      "page": 145
+    }
+  },
+  {
+    "en": "Bamidbar",
+    "he": "במדבר",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 1,
+      "verse": 1,
+      "page": 148
+    }
+  },
+  {
+    "en": "Nasso",
+    "he": "נשא",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 4,
+      "verse": 21,
+      "page": 154
+    }
+  },
+  {
+    "en": "Beha'alotcha",
+    "he": "בהעלותך",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 8,
+      "verse": 1,
+      "page": 162
+    }
+  },
+  {
+    "en": "Sh'lach",
+    "he": "שלח",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 13,
+      "verse": 1,
+      "page": 168
+    }
+  },
+  {
+    "en": "Korach",
+    "he": "קרח",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 16,
+      "verse": 1,
+      "page": 172
+    }
+  },
+  {
+    "en": "Chukat",
+    "he": "חקת",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 19,
+      "verse": 1,
+      "page": 177
+    }
+  },
+  {
+    "en": "Balak",
+    "he": "בלק",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 22,
+      "verse": 2,
+      "page": 180
+    }
+  },
+  {
+    "en": "Pinchas",
+    "he": "פנחס",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 25,
+      "verse": 10,
+      "page": 185
+    }
+  },
+  {
+    "en": "Matot",
+    "he": "מטות",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 30,
+      "verse": 2,
+      "page": 191
+    }
+  },
+  {
+    "en": "Masei",
+    "he": "מסעי",
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 33,
+      "verse": 1,
+      "page": 196
+    }
+  },
+  {
+    "en": "Devarim",
+    "he": "דברים",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 1,
+      "verse": 1,
+      "page": 200
+    }
+  },
+  {
+    "en": "Vaetchanan",
+    "he": "ואתחנן",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 3,
+      "verse": 23,
+      "page": 205
+    }
+  },
+  {
+    "en": "Eikev",
+    "he": "עקב",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 7,
+      "verse": 12,
+      "page": 211
+    }
+  },
+  {
+    "en": "Re'eh",
+    "he": "ראה",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 11,
+      "verse": 26,
+      "page": 217
+    }
+  },
+  {
+    "en": "Shoftim",
+    "he": "שופטים",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 16,
+      "verse": 18,
+      "page": 223
+    }
+  },
+  {
+    "en": "Ki Teitzei",
+    "he": "כי תצא",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 21,
+      "verse": 10,
+      "page": 227
+    }
+  },
+  {
+    "en": "Ki Tavo",
+    "he": "כי תבוא",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 26,
+      "verse": 1,
+      "page": 232
+    }
+  },
+  {
+    "en": "Nitzavim",
+    "he": "נצבים",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 29,
+      "verse": 9,
+      "page": 238
+    }
+  },
+  {
+    "en": "Vayeilech",
+    "he": "וילך",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 31,
+      "verse": 1,
+      "page": 240
+    }
+  },
+  {
+    "en": "Ha'Azinu",
+    "he": "האזינו",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 32,
+      "verse": 1,
+      "page": 242
+    }
+  },
+  {
+    "en": "Vezot Haberakhah",
+    "he": "וזאת הברכה",
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 33,
+      "verse": 1,
+      "page": 244
+    }
+  },
+  {
+    "en": "Rosh Chodesh",
+    "he": "ראש חודש",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 28,
+      "verse": 1,
+      "page": 189
+    }
+  },
+  {
+    "en": "Rosh HaShanah (Day 1)",
+    "he": "ראש השנה א׳",
+    "type": "holyday",
+    "ref": {
+      "book": 1,
+      "chapter": 21,
+      "verse": 1,
+      "page": 20
+    }
+  },
+  {
+    "en": "Rosh HaShanah (Day 2)",
+    "he": "ראש השנה ב׳",
+    "type": "holyday",
+    "ref": {
+      "book": 1,
+      "chapter": 22,
+      "verse": 1,
+      "page": 22
+    }
+  },
+  {
+    "en": "Yom Kippur",
+    "he": "יום כיפור",
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 16,
+      "verse": 1,
+      "page": 131
+    }
+  },
+  {
+    "en": "Sukkot (Day 1)",
+    "he": "סוכות א׳",
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "en": "Sukkot (Day 2)",
+    "he": "סוכות ב׳",
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "en": "Sukkot (Day 3)",
+    "he": "סוכות ג׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 17,
+      "page": 190
+    }
+  },
+  {
+    "en": "Sukkot (Day 4)",
+    "he": "סוכות ד׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 20,
+      "page": 191
+    }
+  },
+  {
+    "en": "Sukkot (Day 5)",
+    "he": "סוכות ה׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 23,
+      "page": 191
+    }
+  },
+  {
+    "en": "Sukkot (Day 6)",
+    "he": "סוכות ו׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 26,
+      "page": 191
+    }
+  },
+  {
+    "en": "Sukkot (Day 7 – Hoshana Raba)",
+    "he": "סוכות ז׳ (הושענא רבה)",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 26,
+      "page": 191
+    }
+  },
+  {
+    "en": "Sukkot (Shabbat Chol HaMoed)",
+    "he": "סוכות - שבת חול המועד",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 33,
+      "verse": 12,
+      "page": 101
+    }
+  },
+  {
+    "en": "Shmini Atzeret",
+    "he": "שמיני עצרת",
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "en": "Simchat Torah",
+    "he": "שמחת תורה",
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 33,
+      "verse": 1,
+      "page": 244
+    }
+  },
+  {
+    "en": "Chanukah (Day 1)",
+    "he": "חנוכה א׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 1,
+      "page": 158
+    }
+  },
+  {
+    "en": "Chanukah (Day 2)",
+    "he": "חנוכה ב׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 18,
+      "page": 159
+    }
+  },
+  {
+    "en": "Chanukah (Day 3)",
+    "he": "חנוכה ג׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 24,
+      "page": 159
+    }
+  },
+  {
+    "en": "Chanukah (Day 4)",
+    "he": "חנוכה ד׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 30,
+      "page": 159
+    }
+  },
+  {
+    "en": "Chanukah (Day 5)",
+    "he": "חנוכה ה׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 36,
+      "page": 160
+    }
+  },
+  {
+    "en": "Chanukah (Day 7)",
+    "he": "חנוכה ז׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 48,
+      "page": 160
+    }
+  },
+  {
+    "en": "Chanukah (Day 8)",
+    "he": "חנוכה ח׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 54,
+      "page": 160
+    }
+  },
+  {
+    "en": "Purim",
+    "he": "פורים",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 17,
+      "verse": 8,
+      "page": 81
+    }
+  },
+  {
+    "en": "Ta'anit Tzibur (Public Fast Day)",
+    "he": "תענית ציבור",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 32,
+      "verse": 11,
+      "page": 99
+    }
+  },
+  {
+    "en": "Pesach (Day 1)",
+    "he": "פסח א׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 12,
+      "verse": 21,
+      "page": 74
+    }
+  },
+  {
+    "en": "Pesach (Day 2)",
+    "he": "פסח ב׳",
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "en": "Pesach (Day 3)",
+    "he": "פסח ג׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 1,
+      "page": 75
+    }
+  },
+  {
+    "en": "Pesach (Day 4)",
+    "he": "פסח ד׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 22,
+      "verse": 24,
+      "page": 87
+    }
+  },
+  {
+    "en": "Pesach (Day 5)",
+    "he": "פסח ה׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 34,
+      "verse": 1,
+      "page": 101
+    }
+  },
+  {
+    "en": "Pesach (Day 6)",
+    "he": "פסח ו׳",
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 9,
+      "verse": 1,
+      "page": 163
+    }
+  },
+  {
+    "en": "Pesach (Shabbat Chol HaMoed)",
+    "he": "פסח - שבת חול המועד",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 33,
+      "verse": 12,
+      "page": 101
+    }
+  },
+  {
+    "en": "Pesach (Day 7)",
+    "he": "פסח ז׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 17,
+      "page": 76
+    }
+  },
+  {
+    "en": "Pesach (Day 8)",
+    "he": "פסח ח׳",
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "en": "Shavuot (Day 1)",
+    "he": "שבועות א׳",
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 19,
+      "verse": 1,
+      "page": 82
+    }
+  },
+  {
+    "en": "Shavuot (Day 2)",
+    "he": "שבועות ב׳",
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "en": "Tish'a B'Av",
+    "he": "תשעה באב",
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 4,
+      "verse": 25,
+      "page": 207
+    }
+  }
+]

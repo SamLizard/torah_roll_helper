@@ -2,7 +2,32 @@
   "language": "Français",
   "dir": "ltr",
   "title": "Assistant de Roulement de la Torah",
-  "routes": {
-    "home": "Accueil"
-  }
+  "routes": { "home": "Accueil" },
+  "directions": { "forward": "Avant", "backward": "Arrière" },
+  "home": {
+    "from": { "title": "DE", "subtitle": "Emplacement actuel (photo ou manuel)" },
+    "to": {
+      "title": "À",
+      "subtitle": "Lecture cible (sélectionnez à venir ou complet)",
+      "canUsePhoto": "Vous pouvez utiliser une photo pour la destination (optionnel)"
+    },
+    "actions": { "photo": "Prendre photo", "choose": "Choisir manuellement", "clear": "Effacer" },
+    "selected": "Sélectionné",
+    "noSelection": "Aucune page sélectionnée"
+  },
+  "targets": {
+    "title": "Choisir une cible",
+    "showingAll": "Affichage de la liste complète",
+    "golaLabel": "Mode Diaspora (Gola)"
+  },
+  "actions": { "close": "Fermer", "search": "Rechercher..." },
+  "result": {
+    "title": "Instruction de roulement",
+    "noData": "Sélectionnez DE et À pour calculer le roulement",
+    "from": "De",
+    "to": "À",
+    "direction": { "forward": "Vers l'avant", "backward": "Vers l'arrière" }
+  },
+  "page": "Page",
+  "noResults": "Aucun résultat trouvé"
 }

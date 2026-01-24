@@ -2,7 +2,28 @@
   "language": "עברית",
   "dir": "rtl",
   "title": "עוזר גלילת התורה",
-  "routes": {
-    "home": "בית"
-  }
+  "routes": { "home": "בית" },
+  "directions": { "forward": "קדימה", "backward": "לאחור" },
+  "home": {
+    "from": { "title": "מָנָה", "subtitle": "מיקום נוכחי (צילום או ידני)" },
+    "to": {
+      "title": "אֶל",
+      "subtitle": "קריאה יעד (בחר קריאות קרובות או רשימה מלאה)",
+      "canUsePhoto": "ניתן להשתמש בתמונה ליעד (אופציונלי)"
+    },
+    "actions": { "photo": "צלם", "choose": "בחר ידנית", "clear": "נקה" },
+    "selected": "נבחר",
+    "noSelection": "לא נבחרה עמודה"
+  },
+  "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה" },
+  "actions": { "close": "סגור", "search": "חיפוש..." },
+  "result": {
+    "title": "הוראת גלילה",
+    "noData": "בחר גם 'מ׳' וגם 'ל׳' כדי לחשב גלילה",
+    "from": "מ־",
+    "to": "ל־",
+    "direction": { "forward": "התקדמות", "backward": "נסיגה" }
+  },
+  "page": "עמוד",
+  "noResults": "לא נמצאו תוצאות"
 }

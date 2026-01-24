@@ -9,7 +9,13 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    port: 8080,
+    port: 8081,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 8081,
+    },
+    middlewareMode: false,
   },
   plugins: [
     vue({
