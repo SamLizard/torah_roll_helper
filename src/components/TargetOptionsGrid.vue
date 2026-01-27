@@ -51,18 +51,22 @@
         <div class="options-grid">
           <div
             v-for="item in pagedOptions"
-            :key="item.id"
+            :key="item.key"
             class="option-card"
             @click="select(item)"
             v-ripple
           >
-            <div class="d-flex justify-space-between align-start mb-2">
-              <span class="option-name text-truncate">
-                {{ item[$vuetify.locale.current] ?? item[$vuetify.locale.fallback] }}
-              </span>
-              <v-icon size="small" color="primary" v-if="item.isFavorite">mdi-star</v-icon>
-            </div>
-            
+          <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
+          <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
+          <div class="d-flex justify-space-between align-start mb-2">
+            <span class="option-name text-truncate">
+              <!-- {{ item[$vuetify.locale.current] ?? item[$vuetify.locale.fallback] }} -->
+                {{ $t(`readingTargets.${item.key}`) }}
+            </span>
+          </div>
+          
+            <!-- TODO 5: display a roll preview for the TO? When hover? -->
+            <!-- TODO 7: add special display for the only gola(/israel) readings. -->
             <div class="d-flex align-center text-caption text-medium-emphasis">
               <v-chip size="x-small" label class="me-2">{{ item.type }}</v-chip>
               <span>{{ $t('page') }} {{ item.ref.page }}</span>
@@ -85,11 +89,16 @@ import targetsData from '@/data/target_pages.json';
 
 // Type definitions for your JSON data (adjust as needed)
 interface TargetItem {
-  id: string | number;
-  type: string;
-  name: string;
-  ref: { page: number; [key: string]: any };
-  [key: string]: any; // for locale keys
+  key: string;
+  group: string;
+  gola: boolean;
+  type: 'parasha' | 'holyday';
+  ref: {
+    book: number;
+    chapter: number;
+    verse: number;
+    page: number;
+  };
 }
 
 const props = defineProps({

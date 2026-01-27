@@ -1,7 +1,13 @@
 <template>
   <v-container fluid class="pa-4">
     <v-row>
+      <!-- TODO 8: Add the calendar view here, and in the manual choose. Here to display the few next readings (if clicked, chosen as TO). -->
       <v-col cols="12" md="6">
+        <!-- DONE 1: Add the option to set manually the book + perek + verse (The utils getPageNumber should be used to give back the page number) -->
+        <!-- The options for the book should be taken from i18n, with keys: genesis, exodus, leviticus, numbers, deuteronomy -->
+        <!-- The minimum number for a perek is 1, and there are [50, 40, 27, 36, 34] perek for the books (so don't let user enter value bigger than it, depending on the book) -->
+        <!-- The minimum number for a verse is 1, and the maximum is 90 (don't check for each perek, but put global maximum of 90) -->
+        <!-- TODO 9: Make it reactive, so it works on phones. -->
         <!-- reusable selector used for FROM -->
         <LocationSelector
           key="from"
@@ -39,16 +45,16 @@
     </v-row>
 
     <!-- Target list modal (full-screen). Component emits 'select' with item -->
+    <!-- TODO 6: make the current (next reading) parasha look different, and start by looking at it? -->
+    <!-- TODO 3: Add titles to group of targets (book separation, holiday separation) -->
     <TargetOptionsGrid
       v-model="targetsOpen"
-      :side="targetsSide"
+      :side="activeSide"
       :allow-gola="allowGolaInTargets"
       @select="onTargetSelected"
     />
 
-    <!-- Dicta dialog could be a separate component; we open it from Home and listen globally -->
-    <!-- <DictaDialog v-model:open="dictaOpen" :side="dictaSide" /> -->
-  </v-container>
+    </v-container>
 </template>
 
 <script setup lang="ts">
@@ -66,14 +72,13 @@ const fromPage = ref<number | null>(null);
 const toPage = ref<number | null>(null);
 
 const targetsOpen = ref(false);
-const targetsSide = ref<'from' | 'to'>('to');
+const activeSide = ref<'from' | 'to'>('to'); // Renamed from targetsSide to generic activeSide
 
 /* for optional photo-for-to toggle (checkbox in your UI or settings) */
 const allowPhotoForTo = ref(false);
 
 /* Dicta dialog state (not implemented here, placeholder) */
 const dictaOpen = ref(false);
-const dictaSide = ref<'from' | 'to'>('from');
 
 /* Use Pinia store to persist isInGola and toPage */
 const options = useOptionsStore();
@@ -97,30 +102,32 @@ watch([fromPage, toPage], () => {
 
 /* --- handlers --- */
 function openDictaFor(side: 'from' | 'to') {
-  dictaSide.value = side;
+  activeSide.value = side;
   // open your dicta dialog here
   dictaOpen.value = true;
   // NOTE: implementing the actual Dicta iframe and postMessage handling belongs in a DictaDialog component
 }
 
 function openTargets(side: 'from' | 'to') {
-  targetsSide.value = side;
+  activeSide.value = side;
   targetsOpen.value = true;
 }
 
-function onSetFromPage(p: number) {
+function onSetFromPage(p: number | null) {
   fromPage.value = p;
 }
 
-function onSetToPage(p: number) {
+function onSetToPage(p: number | null) {
   toPage.value = p;
   // store the chosen toPage in Pinia as the user requested
-  options.changeToPage(p);
+  if (p !== null) {
+    options.changeToPage(p);
+  }
 }
 
 function onTargetSelected(item: any) {
   // item contains { page, name, ... }
-  if (targetsSide.value === 'from') {
+  if (activeSide.value === 'from') {
     fromPage.value = item.ref.page;
   } else {
     toPage.value = item.ref.page;

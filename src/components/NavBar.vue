@@ -3,7 +3,7 @@
     <v-toolbar-title class="font-weight-bold">
       {{ $t("title") }}
     </v-toolbar-title>
-    <div class="route-links-container">
+    <!-- <div class="route-links-container">
       <v-btn
         v-for="route in router.getRoutes()"
         :key="route.path"
@@ -14,7 +14,7 @@
       >
         {{ $t("routes." + route.name?.toString()) }}
       </v-btn>
-    </div>
+    </div> -->
     <v-spacer v-for="i in 3" :key="i"></v-spacer>
     <div>
       <v-toolbar-items>
