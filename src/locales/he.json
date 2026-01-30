@@ -35,7 +35,16 @@
     "max_chapter": "מקסימום פרקים:",
     "max_verse": "מקסימום פסוקים: 90"
   },
-  "books": {
+  "type": {
+    "parasha": "פרשות",
+    "holyday": "חגים"
+  },
+  "group": {
+    "rosh": "ראש השנה",
+    "sukkot": "סוכות",
+    "chanukah": "חנוכה",
+    "pesach": "פסח",
+    "shavuot": "שבועות",
     "genesis": "בראשית",
     "exodus": "שמות",
     "leviticus": "ויקרא",

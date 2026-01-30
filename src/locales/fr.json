@@ -39,7 +39,16 @@
     "max_chapter": "Le chapitre max est",
     "max_verse": "Le verset max est"
   },
-  "books": {
+  "type": {
+    "parasha": "Parachot",
+    "holyday": "Fêtes"
+  },
+  "group": {
+    "rosh": "Roch Hachana",
+    "sukkot": "Soukkot",
+    "chanukah": "Hanoucca",
+    "pesach": "Pessah",
+    "shavuot": "Chavouot",
     "genesis": "Genèse",
     "exodus": "Exode",
     "leviticus": "Lévitique",

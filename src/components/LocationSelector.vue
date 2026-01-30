@@ -109,7 +109,7 @@ const displayString = computed(() => {
   // and doesn't match the manual entry, but for now we stick to the manual entry state)
   if (!currentRef.value.chapter || !currentRef.value.verse) return '';
   
-  const bookName = t(`books.${BOOKS[currentRef.value.book - 1]}`);
+  const bookName = t(`group.${BOOKS[currentRef.value.book - 1]}`);
   return `${bookName} ${currentRef.value.chapter}:${currentRef.value.verse}`;
 });
 

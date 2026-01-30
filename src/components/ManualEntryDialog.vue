@@ -140,7 +140,7 @@ watch(() => localState.book, () => {
 
 const bookOptions = computed(() => {
   return BOOKS.map((key, index) => ({
-    title: t(`books.${key}`), // Ensure these keys exist in your i18n files
+    title: t(`group.${key}`), // Ensure these keys exist in your i18n files
     value: index + 1
   }));
 });

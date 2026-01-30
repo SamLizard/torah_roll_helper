@@ -1,7 +1,7 @@
 [
   {
     "key": "bereshit",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -13,7 +13,7 @@
   },
   {
     "key": "noach",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -25,7 +25,7 @@
   },
   {
     "key": "lech_lecha",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -37,7 +37,7 @@
   },
   {
     "key": "vayera",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -49,7 +49,7 @@
   },
   {
     "key": "chayei_sara",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -61,7 +61,7 @@
   },
   {
     "key": "toldot",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -73,7 +73,7 @@
   },
   {
     "key": "vayetzei",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -85,7 +85,7 @@
   },
   {
     "key": "vayishlach",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -97,7 +97,7 @@
   },
   {
     "key": "vayeshev",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -109,7 +109,7 @@
   },
   {
     "key": "miketz",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -121,7 +121,7 @@
   },
   {
     "key": "vayigash",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -133,7 +133,7 @@
   },
   {
     "key": "vayechi",
-    "group": "Genesis",
+    "group": "genesis",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -145,7 +145,7 @@
   },
   {
     "key": "shemot",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -157,7 +157,7 @@
   },
   {
     "key": "vaera",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -169,7 +169,7 @@
   },
   {
     "key": "bo",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -181,7 +181,7 @@
   },
   {
     "key": "beshalach",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -193,7 +193,7 @@
   },
   {
     "key": "yitro",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -205,7 +205,7 @@
   },
   {
     "key": "mishpatim",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -217,7 +217,7 @@
   },
   {
     "key": "terumah",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -229,7 +229,7 @@
   },
   {
     "key": "tetzaveh",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -241,7 +241,7 @@
   },
   {
     "key": "ki_tisa",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -253,7 +253,7 @@
   },
   {
     "key": "vayakhel",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -265,7 +265,7 @@
   },
   {
     "key": "pekudei",
-    "group": "Exodus",
+    "group": "exodus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -277,7 +277,7 @@
   },
   {
     "key": "vayikra",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -289,7 +289,7 @@
   },
   {
     "key": "tzav",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -301,7 +301,7 @@
   },
   {
     "key": "shmini",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -313,7 +313,7 @@
   },
   {
     "key": "tazria",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -325,7 +325,7 @@
   },
   {
     "key": "metzora",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -337,7 +337,7 @@
   },
   {
     "key": "achrei_mot",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -349,7 +349,7 @@
   },
   {
     "key": "kedoshim",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -361,7 +361,7 @@
   },
   {
     "key": "emor",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -373,7 +373,7 @@
   },
   {
     "key": "behar",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -385,7 +385,7 @@
   },
   {
     "key": "bechukotai",
-    "group": "Leviticus",
+    "group": "leviticus",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -397,7 +397,7 @@
   },
   {
     "key": "bamidbar",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -409,7 +409,7 @@
   },
   {
     "key": "nasso",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -421,7 +421,7 @@
   },
   {
     "key": "behaalotcha",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -433,7 +433,7 @@
   },
   {
     "key": "shlach",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -445,7 +445,7 @@
   },
   {
     "key": "korach",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -457,7 +457,7 @@
   },
   {
     "key": "chukat",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -469,7 +469,7 @@
   },
   {
     "key": "balak",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -481,7 +481,7 @@
   },
   {
     "key": "pinchas",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -493,7 +493,7 @@
   },
   {
     "key": "matot",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -505,7 +505,7 @@
   },
   {
     "key": "masei",
-    "group": "Numbers",
+    "group": "numbers",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -517,7 +517,7 @@
   },
   {
     "key": "devarim",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -529,7 +529,7 @@
   },
   {
     "key": "vaetchanan",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -541,7 +541,7 @@
   },
   {
     "key": "eikev",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -553,7 +553,7 @@
   },
   {
     "key": "reeh",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -565,7 +565,7 @@
   },
   {
     "key": "shoftim",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -577,7 +577,7 @@
   },
   {
     "key": "ki_teitzei",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -589,7 +589,7 @@
   },
   {
     "key": "ki_tavo",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -601,7 +601,7 @@
   },
   {
     "key": "nitzavim",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -613,7 +613,7 @@
   },
   {
     "key": "vayeilech",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -625,7 +625,7 @@
   },
   {
     "key": "haazinu",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {
@@ -637,7 +637,7 @@
   },
   {
     "key": "vezot_haberakhah",
-    "group": "Deuteronomy",
+    "group": "deuteronomy",
     "gola": false,
     "type": "parasha",
     "ref": {

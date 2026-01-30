@@ -35,7 +35,16 @@
     "max_chapter": "Max chapter is",
     "max_verse": "Max verse is"
   },
-  "books": {
+  "type": {
+    "parasha": "Parashot",
+    "holyday": "Holidays"
+  },
+  "group": {
+    "rosh": "Rosh Hashanah",
+    "sukkot": "Sukkot",
+    "chanukah": "Chanukah",
+    "pesach": "Pesach",
+    "shavuot": "Shavuot",
     "genesis": "Genesis",
     "exodus": "Exodus",
     "leviticus": "Leviticus",
