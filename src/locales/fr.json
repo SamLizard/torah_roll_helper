@@ -29,6 +29,7 @@
     "direction": { "forward": "Vers l'avant", "backward": "Vers l'arrière" }
   },
   "page": "Page",
+  "separator": " / ",
   "noResults": "Aucun résultat trouvé",
   "manual": {
     "title": "Entrer le lieu manuellement",

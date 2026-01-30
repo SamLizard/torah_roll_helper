@@ -1,4 +1,7 @@
 import type { RealDb, RollInstructions } from '../types';
+import targetsData from '@/data/target_pages.json';
+import pageTitlesData from '@/data/page_titles_keys.json'; 
+import type { ManualData } from '@/components/ManualEntryDialog.vue';
 
 /**
  * Binary search to find the page containing a specific verse.
@@ -102,4 +105,36 @@ export const computeRoll = (fromPage: number, toPage: number): RollInstructions 
   const rollDirection = toPage > fromPage ? 'forward' : 'backward';
 
   return { pages, rollDirection };
+};
+
+
+/**
+ * Returns the translation keys for a specific page.
+ * Priority:
+ * 1. Exact match in target_pages.json (Readings) - Checks for ALL matches
+ * 2. Lookup in page_titles_keys.json (Fallback)
+ */
+export const getPageTitleKeys = (pageNumber: number, ref: ManualData): string[] => {
+  // 1. Check target_pages (Readings)
+  // Filter to find ALL readings that match the exact Book + Chapter + Verse
+  const readingMatches = targetsData.filter(t => 
+    t.ref.book === ref.book && 
+    t.ref.chapter === ref.chapter && 
+    t.ref.verse === ref.verse
+  );
+  
+  if (readingMatches.length > 0) {
+    // Return all matched keys, prefixed for i18n
+    return readingMatches.map(m => `readingTargets.${m.key}`);
+  }
+
+  // 2. Check page_titles_keys.json
+  // Fallback if no specific reading target matches the exact reference
+  const titles = (pageTitlesData as string[][])[pageNumber - 1];
+  
+  if (titles && titles.length > 0) {
+    return titles.map(key => `readingTargets.${key}`);
+  }
+
+  return [];
 };

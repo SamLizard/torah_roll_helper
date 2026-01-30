@@ -6,7 +6,7 @@
       <div class="big-number">{{ pages }}</div>
       <div class="text-h6 mt-2">{{ $t(`result.direction.${direction}`) }}</div>
       <div class="mt-4 text-body-2">
-        {{ $t('result.from') }}: {{ fromPage ?? '—' }} &nbsp; → &nbsp; {{ $t('result.to') }}: {{ toPage ?? '—' }}
+        {{ $t('result.from') }}: {{ fromPage ?? '—' }} &nbsp; {{ $vuetify.locale.isRtl ? '←' : '→' }} &nbsp; {{ $t('result.to') }}: {{ toPage ?? '—' }}
       </div>
     </div>
 

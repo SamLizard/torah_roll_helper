@@ -13,6 +13,7 @@
           key="from"
           side="from"
           :page="fromPage"
+          :selected-ref="fromRef"
           @open-dicta="openDictaFor('from')"
           @choose-manual="openTargets('from')"
           @manual-set="onSetFromPage"
@@ -25,6 +26,7 @@
           key="to"
           side="to"
           :page="toPage"
+          :selected-ref="toRef"
           :allow-photo-for-to="allowPhotoForTo"
           @open-dicta="openDictaFor('to')"
           @choose-manual="openTargets('to')"
@@ -66,13 +68,17 @@ import { useOptionsStore } from '@/stores/options';
 import LocationSelector from '@/components/LocationSelector.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
+import type { ManualData } from '@/components/ManualEntryDialog.vue'; // Ensure type is exported
 
 import { computeRoll } from '@/composables/utils';
 import type { RollInstructions } from '@/types';
 
 /* --- local state --- */
 const fromPage = ref<number | null>(null);
+const fromRef = ref<ManualData | null>(null);
+
 const toPage = ref<number | null>(null);
+const toRef = ref<ManualData | null>(null);
 
 const targetsOpen = ref(false);
 const activeSide = ref<'from' | 'to'>('to'); // Renamed from targetsSide to generic activeSide
@@ -116,12 +122,16 @@ function openTargets(side: 'from' | 'to') {
   targetsOpen.value = true;
 }
 
-function onSetFromPage(p: number | null) {
+// Handler for Manual Entry (emitted from LocationSelector)
+function onSetFromPage(p: number | null, refData: ManualData | null = null) {
   fromPage.value = p;
+  fromRef.value = refData;
 }
 
-function onSetToPage(p: number | null) {
+// Handler for Manual Entry (emitted from LocationSelector)
+function onSetToPage(p: number | null, refData: ManualData | null = null) {
   toPage.value = p;
+  toRef.value = refData;
   // store the chosen toPage in Pinia as the user requested
   if (p !== null) {
     options.changeToPage(p);
@@ -129,11 +139,19 @@ function onSetToPage(p: number | null) {
 }
 
 function onTargetSelected(item: any) {
-  // item contains { page, name, ... }
+  // Construct the Ref object from the target item
+  const newRef: ManualData = {
+    book: item.ref.book,
+    chapter: item.ref.chapter,
+    verse: item.ref.verse
+  };
+
   if (activeSide.value === 'from') {
     fromPage.value = item.ref.page;
+    fromRef.value = newRef;
   } else {
     toPage.value = item.ref.page;
+    toRef.value = newRef;
     options.changeToPage(item.ref.page);
   }
   targetsOpen.value = false;

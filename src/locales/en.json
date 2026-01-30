@@ -25,6 +25,7 @@
     "direction": { "forward": "Forward", "backward": "Backward" }
   },
   "page": "Page",
+  "separator": " / ",
   "noResults": "No results found",
   "manual": {
     "title": "Enter Location Manually",
