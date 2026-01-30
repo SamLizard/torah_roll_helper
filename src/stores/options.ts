@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 interface State {
-  isInGola: boolean; // TODO 2: make the gola change the data shown.
+  isInGola: boolean; // DONE 2: make the gola change the data shown.
   toPage: number | undefined;
 }
 

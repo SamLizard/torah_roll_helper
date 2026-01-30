@@ -87,6 +87,9 @@ import { ref, computed, watch } from 'vue';
 import { useOptionsStore } from '@/stores/options';
 import targetsData from '@/data/target_pages.json';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 // Type definitions for your JSON data (adjust as needed)
 interface TargetItem {
   key: string;
@@ -132,11 +135,15 @@ const filtered = computed(() => {
   // Cast to typed array
   const list = targetsData as TargetItem[];
   
-  if (!q) return list;
-  
-  return list.filter((t) => {
+  return list.filter((target) => {
+    // Exclude gola-only items when the store says we're not in Gola
+    if (target.gola && !store.isInGola) return false;
+
+    // If no query, include the item (already passed gola check)
+    if (!q) return true;
+
     // Basic search on name, type, and page
-    const searchStr = `${t.name} ${t.type} ${t.ref.page} ${t.en || ''} ${t.he || ''}`.toLowerCase();
+    const searchStr = `${target.key} ${target.type} ${target.ref.page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
     return searchStr.includes(q);
   });
 });
