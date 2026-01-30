@@ -20,7 +20,7 @@
     "showingAll": "Affichage de la liste complète",
     "golaLabel": "Mode Diaspora (Gola)"
   },
-  "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider" },
+  "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer" },
   "result": {
     "title": "Instruction de roulement",
     "noData": "Sélectionnez DE et À pour calculer le roulement",

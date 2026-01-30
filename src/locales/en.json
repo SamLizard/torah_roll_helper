@@ -16,7 +16,7 @@
     "noSelection": "No page selected"
   },
   "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode" },
-  "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page" },
+  "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page", "clear": "Clear" },
   "result": {
     "title": "Roll instruction",
     "noData": "Select both FROM and TO to compute roll",
