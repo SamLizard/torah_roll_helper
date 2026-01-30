@@ -71,7 +71,10 @@
               </v-icon>
               
               <v-icon color="primary" class="me-2" size="small">mdi-bookmark-outline</v-icon>
-              <h3 class="text-h6 font-weight-bold mb-0">{{ $t(`type.${section.type}`) }}</h3>
+              <h3 class="text-h6 font-weight-bold mb-0">
+                {{ $t(`type.${section.type}`) }}
+                <span class="text-body-2 text-medium-emphasis ms-2">({{ section.count }})</span>
+              </h3>
             </div>
 
             <v-expand-transition>
@@ -93,7 +96,10 @@
                     bg-color="surface"
                   >
                     <v-expansion-panel-title class="font-weight-medium">
-                      {{ $t(`group.${group.key}`) }}
+                      <span>
+                        {{ $t(`group.${group.key}`) }}
+                        <span class="text-caption text-medium-emphasis ms-2">({{ group.items.length }})</span>
+                      </span>
                       <template #actions="{ expanded }">
                         <v-icon :icon="expanded ? 'mdi-folder-open-outline' : 'mdi-folder-outline'" />
                       </template>
@@ -289,12 +295,16 @@ const groupedSections = computed(() => {
       }
     });
 
+    // Calculate total count for this Type section
+    const totalCount = finalSingles.length + finalGroups.reduce((sum, g) => sum + g.items.length, 0);
+
     // Only add section if it has content
-    if (finalGroups.length > 0 || finalSingles.length > 0) {
+    if (totalCount > 0) {
       result.push({
         type,
         groups: finalGroups, // You might want to sort these keys if needed
-        singles: finalSingles
+        singles: finalSingles,
+        count: totalCount // <--- Added this line
       });
     }
   }
