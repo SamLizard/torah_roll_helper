@@ -12,7 +12,7 @@
         <LocationSelector
           key="from"
           side="from"
-          :page="fromPage"
+          :page="options.fromPage" 
           :selected-ref="fromRef"
           @open-dicta="openDictaFor('from')"
           @choose-manual="openTargets('from')"
@@ -25,7 +25,7 @@
         <LocationSelector
           key="to"
           side="to"
-          :page="toPage"
+          :page="options.toPage" 
           :selected-ref="toRef"
           :allow-photo-for-to="allowPhotoForTo"
           @open-dicta="openDictaFor('to')"
@@ -40,8 +40,8 @@
         <RollResult
           :pages="roll?.pages ?? null"
           :direction="roll?.rollDirection ?? null"
-          :from-page="fromPage"
-          :to-page="toPage"
+          :from-page="options.fromPage"
+          :to-page="options.toPage"
         />
       </v-col>
     </v-row>
@@ -73,11 +73,13 @@ import type { ManualData } from '@/components/ManualEntryDialog.vue'; // Ensure 
 import { computeRoll } from '@/composables/utils';
 import type { RollInstructions } from '@/types';
 
-/* --- local state --- */
-const fromPage = ref<number | null>(null);
+/* --- Store Access --- */
+const options = useOptionsStore(); // options.fromPage / options.toPage
+
+/* --- Local state --- */
+// fromPage ref REMOVED (using options.fromPage)
 const fromRef = ref<ManualData | null>(null);
 
-const toPage = ref<number | null>(null);
 const toRef = ref<ManualData | null>(null);
 
 const targetsOpen = ref(false);
@@ -89,9 +91,6 @@ const allowPhotoForTo = ref(false);
 /* Dicta dialog state (not implemented here, placeholder) */
 const dictaOpen = ref(false);
 
-/* Use Pinia store to persist isInGola and toPage */
-const options = useOptionsStore();
-
 /* Only show gola option in Targets when 'full list' is opened (per your requirement) */
 const allowGolaInTargets = computed(() => {
   // We expose the gola toggle from TargetOptionsGrid when it's the full list
@@ -101,13 +100,18 @@ const allowGolaInTargets = computed(() => {
 /* --- derived roll --- */
 const roll = ref<RollInstructions | null>(null);
 
-watch([fromPage, toPage], () => {
-  if (fromPage.value != null && toPage.value != null) {
-    roll.value = computeRoll(fromPage.value, toPage.value);
-  } else {
-    roll.value = null;
-  }
-});
+// Watch store values instead of local refs
+watch(
+  [() => options.fromPage, () => options.toPage], 
+  ([newFrom, newTo]) => {
+    if (newFrom != null && newTo != null) {
+      roll.value = computeRoll(newFrom, newTo);
+    } else {
+      roll.value = null;
+    }
+  },
+  { immediate: true }
+);
 
 /* --- handlers --- */
 function openDictaFor(side: 'from' | 'to') {
@@ -124,18 +128,14 @@ function openTargets(side: 'from' | 'to') {
 
 // Handler for Manual Entry (emitted from LocationSelector)
 function onSetFromPage(p: number | null, refData: ManualData | null = null) {
-  fromPage.value = p;
+  options.changeFromPage(p); // Update store
   fromRef.value = refData;
 }
 
 // Handler for Manual Entry (emitted from LocationSelector)
 function onSetToPage(p: number | null, refData: ManualData | null = null) {
-  toPage.value = p;
+  options.changeToPage(p);
   toRef.value = refData;
-  // store the chosen toPage in Pinia as the user requested
-  if (p !== null) {
-    options.changeToPage(p);
-  }
 }
 
 function onTargetSelected(item: any) {
@@ -147,12 +147,11 @@ function onTargetSelected(item: any) {
   };
 
   if (activeSide.value === 'from') {
-    fromPage.value = item.ref.page;
+    options.changeFromPage(item.ref.page);
     fromRef.value = newRef;
   } else {
-    toPage.value = item.ref.page;
-    toRef.value = newRef;
     options.changeToPage(item.ref.page);
+    toRef.value = newRef;
   }
   targetsOpen.value = false;
 }

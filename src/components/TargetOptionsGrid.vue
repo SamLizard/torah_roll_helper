@@ -114,18 +114,31 @@
                           @click="select(item)"
                           v-ripple
                         >
-                      <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
-                      <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
+                          <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
+                          <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
                           <div class="d-flex justify-space-between align-start mb-2">
                             <span class="option-name text-truncate">
                               {{ $t(`readingTargets.${item.key}`) }}
                             </span>
                           </div>
                           
-                      <!-- TODO 5: display a roll preview for the TO? When hover? -->
-                      <!-- TODO 7: add special display for the only gola(/israel) readings. -->
-                          <div class="d-flex align-center text-caption text-medium-emphasis">
+                          <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
+                          <!-- TODO 7: add special display for the only gola(/israel) readings. -->
+                          <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
                             <span>{{ $t('page') }} {{ item.ref.page }}</span>
+
+                            <div 
+                              v-if="getRollPreview(item.ref.page)" 
+                              :class="`text-${getRollPreview(item.ref.page)?.color} d-flex align-center gap-1`"
+                            >
+                              <v-icon size="x-small">
+                                {{ getRollPreview(item.ref.page)?.icon }}
+                              </v-icon>
+                              
+                              <span class="font-weight-bold mx-1">
+                                {{ getRollPreview(item.ref.page)?.text }}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -147,8 +160,17 @@
                       </span>
                     </div>
                     
-                    <div class="d-flex align-center text-caption text-medium-emphasis">
+                    <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
                       <span>{{ $t('page') }} {{ item.ref.page }}</span>
+
+                      <div v-if="getRollPreview(item.ref.page)" :class="`text-${getRollPreview(item.ref.page)?.color}`">
+                        <v-icon size="x-small" class="me-1">
+                          {{ getRollPreview(item.ref.page)?.icon }}
+                        </v-icon>
+                        <span class="font-weight-bold">
+                          {{ getRollPreview(item.ref.page)?.text }}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -164,12 +186,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useOptionsStore } from '@/stores/options';
 import targetsData from '@/data/target_pages.json';
-
+import { computeRoll } from '@/composables/utils'; // Import computeRoll
 import { useI18n } from 'vue-i18n';
+import { useRtl } from 'vuetify';
 const { t } = useI18n();
+const { isRtl } = useRtl();
 
 interface TargetItem {
   key: string;
@@ -189,7 +213,7 @@ const props = defineProps({
   side: { type: String as () => 'from' | 'to', default: 'to' },
   allowGola: { type: Boolean, default: false },
   // Future TODO 6: Pass the group key here (e.g. 'genesis') to auto-open it
-  initialOpenGroup: { type: String, default: null } 
+  initialOpenGroup: { type: String, default: null },
 });
 
 const emit = defineEmits<{
@@ -320,9 +344,45 @@ const select = (item: TargetItem) => {
 const close = () => {
   open.value = false;
 };
+
+// Logic for DONE 5
+const getRollPreview = (targetPage: number) => {
+  // Only show preview if we are selecting 'TO' and we have a 'FROM' page
+  const fromPage = store.fromPage;
+
+  if (props.side !== 'to' || fromPage === null || fromPage === targetPage) {
+    return null;
+  }
+
+  // Calculate logic
+  const result = computeRoll(fromPage, targetPage);
+  if (!result) return null;
+
+  const isForward = result.rollDirection === 'forward';
+  
+  // RTL Logic for Icon Direction
+  // In LTR: Forward = Right Arrow, Backward = Left Arrow
+  // In RTL (Hebrew): Forward (Next Columns) = Left Arrow, Backward = Right Arrow
+  let iconName = '';
+  if (isRtl.value) {
+    iconName = isForward ? 'mdi-arrow-left' : 'mdi-arrow-right';
+  } else {
+    iconName = isForward ? 'mdi-arrow-right' : 'mdi-arrow-left';
+  }
+
+  return {
+    icon: iconName,
+    color: isForward ? 'primary' : 'secondary',
+    text: t('preview.cols', { count: result.pages })
+  };
+};
 </script>
 
 <style scoped>
+.gap-1 {
+  gap: 4px;
+}
+
 .search-container {
   width: 100%;
   max-width: 300px;

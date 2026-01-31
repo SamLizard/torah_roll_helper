@@ -31,6 +31,9 @@
   "page": "Page",
   "separator": " / ",
   "noResults": "Aucun résultat trouvé",
+  "preview": {
+    "cols": "{count} col."
+  },
   "manual": {
     "title": "Entrer le lieu manuellement",
     "book": "Livre",

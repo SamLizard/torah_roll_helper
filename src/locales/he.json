@@ -27,6 +27,9 @@
   "page": "עמוד",
   "separator": " \\ ",
   "noResults": "לא נמצאו תוצאות",
+  "preview": {
+    "cols": "{count} עמ׳"
+  },
   "manual": {
     "title": "הכנס מיקום ידנית",
     "book": "ספר",

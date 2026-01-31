@@ -27,6 +27,9 @@
   "page": "Page",
   "separator": " / ",
   "noResults": "No results found",
+  "preview": {
+    "cols": "{count} cols"
+  },
   "manual": {
     "title": "Enter Location Manually",
     "book": "Book",
