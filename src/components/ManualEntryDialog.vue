@@ -1,4 +1,6 @@
 <template>
+  <!-- TODO 7.7: add an option to choose directly the page (for example, he have tikkun open at some page) -->
+  <!-- Add a horizontal bar, then a input for page? -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rounded-xl pa-4">
       <v-card-title class="text-h6 font-weight-bold">

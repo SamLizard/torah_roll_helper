@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 7.8: Add an arrow for the FROM -> TO, so the user saws directly the direction (pay attention to mobile) -->
   <v-container fluid class="pa-4">
     <v-row>
       <!-- TODO 8: Add the calendar view here, and in the manual choose. Here to display the few next readings (if clicked, chosen as TO). -->
