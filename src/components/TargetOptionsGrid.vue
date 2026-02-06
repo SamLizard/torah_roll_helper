@@ -37,6 +37,7 @@
             <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
           </div>
           
+          <!-- TODO 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
           <div v-if="allowGola" class="d-flex align-center bg-surface px-4 rounded-lg border">
             <v-switch
               v-model="localIsInGola"
@@ -204,6 +205,7 @@ import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils'; // Import computeRoll
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
+import { f } from 'vue-router/dist/router-CWoNjPRp.mjs';
 const { t } = useI18n();
 const { isRtl } = useRtl();
 
@@ -271,8 +273,8 @@ const toggleSection = (type: string) => {
   sectionCollapsed.value[type] = !sectionCollapsed.value[type];
 };
 
-const filtered = computed(() => {
-  const q = filter.value.trim().toLowerCase();
+const filtered = computed(() => {  
+  const q = filter.value?.trim()?.toLowerCase();
   const list = targetsData as TargetItem[];
   
   return list.filter((target) => {
@@ -349,6 +351,8 @@ const groupedSections = computed(() => {
 });
 
 const select = (item: TargetItem) => {  
+  filter.value = '';
+  
   emit('select', item);
   open.value = false;
 };
