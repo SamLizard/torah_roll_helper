@@ -24,7 +24,7 @@ export default defineConfig({
       ],
     }),
   ],
-  base: '/torahRollHelper/', 
+  base: '/torah_roll_helper/', 
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

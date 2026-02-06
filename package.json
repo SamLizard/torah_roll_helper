@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -33,6 +34,7 @@
     "@vue/tsconfig": "^0.5.0",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^9.17.0",
+    "gh-pages": "^6.3.0",
     "npm-run-all2": "^6.1.1",
     "sass": "^1.69.7",
     "typescript": "^5.9.3",
