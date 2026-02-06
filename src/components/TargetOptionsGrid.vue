@@ -212,7 +212,7 @@ const props = defineProps({
   modelValue: { type: Boolean, default: false },
   side: { type: String as () => 'from' | 'to', default: 'to' },
   allowGola: { type: Boolean, default: false },
-  // Future TODO 6: Pass the group key here (e.g. 'genesis') to auto-open it
+  // Future TODO 8.5: Pass the group key here (e.g. 'genesis') to auto-open it
   initialOpenGroup: { type: String, default: null },
 });
 
@@ -243,7 +243,7 @@ const open = computed({
   set: (v: boolean) => emit('update:modelValue', v)
 });
 
-// Watch for the prop to set initial open group (For TODO 6)
+// Watch for the prop to set initial open group (For TODO 8.5)
 watch(() => props.initialOpenGroup, (newVal) => {
   if (newVal) {
     // Add the group to the open list if not already there

@@ -48,7 +48,7 @@
     </v-row>
 
     <!-- Target list modal (full-screen). Component emits 'select' with item -->
-    <!-- TODO 6: make the current (next reading) parasha look different, and start by looking at it? -->
+    <!-- TODO 8.5: make the current (next reading) parasha look different, and start by looking at it? -->
     <!-- DONE 3: Add titles to group of targets (book separation, holiday separation) -->
     <!-- So there is the first separation by type (parasha/holyday) - add type.parasha and type.holydays to i18n, and display it -->
     <!-- And there is the second separation by group (only if there) is more than 1 item with this group. Take from group.group in i18n -->
