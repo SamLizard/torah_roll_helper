@@ -10,12 +10,6 @@ import path from 'path';
 export default defineConfig({
   server: {
     port: 8081,
-    hmr: {
-      protocol: 'ws',
-      host: 'localhost',
-      port: 8081,
-    },
-    middlewareMode: false,
   },
   plugins: [
     vue({
@@ -30,6 +24,7 @@ export default defineConfig({
       ],
     }),
   ],
+  base: '/torahRollHelper/', 
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

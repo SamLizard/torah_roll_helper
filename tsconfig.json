@@ -9,12 +9,12 @@
     }
   ],
   "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "types": ["vite/client"],
+    "strict": true,
+    "jsx": "preserve",
     "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  },
-  "include": ["src/**/*"]
+  }
 }
