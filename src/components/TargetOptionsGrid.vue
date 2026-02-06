@@ -205,7 +205,6 @@ import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils'; // Import computeRoll
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
-import { f } from 'vue-router/dist/router-CWoNjPRp.mjs';
 const { t } = useI18n();
 const { isRtl } = useRtl();
 

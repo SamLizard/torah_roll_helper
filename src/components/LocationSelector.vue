@@ -6,11 +6,18 @@
       <template #title>
         <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
       </template>
+      <!-- TODO 7.9: fix subtitle hidden by actions. -->
       <template #subtitle>
         <div class="text-caption">{{ $t(`home.${side}.subtitle`) }}</div>
       </template>
       <template #append>
         <div class="d-flex gap-2">
+          <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
+            {{ $t('home.actions.choose') }}
+          </v-btn>          
+          <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
+            {{ $t('home.actions.photo') }}
+          </v-btn>
           <v-btn 
             size="small" 
             variant="tonal" 
@@ -19,13 +26,6 @@
             @click="isManualOpen = true"
           >
             {{ $t('home.actions.input') }}
-          </v-btn>
-
-          <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
-            {{ $t('home.actions.photo') }}
-          </v-btn>
-          <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
-            {{ $t('home.actions.choose') }}
           </v-btn>
         </div>
       </template>
