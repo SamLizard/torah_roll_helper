@@ -15,7 +15,7 @@
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"
   },
-  "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה" },
+  "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה", "golaBadge": "גולה" },
   "actions": { "close": "סגור", "search": "חיפוש...", "cancel": "ביטול", "confirm": "קבע עמוד", "clear": "נקה" },
   "result": {
     "title": "הוראת גלילה",

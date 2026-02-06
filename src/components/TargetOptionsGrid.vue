@@ -111,11 +111,17 @@
                           v-for="item in group.items"
                           :key="item.key"
                           class="option-card"
+                          :class="{ 'gola-card': item.gola }"
                           @click="select(item)"
                           v-ripple
                         >
                           <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
                           <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
+                          <div v-if="item.gola" class="gola-badge">
+                            <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
+                            <span>{{ $t('targets.golaBadge') }}</span>
+                          </div>
+
                           <div class="d-flex justify-space-between align-start mb-2">
                             <span class="option-name text-truncate">
                               {{ $t(`readingTargets.${item.key}`) }}
@@ -123,7 +129,7 @@
                           </div>
                           
                           <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
-                          <!-- TODO 7: add special display for the only gola(/israel) readings. -->
+                          <!-- DONE 7: add special display for the only gola readings. -->
                           <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
                             <span>{{ $t('page') }} {{ item.ref.page }}</span>
 
@@ -151,9 +157,15 @@
                     v-for="item in section.singles"
                     :key="item.key"
                     class="option-card"
+                    :class="{ 'gola-card': item.gola }"
                     @click="select(item)"
                     v-ripple
                   >
+                    <div v-if="item.gola" class="gola-badge">
+                      <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
+                      <span>{{ $t('targets.golaBadge') }}</span>
+                    </div>
+
                     <div class="d-flex justify-space-between align-start mb-2">
                       <span class="option-name text-truncate">
                         {{ $t(`readingTargets.${item.key}`) }}
@@ -417,10 +429,34 @@ const getRollPreview = (targetPage: number) => {
   border-color: rgb(var(--v-theme-primary));
 }
 
+/* Styles for Gola items */
+.gola-card {
+  border-color: rgba(var(--v-theme-primary), 0.3);
+  background-color: rgba(var(--v-theme-primary), 0.03); /* Very light tint */
+}
+
+.gola-badge {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px; /* Use logical CSS if preferred: inset-inline-end: 8px */
+  background-color: rgba(var(--v-theme-surface), 0.9);
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgb(var(--v-theme-primary));
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
 .option-name { 
   font-weight: 600; 
   font-size: 1rem;
   line-height: 1.2;
+  /* Ensure text doesn't overlap the badge if name is long */
+  padding-inline-end: 20px;
 }
 
 /* Specific style to make expansion panels blend better */

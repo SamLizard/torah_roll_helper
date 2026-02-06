@@ -15,11 +15,7 @@
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
   },
-  "targets": {
-    "title": "Choisir une cible",
-    "showingAll": "Affichage de la liste complète",
-    "golaLabel": "Mode Diaspora (Gola)"
-  },
+  "targets": { "title": "Choisir une cible", "showingAll": "Affichage de la liste complète", "golaLabel": "Mode Diaspora (Gola)", "golaBadge": "Gola" },
   "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer" },
   "result": {
     "title": "Instruction de roulement",
