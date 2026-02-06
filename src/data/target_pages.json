@@ -1,0 +1,1070 @@
+[
+  {
+    "key": "bereshit",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 1,
+      "verse": 1,
+      "page": 1
+    }
+  },
+  {
+    "key": "noach",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 6,
+      "verse": 9,
+      "page": 6
+    }
+  },
+  {
+    "key": "lech_lecha",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 12,
+      "verse": 1,
+      "page": 12
+    }
+  },
+  {
+    "key": "vayera",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 18,
+      "verse": 1,
+      "page": 17
+    }
+  },
+  {
+    "key": "chayei_sara",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 23,
+      "verse": 1,
+      "page": 23
+    }
+  },
+  {
+    "key": "toldot",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 25,
+      "verse": 19,
+      "page": 27
+    }
+  },
+  {
+    "key": "vayetzei",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 28,
+      "verse": 10,
+      "page": 31
+    }
+  },
+  {
+    "key": "vayishlach",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 32,
+      "verse": 4,
+      "page": 37
+    }
+  },
+  {
+    "key": "vayeshev",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 37,
+      "verse": 1,
+      "page": 42
+    }
+  },
+  {
+    "key": "miketz",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 41,
+      "verse": 1,
+      "page": 47
+    }
+  },
+  {
+    "key": "vayigash",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 44,
+      "verse": 18,
+      "page": 53
+    }
+  },
+  {
+    "key": "vayechi",
+    "group": "genesis",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 1,
+      "chapter": 47,
+      "verse": 28,
+      "page": 57
+    }
+  },
+  {
+    "key": "shemot",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 1,
+      "verse": 1,
+      "page": 61
+    }
+  },
+  {
+    "key": "vaera",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 6,
+      "verse": 2,
+      "page": 66
+    }
+  },
+  {
+    "key": "bo",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 10,
+      "verse": 1,
+      "page": 71
+    }
+  },
+  {
+    "key": "beshalach",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 17,
+      "page": 76
+    }
+  },
+  {
+    "key": "yitro",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 18,
+      "verse": 1,
+      "page": 81
+    }
+  },
+  {
+    "key": "mishpatim",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 21,
+      "verse": 1,
+      "page": 84
+    }
+  },
+  {
+    "key": "terumah",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 25,
+      "verse": 1,
+      "page": 89
+    }
+  },
+  {
+    "key": "tetzaveh",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 27,
+      "verse": 20,
+      "page": 92
+    }
+  },
+  {
+    "key": "ki_tisa",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 30,
+      "verse": 11,
+      "page": 97
+    }
+  },
+  {
+    "key": "vayakhel",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 35,
+      "verse": 1,
+      "page": 103
+    }
+  },
+  {
+    "key": "pekudei",
+    "group": "exodus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 2,
+      "chapter": 38,
+      "verse": 21,
+      "page": 108
+    }
+  },
+  {
+    "key": "vayikra",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 1,
+      "verse": 1,
+      "page": 111
+    }
+  },
+  {
+    "key": "tzav",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 6,
+      "verse": 1,
+      "page": 117
+    }
+  },
+  {
+    "key": "shmini",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 9,
+      "verse": 1,
+      "page": 121
+    }
+  },
+  {
+    "key": "tazria",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 12,
+      "verse": 1,
+      "page": 124
+    }
+  },
+  {
+    "key": "metzora",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 14,
+      "verse": 1,
+      "page": 127
+    }
+  },
+  {
+    "key": "achrei_mot",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 16,
+      "verse": 1,
+      "page": 131
+    }
+  },
+  {
+    "key": "kedoshim",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 19,
+      "verse": 1,
+      "page": 135
+    }
+  },
+  {
+    "key": "emor",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 21,
+      "verse": 1,
+      "page": 137
+    }
+  },
+  {
+    "key": "behar",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 25,
+      "verse": 1,
+      "page": 143
+    }
+  },
+  {
+    "key": "bechukotai",
+    "group": "leviticus",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 3,
+      "chapter": 26,
+      "verse": 3,
+      "page": 145
+    }
+  },
+  {
+    "key": "bamidbar",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 1,
+      "verse": 1,
+      "page": 148
+    }
+  },
+  {
+    "key": "nasso",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 4,
+      "verse": 21,
+      "page": 154
+    }
+  },
+  {
+    "key": "behaalotcha",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 8,
+      "verse": 1,
+      "page": 162
+    }
+  },
+  {
+    "key": "shlach",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 13,
+      "verse": 1,
+      "page": 168
+    }
+  },
+  {
+    "key": "korach",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 16,
+      "verse": 1,
+      "page": 172
+    }
+  },
+  {
+    "key": "chukat",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 19,
+      "verse": 1,
+      "page": 177
+    }
+  },
+  {
+    "key": "balak",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 22,
+      "verse": 2,
+      "page": 180
+    }
+  },
+  {
+    "key": "pinchas",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 25,
+      "verse": 10,
+      "page": 185
+    }
+  },
+  {
+    "key": "matot",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 30,
+      "verse": 2,
+      "page": 191
+    }
+  },
+  {
+    "key": "masei",
+    "group": "numbers",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 4,
+      "chapter": 33,
+      "verse": 1,
+      "page": 196
+    }
+  },
+  {
+    "key": "devarim",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 1,
+      "verse": 1,
+      "page": 200
+    }
+  },
+  {
+    "key": "vaetchanan",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 3,
+      "verse": 23,
+      "page": 205
+    }
+  },
+  {
+    "key": "eikev",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 7,
+      "verse": 12,
+      "page": 211
+    }
+  },
+  {
+    "key": "reeh",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 11,
+      "verse": 26,
+      "page": 217
+    }
+  },
+  {
+    "key": "shoftim",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 16,
+      "verse": 18,
+      "page": 223
+    }
+  },
+  {
+    "key": "ki_teitzei",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 21,
+      "verse": 10,
+      "page": 227
+    }
+  },
+  {
+    "key": "ki_tavo",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 26,
+      "verse": 1,
+      "page": 232
+    }
+  },
+  {
+    "key": "nitzavim",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 29,
+      "verse": 9,
+      "page": 238
+    }
+  },
+  {
+    "key": "vayeilech",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 31,
+      "verse": 1,
+      "page": 240
+    }
+  },
+  {
+    "key": "haazinu",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 32,
+      "verse": 1,
+      "page": 242
+    }
+  },
+  {
+    "key": "vezot_haberakhah",
+    "group": "deuteronomy",
+    "gola": false,
+    "type": "parasha",
+    "ref": {
+      "book": 5,
+      "chapter": 33,
+      "verse": 1,
+      "page": 244
+    }
+  },
+  {
+    "key": "rosh-chodesh",
+    "group": "rosh-chodesh",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 28,
+      "verse": 1,
+      "page": 189
+    }
+  },
+  {
+    "key": "rosh-1",
+    "group": "rosh",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 1,
+      "chapter": 21,
+      "verse": 1,
+      "page": 20
+    }
+  },
+  {
+    "key": "rosh-2",
+    "group": "rosh",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 1,
+      "chapter": 22,
+      "verse": 1,
+      "page": 22
+    }
+  },
+  {
+    "key": "yom-kippur",
+    "group": "yom-kippur",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 16,
+      "verse": 1,
+      "page": 131
+    }
+  },
+  {
+    "key": "sukkot-1",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "key": "sukkot-2",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "key": "sukkot-3",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 17,
+      "page": 190
+    }
+  },
+  {
+    "key": "sukkot-4",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 20,
+      "page": 191
+    }
+  },
+  {
+    "key": "sukkot-5",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 23,
+      "page": 191
+    }
+  },
+  {
+    "key": "sukkot-6",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 26,
+      "page": 191
+    }
+  },
+  {
+    "key": "sukkot-7",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 29,
+      "verse": 26,
+      "page": 191
+    }
+  },
+  {
+    "key": "sukkot-shabbat-chol-hamoed",
+    "group": "sukkot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 33,
+      "verse": 12,
+      "page": 101
+    }
+  },
+  {
+    "key": "shmini-atzeret",
+    "group": "shmini-atzeret",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "key": "simchat-torah",
+    "group": "simchat-torah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 33,
+      "verse": 1,
+      "page": 244
+    }
+  },
+  {
+    "key": "chanukah-1",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 1,
+      "page": 158
+    }
+  },
+  {
+    "key": "chanukah-2",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 18,
+      "page": 159
+    }
+  },
+  {
+    "key": "chanukah-3",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 24,
+      "page": 159
+    }
+  },
+  {
+    "key": "chanukah-4",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 30,
+      "page": 159
+    }
+  },
+  {
+    "key": "chanukah-5",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 36,
+      "page": 160
+    }
+  },
+  {
+    "key": "chanukah-7",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 48,
+      "page": 160
+    }
+  },
+  {
+    "key": "chanukah-8",
+    "group": "chanukah",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 7,
+      "verse": 54,
+      "page": 160
+    }
+  },
+  {
+    "key": "purim",
+    "group": "purim",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 17,
+      "verse": 8,
+      "page": 81
+    }
+  },
+  {
+    "key": "taanit-tzibur",
+    "group": "taanit-tzibur",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 32,
+      "verse": 11,
+      "page": 99
+    }
+  },
+  {
+    "key": "pesach-1",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 12,
+      "verse": 21,
+      "page": 74
+    }
+  },
+  {
+    "key": "pesach-2",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 3,
+      "chapter": 22,
+      "verse": 26,
+      "page": 139
+    }
+  },
+  {
+    "key": "pesach-3",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 1,
+      "page": 75
+    }
+  },
+  {
+    "key": "pesach-4",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 22,
+      "verse": 24,
+      "page": 87
+    }
+  },
+  {
+    "key": "pesach-5",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 34,
+      "verse": 1,
+      "page": 101
+    }
+  },
+  {
+    "key": "pesach-6",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 4,
+      "chapter": 9,
+      "verse": 1,
+      "page": 163
+    }
+  },
+  {
+    "key": "pesach-shabbat-chol-hamoed",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 33,
+      "verse": 12,
+      "page": 101
+    }
+  },
+  {
+    "key": "pesach-7",
+    "group": "pesach",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 13,
+      "verse": 17,
+      "page": 76
+    }
+  },
+  {
+    "key": "pesach-8",
+    "group": "pesach",
+    "gola": true,
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "key": "shavuot-1",
+    "group": "shavuot",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 2,
+      "chapter": 19,
+      "verse": 1,
+      "page": 82
+    }
+  },
+  {
+    "key": "shavuot-2",
+    "group": "shavuot",
+    "gola": true,
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 14,
+      "verse": 22,
+      "page": 220
+    }
+  },
+  {
+    "key": "tisha-bav",
+    "group": "tisha-bav",
+    "gola": false,
+    "type": "holyday",
+    "ref": {
+      "book": 5,
+      "chapter": 4,
+      "verse": 25,
+      "page": 207
+    }
+  }
+]

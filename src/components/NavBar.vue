@@ -1,15 +1,20 @@
 <template>
-  <v-app-bar app color="#f2f2f2" :align="$vuetify.locale.isRtl ? 'right' : 'left'" class="navbar" flat>
-    <v-toolbar-title>
-      <strong>{{ $t("title") }}</strong>
+  <v-app-bar app color="#f2f2f2" :align="$vuetify.locale.isRtl ? 'right' : 'left'" flat density="comfortable">
+    <v-toolbar-title class="font-weight-bold">
+      {{ $t("title") }}
     </v-toolbar-title>
-    <div class="route-links-container">
-      <v-btn v-for="route in router.getRoutes()" v-show="showRoute(route)" :key="route.path"
-        :color="route.path === router.currentRoute.value.path ? 'primary' : ''" :to="route.path" variant="elevated"
-        active-class="no-active" flex-grow>
+    <!-- <div class="route-links-container">
+      <v-btn
+        v-for="route in router.getRoutes()"
+        :key="route.path"
+        :color="isActive(route.path) ? 'primary' : undefined"
+        :to="route.path"
+        variant="elevated"
+        active-class="no-active" flex-grow
+      >
         {{ $t("routes." + route.name?.toString()) }}
       </v-btn>
-    </div>
+    </div> -->
     <v-spacer v-for="i in 3" :key="i"></v-spacer>
     <div>
       <v-toolbar-items>
@@ -25,18 +30,12 @@ import LanguageSelection from "./LanguageSelection.vue";
 
 const router = useRouter();
 
-const allowedRoutes = ['home'];
-
-const showRoute = (route: any): boolean => {
-  return !allowedRoutes.includes(route.name) || route.name === 'home';
+const isActive = (path: string): boolean => {
+  return router.currentRoute.value.path === path;
 };
 </script>
-<style scoped>
-.navbar {
-  background-color: #f2f2f2;
-  /*#f8f9fa;*/
-}
 
+<style scoped>
 .route-links-container {
   display: flex;
   justify-content: space-evenly;

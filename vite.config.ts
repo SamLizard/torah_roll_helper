@@ -9,7 +9,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    port: 8080,
+    port: 8081,
   },
   plugins: [
     vue({
@@ -24,6 +24,7 @@ export default defineConfig({
       ],
     }),
   ],
+  base: '/torah_roll_helper/', 
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
