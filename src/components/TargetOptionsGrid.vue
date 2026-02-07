@@ -1,205 +1,207 @@
 <template>
-  <!-- TODO 7.5: Change it so the navbar is always accessible. Maybe add a navbar instance? Or change from v-dialog to regular page? -->
-  <v-dialog 
-    v-model="open" 
-    fullscreen 
-    transition="dialog-bottom-transition"
-    scrollable
-  >
-    <v-card class="bg-background">
-      <v-toolbar color="surface" elevation="1">
-        <v-btn icon @click="close">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ $t('targets.title') }}</v-toolbar-title>
+  <!-- DONE 7.5: Change it so the navbar is always accessible. Maybe add a navbar instance? Or change from v-dialog to regular page? -->
+  <transition name="dialog-bottom-transition">
+    <div 
+      v-if="open" 
+      class="target-overlay bg-background"
+    >
+      <v-card class="h-100 d-flex flex-column" rounded="0" elevation="0">
         
-        <v-spacer />
-        
-        <div class="search-container me-4">
-          <v-text-field
-            v-model="filter"
-            :placeholder="$t('actions.search')"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            density="compact"
-            hide-details
-            clearable
-            single-line
-            rounded="lg"
-          />
-        </div>
-      </v-toolbar>
-
-      <v-card-text class="pa-4">
-        <div v-if="isFullList" class="d-flex align-center justify-space-between mb-6">
-          <div class="text-subtitle-1 font-weight-medium">
-            {{ $t('targets.showingAll') }} 
-            <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
-          </div>
+        <v-toolbar color="surface" elevation="1" density="compact">
+          <v-btn icon @click="close">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title class="text-subtitle-1 font-weight-bold">
+            {{ $t('targets.title') }}
+          </v-toolbar-title>
           
-          <!-- TODO 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
-          <div v-if="allowGola" class="d-flex align-center bg-surface px-4 rounded-lg border">
-            <v-switch
-              v-model="localIsInGola"
-              :label="$t('targets.golaLabel')"
-              color="primary"
-              hide-details
+          <v-spacer />
+          
+          <div class="search-container me-4">
+            <v-text-field
+              v-model="filter"
+              :placeholder="$t('actions.search')"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
               density="compact"
-              inset
+              hide-details
+              clearable
+              single-line
+              rounded="lg"
             />
           </div>
-        </div>
+        </v-toolbar>
 
-        <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
-          {{ $t('noResults') }}
-        </div>
-
-        <template v-else>
-          <div v-for="section in groupedSections" :key="section.type" class="mb-8">
-            
-            <div 
-              class="d-flex align-center mb-3 cursor-pointer user-select-none" 
-              @click="toggleSection(section.type)"
-              v-ripple
-              style="width: fit-content; border-radius: 8px; padding: 4px 8px; margin-left: -8px;"
-            >
-              <v-icon 
-                class="me-2 transition-transform" 
-                :class="{ 'rotate-minus-90': sectionCollapsed[section.type] }"
-                color="primary"
-              >
-                mdi-chevron-down
-              </v-icon>
-              
-              <v-icon color="primary" class="me-2" size="small">mdi-bookmark-outline</v-icon>
-              <h3 class="text-h6 font-weight-bold mb-0">
-                {{ $t(`type.${section.type}`) }}
-                <span class="text-body-2 text-medium-emphasis ms-2">({{ section.count }})</span>
-              </h3>
+        <v-card-text class="pa-4 flex-grow-1 overflow-y-auto">
+          <div v-if="isFullList" class="d-flex align-center justify-space-between mb-6">
+            <div class="text-subtitle-1 font-weight-medium">
+              {{ $t('targets.showingAll') }} 
+              <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
             </div>
+            
+            <!-- TODO 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
+            <div v-if="allowGola" class="d-flex align-center bg-surface px-4 rounded-lg border">
+              <v-switch
+                v-model="localIsInGola"
+                :label="$t('targets.golaLabel')"
+                color="primary"
+                hide-details
+                density="compact"
+                inset
+              />
+            </div>
+          </div>
 
-            <v-expand-transition>
-              <div v-show="!sectionCollapsed[section.type]">
-                
-                <v-expansion-panels 
-                  v-if="section.groups.length > 0" 
-                  v-model="openGroups" 
-                  variant="accordion" 
-                  class="mb-4 rounded-lg border" 
-                  flat
-                  multiple
+          <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
+            {{ $t('noResults') }}
+          </div>
+
+          <template v-else>
+            <div v-for="section in groupedSections" :key="section.type" class="mb-8">
+              
+              <div 
+                class="d-flex align-center mb-3 cursor-pointer user-select-none" 
+                @click="toggleSection(section.type)"
+                v-ripple
+                style="width: fit-content; border-radius: 8px; padding: 4px 8px; margin-left: -8px;"
+              >
+                <v-icon 
+                  class="me-2 transition-transform" 
+                  :class="{ 'rotate-minus-90': sectionCollapsed[section.type] }"
+                  color="primary"
                 >
-                  <v-expansion-panel
-                    v-for="group in section.groups"
-                    :key="group.key"
-                    :value="group.key"
-                    elevation="0"
-                    bg-color="surface"
+                  mdi-chevron-down
+                </v-icon>
+                
+                <v-icon color="primary" class="me-2" size="small">mdi-bookmark-outline</v-icon>
+                <h3 class="text-h6 font-weight-bold mb-0">
+                  {{ $t(`type.${section.type}`) }}
+                  <span class="text-body-2 text-medium-emphasis ms-2">({{ section.count }})</span>
+                </h3>
+              </div>
+
+              <v-expand-transition>
+                <div v-show="!sectionCollapsed[section.type]">
+                  
+                  <v-expansion-panels 
+                    v-if="section.groups.length > 0" 
+                    v-model="openGroups" 
+                    variant="accordion" 
+                    class="mb-4 rounded-lg border" 
+                    flat
+                    multiple
                   >
-                    <v-expansion-panel-title class="font-weight-medium">
-                      <span>
-                        {{ $t(`group.${group.key}`) }}
-                        <span class="text-caption text-medium-emphasis ms-2">({{ group.items.length }})</span>
-                      </span>
-                      <template #actions="{ expanded }">
-                        <v-icon :icon="expanded ? 'mdi-folder-open-outline' : 'mdi-folder-outline'" />
-                      </template>
-                    </v-expansion-panel-title>
-                    
-                    <v-expansion-panel-text>
-                      <div class="options-grid pt-2">
-                        <div
-                          v-for="item in group.items"
-                          :key="item.key"
-                          class="option-card"
-                          :class="{ 'gola-card': item.gola }"
-                          @click="select(item)"
-                          v-ripple
-                        >
-                          <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
-                          <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
-                          <div v-if="item.gola" class="gola-badge">
-                            <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
-                            <span>{{ $t('targets.golaBadge') }}</span>
-                          </div>
+                    <v-expansion-panel
+                      v-for="group in section.groups"
+                      :key="group.key"
+                      :value="group.key"
+                      elevation="0"
+                      bg-color="surface"
+                    >
+                      <v-expansion-panel-title class="font-weight-medium">
+                        <span>
+                          {{ $t(`group.${group.key}`) }}
+                          <span class="text-caption text-medium-emphasis ms-2">({{ group.items.length }})</span>
+                        </span>
+                        <template #actions="{ expanded }">
+                          <v-icon :icon="expanded ? 'mdi-folder-open-outline' : 'mdi-folder-outline'" />
+                        </template>
+                      </v-expansion-panel-title>
+                      
+                      <v-expansion-panel-text>
+                        <div class="options-grid pt-2">
+                          <div
+                            v-for="item in group.items"
+                            :key="item.key"
+                            class="option-card"
+                            :class="{ 'gola-card': item.gola }"
+                            @click="select(item)"
+                            v-ripple
+                          >
+                            <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
+                            <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
+                            <div v-if="item.gola" class="gola-badge">
+                              <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
+                              <span>{{ $t('targets.golaBadge') }}</span>
+                            </div>
 
-                          <div class="d-flex justify-space-between align-start mb-2">
-                            <span class="option-name text-truncate">
-                              {{ $t(`readingTargets.${item.key}`) }}
-                            </span>
-                          </div>
-                          
-                          <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
-                          <!-- DONE 7: add special display for the only gola readings. -->
-                          <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                            <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                            <div 
-                              v-if="getRollPreview(item.ref.page)" 
-                              :class="`text-${getRollPreview(item.ref.page)?.color} d-flex align-center gap-1`"
-                            >
-                              <v-icon size="x-small">
-                                {{ getRollPreview(item.ref.page)?.icon }}
-                              </v-icon>
-                              
-                              <span class="font-weight-bold mx-1">
-                                {{ getRollPreview(item.ref.page)?.text }}
+                            <div class="d-flex justify-space-between align-start mb-2">
+                              <span class="option-name text-truncate">
+                                {{ $t(`readingTargets.${item.key}`) }}
                               </span>
+                            </div>
+                            
+                            <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
+                            <!-- DONE 7: add special display for the only gola readings. -->
+                            <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
+                              <span>{{ $t('page') }} {{ item.ref.page }}</span>
+
+                              <div 
+                                v-if="getRollPreview(item.ref.page)" 
+                                :class="`text-${getRollPreview(item.ref.page)?.color} d-flex align-center gap-1`"
+                              >
+                                <v-icon size="x-small">
+                                  {{ getRollPreview(item.ref.page)?.icon }}
+                                </v-icon>
+                                
+                                <span class="font-weight-bold mx-1">
+                                  {{ getRollPreview(item.ref.page)?.text }}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+
+                  <div v-if="section.singles.length > 0" class="options-grid">
+                    <div
+                      v-for="item in section.singles"
+                      :key="item.key"
+                      class="option-card"
+                      :class="{ 'gola-card': item.gola }"
+                      @click="select(item)"
+                      v-ripple
+                    >
+                      <div v-if="item.gola" class="gola-badge">
+                        <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
+                        <span>{{ $t('targets.golaBadge') }}</span>
                       </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
 
-                <div v-if="section.singles.length > 0" class="options-grid">
-                  <div
-                    v-for="item in section.singles"
-                    :key="item.key"
-                    class="option-card"
-                    :class="{ 'gola-card': item.gola }"
-                    @click="select(item)"
-                    v-ripple
-                  >
-                    <div v-if="item.gola" class="gola-badge">
-                      <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
-                      <span>{{ $t('targets.golaBadge') }}</span>
-                    </div>
-
-                    <div class="d-flex justify-space-between align-start mb-2">
-                      <span class="option-name text-truncate">
-                        {{ $t(`readingTargets.${item.key}`) }}
-                      </span>
-                    </div>
-                    
-                    <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                      <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                      <div v-if="getRollPreview(item.ref.page)" :class="`text-${getRollPreview(item.ref.page)?.color}`">
-                        <v-icon size="x-small" class="me-1">
-                          {{ getRollPreview(item.ref.page)?.icon }}
-                        </v-icon>
-                        <span class="font-weight-bold">
-                          {{ getRollPreview(item.ref.page)?.text }}
+                      <div class="d-flex justify-space-between align-start mb-2">
+                        <span class="option-name text-truncate">
+                          {{ $t(`readingTargets.${item.key}`) }}
                         </span>
+                      </div>
+                      
+                      <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
+                        <span>{{ $t('page') }} {{ item.ref.page }}</span>
+
+                        <div v-if="getRollPreview(item.ref.page)" :class="`text-${getRollPreview(item.ref.page)?.color}`">
+                          <v-icon size="x-small" class="me-1">
+                            {{ getRollPreview(item.ref.page)?.icon }}
+                          </v-icon>
+                          <span class="font-weight-bold">
+                            {{ getRollPreview(item.ref.page)?.text }}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
+
                 </div>
-
-              </div>
-            </v-expand-transition>
-          </div>
-        </template>
-
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+              </v-expand-transition>
+            </div>
+          </template>
+        </v-card-text>
+      </v-card>
+    </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useOptionsStore } from '@/stores/options';
 import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils'; // Import computeRoll
@@ -254,6 +256,29 @@ watch(localIsInGola, (v) => store.changeIsInGola(v));
 const open = computed({
   get: () => props.modelValue,
   set: (v: boolean) => emit('update:modelValue', v)
+});
+
+// Handle ESC key to close
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && open.value) {
+    close();
+  }
+};
+
+// Toggle body scroll when opened/closed
+watch(open, (isOpen) => {
+  if (isOpen) {
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeydown);
+  } else {
+    document.body.style.overflow = '';
+    window.removeEventListener('keydown', onKeydown);
+  }
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+  window.removeEventListener('keydown', onKeydown);
 });
 
 // Watch for the prop to set initial open group (For TODO 8.5)
@@ -394,6 +419,35 @@ const getRollPreview = (targetPage: number) => {
 </script>
 
 <style scoped>
+/* FULL SCREEN OVERLAY
+  - Fixed position
+  - z-index: 950 (Below NavBar which is usually >1000)
+  - padding-top: 64px (To prevent content from hiding behind NavBar)
+*/
+.target-overlay {
+  position: fixed;
+  inset: 0; /* top:0, right:0, bottom:0, left:0 */
+  z-index: 950;
+  
+  /* Safe area for navbar - usually 56px-64px depending on density */
+  padding-top: 64px; 
+  
+  display: flex;
+  flex-direction: column;
+}
+
+/* ANIMATION 
+  Replicating the dialog-bottom-transition 
+*/
+.dialog-bottom-transition-enter-active,
+.dialog-bottom-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.dialog-bottom-transition-enter-from,
+.dialog-bottom-transition-leave-to {
+  transform: translateY(100%);
+}
+
 .gap-1 {
   gap: 4px;
 }
@@ -461,6 +515,12 @@ const getRollPreview = (targetPage: number) => {
   /* Ensure text doesn't overlap the badge if name is long */
   padding-inline-end: 20px;
 }
+
+/* .targets-dialog :deep(.v-overlay__content) {
+  top: var(--v-layout-top, 64px);
+  height: calc(100% - var(--v-layout-top, 64px));
+  max-height: none;
+} */
 
 /* Specific style to make expansion panels blend better */
 :deep(.v-expansion-panel) {
