@@ -16,7 +16,7 @@
     "noSelection": "Aucune page sélectionnée"
   },
   "targets": { "title": "Choisir une cible", "showingAll": "Affichage de la liste complète", "golaLabel": "Mode Diaspora (Gola)", "golaBadge": "Gola" },
-  "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer" },
+  "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer", "restore": "Restaurer" },
   "result": {
     "title": "Instruction de roulement",
     "noData": "Sélectionnez DE et À pour calculer le roulement",
@@ -35,9 +35,13 @@
     "book": "Livre",
     "chapter": "Chapitre",
     "verse": "Verset",
+    "use_page": "J'ai deja la page",
+    "page": "Page",
     "required": "Requis",
+    "must_be_positive": "Doit etre positif",
     "max_chapter": "Le chapitre max est",
-    "max_verse": "Le verset max est"
+    "max_verse": "Le verset max est",
+    "max_page": "La page max est"
   },
   "type": {
     "parasha": "Parachot",

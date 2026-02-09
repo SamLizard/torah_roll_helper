@@ -66,6 +66,7 @@
     <ManualEntryDialog 
       v-model="isManualOpen"
       :initial-data="currentRef"
+      :initial-page="page"
       @save="onManualSave"
       @draft="onManualDraft"
     />

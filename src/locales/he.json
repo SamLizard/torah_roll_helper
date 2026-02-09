@@ -16,7 +16,7 @@
     "noSelection": "לא נבחרה עמודה"
   },
   "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה", "golaBadge": "גולה" },
-  "actions": { "close": "סגור", "search": "חיפוש...", "cancel": "ביטול", "confirm": "קבע עמוד", "clear": "נקה" },
+  "actions": { "close": "סגור", "search": "חיפוש...", "cancel": "ביטול", "confirm": "קבע עמוד", "clear": "נקה", "restore": "שחזר" },
   "result": {
     "title": "הוראת גלילה",
     "noData": "בחר גם 'מ׳' וגם 'ל׳' כדי לחשב גלילה",
@@ -35,9 +35,13 @@
     "book": "ספר",
     "chapter": "פרק",
     "verse": "פסוק",
+    "use_page": "יש לי כבר את העמוד",
+    "page": "עמוד",
     "required": "חובה",
+    "must_be_positive": "חייב להיות חיובי",
     "max_chapter": "מקסימום פרקים:",
-    "max_verse": "מקסימום פסוקים: 90"
+    "max_verse": "מקסימום פסוקים:",
+    "max_page": "מקסימום עמודים:"
   },
   "type": {
     "parasha": "פרשות",

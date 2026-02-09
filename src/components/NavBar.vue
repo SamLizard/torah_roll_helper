@@ -17,7 +17,7 @@
     </div> -->
     <v-spacer v-for="i in 3" :key="i"></v-spacer>
     <div class="d-flex align-center">
-      <!-- TODO 7.6: When there will be a special part for the user details/settings, put the gola switch there for small screens. -->
+      <!-- TODO 13: When there will be a special part for the user details/settings, put the gola switch there for small screens. -->
       <v-switch
         v-model="isInGola"
         :label="$t('targets.golaLabel')"
