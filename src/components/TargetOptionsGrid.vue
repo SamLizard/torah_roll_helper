@@ -39,17 +39,7 @@
               <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
             </div>
             
-            <!-- TODO 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
-            <div v-if="allowGola" class="d-flex align-center bg-surface px-4 rounded-lg border">
-              <v-switch
-                v-model="localIsInGola"
-                :label="$t('targets.golaLabel')"
-                color="primary"
-                hide-details
-                density="compact"
-                inset
-              />
-            </div>
+            <!-- DONE 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
           </div>
 
           <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
@@ -239,7 +229,6 @@ const emit = defineEmits<{
 const store = useOptionsStore();
 const filter = ref('');
 const isFullList = ref(true); 
-const localIsInGola = ref(store.isInGola);
 
 // Tracks which Outer Sections (Types) are collapsed.
 // Default: empty object means all are expanded (false).
@@ -250,8 +239,6 @@ const sectionCollapsed = ref<Record<string, boolean>>({});
 const openGroups = ref<string[]>([]);
 
 // --- Watchers ---
-
-watch(localIsInGola, (v) => store.changeIsInGola(v));
 
 const open = computed({
   get: () => props.modelValue,
