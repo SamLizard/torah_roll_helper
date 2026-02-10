@@ -2,16 +2,14 @@
   <!-- DONE 11: The book (i18n) + perek (+ verse if there is one) should be displayed in the component -->
   <!-- DONE: it is not working when the page was chosen manually -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
-    <v-card-item>
-      <template #title>
-        <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
-      </template>
-      <!-- TODO 7.9: fix subtitle hidden by actions. -->
-      <template #subtitle>
-        <div class="text-caption">{{ $t(`home.${side}.subtitle`) }}</div>
-      </template>
-      <template #append>
-        <div class="d-flex gap-2">
+    <v-card-item class="location-card-item">
+      <!-- DONE 7.9: fix subtitle hidden by actions. -->
+      <div class="location-header">
+        <div class="location-text">
+          <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
+          <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
+        </div>
+        <div class="location-actions">
           <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
             {{ $t('home.actions.choose') }}
           </v-btn>          
@@ -28,7 +26,7 @@
             {{ $t('home.actions.input') }}
           </v-btn>
         </div>
-      </template>
+      </div>
     </v-card-item>
 
     <v-divider />
@@ -151,5 +149,63 @@ const clear = () => {
 <style scoped>
 .gap-2 {
   gap: 8px;
+}
+
+.location-subtitle {
+  white-space: normal;
+}
+
+.location-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.location-text {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.location-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 1 420px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.location-actions :deep(.v-btn) {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .location-text {
+    flex-basis: 100%;
+  }
+
+  .location-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .location-header {
+    flex-direction: column;
+  }
+
+  .location-text {
+    flex: 0 0 auto;
+  }
+
+  .location-actions {
+    flex: 0 0 auto;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
 }
 </style>
