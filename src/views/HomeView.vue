@@ -1,9 +1,9 @@
 <template>
-  <!-- TODO 7.8: Add an arrow for the FROM -> TO, so the user saws directly the direction (pay attention to mobile) -->
+  <!-- DONE 7.8: Add an arrow for the FROM -> TO, so the user saws directly the direction (pay attention to mobile) -->
   <v-container fluid class="pa-4">
-    <v-row>
+    <v-row class="position-relative">
       <!-- TODO 8: Add the calendar view here, and in the manual choose. Here to display the few next readings (if clicked, chosen as TO). -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" class="px-md-5">
         <!-- DONE 1: Add the option to set manually the book + perek + verse (The utils getPageNumber should be used to give back the page number) -->
         <!-- The options for the book should be taken from i18n, with keys: genesis, exodus, leviticus, numbers, deuteronomy -->
         <!-- The minimum number for a perek is 1, and there are [50, 40, 27, 36, 34] perek for the books (so don't let user enter value bigger than it, depending on the book) -->
@@ -21,7 +21,19 @@
         />
       </v-col>
 
-      <v-col cols="12" md="6">
+      <v-icon
+        class="position-absolute d-none d-md-flex"
+        style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
+        size="36"
+      >
+        mdi-arrow-right
+      </v-icon>
+
+      <v-col cols="12" class="d-flex d-md-none align-center justify-center py-0">
+        <v-icon size="36">mdi-arrow-down</v-icon>
+      </v-col>
+
+      <v-col cols="12" md="6" class="px-md-5">
         <!-- reusable selector used for TO -->
         <LocationSelector
           key="to"
