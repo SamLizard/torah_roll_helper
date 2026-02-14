@@ -86,8 +86,33 @@
         <div class="text-h2 font-weight-black text-primary mb-2">{{ page }}</div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
-        <div v-if="computedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
-          {{ computedPageTitle }}
+        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
+          {{ resolvedPageTitle }}
+        </div>
+
+        <div v-if="targetRefOptions.length > 1" class="mt-2">
+          <div class="text-caption text-medium-emphasis mb-2">
+            {{ $t('home.targetRef.title') }}
+          </div>
+
+          <v-btn-toggle
+            :model-value="selectedTargetRefMode"
+            divided
+            density="compact"
+            class="target-ref-toggle"
+            @update:model-value="onTargetRefModeChanged"
+          >
+            <v-btn
+              v-for="option in targetRefOptions"
+              :key="option.mode"
+              :value="option.mode"
+              size="small"
+              variant="text"
+              class="text-caption"
+            >
+              {{ $t(option.labelKey) }}
+            </v-btn>
+          </v-btn-toggle>
         </div>
 
         <v-btn class="mt-4" size="small" color="error" variant="text" @click="clear">
@@ -132,6 +157,7 @@ interface TargetItem {
   key: string;
   gola: boolean;
   ref: TorahRef;
+  refEndPartial?: TorahRef;
   refEnd: TorahRef;
 }
 
@@ -142,17 +168,26 @@ interface CalendarEntry {
   target: TargetItem;
 }
 
+type TargetRefMode = 'ref' | 'refEndPartial' | 'refEnd';
+
+interface TargetRefOption {
+  mode: TargetRefMode;
+  labelKey: string;
+  ref: TorahRef;
+}
+
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
   selectedRef: { type: Object as () => ManualData | null, default: null }, // Received from HomeView
-  allowPhotoForTo: { type: Boolean, default: false }
+  allowPhotoForTo: { type: Boolean, default: false },
+  targetKey: { type: String as () => string | null, default: null },
 });
 
 const emit = defineEmits<{
   (e: 'open-dicta'): void;
   (e: 'choose-manual'): void;
-  (e: 'manual-set', page: number | null, data?: ManualData): void; // Updated signature
+  (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void; // Updated signature
 }>();
 
 const { t, locale } = useI18n();
@@ -169,6 +204,61 @@ const currentRef = ref<ManualData>({
 
 const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
 const monthlyReadings = computed(() => generateMonthlyReadings());
+
+const toManualData = (torahRef: TorahRef): ManualData => ({
+  book: torahRef.book,
+  chapter: torahRef.chapter,
+  verse: torahRef.verse,
+});
+
+const isSameTorahRef = (
+  torahRef: TorahRef,
+  page: number | null,
+  refData: ManualData | null
+) =>
+  page === torahRef.page &&
+  refData?.chapter != null &&
+  refData?.verse != null &&
+  refData.book === torahRef.book &&
+  refData.chapter === torahRef.chapter &&
+  refData.verse === torahRef.verse;
+
+const getTargetRefOptions = (target: TargetItem): TargetRefOption[] => {
+  const options: TargetRefOption[] = [
+    {
+      mode: 'ref',
+      labelKey: 'home.targetRef.ref',
+      ref: target.ref,
+    },
+  ];
+
+  if (target.refEndPartial) {
+    options.push({
+      mode: 'refEndPartial',
+      labelKey: 'home.targetRef.refEndPartial',
+      ref: target.refEndPartial,
+    });
+  }
+
+  options.push({
+    mode: 'refEnd',
+    labelKey: 'home.targetRef.refEnd',
+    ref: target.refEnd,
+  });
+
+  return options;
+};
+
+const getDefaultTargetRefMode = (target: TargetItem, side: 'from' | 'to'): TargetRefMode => {
+  if (side === 'from') return target.refEndPartial ? 'refEndPartial' : 'refEnd';
+  return 'ref';
+};
+
+const getRefForMode = (target: TargetItem, mode: TargetRefMode): TorahRef => {
+  if (mode === 'ref') return target.ref;
+  if (mode === 'refEndPartial' && target.refEndPartial) return target.refEndPartial;
+  return target.refEnd;
+};
 
 const formatCalendarDate = (dateIso: string) => {
   const parsedDate = new Date(`${dateIso}T12:00:00`);
@@ -216,7 +306,39 @@ const calendarEntries = computed(() => {
   );
 });
 
-const isSelectedCalendarEntry = (entry: CalendarEntry) => props.page === entry.target.ref.page;
+const isSelectedCalendarEntry = (entry: CalendarEntry) => {
+  if (props.targetKey) return props.targetKey === entry.key;
+  return props.page === entry.target.ref.page;
+};
+
+const matchedTarget = computed(() => {
+  if (props.targetKey) {
+    const explicitTarget = targetsByKey.get(props.targetKey);
+    if (explicitTarget) return explicitTarget;
+  }
+
+  if (props.page == null || currentRef.value.chapter == null || currentRef.value.verse == null) {
+    return null;
+  }
+
+  return (targetsData as TargetItem[]).find((target) =>
+    getTargetRefOptions(target).some((option) =>
+      isSameTorahRef(option.ref, props.page, currentRef.value)
+    )
+  ) ?? null;
+});
+
+const targetRefOptions = computed(() =>
+  matchedTarget.value ? getTargetRefOptions(matchedTarget.value) : []
+);
+
+const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
+  const selectedOption = targetRefOptions.value.find((option) =>
+    isSameTorahRef(option.ref, props.page, currentRef.value)
+  );
+
+  return selectedOption?.mode ?? null;
+});
 
 const getCalendarRollPreview = (entry: CalendarEntry) => {
   if (props.side !== 'to') return null;
@@ -238,14 +360,22 @@ const getCalendarRollPreview = (entry: CalendarEntry) => {
 };
 
 const selectCalendarEntry = (entry: CalendarEntry) => {
-  const refData: ManualData = {
-    book: entry.target.ref.book,
-    chapter: entry.target.ref.chapter,
-    verse: entry.target.ref.verse,
-  };
+  const defaultMode = getDefaultTargetRefMode(entry.target, props.side);
+  const targetRef = getRefForMode(entry.target, defaultMode);
+  const refData = toManualData(targetRef);
 
   currentRef.value = refData;
-  emit('manual-set', entry.target.ref.page, refData);
+  emit('manual-set', targetRef.page, refData, entry.target.key);
+};
+
+const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
+  if (!mode || !matchedTarget.value) return;
+
+  const targetRef = getRefForMode(matchedTarget.value, mode);
+  const refData = toManualData(targetRef);
+
+  currentRef.value = refData;
+  emit('manual-set', targetRef.page, refData, matchedTarget.value.key);
 };
 
 // Sync local state when the prop changes (e.g., selection from TargetOptionsGrid)
@@ -274,9 +404,29 @@ const computedPageTitle = computed(() => {
   return '';
 });
 
+const resolvedPageTitle = computed(() => {
+  if (computedPageTitle.value) return computedPageTitle.value;
+  if (matchedTarget.value) return t(`readingTargets.${matchedTarget.value.key}`);
+  return '';
+});
+
 const onManualSave = (data: ManualData, page: number) => {
+  const matchedManualTarget = (targetsData as TargetItem[]).find((target) =>
+    getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
+  );
+
+  if (matchedManualTarget) {
+    const defaultMode = getDefaultTargetRefMode(matchedManualTarget, props.side);
+    const targetRef = getRefForMode(matchedManualTarget, defaultMode);
+    const refData = toManualData(targetRef);
+
+    currentRef.value = refData;
+    emit('manual-set', targetRef.page, refData, matchedManualTarget.key); // Emit both page and ref data
+    return;
+  }
+
   currentRef.value = data;
-  emit('manual-set', page, data); // Emit both page and ref data
+  emit('manual-set', page, data, null); // Emit both page and ref data
 };
 
 // When Typing in Manual Dialog (Draft)
@@ -352,6 +502,16 @@ const clear = () => {
 .calendar-reading-card--active {
   border-color: rgb(var(--v-theme-primary));
   background-color: rgba(var(--v-theme-primary), 0.08);
+}
+
+.target-ref-toggle {
+  width: 100%;
+}
+
+.target-ref-toggle :deep(.v-btn) {
+  flex: 1 1 0;
+  min-width: 0;
+  text-transform: none;
 }
 
 @media (max-width: 900px) {

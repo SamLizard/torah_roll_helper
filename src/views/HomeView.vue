@@ -20,10 +20,11 @@
       So all of them are in a slide and the user see the few first(TO)/last(FROM), and can look at more (the rest of the events).
       Pay attention that it should be reactive, so phones can also work with it.
        -->
-      <!-- TODO 8.1:
+      <!-- DONE 8.1:
         The from/to (when filled using a target, or if the verse correspond to a target) should let the option to choose between the regular ref, the partial end [refEndPartial if existing] (end of sheni/hamishi reading) or full end [refEnd] (end of full parasha).
         The user should be able to switch between them directly in the LocationSelector card (you can make a different component if needed).
         So by default for from it is the refEndPartial, and for to is is the ref.
+        This should be a component that replaces the title of the page that is displayed under the page. If there is no official reading at this manualData, the component will display only the page name, as it is currently.
       -->
       <v-col cols="12" md="6" class="px-md-5">
         <!-- DONE 1: Add the option to set manually the book + perek + verse (The utils getPageNumber should be used to give back the page number) -->
@@ -37,6 +38,7 @@
           side="from"
           :page="options.fromPage" 
           :selected-ref="fromRef"
+          :target-key="fromTargetKey"
           @open-dicta="openDictaFor('from')"
           @choose-manual="openTargets('from')"
           @manual-set="onSetFromPage"
@@ -62,6 +64,7 @@
           side="to"
           :page="options.toPage" 
           :selected-ref="toRef"
+          :target-key="toTargetKey"
           :allow-photo-for-to="allowPhotoForTo"
           @open-dicta="openDictaFor('to')"
           @choose-manual="openTargets('to')"
@@ -106,7 +109,14 @@ import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import type { ManualData } from '@/components/ManualEntryDialog.vue'; // Ensure type is exported
 
 import { computeRoll } from '@/composables/utils';
-import type { RollInstructions } from '@/types';
+import type { RollInstructions, TorahRef } from '@/types';
+
+interface HomeTargetItem {
+  key: string;
+  ref: TorahRef;
+  refEndPartial?: TorahRef;
+  refEnd: TorahRef;
+}
 
 /* --- Store Access --- */
 const options = useOptionsStore(); // options.fromPage / options.toPage
@@ -116,6 +126,8 @@ const options = useOptionsStore(); // options.fromPage / options.toPage
 const fromRef = ref<ManualData | null>(null);
 
 const toRef = ref<ManualData | null>(null);
+const fromTargetKey = ref<string | null>(null);
+const toTargetKey = ref<string | null>(null);
 
 const targetsOpen = ref(false);
 const activeSide = ref<'from' | 'to'>('to'); // Renamed from targetsSide to generic activeSide
@@ -149,45 +161,64 @@ watch(
 );
 
 /* --- handlers --- */
-function openDictaFor(side: 'from' | 'to') {
+const toManualData = (torahRef: TorahRef): ManualData => ({
+  book: torahRef.book,
+  chapter: torahRef.chapter,
+  verse: torahRef.verse,
+});
+
+const getDefaultRefForSide = (target: HomeTargetItem, side: 'from' | 'to'): TorahRef => {
+  if (side === 'from') return target.refEndPartial ?? target.refEnd;
+  return target.ref;
+};
+
+const openDictaFor = (side: 'from' | 'to') => {
   activeSide.value = side;
   // open your dicta dialog here
   dictaOpen.value = true;
   // NOTE: implementing the actual Dicta iframe and postMessage handling belongs in a DictaDialog component
-}
+};
 
-function openTargets(side: 'from' | 'to') {
+const openTargets = (side: 'from' | 'to') => {
   activeSide.value = side;
   targetsOpen.value = true;
-}
+};
 
 // Handler for Manual Entry (emitted from LocationSelector)
-function onSetFromPage(p: number | null, refData: ManualData | null = null) {
+const onSetFromPage = (
+  p: number | null,
+  refData: ManualData | null = null,
+  targetKey: string | null = null
+) => {
   options.changeFromPage(p); // Update store
   fromRef.value = refData;
-}
+  fromTargetKey.value = p == null ? null : targetKey;
+};
 
 // Handler for Manual Entry (emitted from LocationSelector)
-function onSetToPage(p: number | null, refData: ManualData | null = null) {
+const onSetToPage = (
+  p: number | null,
+  refData: ManualData | null = null,
+  targetKey: string | null = null
+) => {
   options.changeToPage(p);
   toRef.value = refData;
-}
+  toTargetKey.value = p == null ? null : targetKey;
+};
 
-function onTargetSelected(item: any) {
-  // Construct the Ref object from the target item
-  const newRef: ManualData = {
-    book: item.ref.book,
-    chapter: item.ref.chapter,
-    verse: item.ref.verse
-  };
+const onTargetSelected = (item: HomeTargetItem) => {
+  const selectedRef = getDefaultRefForSide(item, activeSide.value);
+  const newRef = toManualData(selectedRef);
 
   if (activeSide.value === 'from') {
-    options.changeFromPage(item.ref.page);
+    options.changeFromPage(selectedRef.page);
     fromRef.value = newRef;
+    fromTargetKey.value = item.key;
   } else {
-    options.changeToPage(item.ref.page);
+    options.changeToPage(selectedRef.page);
     toRef.value = newRef;
+    toTargetKey.value = item.key;
   }
   targetsOpen.value = false;
-}
+};
 </script>

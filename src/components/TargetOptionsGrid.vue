@@ -207,6 +207,8 @@ interface TargetItem {
   gola: boolean;
   type: 'parasha' | 'holyday';
   ref: TorahRef;
+  refEndPartial?: TorahRef;
+  refEnd: TorahRef;
 }
 
 const props = defineProps({
