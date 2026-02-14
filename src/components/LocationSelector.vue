@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 15: make the components of a reading the same for calendar and TargetOptionsGrid -->
   <!-- DONE 11: The book (i18n) + perek (+ verse if there is one) should be displayed in the component -->
   <!-- DONE: it is not working when the page was chosen manually -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
@@ -30,6 +31,51 @@
     </v-card-item>
 
     <v-divider />
+
+    <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
+      <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
+        <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+        <span>{{ $t(`home.calendar.${side}`) }}</span>
+      </div>
+
+      <v-slide-group show-arrows class="calendar-slide-group">
+        <v-slide-group-item
+          v-for="entry in calendarEntries"
+          :key="`${side}-${entry.key}-${entry.dateIso}`"
+        >
+          <v-card
+            class="calendar-reading-card"
+            :class="{ 'calendar-reading-card--active': isSelectedCalendarEntry(entry) }"
+            variant="outlined"
+            @click="selectCalendarEntry(entry)"
+            v-ripple
+          >
+            <div class="d-flex align-center text-caption text-medium-emphasis">
+              <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+              <span>{{ entry.dateLabel }}</span>
+            </div>
+
+            <div class="text-body-2 font-weight-bold text-truncate mt-1 mb-1">
+              {{ $t(`readingTargets.${entry.key}`) }}
+            </div>
+
+            <div class="d-flex align-center justify-space-between gap-1">
+              <div class="text-caption text-medium-emphasis font-weight-medium">
+                {{ entry.target.ref.page }} -> {{ entry.target.refEnd.page }}
+              </div>
+
+              <div
+                v-if="getCalendarRollPreview(entry)"
+                :class="`text-${getCalendarRollPreview(entry)?.color} d-flex align-center gap-1 text-caption`"
+              >
+                <v-icon size="14">{{ getCalendarRollPreview(entry)?.icon }}</v-icon>
+                <span class="font-weight-bold">{{ getCalendarRollPreview(entry)?.text }}</span>
+              </div>
+            </div>
+          </v-card>
+        </v-slide-group-item>
+      </v-slide-group>
+    </v-card-text>
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
@@ -75,7 +121,26 @@
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
-import { getPageTitleKeys } from '@/composables/utils';
+import { computeRoll, getPageTitleKeys } from '@/composables/utils';
+import { useOptionsStore } from '@/stores/options';
+import targetsData from '@/data/target_pages.json';
+import { generateMonthlyReadings, type MonthlyReadingEntry } from '@/composables/calendar/calendar';
+import { useRtl } from 'vuetify';
+import type { TorahRef } from '@/types';
+
+interface TargetItem {
+  key: string;
+  gola: boolean;
+  ref: TorahRef;
+  refEnd: TorahRef;
+}
+
+interface CalendarEntry {
+  key: string;
+  dateIso: string;
+  dateLabel: string;
+  target: TargetItem;
+}
 
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
@@ -90,7 +155,9 @@ const emit = defineEmits<{
   (e: 'manual-set', page: number | null, data?: ManualData): void; // Updated signature
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const { isRtl } = useRtl();
+const options = useOptionsStore();
 const isManualOpen = ref(false);
 
 // Stores the draft/selected book, chapter, verse
@@ -99,6 +166,87 @@ const currentRef = ref<ManualData>({
   chapter: null,
   verse: null
 });
+
+const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+const monthlyReadings = computed(() => generateMonthlyReadings());
+
+const formatCalendarDate = (dateIso: string) => {
+  const parsedDate = new Date(`${dateIso}T12:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return dateIso;
+
+  return new Intl.DateTimeFormat(locale.value, {
+    month: 'short',
+    day: 'numeric',
+  }).format(parsedDate);
+};
+
+const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => {
+  const target = targetsByKey.get(reading.readingId);
+  if (!target) return null;
+  if (target.gola && !options.isInGola) return null;
+
+  const dateIso = props.side === 'from'
+    ? reading.dates[reading.dates.length - 1]
+    : reading.dates[0];
+  if (!dateIso) return null;
+
+  return {
+    key: reading.readingId,
+    dateIso,
+    dateLabel: formatCalendarDate(dateIso),
+    target,
+  };
+};
+
+const isCalendarEntry = (entry: CalendarEntry | null): entry is CalendarEntry => entry !== null;
+
+const calendarEntries = computed(() => {
+  const sourceReadings = props.side === 'from'
+    ? monthlyReadings.value.lastMonth
+    : monthlyReadings.value.nextMonth;
+
+  const mappedEntries = sourceReadings
+    .map((reading) => toCalendarEntry(reading))
+    .filter(isCalendarEntry);
+
+  return mappedEntries.sort((a, b) =>
+    props.side === 'from'
+      ? b.dateIso.localeCompare(a.dateIso)
+      : a.dateIso.localeCompare(b.dateIso)
+  );
+});
+
+const isSelectedCalendarEntry = (entry: CalendarEntry) => props.page === entry.target.ref.page;
+
+const getCalendarRollPreview = (entry: CalendarEntry) => {
+  if (props.side !== 'to') return null;
+  if (options.fromPage === null || options.fromPage === entry.target.ref.page) return null;
+
+  const roll = computeRoll(options.fromPage, entry.target.ref.page);
+  if (!roll) return null;
+
+  const isForward = roll.rollDirection === 'forward';
+  const icon = isRtl.value
+    ? (isForward ? 'mdi-arrow-left' : 'mdi-arrow-right')
+    : (isForward ? 'mdi-arrow-right' : 'mdi-arrow-left');
+
+  return {
+    icon,
+    color: isForward ? 'primary' : 'secondary',
+    text: t('preview.cols', { count: roll.pages }),
+  };
+};
+
+const selectCalendarEntry = (entry: CalendarEntry) => {
+  const refData: ManualData = {
+    book: entry.target.ref.book,
+    chapter: entry.target.ref.chapter,
+    verse: entry.target.ref.verse,
+  };
+
+  currentRef.value = refData;
+  emit('manual-set', entry.target.ref.page, refData);
+};
 
 // Sync local state when the prop changes (e.g., selection from TargetOptionsGrid)
 watch(() => props.selectedRef, (newRef) => {
@@ -151,6 +299,10 @@ const clear = () => {
   gap: 8px;
 }
 
+.gap-1 {
+  gap: 4px;
+}
+
 .location-subtitle {
   white-space: normal;
 }
@@ -177,6 +329,29 @@ const clear = () => {
 
 .location-actions :deep(.v-btn) {
   white-space: nowrap;
+}
+
+.calendar-slide-group {
+  margin-inline: -4px;
+}
+
+.calendar-reading-card {
+  min-width: 166px;
+  max-width: 184px;
+  padding: 8px 10px;
+  margin-inline: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.calendar-reading-card:hover {
+  border-color: rgb(var(--v-theme-primary));
+  transform: translateY(-2px);
+}
+
+.calendar-reading-card--active {
+  border-color: rgb(var(--v-theme-primary));
+  background-color: rgba(var(--v-theme-primary), 0.08);
 }
 
 @media (max-width: 900px) {
@@ -206,6 +381,10 @@ const clear = () => {
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 2px;
+  }
+
+  .calendar-reading-card {
+    min-width: 154px;
   }
 }
 </style>

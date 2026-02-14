@@ -11,6 +11,10 @@
       "subtitle": "Lecture cible (sélectionnez à venir ou complet)",
       "canUsePhoto": "Vous pouvez utiliser une photo pour la destination (optionnel)"
     },
+    "calendar": {
+      "from": "Lectures récentes",
+      "to": "Lectures à venir"
+    },
     "actions": { "photo": "Prendre photo", "choose": "Choisir manuellement", "clear": "Effacer", "input": "Saisie" },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
@@ -57,7 +61,8 @@
     "exodus": "Exode",
     "leviticus": "Lévitique",
     "numbers": "Nombres",
-    "deuteronomy": "Deutéronome"
+    "deuteronomy": "Deutéronome",
+    "four-readings": "Quatre Parachiot"
   },
   "readingTargets": {
     "bereshit": "Béréchit",
@@ -148,6 +153,10 @@
     "pesach-8": "Pessah (8ème jour)",
     "shavuot-1": "Chavouot (1er jour)",
     "shavuot-2": "Chavouot (2ème jour)",
-    "tisha-bav": "Tich'a B'Av"
+    "tisha-bav": "Tich'a B'Av",
+    "shekalim": "Chekalim",
+    "zachor": "Zachor",
+    "parah": "Parah",
+    "hachodesh": "HaChodesh"
   }
 }

@@ -11,6 +11,10 @@
       "subtitle": "קריאה יעד (בחר קריאות קרובות או רשימה מלאה)",
       "canUsePhoto": "ניתן להשתמש בתמונה ליעד (אופציונלי)"
     },
+    "calendar": {
+      "from": "קריאות אחרונות",
+      "to": "קריאות קרובות"
+    },
     "actions": { "photo": "צלם", "choose": "בחר ידנית", "clear": "נקה", "input": "הקלדה" },
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"
@@ -57,7 +61,8 @@
     "exodus": "שמות",
     "leviticus": "ויקרא",
     "numbers": "במדבר",
-    "deuteronomy": "דברים"
+    "deuteronomy": "דברים",
+    "four-readings": "ארבע פרשיות"
   },
   "readingTargets": {
     "bereshit": "בראשית",
@@ -148,6 +153,10 @@
     "pesach-8": "פסח ח׳",
     "shavuot-1": "שבועות א׳",
     "shavuot-2": "שבועות ב׳",
-    "tisha-bav": "תשעה באב"
+    "tisha-bav": "תשעה באב",
+    "shekalim": "שקלים",
+    "zachor": "זכור",
+    "parah": "פרה",
+    "hachodesh": "החודש"
   }
 }

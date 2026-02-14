@@ -191,10 +191,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { useOptionsStore } from '@/stores/options';
 import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils'; // Import computeRoll
+import type { TorahRef } from '@/types';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
 const { t } = useI18n();
@@ -205,12 +206,7 @@ interface TargetItem {
   group: string;
   gola: boolean;
   type: 'parasha' | 'holyday';
-  ref: {
-    book: number;
-    chapter: number;
-    verse: number;
-    page: number;
-  };
+  ref: TorahRef;
 }
 
 const props = defineProps({

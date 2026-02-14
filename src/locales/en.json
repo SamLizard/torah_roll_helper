@@ -11,6 +11,10 @@
       "subtitle": "Target reading (select upcoming or full list)",
       "canUsePhoto": "You may use photo for TO (optional)"
     },
+    "calendar": {
+      "from": "Recent readings",
+      "to": "Upcoming readings"
+    },
     "actions": { "photo": "Take photo", "choose": "Choose manually", "clear": "Clear", "input": "Input" },
     "selected": "Selected",
     "noSelection": "No page selected"
@@ -57,7 +61,8 @@
     "exodus": "Exodus",
     "leviticus": "Leviticus",
     "numbers": "Numbers",
-    "deuteronomy": "Deuteronomy"
+    "deuteronomy": "Deuteronomy",
+    "four-readings": "Four Parashiot"
   },
   "readingTargets": {
     "bereshit": "Bereshit",
@@ -148,6 +153,10 @@
     "pesach-8": "Pesach (Day 8)",
     "shavuot-1": "Shavuot (Day 1)",
     "shavuot-2": "Shavuot (Day 2)",
-    "tisha-bav": "Tish'a B'Av"
+    "tisha-bav": "Tish'a B'Av",
+    "shekalim": "Shekalim",
+    "zachor": "Zachor",
+    "parah": "Parah",
+    "hachodesh": "HaChodesh"
   }
 }

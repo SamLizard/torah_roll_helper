@@ -1,0 +1,338 @@
+import { HDate } from '@hebcal/hdate'
+import { getLeyningOnDate } from '@hebcal/leyning/dist/esm/getLeyningOnDate'
+import type { Leyning, LeyningWeekday } from '@hebcal/leyning/dist/esm/types'
+import { useOptionsStore } from '@/stores/options'
+import { slugify } from './tikkun_io_utils';
+
+export interface MonthlyReadingEntry {
+  readingId: string
+  dates: string[]
+}
+
+export interface MonthlyReadings {
+  /**
+   * Readings from one month before today until today (inclusive).
+   * Example: if today is 2026-02-12, this range is 2026-01-12..2026-02-12.
+   */
+  lastMonth: MonthlyReadingEntry[]
+  /**
+   * Readings from today until one month after today (inclusive).
+   * Example: if today is 2026-02-12, this range is 2026-02-12..2026-03-12.
+   */
+  nextMonth: MonthlyReadingEntry[]
+}
+
+// DONE: make it simpler (remove this, and take directly the day...)
+
+type TorahOccurrence = {
+  readingId: string
+  dateIso: string
+}
+
+type Group = {
+  readingId: string
+  dates: Set<string>
+}
+
+// Canonical parsha IDs used by the old `parshiyot.json` data (via slugify(parsha.en)).
+const PARSHA_IDS = [
+  'bereshit',
+  'noach',
+  'lech_lecha',
+  'vayera',
+  'chayei_sara',
+  'toldot',
+  'vayetzei',
+  'vayishlach',
+  'vayeshev',
+  'miketz',
+  'vayigash',
+  'vayechi',
+  'shemot',
+  'vaera',
+  'bo',
+  'beshalach',
+  'yitro',
+  'mishpatim',
+  'terumah',
+  'tetzaveh',
+  'ki_tisa',
+  'vayakhel',
+  'pekudei',
+  'vayikra',
+  'tzav',
+  'shmini',
+  'tazria',
+  'metzora',
+  'achrei_mot',
+  'kedoshim',
+  'emor',
+  'behar',
+  'bechukotai',
+  'bamidbar',
+  'nasso',
+  'behaalotcha',
+  'shlach',
+  'korach',
+  'chukat',
+  'balak',
+  'pinchas',
+  'matot',
+  'masei',
+  'devarim',
+  'vaetchanan',
+  'eikev',
+  'reeh',
+  'shoftim',
+  'ki_teitzei',
+  'ki_tavo',
+  'nitzavim',
+  'vayeilech',
+  'haazinu',
+  'vezot_haberakhah',
+]
+
+const generateMonthlyReadings = (
+  day: Date = new Date()
+): MonthlyReadings => {
+  const today = atNoon(day)
+  const optionsStore = useOptionsStore()
+  const isIsrael = !optionsStore.isInGola
+
+  return {
+    lastMonth: collectRange({
+      start: addMonths(today, -1),
+      end: today,
+      isIsrael,
+    }),
+    nextMonth: collectRange({
+      start: today,
+      end: addMonths(today, 1),
+      isIsrael,
+    }),
+  }
+}
+
+const collectRange = ({
+  start,
+  end,
+  isIsrael,
+}: {
+  start: Date
+  end: Date
+  isIsrael: boolean
+}): MonthlyReadingEntry[] => {
+  const groups = new Map<string, Group>()
+
+  for (const day of eachDate(start, end)) {
+    const leinings = getLeyningOnDate(new HDate(day), isIsrael, true)
+    for (const leining of leinings) {
+      for (const occurrence of getTorahOccurrences(day, leining)) {
+        const existing = groups.get(occurrence.readingId)
+        if (!existing) {
+          groups.set(occurrence.readingId, {
+            readingId: occurrence.readingId,
+            dates: new Set([occurrence.dateIso]),
+          })
+          continue
+        }
+
+        existing.dates.add(occurrence.dateIso)
+      }
+    }
+  }
+
+  return Array.from(groups.values())
+    .map((group) => ({
+      readingId: group.readingId,
+      dates: Array.from(group.dates).sort(),
+    }))
+    .sort(compareByFirstDateThenId)
+}
+
+const getTorahOccurrences = (
+  day: Date,
+  leining: Leyning | LeyningWeekday
+): TorahOccurrence[] => {
+  const titleEn = normalizeTitleEn(leining.name.en)
+  const readingId = toCanonicalReadingId(leining, titleEn)
+  const dateIso = toISODateString(day)
+
+  const results: TorahOccurrence[] = []
+  if (leining.weekday) {
+    results.push({
+      readingId,
+      dateIso,
+    })
+  }
+
+  if ('fullkriyah' in leining && leining.fullkriyah) {
+    results.push({
+      readingId,
+      dateIso,
+    })
+
+    // DONE: In fullkriyah, if the fullkriyah.M.reason is fulled, it means that there is a special shabbat with a reading for Maftir. In this case, add the maftir one to the list.
+    const maftirAliyah = leining.fullkriyah.M
+    const maftirReason = maftirAliyah?.reason
+    const specialMaftirName = extractSpecialShabbatName(maftirReason)
+    const specialMaftirReadingId = specialMaftirName
+      ? toSpecialStandaloneMaftirReadingId(specialMaftirName)
+      : null
+    if (specialMaftirName && specialMaftirReadingId && maftirAliyah) {
+      results.push({
+        readingId: specialMaftirReadingId,
+        dateIso,
+      })
+    }
+  }
+
+  return results
+}
+
+const normalizeTitleEn = (title: string) => {
+  return title.replace(/-/g, ' ').trim()
+}
+
+const toCanonicalReadingId = (leining: Leyning | LeyningWeekday, titleEn: string) => {
+  if (leining.parsha) return parshaIdFromLeining(leining, titleEn)
+  return holidayIdFromTitle(titleEn)
+}
+
+const parshaIdFromLeining = (leining: Leyning | LeyningWeekday, titleEn: string) => {
+  const rawParshaNum = leining.parshaNum
+  const parshaNum = Array.isArray(rawParshaNum) ? rawParshaNum[0] : rawParshaNum
+  if (parshaNum && parshaNum >= 1 && parshaNum <= PARSHA_IDS.length)
+    return PARSHA_IDS[parshaNum - 1]
+
+  // Fallback for unexpected shapes: keep previous behavior but collapse doubles to the first name.
+  const firstPart = titleEn.split(' ')[0]
+  return toRepositoryReadingId(firstPart)
+}
+
+const holidayIdFromTitle = (titleEn: string): string => {
+  if (titleEn.startsWith('Rosh Chodesh')) return 'rosh-chodesh';
+  
+  const fastDays = ["Ta'anit Esther", "Tzom Gedaliah", "Tzom Tammuz", "Asara B'Tevet", "Tish'a B'Av (Mincha)"];
+  if (fastDays.some(fast => titleEn.startsWith(fast))) return 'taanit-tzibur';
+  
+  if (titleEn.startsWith("Tish'a B'Av")) return 'tisha-bav';
+  if (titleEn.startsWith('Rosh Hashana I')) return 'rosh-1';
+  if (titleEn.startsWith('Rosh Hashana II')) return 'rosh-2';
+  if (titleEn.startsWith('Yom Kippur')) return 'yom-kippur';
+  if (titleEn.startsWith('Purim') || titleEn.startsWith('Shushan Purim')) return 'purim';
+  if (titleEn.startsWith('Shmini Atzeret')) return 'shmini-atzeret';
+  if (titleEn.startsWith('Simchat Torah') || titleEn.startsWith('Erev Simchat Torah')) return 'simchat-torah';
+  if (titleEn.startsWith('Shavuot I')) return 'shavuot-1';
+  if (titleEn.startsWith('Shavuot II')) return 'shavuot-2';
+
+  if (titleEn.startsWith('Sukkot Shabbat Chol ha Moed')) return 'sukkot-shabbat-chol-hamoed';
+  if (titleEn.startsWith('Sukkot Final Day')) return 'sukkot-7';
+  if (titleEn.startsWith('Sukkot Chol ha Moed Day ')) {
+    const day = extractDayNumber(titleEn);
+    if (day != null) return `sukkot-${day + 2}`;
+  }
+  if (titleEn.startsWith('Sukkot I')) return 'sukkot-1';
+  if (titleEn.startsWith('Sukkot II')) return 'sukkot-2';
+
+  if (titleEn.startsWith('Pesach Shabbat Chol ha Moed')) return 'pesach-shabbat-chol-hamoed';
+  if (titleEn.startsWith('Pesach Chol ha Moed Day ')) {
+    const day = extractDayNumber(titleEn);
+    if (day != null) return `pesach-${day + 2}`;
+  }
+  if (titleEn.startsWith('Pesach I')) return 'pesach-1';
+  if (titleEn.startsWith('Pesach II')) return 'pesach-2';
+  if (titleEn.startsWith('Pesach VII')) return 'pesach-7';
+  if (titleEn.startsWith('Pesach VIII')) return 'pesach-8';
+
+  if (titleEn.startsWith('Chanukah Day ')) {
+    const day = extractDayNumber(titleEn);
+    if (day === 6) return 'rosh-chodesh';
+    if (day != null && [1, 2, 3, 4, 5, 7, 8].includes(day)) return `chanukah-${day}`;
+  }
+
+  return toRepositoryReadingId(titleEn);
+};
+
+const extractDayNumber = (titleEn: string) => {
+  const dayMatch = /\bDay\s+(\d+)/.exec(titleEn)
+  if (!dayMatch?.[1]) return null
+  return Number(dayMatch[1])
+}
+
+const extractSpecialShabbatName = (reason: string | undefined) => {
+  if (!reason) return null
+  if (!reason.startsWith('Shabbat ')) return null
+
+  const shabbatSplit = reason.split('Shabbat ')
+  const afterShabbat = shabbatSplit[1]?.trim()
+  if (!afterShabbat) return null
+
+  // Normalize cases like "Shabbat Shekalim (on Rosh Chodesh)" => "Shekalim"
+  return afterShabbat.split('(')[0].trim()
+}
+
+const normalizeSpecialStandaloneMaftirName = (name: string) => {
+  return name.toLowerCase().trim()
+}
+
+const toSpecialStandaloneMaftirReadingId = (name: string): string | null => {
+  const normalized = normalizeSpecialStandaloneMaftirName(name)
+  const specialStandaloneMaftirs = ['shekalim', 'zachor', 'parah', 'hachodesh']
+  return specialStandaloneMaftirs.includes(normalized) ? normalized : null
+}
+
+const toRepositoryReadingId = (titleEn: string) => {
+  return slugify(titleEn)
+}
+
+const compareByFirstDateThenId = (a: MonthlyReadingEntry, b: MonthlyReadingEntry) => {
+  const ad = a.dates[0] ?? ''
+  const bd = b.dates[0] ?? ''
+  if (ad !== bd) return ad.localeCompare(bd)
+  return a.readingId.localeCompare(b.readingId)
+}
+
+const addMonths = (date: Date, months: number) => {
+  const out = new Date(date)
+  out.setMonth(out.getMonth() + months)
+  return atNoon(out)
+}
+
+const eachDate = (start: Date, end: Date) => {
+  const dates: Date[] = []
+  for (
+    const day = atNoon(start);
+    day.getTime() <= end.getTime();
+    day.setDate(day.getDate() + 1)
+  ) {
+    dates.push(new Date(day))
+  }
+  return dates
+}
+
+const toISODateString = (date: Date) => {
+  const minutesOffset = date.getTimezoneOffset()
+  const millisecondsOffset = minutesOffset * 60 * 1000
+  const local = new Date(+date - millisecondsOffset)
+  return local.toISOString().substring(0, 10)
+}
+
+const atNoon = (date: Date) => {
+  const out = new Date(date)
+  out.setHours(12, 0, 0, 0)
+  return out
+}
+
+export {
+  generateMonthlyReadings,
+}
+
+// pay attention:
+// there are 4 parashiyot that the last verse is finishing at the following page of the start of the last verse:
+// - Vayestse 
+// - Ki tisa
+// - Emor
+// - Ekev
+
+// But there is no parasha that the last verse is finishing at the end of current page, and the next verse is in next page.

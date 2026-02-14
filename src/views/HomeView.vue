@@ -2,7 +2,29 @@
   <!-- DONE 7.8: Add an arrow for the FROM -> TO, so the user saws directly the direction (pay attention to mobile) -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
-      <!-- TODO 8: Add the calendar view here, and in the manual choose. Here to display the few next readings (if clicked, chosen as TO). -->
+      <!-- DONE 8: Add the calendar view here, and in the manual choose. Here to display the few next readings (if clicked, chosen as TO).
+      Some code to get the calendar data, and see the corresponding data from the json:
+      import targetsData from '@/data/target_pages.json';
+      import { generateMonthlyReadings } from '@/composables/calendar/calendar';
+
+      const readings = generateMonthlyReadings();      
+
+      html part:
+      <div v-for="reading in [...readings.lastMonth, ...readings.nextMonth]" :key="reading.readingId">
+        <div>{{ $t(`readingTargets.${reading.readingId}`) }} - {{ reading.dates }}</div>
+        {{ targetsData.find(t => t.key === reading.readingId)?.refEnd.page }}
+      </div>
+
+      The last month should be in "FROM" selector and the next month in "TO" selector.
+      Display the name, the date (for the FROM it should display last date of the array, and for the TO is should display the first date of the array), and when clicking, make it work like if any other target was chosen.
+      So all of them are in a slide and the user see the few first(TO)/last(FROM), and can look at more (the rest of the events).
+      Pay attention that it should be reactive, so phones can also work with it.
+       -->
+      <!-- TODO 8.1:
+        The from/to (when filled using a target, or if the verse correspond to a target) should let the option to choose between the regular ref, the partial end [refEndPartial if existing] (end of sheni/hamishi reading) or full end [refEnd] (end of full parasha).
+        The user should be able to switch between them directly in the LocationSelector card (you can make a different component if needed).
+        So by default for from it is the refEndPartial, and for to is is the ref.
+      -->
       <v-col cols="12" md="6" class="px-md-5">
         <!-- DONE 1: Add the option to set manually the book + perek + verse (The utils getPageNumber should be used to give back the page number) -->
         <!-- The options for the book should be taken from i18n, with keys: genesis, exodus, leviticus, numbers, deuteronomy -->
