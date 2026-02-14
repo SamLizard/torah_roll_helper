@@ -5,10 +5,10 @@
   "routes": { "home": "בית" },
   "directions": { "forward": "קדימה", "backward": "לאחור" },
   "home": {
-    "from": { "title": "מָנָה", "subtitle": "מיקום נוכחי (צילום או ידני)" },
+    "from": { "title": "נקודת התחלה", "subtitle": "מיקום נוכחי (צילום או ידני)" },
     "to": {
-      "title": "אֶל",
-      "subtitle": "קריאה יעד (בחר קריאות קרובות או רשימה מלאה)",
+      "title": "יעד",
+      "subtitle": "קריאת יעד (בחר קריאות קרובות או רשימה מלאה)",
       "canUsePhoto": "ניתן להשתמש בתמונה ליעד (אופציונלי)"
     },
     "calendar": {
@@ -28,11 +28,11 @@
   "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה", "golaBadge": "גולה" },
   "actions": { "close": "סגור", "search": "חיפוש...", "cancel": "ביטול", "confirm": "קבע עמוד", "clear": "נקה", "restore": "שחזר" },
   "result": {
-    "title": "הוראת גלילה",
-    "noData": "בחר גם 'מ׳' וגם 'ל׳' כדי לחשב גלילה",
+    "title": "הוראות גלילה",
+    "noData": "בחר גם 'מ־' וגם 'ל־' כדי לחשב גלילה",
     "from": "מ־",
     "to": "ל־",
-    "direction": { "forward": "התקדמות", "backward": "נסיגה" }
+    "direction": { "forward": "לגלול קדימה", "backward": "לגלול לאחור" }
   },
   "page": "עמוד",
   "separator": " \\ ",
@@ -45,7 +45,7 @@
     "book": "ספר",
     "chapter": "פרק",
     "verse": "פסוק",
-    "use_page": "יש לי כבר את העמוד",
+    "use_page": "העמוד ידוע לי",
     "page": "עמוד",
     "required": "חובה",
     "must_be_positive": "חייב להיות חיובי",

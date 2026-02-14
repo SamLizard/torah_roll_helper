@@ -41,14 +41,14 @@
     "cols": "{count} col."
   },
   "manual": {
-    "title": "Entrer le lieu manuellement",
+    "title": "Entrer l'emplacement manuellement",
     "book": "Livre",
     "chapter": "Chapitre",
     "verse": "Verset",
-    "use_page": "J'ai deja la page",
+    "use_page": "J'ai déjà la page",
     "page": "Page",
     "required": "Requis",
-    "must_be_positive": "Doit etre positif",
+    "must_be_positive": "Doit être positif",
     "max_chapter": "Le chapitre max est",
     "max_verse": "Le verset max est",
     "max_page": "La page max est"
@@ -96,7 +96,7 @@
     "pekudei": "Pékoudé",
     "vayikra": "Vayikra",
     "tzav": "Tzav",
-    "shmini": "Chimini",
+    "shmini": "Chemini",
     "tazria": "Tazria",
     "metzora": "Metsora",
     "achrei_mot": "Achrei Mot",

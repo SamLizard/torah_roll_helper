@@ -28,7 +28,7 @@
   "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode", "golaBadge": "Gola" },
   "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page", "clear": "Clear", "restore": "Restore" },
   "result": {
-    "title": "Roll instruction",
+    "title": "Rolling Instructions",
     "noData": "Select both FROM and TO to compute roll",
     "from": "From",
     "to": "To",
