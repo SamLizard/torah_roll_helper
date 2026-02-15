@@ -1,7 +1,7 @@
 <template>
   <!-- DONE 7.7: add an option to choose directly the page (for example, he have tikkun open at some page) -->
   <!-- Add a horizontal bar, then a input for page? -->
-  <!-- TODO 8.2: There is a bug - when the manual data is empty, if the user enters the chapter and verse, it doesn't let him define the page using it... -->
+  <!-- DONE 8.2: There is a bug - when the manual data is empty, if the user enters the chapter and verse, it doesn't let him define the page using it... -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rounded-xl pa-4">
       <v-card-title class="text-h6 font-weight-bold">
@@ -132,6 +132,12 @@ const localState = reactive<ManualData>({
 
 const isValid = ref(false);
 const pageNumber = ref<number | null>(null);
+const initialRefSnapshot = ref<ManualData>({
+  book: 1,
+  chapter: null,
+  verse: null
+});
+const initialPageSnapshot = ref<number | null>(null);
 const hasPage = computed(() => {
   const raw = pageNumber.value as unknown;
   if (raw == null || raw === '') return false;
@@ -140,9 +146,11 @@ const hasPage = computed(() => {
 });
 
 const hasInitialSelection = computed(() => {
-  const initialPage = props.initialPage;
+  const initialPage = initialPageSnapshot.value;
   const hasInitialPage = initialPage != null && Number.isFinite(initialPage);
-  const hasInitialRef = props.initialData.chapter != null && props.initialData.verse != null;
+  const hasInitialRef =
+    initialRefSnapshot.value.chapter != null &&
+    initialRefSnapshot.value.verse != null;
   return hasInitialPage || hasInitialRef;
 });
 
@@ -176,11 +184,23 @@ const isSameRef = (a: ManualData | null, b: ManualData | null) =>
 // 1. Load data when dialog opens
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
+    const initialBook = props.initialData.book || 1;
+    const initialChapter = props.initialData.chapter;
+    const initialVerse = props.initialData.verse;
+    const initialPage = props.initialPage ?? null;
+
+    initialRefSnapshot.value = {
+      book: initialBook,
+      chapter: initialChapter,
+      verse: initialVerse
+    };
+    initialPageSnapshot.value = initialPage;
+
     suppressAutoClear = true;
-    localState.book = props.initialData.book || 1;
-    localState.chapter = props.initialData.chapter;
-    localState.verse = props.initialData.verse;
-    pageNumber.value = props.initialPage ?? null;
+    localState.book = initialBook;
+    localState.chapter = initialChapter;
+    localState.verse = initialVerse;
+    pageNumber.value = initialPage;
     lastValidRef.value = isRefValid.value
       ? { book: localState.book, chapter: localState.chapter, verse: localState.verse }
       : null;
@@ -286,14 +306,14 @@ const isSameAsInitial = computed(() => {
   if (hasPage.value) {
     const raw = pageNumber.value as unknown;
     const current = typeof raw === 'number' ? raw : Number(raw);
-    const initial = props.initialPage;
+    const initial = initialPageSnapshot.value;
     return initial != null && Number.isFinite(current) && current === initial;
   }
 
   return (
-    localState.book === props.initialData.book &&
-    localState.chapter === props.initialData.chapter &&
-    localState.verse === props.initialData.verse
+    localState.book === initialRefSnapshot.value.book &&
+    localState.chapter === initialRefSnapshot.value.chapter &&
+    localState.verse === initialRefSnapshot.value.verse
   );
 });
 
@@ -341,10 +361,10 @@ const restoreInitial = () => {
   suppressRefWatch = true;
   suppressPageWatch = true;
 
-  localState.book = props.initialData.book || 1;
-  localState.chapter = props.initialData.chapter;
-  localState.verse = props.initialData.verse;
-  pageNumber.value = props.initialPage ?? null;
+  localState.book = initialRefSnapshot.value.book;
+  localState.chapter = initialRefSnapshot.value.chapter;
+  localState.verse = initialRefSnapshot.value.verse;
+  pageNumber.value = initialPageSnapshot.value;
 
   lastValidRef.value = isRefValid.value
     ? { book: localState.book, chapter: localState.chapter, verse: localState.verse }
