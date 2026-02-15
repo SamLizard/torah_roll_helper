@@ -33,48 +33,50 @@
     <v-divider />
 
     <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
-      <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
-        <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
-        <span>{{ $t(`home.calendar.${side}`) }}</span>
-      </div>
+      <div class="mt-4" style="display: grid; min-width: 0;">
+        <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
+          <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+          <span>{{ $t(`home.calendar.${side}`) }}</span>
+        </div>
 
-      <v-slide-group show-arrows class="calendar-slide-group">
-        <v-slide-group-item
-          v-for="entry in calendarEntries"
-          :key="`${side}-${entry.key}-${entry.dateIso}`"
-        >
-          <v-card
-            class="calendar-reading-card"
-            :class="{ 'calendar-reading-card--active': isSelectedCalendarEntry(entry) }"
-            variant="outlined"
-            @click="selectCalendarEntry(entry)"
-            v-ripple
+        <v-slide-group show-arrows class="calendar-slide-group">
+          <v-slide-group-item
+            v-for="entry in calendarEntries"
+            :key="`${side}-${entry.key}-${entry.dateIso}`"
           >
-            <div class="d-flex align-center text-caption text-medium-emphasis">
-              <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
-              <span>{{ entry.dateLabel }}</span>
-            </div>
-
-            <div class="text-body-2 font-weight-bold text-truncate mt-1 mb-1">
-              {{ $t(`readingTargets.${entry.key}`) }}
-            </div>
-
-            <div class="d-flex align-center justify-space-between gap-1">
-              <div class="text-caption text-medium-emphasis font-weight-medium">
-                {{ entry.target.ref.page }} -> {{ entry.target.refEnd.page }}
+            <v-card
+              class="calendar-reading-card"
+              :class="{ 'calendar-reading-card--active': isSelectedCalendarEntry(entry) }"
+              variant="outlined"
+              @click="selectCalendarEntry(entry)"
+              v-ripple
+            >
+              <div class="d-flex align-center text-caption text-medium-emphasis">
+                <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+                <span>{{ entry.dateLabel }}</span>
               </div>
 
-              <div
-                v-if="getCalendarRollPreview(entry)"
-                :class="`text-${getCalendarRollPreview(entry)?.color} d-flex align-center gap-1 text-caption`"
-              >
-                <v-icon size="14">{{ getCalendarRollPreview(entry)?.icon }}</v-icon>
-                <span class="font-weight-bold">{{ getCalendarRollPreview(entry)?.text }}</span>
+              <div class="text-body-2 font-weight-bold text-truncate mt-1 mb-1">
+                {{ $t(`readingTargets.${entry.key}`) }}
               </div>
-            </div>
-          </v-card>
-        </v-slide-group-item>
-      </v-slide-group>
+
+              <div class="d-flex align-center justify-space-between gap-1">
+                <div class="text-caption text-medium-emphasis font-weight-medium">
+                  {{ entry.target.ref.page }} -> {{ entry.target.refEnd.page }}
+                </div>
+
+                <div
+                  v-if="getCalendarRollPreview(entry)"
+                  :class="`text-${getCalendarRollPreview(entry)?.color} d-flex align-center gap-1 text-caption`"
+                >
+                  <v-icon size="14">{{ getCalendarRollPreview(entry)?.icon }}</v-icon>
+                  <span class="font-weight-bold">{{ getCalendarRollPreview(entry)?.text }}</span>
+                </div>
+              </div>
+            </v-card>
+          </v-slide-group-item>
+        </v-slide-group>
+      </div>
     </v-card-text>
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
@@ -145,11 +147,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
 import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
+import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
-import { generateMonthlyReadings, type MonthlyReadingEntry } from '@/composables/calendar/calendar';
+import type { MonthlyReadingEntry } from '@/composables/calendar/calendar';
 import { useRtl } from 'vuetify';
 import type { TorahRef } from '@/types';
 
@@ -193,6 +197,8 @@ const emit = defineEmits<{
 const { t, locale } = useI18n();
 const { isRtl } = useRtl();
 const options = useOptionsStore();
+const monthlyReadingsStore = useMonthlyReadingsStore();
+const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
 
 // Stores the draft/selected book, chapter, verse
@@ -203,7 +209,6 @@ const currentRef = ref<ManualData>({
 });
 
 const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
-const monthlyReadings = computed(() => generateMonthlyReadings());
 
 const toManualData = (torahRef: TorahRef): ManualData => ({
   book: torahRef.book,

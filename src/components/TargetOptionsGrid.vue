@@ -75,7 +75,8 @@
                   
                   <v-expansion-panels 
                     v-if="section.groups.length > 0" 
-                    v-model="openGroups" 
+                    :model-value="getOpenGroups(section.type)"
+                    @update:model-value="(value) => setOpenGroups(section.type, value)"
                     variant="accordion" 
                     class="mb-4 rounded-lg border" 
                     flat
@@ -103,8 +104,9 @@
                           <div
                             v-for="item in group.items"
                             :key="item.key"
+                            :ref="(el) => setCardRef(item.key, el)"
                             class="option-card"
-                            :class="{ 'gola-card': item.gola }"
+                            :class="{ 'gola-card': item.gola, 'next-parasha-card': isNextParasha(item) }"
                             @click="select(item)"
                             v-ripple
                           >
@@ -113,6 +115,10 @@
                             <div v-if="item.gola" class="gola-badge">
                               <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
                               <span>{{ $t('targets.golaBadge') }}</span>
+                            </div>
+
+                            <div v-if="isNextParasha(item)" class="next-parasha-badge">
+                              <v-icon size="11" color="primary">mdi-book-marker</v-icon>
                             </div>
 
                             <div class="d-flex justify-space-between align-start mb-2">
@@ -149,14 +155,19 @@
                     <div
                       v-for="item in section.singles"
                       :key="item.key"
+                      :ref="(el) => setCardRef(item.key, el)"
                       class="option-card"
-                      :class="{ 'gola-card': item.gola }"
+                      :class="{ 'gola-card': item.gola, 'next-parasha-card': isNextParasha(item) }"
                       @click="select(item)"
                       v-ripple
                     >
                       <div v-if="item.gola" class="gola-badge">
                         <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
                         <span>{{ $t('targets.golaBadge') }}</span>
+                      </div>
+
+                      <div v-if="isNextParasha(item)" class="next-parasha-badge">
+                        <v-icon size="11" color="primary">mdi-book-marker</v-icon>
                       </div>
 
                       <div class="d-flex justify-space-between align-start mb-2">
@@ -191,8 +202,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, type ComponentPublicInstance } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useOptionsStore } from '@/stores/options';
+import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils'; // Import computeRoll
 import type { TorahRef } from '@/types';
@@ -210,12 +223,14 @@ interface TargetItem {
   refEndPartial?: TorahRef;
   refEnd: TorahRef;
 }
+type SectionType = TargetItem['type'];
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   side: { type: String as () => 'from' | 'to', default: 'to' },
   allowGola: { type: Boolean, default: false },
-  // Future TODO 8.5: Pass the group key here (e.g. 'genesis') to auto-open it
+  selectedTargetKey: { type: String, default: null },
+  // Future DONE 8.5: Pass the group key here (e.g. 'genesis') to auto-open it
   initialOpenGroup: { type: String, default: null },
 });
 
@@ -225,6 +240,8 @@ const emit = defineEmits<{
 }>();
 
 const store = useOptionsStore();
+const monthlyReadingsStore = useMonthlyReadingsStore();
+const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const filter = ref('');
 const isFullList = ref(true); 
 
@@ -234,7 +251,106 @@ const sectionCollapsed = ref<Record<string, boolean>>({});
 
 // Tracks which Inner Groups (Accordion) are open. 
 // Bound to v-model of v-expansion-panels.
-const openGroups = ref<string[]>([]);
+const openGroupsByType = ref<Record<SectionType, string[]>>({
+  parasha: [],
+  holyday: [],
+});
+const cardRefs = ref<Record<string, HTMLElement>>({});
+const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+const hasAutoFocusedNextParasha = ref(false);
+
+const isSectionType = (type: string): type is SectionType => type === 'parasha' || type === 'holyday';
+
+const setCardRef = (
+  key: string,
+  el: Element | ComponentPublicInstance | null
+) => {
+  if (!el) {
+    delete cardRefs.value[key];
+    return;
+  }
+
+  if (el instanceof Element) {
+    if (el instanceof HTMLElement) {
+      cardRefs.value[key] = el;
+    }
+    return;
+  }
+
+  const rootElement = (el as ComponentPublicInstance).$el;
+  if (rootElement instanceof HTMLElement) {
+    cardRefs.value[key] = rootElement;
+  }
+};
+
+const nextParashaKey = computed(() => {
+  const nextReadings = monthlyReadings.value.nextMonth;
+
+  for (const reading of nextReadings) {
+    const target = targetsByKey.get(reading.readingId);
+    if (!target) continue;
+    if (target.gola && !store.isInGola) continue;
+    if (target.type === 'parasha') return target.key;
+  }
+
+  return null;
+});
+
+const isNextParasha = (item: TargetItem) => item.key === nextParashaKey.value;
+
+const getPreferredFocusTargetKey = () => {
+  if (props.selectedTargetKey && filtered.value.some((target) => target.key === props.selectedTargetKey)) {
+    return props.selectedTargetKey;
+  }
+
+  return nextParashaKey.value;
+};
+
+const revealFocusGroup = () => {
+  const targetKey = getPreferredFocusTargetKey();
+  if (!targetKey) return;
+
+  const focusTarget = targetsByKey.get(targetKey);
+  if (!focusTarget) return;
+
+  sectionCollapsed.value[focusTarget.type] = false;
+  if (focusTarget.group && !openGroupsByType.value[focusTarget.type].includes(focusTarget.group)) {
+    openGroupsByType.value = {
+      ...openGroupsByType.value,
+      [focusTarget.type]: [...openGroupsByType.value[focusTarget.type], focusTarget.group],
+    };
+  }
+};
+
+const focusPreferredTarget = () => {
+  const targetKey = getPreferredFocusTargetKey();
+  if (!targetKey) return;
+
+  const focusCard = cardRefs.value[targetKey];
+  if (!focusCard) return;
+
+  focusCard.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+  hasAutoFocusedNextParasha.value = true;
+};
+
+const normalizeGroupValues = (value: unknown) => {
+  if (Array.isArray(value)) return value.map((item) => String(item));
+  if (value == null) return [];
+  return [String(value)];
+};
+
+const getOpenGroups = (type: string) => {
+  if (!isSectionType(type)) return [];
+  return openGroupsByType.value[type];
+};
+
+const setOpenGroups = (type: string, value: unknown) => {
+  if (!isSectionType(type)) return;
+  openGroupsByType.value = {
+    ...openGroupsByType.value,
+    [type]: normalizeGroupValues(value),
+  };
+};
 
 // --- Watchers ---
 
@@ -253,6 +369,9 @@ const onKeydown = (e: KeyboardEvent) => {
 // Toggle body scroll when opened/closed
 watch(open, (isOpen) => {
   if (isOpen) {
+    filter.value = '';
+    hasAutoFocusedNextParasha.value = false;
+    revealFocusGroup();
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKeydown);
   } else {
@@ -266,12 +385,14 @@ onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown);
 });
 
-// Watch for the prop to set initial open group (For TODO 8.5)
+// Watch for the prop to set initial open group (For DONE 8.5)
 watch(() => props.initialOpenGroup, (newVal) => {
   if (newVal) {
-    // Add the group to the open list if not already there
-    if (!openGroups.value.includes(newVal)) {
-      openGroups.value.push(newVal);
+    if (!openGroupsByType.value.parasha.includes(newVal)) {
+      openGroupsByType.value.parasha = [...openGroupsByType.value.parasha, newVal];
+    }
+    if (!openGroupsByType.value.holyday.includes(newVal)) {
+      openGroupsByType.value.holyday = [...openGroupsByType.value.holyday, newVal];
     }
   }
 }, { immediate: true });
@@ -358,6 +479,17 @@ const groupedSections = computed(() => {
 
   return result;
 });
+
+watch(
+  () => [open.value, props.selectedTargetKey, nextParashaKey.value, groupedSections.value.length, filter.value],
+  () => {
+    if (!open.value || hasAutoFocusedNextParasha.value) return;
+    if (filter.value.trim().length > 0) return;
+
+    focusPreferredTarget();
+  },
+  { flush: 'post' }
+);
 
 const select = (item: TargetItem) => {  
   filter.value = '';
@@ -469,6 +601,29 @@ const getRollPreview = (targetPage: number) => {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.08);
   border-color: rgb(var(--v-theme-primary));
+}
+
+.next-parasha-card {
+  border-color: rgba(var(--v-theme-primary), 0.55);
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.2);
+}
+
+.next-parasha-badge {
+  position: absolute;
+  top: 8px;
+  inset-inline-start: 8px;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(var(--v-theme-surface), 0.92);
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.next-parasha-card .option-name {
+  padding-inline-start: 20px;
 }
 
 /* Styles for Gola items */
