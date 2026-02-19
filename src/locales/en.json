@@ -2,7 +2,16 @@
   "language": "English",
   "dir": "ltr",
   "title": "Torah Roll Assistant",
-  "routes": { "home": "Home" },
+  "routes": { "home": "Home", "about": "About", "howTo": "How To Use" },
+  "about": {
+    "title": "About",
+    "description": "Torah Roll Assistant helps gabbaim and Torah readers quickly determine the rolling direction and distance between two locations in a Torah scroll.",
+    "github": "View on GitHub",
+    "dataCreditsTitle": "Data and acknowledgements",
+    "dataCreditsPrefix": "The database in this project is based on the open-source files from",
+    "dataCreditsMiddle": ", which in turn are based on",
+    "dataCreditsThanks": "Thank you to the tikkun.io project for sharing this work."
+  },
   "directions": { "forward": "Forward", "backward": "Backward" },
   "home": {
     "from": { "title": "FROM", "subtitle": "Current location (photo or manual)" },
@@ -24,6 +33,37 @@
     "actions": { "photo": "Take photo", "choose": "Choose manually", "clear": "Clear", "input": "Input" },
     "selected": "Selected",
     "noSelection": "No page selected"
+  },
+  "howTo": {
+    "title": "How To Use",
+    "subtitle": "Follow these quick steps to get clear rolling instructions.",
+    "steps": {
+      "from": "Set FROM to where the Torah is currently open.",
+      "calendar": "Use the calendar strips: recent readings for FROM and upcoming readings for TO.",
+      "to": "Set TO by choosing the next reading you want to reach.",
+      "review": "Read the result to see which direction to roll and how much to move.",
+      "adjust": "If needed, fine-tune FROM and TO so the result matches your exact reading point.",
+      "settings": "Open Settings if you need to change community mode, nusach, or scroll layout."
+    },
+    "tip": "Tip: update FROM first, then choose TO."
+  },
+  "settings": {
+    "label": "Settings",
+    "subtitle": "Reading and scroll options",
+    "golaLabel": "Gola (Diaspora) mode",
+    "nusachLabel": "Nusach",
+    "torahTypeLabel": "Scroll layout",
+    "help": {
+      "gola": "Turn this on if your shul follows the Diaspora reading schedule.",
+      "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
+      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
+    },
+    "nusachOptions": {
+      "sefaradic": "Sefaradic"
+    },
+    "torahTypeOptions": {
+      "klaf_245": "רמ\"ה (245 pages)"
+    }
   },
   "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode", "golaBadge": "Gola" },
   "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page", "clear": "Clear", "restore": "Restore" },

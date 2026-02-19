@@ -2,7 +2,16 @@
   "language": "Français",
   "dir": "ltr",
   "title": "Assistant de Roulement de la Torah",
-  "routes": { "home": "Accueil" },
+  "routes": { "home": "Accueil", "about": "À propos", "howTo": "Mode d'emploi" },
+  "about": {
+    "title": "À propos",
+    "description": "L'Assistant de Roulement de la Torah aide les gabbaïm et les lecteurs de la Torah à déterminer rapidement la direction et la distance de roulement entre deux emplacements dans un rouleau de Torah.",
+    "github": "Voir sur GitHub",
+    "dataCreditsTitle": "Données et remerciements",
+    "dataCreditsPrefix": "La base de données de ce projet est basée sur les fichiers open source de",
+    "dataCreditsMiddle": ", qui eux-mêmes s'appuient sur",
+    "dataCreditsThanks": "Merci au projet tikkun.io pour ce travail partagé."
+  },
   "directions": { "forward": "Avant", "backward": "Arrière" },
   "home": {
     "from": { "title": "DE", "subtitle": "Emplacement actuel (photo ou manuel)" },
@@ -24,6 +33,37 @@
     "actions": { "photo": "Prendre photo", "choose": "Choisir manuellement", "clear": "Effacer", "input": "Saisie" },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
+  },
+  "howTo": {
+    "title": "Mode d'emploi",
+    "subtitle": "Suivez ces étapes courtes pour obtenir des instructions de roulement claires.",
+    "steps": {
+      "from": "Définissez DE sur l'endroit où la Torah est actuellement ouverte.",
+      "calendar": "Utilisez les bandes calendrier : lectures récentes pour DE et lectures à venir pour À.",
+      "to": "Définissez À en choisissant la lecture que vous voulez atteindre.",
+      "review": "Lisez le résultat pour voir la direction de roulement et la distance à déplacer.",
+      "adjust": "Si besoin, ajustez DE et À jusqu'à obtenir le point de lecture exact.",
+      "settings": "Ouvrez les paramètres si vous devez changer le mode Gola, le noussah ou la mise en page."
+    },
+    "tip": "Astuce : commencez par définir DE, puis choisissez À."
+  },
+  "settings": {
+    "label": "Paramètres",
+    "subtitle": "Options de lecture et de rouleau",
+    "golaLabel": "Mode Diaspora (Gola)",
+    "nusachLabel": "Noussah",
+    "torahTypeLabel": "Mise en page",
+    "help": {
+      "gola": "Activez cette option si votre communauté suit le cycle de lecture de la diaspora.",
+      "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
+      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats, comme רמ״ח (248), pourront être ajoutés."
+    },
+    "nusachOptions": {
+      "sefaradic": "Séfarade"
+    },
+    "torahTypeOptions": {
+      "klaf_245": "רמ״ה (245 pages)"
+    }
   },
   "targets": { "title": "Choisir une cible", "showingAll": "Affichage de la liste complète", "golaLabel": "Mode Diaspora (Gola)", "golaBadge": "Gola" },
   "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer", "restore": "Restaurer" },

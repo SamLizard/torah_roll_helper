@@ -100,6 +100,7 @@ import { useI18n } from 'vue-i18n';
 import { getPageNumber } from '@/composables/utils'; // Adjust path if needed
 import realDb from '@/data/real_db.json'; // Ensure this path is correct
 import type { RealDb } from '@/types';
+import { useOptionsStore } from '@/stores/options';
 
 // Data interface
 export interface ManualData {
@@ -122,6 +123,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const db = realDb as RealDb;
+const optionsStore = useOptionsStore();
 
 // Local form state
 const localState = reactive<ManualData>({
@@ -279,12 +281,12 @@ const maxChapters = computed(() => {
   return MAX_CHAPTERS[localState.book - 1];
 });
 
-const maxPage = 245;
+const maxPage = computed<number>(() => optionsStore.maxTorahPages);
 
 const isPageValid = computed(() => {
   const raw = pageNumber.value as unknown;
   const v = typeof raw === 'number' ? raw : Number(raw);
-  return Number.isFinite(v) && v >= 1 && v <= maxPage;
+  return Number.isFinite(v) && v >= 1 && v <= maxPage.value;
 });
 
 const isRefValid = computed(() => {
@@ -342,7 +344,7 @@ const verseRules = [
 
 const pageRules = [
   positiveRule,
-  (v: number | null) => v == null || (v <= maxPage) || `${t('manual.max_page')} ${maxPage}`
+  (v: number | null) => v == null || (v <= maxPage.value) || `${t('manual.max_page')} ${maxPage.value}`
 ];
 
 // --- Actions ---

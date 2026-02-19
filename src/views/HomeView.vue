@@ -50,7 +50,7 @@
         style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
         size="36"
       >
-        mdi-arrow-right
+        mdi-arrow-{{ $vuetify.locale.isRtl ? 'left' : 'right' }}
       </v-icon>
 
       <v-col cols="12" class="d-flex d-md-none align-center justify-center py-0">
