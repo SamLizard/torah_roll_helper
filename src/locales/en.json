@@ -5,7 +5,7 @@
   "routes": { "home": "Home", "about": "About", "howTo": "How To Use" },
   "about": {
     "title": "About",
-    "description": "The Torah Rolling Assistant is designed for Gabbaim and Torah readers to minimize Tora'h Tzibur. It provides the exact direction and distance needed to roll a Sefer Torah between any two locations in the scroll.",
+    "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current opening of the Sefer Torah and a target reading, it calculates the exact rolling direction and number of columns needed to reach it.",
     "github": "View on GitHub",
     "dataCreditsTitle": "Data Sources & Credits",
     "dataCreditsPrefix": "The database for this project is based on open-source files from",
@@ -52,7 +52,7 @@
     "nusachLabel": "Nusach",
     "torahTypeLabel": "Scroll layout",
     "help": {
-      "gola": "Enable this if you are outside of Israel to align the weekly readings and special holidays readings with the Diaspora calendar.",
+      "gola": "Enable this if you are outside Israel to synchronize the weekly Parasha readings and special Diaspora holiday readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
       "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
     },

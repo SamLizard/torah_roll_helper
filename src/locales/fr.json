@@ -5,13 +5,13 @@
   "routes": { "home": "Accueil", "about": "À propos", "howTo": "Mode d'emploi" },
   "about": {
     "title": "À propos",
-    "description": "Cet outil aide les Gabbaim et Ba'al Koreh à préparer le Sefer Torah efficacement afin d'éviter le Tora'h Tzibur. Il calcule la direction et la distance précise (nombre de colonnes) pour rouler le parchemin entre deux lectures.",
+    "description": "Cet outil aide les Gabbaim et Ba'al Koré à préparer le Sefer Torah efficacement afin d'éviter le Tora'h Tzibur. Il calcule la direction et la distance précise (nombre de colonnes) pour rouler le parchemin entre deux lectures.",
     "github": "Voir sur GitHub",
     "dataCreditsTitle": "Données et Remerciements",
     "dataCreditsPrefix": "La base de données de ce projet repose sur les fichiers open source de",
     "dataCreditsMiddle": ", qui utilisent eux-mêmes les données de",
     "dataCreditsThanks": "Merci au projet tikkun.io pour le partage de ces ressources précieuses.",
-    "issueInvite": "Vous avez une idée d'amélioration? Une langue que vous voudrais ajouter? N'hésitez pas à ouvrir une 'issue' sur GitHub."
+    "issueInvite": "Vous avez une idée d'amélioration ou souhaitez ajouter une langue ? N'hésitez pas à ouvrir une issue sur GitHub."
   },
   "directions": { "forward": "Avant", "backward": "Arrière" },
   "home": {
@@ -52,7 +52,7 @@
     "nusachLabel": "Noussah",
     "torahTypeLabel": "Mise en page",
     "help": {
-      "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures avec le calendrier des fêtes de la Diaspora, et afficher les lectures spéciales de la Diaspora.",
+      "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures hebdomadaires et les lectures spéciales des fêtes avec le calendrier de la Diaspora.",
       "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
       "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats, comme רמ״ח (248), pourront être ajoutés."
     },
