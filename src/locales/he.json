@@ -10,7 +10,8 @@
     "dataCreditsTitle": "נתונים ותודות",
     "dataCreditsPrefix": "מסד הנתונים בפרויקט הזה מבוסס על קבצי הקוד הפתוח של",
     "dataCreditsMiddle": ", שמבוססים בתורם על",
-    "dataCreditsThanks": "תודה רבה לפרויקט tikkun.io על השיתוף."
+    "dataCreditsThanks": "תודה רבה לפרויקט tikkun.io על השיתוף.",
+    "issueInvite": "אם יש לכם רעיון לשיפור, או רצון להוסיף שפה חדשה, אפשר לפתוח issue ב-GitHub."
   },
   "directions": { "forward": "קדימה", "backward": "לאחור" },
   "home": {

@@ -10,7 +10,8 @@
     "dataCreditsTitle": "Data and acknowledgements",
     "dataCreditsPrefix": "The database in this project is based on the open-source files from",
     "dataCreditsMiddle": ", which in turn are based on",
-    "dataCreditsThanks": "Thank you to the tikkun.io project for sharing this work."
+    "dataCreditsThanks": "Thank you to the tikkun.io project for sharing this work.",
+    "issueInvite": "If you have an improvement idea, or want to add a new language, please open an issue on GitHub."
   },
   "directions": { "forward": "Forward", "backward": "Backward" },
   "home": {

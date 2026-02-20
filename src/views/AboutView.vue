@@ -31,6 +31,7 @@
               </a>.
             </p>
             <p>{{ $t('about.dataCreditsThanks') }}</p>
+            <p class="mt-4">{{ $t('about.issueInvite') }}</p>
 
             <p class="mt-4">
               <v-btn
