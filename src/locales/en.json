@@ -5,13 +5,13 @@
   "routes": { "home": "Home", "about": "About", "howTo": "How To Use" },
   "about": {
     "title": "About",
-    "description": "Torah Roll Assistant helps gabbaim and Torah readers quickly determine the rolling direction and distance between two locations in a Torah scroll.",
+    "description": "The Torah Rolling Assistant is designed for Gabbaim and Torah readers to minimize Tora'h Tzibur. It provides the exact direction and distance needed to roll a Sefer Torah between any two locations in the scroll.",
     "github": "View on GitHub",
-    "dataCreditsTitle": "Data and acknowledgements",
-    "dataCreditsPrefix": "The database in this project is based on the open-source files from",
-    "dataCreditsMiddle": ", which in turn are based on",
-    "dataCreditsThanks": "Thank you to the tikkun.io project for sharing this work.",
-    "issueInvite": "If you have an improvement idea, or want to add a new language, please open an issue on GitHub."
+    "dataCreditsTitle": "Data Sources & Credits",
+    "dataCreditsPrefix": "The database for this project is based on open-source files from",
+    "dataCreditsMiddle": ", which in turn utilize data from",
+    "dataCreditsThanks": "Our thanks go to the tikkun.io project for sharing their work with the community.",
+    "issueInvite": "If you have an improvement idea or wish to add a language, please open an issue on GitHub."
   },
   "directions": { "forward": "Forward", "backward": "Backward" },
   "home": {
@@ -26,7 +26,7 @@
       "to": "Upcoming readings"
     },
     "targetRef": {
-      "title": "Parasha reference point",
+      "title": "Parasha Reference Point",
       "ref": "Parasha start",
       "refEndPartial": "Sheni/Hamishi end",
       "refEnd": "Full parasha end"
@@ -39,12 +39,9 @@
     "title": "How To Use",
     "subtitle": "Follow these quick steps to get clear rolling instructions.",
     "steps": {
-      "from": "Set FROM to where the Torah is currently open.",
-      "calendar": "Use the calendar strips: recent readings for FROM and upcoming readings for TO.",
-      "to": "Set TO by choosing the next reading you want to reach.",
-      "review": "Read the result to see which direction to roll and how much to move.",
-      "adjust": "If needed, fine-tune FROM and TO so the result matches your exact reading point.",
-      "settings": "Open Settings if you need to change community mode, nusach, or scroll layout."
+      "step1": "Identify the current location of the scroll (the column it is currently open to) using the camera or manual input.",
+      "step2": "Select your target reading from the upcoming list or the full index.",
+      "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
     },
     "tip": "Tip: update FROM first, then choose TO."
   },
@@ -55,7 +52,7 @@
     "nusachLabel": "Nusach",
     "torahTypeLabel": "Scroll layout",
     "help": {
-      "gola": "Turn this on if your shul follows the Diaspora reading schedule.",
+      "gola": "Enable this if you are outside of Israel to align the weekly readings and special holidays readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
       "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
     },

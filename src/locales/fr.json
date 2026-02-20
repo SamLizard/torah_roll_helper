@@ -5,13 +5,13 @@
   "routes": { "home": "Accueil", "about": "À propos", "howTo": "Mode d'emploi" },
   "about": {
     "title": "À propos",
-    "description": "L'Assistant de Roulement de la Torah aide les gabbaïm et les lecteurs de la Torah à déterminer rapidement la direction et la distance de roulement entre deux emplacements dans un rouleau de Torah.",
+    "description": "Cet outil aide les Gabbaim et Ba'al Koreh à préparer le Sefer Torah efficacement afin d'éviter le Tora'h Tzibur. Il calcule la direction et la distance précise (nombre de colonnes) pour rouler le parchemin entre deux lectures.",
     "github": "Voir sur GitHub",
-    "dataCreditsTitle": "Données et remerciements",
-    "dataCreditsPrefix": "La base de données de ce projet est basée sur les fichiers open source de",
-    "dataCreditsMiddle": ", qui eux-mêmes s'appuient sur",
-    "dataCreditsThanks": "Merci au projet tikkun.io pour ce travail partagé.",
-    "issueInvite": "Si vous avez une idée d'amélioration, ou souhaitez ajouter une nouvelle langue, ouvrez une issue sur GitHub."
+    "dataCreditsTitle": "Données et Remerciements",
+    "dataCreditsPrefix": "La base de données de ce projet repose sur les fichiers open source de",
+    "dataCreditsMiddle": ", qui utilisent eux-mêmes les données de",
+    "dataCreditsThanks": "Merci au projet tikkun.io pour le partage de ces ressources précieuses.",
+    "issueInvite": "Vous avez une idée d'amélioration? Une langue que vous voudrais ajouter? N'hésitez pas à ouvrir une 'issue' sur GitHub."
   },
   "directions": { "forward": "Avant", "backward": "Arrière" },
   "home": {
@@ -39,12 +39,9 @@
     "title": "Mode d'emploi",
     "subtitle": "Suivez ces étapes courtes pour obtenir des instructions de roulement claires.",
     "steps": {
-      "from": "Définissez DE sur l'endroit où la Torah est actuellement ouverte.",
-      "calendar": "Utilisez les bandes calendrier : lectures récentes pour DE et lectures à venir pour À.",
-      "to": "Définissez À en choisissant la lecture que vous voulez atteindre.",
-      "review": "Lisez le résultat pour voir la direction de roulement et la distance à déplacer.",
-      "adjust": "Si besoin, ajustez DE et À jusqu'à obtenir le point de lecture exact.",
-      "settings": "Ouvrez les paramètres si vous devez changer le mode Gola, le noussah ou la mise en page."
+      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo ou saisie manuelle.",
+      "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
+      "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
     },
     "tip": "Astuce : commencez par définir DE, puis choisissez À."
   },
@@ -55,7 +52,7 @@
     "nusachLabel": "Noussah",
     "torahTypeLabel": "Mise en page",
     "help": {
-      "gola": "Activez cette option si votre communauté suit le cycle de lecture de la diaspora.",
+      "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures avec le calendrier des fêtes de la Diaspora, et afficher les lectures spéciales de la Diaspora.",
       "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
       "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats, comme רמ״ח (248), pourront être ajoutés."
     },

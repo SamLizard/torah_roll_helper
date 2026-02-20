@@ -12,8 +12,8 @@
 
           <v-card-text class="pt-6">
             <ol class="howto-list">
-              <li v-for="(step, idx) in steps" :key="idx">
-                {{ step }}
+              <li v-for="(step, idx) in 3" :key="idx">
+                {{ $t(`howTo.steps.step${idx + 1}`) }}
               </li>
             </ol>
 
@@ -28,21 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-
-const { t } = useI18n();
-
-const steps = computed<string[]>(() => {
-  return [
-    t('howTo.steps.from'),
-    t('howTo.steps.calendar'),
-    t('howTo.steps.to'),
-    t('howTo.steps.review'),
-    t('howTo.steps.adjust'),
-    t('howTo.steps.settings'),
-  ];
-});
 </script>
 
 <style scoped>
