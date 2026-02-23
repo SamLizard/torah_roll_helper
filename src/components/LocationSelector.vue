@@ -80,7 +80,7 @@
     </v-card-text>
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
-      <!-- TODO 9.5: fix the texts that are one on the other in french (should go over another line?) -->
+      <!-- DONE 9.5: fix the texts that are one on the other in french (should go over another line?) -->
       <div v-if="page !== null" class="text-center w-100">
         <!-- DONE 4: display the name of the page. Base on the selection if manually selected, or if fits exactly a reading. Else take from json. -->
         <!-- So, there should be a utils method that returns the title id based on the page number, for the case that it doesn't have a selection from the options (TargetOptionsGrid) -->
@@ -518,6 +518,16 @@ const clear = () => {
   flex: 1 1 0;
   min-width: 0;
   text-transform: none;
+  height: auto;
+  min-height: 32px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.target-ref-toggle :deep(.v-btn__content) {
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
 }
 
 @media (max-width: 900px) {
