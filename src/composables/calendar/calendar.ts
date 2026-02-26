@@ -10,19 +10,9 @@ export interface MonthlyReadingEntry {
 }
 
 export interface MonthlyReadings {
-  /**
-   * Readings from one month before today until today (inclusive).
-   * Example: if today is 2026-02-12, this range is 2026-01-12..2026-02-12.
-   */
   lastMonth: MonthlyReadingEntry[]
-  /**
-   * Readings from today until one month after today (inclusive).
-   * Example: if today is 2026-02-12, this range is 2026-02-12..2026-03-12.
-   */
   nextMonth: MonthlyReadingEntry[]
 }
-
-// DONE: make it simpler (remove this, and take directly the day...)
 
 type TorahOccurrence = {
   readingId: string
@@ -34,7 +24,6 @@ type Group = {
   dates: Set<string>
 }
 
-// Canonical parsha IDs used by the old `parshiyot.json` data (via slugify(parsha.en)).
 const PARSHA_IDS = [
   'bereshit',
   'noach',
@@ -172,7 +161,6 @@ const getTorahOccurrences = (
       dateIso,
     })
 
-    // DONE: In fullkriyah, if the fullkriyah.M.reason is fulled, it means that there is a special shabbat with a reading for Maftir. In this case, add the maftir one to the list.
     const maftirAliyah = leining.fullkriyah.M
     const maftirReason = maftirAliyah?.reason
     const specialMaftirName = extractSpecialShabbatName(maftirReason)
@@ -205,7 +193,6 @@ const parshaIdFromLeining = (leining: Leyning | LeyningWeekday, titleEn: string)
   if (parshaNum && parshaNum >= 1 && parshaNum <= PARSHA_IDS.length)
     return PARSHA_IDS[parshaNum - 1]
 
-  // Fallback for unexpected shapes: keep previous behavior but collapse doubles to the first name.
   const firstPart = titleEn.split(' ')[0]
   return toRepositoryReadingId(firstPart)
 }
@@ -268,7 +255,6 @@ const extractSpecialShabbatName = (reason: string | undefined) => {
   const afterShabbat = shabbatSplit[1]?.trim()
   if (!afterShabbat) return null
 
-  // Normalize cases like "Shabbat Shekalim (on Rosh Chodesh)" => "Shekalim"
   return afterShabbat.split('(')[0].trim()
 }
 
@@ -328,11 +314,12 @@ export {
   generateMonthlyReadings,
 }
 
-// pay attention:
-// there are 4 parashiyot that the last verse is finishing at the following page of the start of the last verse:
-// - Vayestse 
-// - Ki tisa
-// - Emor
-// - Ekev
+/* pay attention:
+there are 4 parashiyot that the last verse is finishing at the following page of the start of the last verse:
+- Vayestse 
+- Ki tisa
+- Emor
+- Ekev
 
-// But there is no parasha that the last verse is finishing at the end of current page, and the next verse is in next page.
+But there is no parasha that the last verse is finishing at the end of current page, and the next verse is in next page.
+*/

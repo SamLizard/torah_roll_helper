@@ -101,7 +101,6 @@ const getRouteIcon = (route: (typeof navLinks.value)[number]): string | undefine
 };
 
 const openSettingsPopup = (): void => {
-  // DONE: Implement your settings logic here
   settingsPopupOpen.value = true;
   drawer.value = false;
 };
@@ -115,7 +114,6 @@ const openSettingsPopup = (): void => {
   margin-right: 8px;
 }
 
-/* Allow the title in the drawer to take multiple lines so it's readable */
 .full-title-wrap {
   white-space: normal !important;
   line-height: 1.2;
@@ -130,7 +128,6 @@ const openSettingsPopup = (): void => {
   border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-/* Visually highlight the active button on desktop */
 .v-btn--active {
   font-weight: bold;
 }

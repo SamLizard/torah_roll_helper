@@ -10,7 +10,7 @@ const TORAH_TYPE_OPTIONS = [
 type TorahTypeOption = (typeof TORAH_TYPE_OPTIONS)[number]['id'];
 
 interface State {
-  isInGola: boolean; // DONE 2: make the gola change the data shown.
+  isInGola: boolean;
   nusach: NusachOption;
   torahType: TorahTypeOption;
   fromPage: number | null;

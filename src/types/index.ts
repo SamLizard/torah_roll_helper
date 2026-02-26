@@ -12,10 +12,8 @@ interface PageEntry {
   firstVerse: Verse;
 }
 
-// A Book is an array of [chapter, verse, page] tuples
 type BookData = [number, number, number][];
 
-// The RealDb is an array containing 5 BookData arrays
 type RealDb = BookData[];
 
 interface RollInstructions {

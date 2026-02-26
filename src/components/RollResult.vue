@@ -1,5 +1,4 @@
 <template>
-  <!-- DONE 7.6: Use the same colors for the arrows and text as the preview (DONE 5) -->
   <v-sheet class="pa-6 d-flex flex-column align-center" elevation="2">
     <div class="text-subtitle-1 mb-2">{{ $t('result.title') }}</div>
 

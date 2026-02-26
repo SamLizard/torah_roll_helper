@@ -1,7 +1,4 @@
 <template>
-  <!-- DONE 7.7: add an option to choose directly the page (for example, he have tikkun open at some page) -->
-  <!-- Add a horizontal bar, then a input for page? -->
-  <!-- DONE 8.2: There is a bug - when the manual data is empty, if the user enters the chapter and verse, it doesn't let him define the page using it... -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rounded-xl pa-4">
       <v-card-title class="manual-dialog-title">
@@ -102,14 +99,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getPageNumber } from '@/composables/utils'; // Adjust path if needed
+import { getPageNumber } from '@/composables/utils';
 import { useManualEntryRules } from '@/composables/rules';
-import realDb from '@/data/real_db.json'; // Ensure this path is correct
+import realDb from '@/data/real_db.json';
 import type { RealDb } from '@/types';
 import { useOptionsStore } from '@/stores/options';
 import Swal from 'sweetalert2';
 
-// Data interface
 export interface ManualData {
   book: number;
   chapter: number | null;
@@ -125,14 +121,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
   (e: 'save', data: ManualData, page: number): void;
-  (e: 'draft', data: ManualData): void; // New emit for live updates
+  (e: 'draft', data: ManualData): void;
 }>();
 
 const { t } = useI18n();
 const db = realDb as RealDb;
 const optionsStore = useOptionsStore();
 
-// Local form state
 const localState = reactive<ManualData>({
   book: 1,
   chapter: null,
@@ -170,11 +165,9 @@ const isLocalEmpty = computed(() =>
   !hasPage.value
 );
 
-// Constants
 const BOOKS = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'];
 const MAX_CHAPTERS = [50, 40, 27, 36, 34];
 
-// Computed
 const dialog = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val)
@@ -190,7 +183,6 @@ const lastValidPage = ref<number | null>(null);
 const isSameRef = (a: ManualData | null, b: ManualData | null) =>
   !!a && !!b && a.book === b.book && a.chapter === b.chapter && a.verse === b.verse;
 
-// 1. Load data when dialog opens
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
     const initialBook = props.initialData.book || 1;
@@ -220,7 +212,6 @@ watch(() => props.modelValue, (isOpen) => {
   }
 });
 
-// 2. Watch for changes and emit 'draft' immediately
 watch(localState, (newState) => {
   emit('draft', { ...newState });
 }, { deep: true });
@@ -267,18 +258,15 @@ watch(pageNumber, () => {
   }
 });
 
-// Book change logic (reset chapter if out of bounds)
 watch(() => localState.book, () => {
   if (localState.chapter && localState.chapter > maxChapters.value) {
     localState.chapter = null;
   }
 });
 
-// --- Computed ---
-
 const bookOptions = computed(() => {
   return BOOKS.map((key, index) => ({
-    title: t(`group.${key}`), // Ensure these keys exist in your i18n files
+    title: t(`group.${key}`),
     value: index + 1
   }));
 });
@@ -337,8 +325,6 @@ const { chapterRules, verseRules, pageRules } = useManualEntryRules({
   t
 });
 
-// --- Actions ---
-
 const clearLocal = () => {
   localState.book = 1;
   localState.chapter = null;
@@ -375,7 +361,6 @@ const close = () => {
 };
 
 const confirm = () => {
-  // DONE 14: Check that the new page/ManualData is different from the one that is currently selected (if it was already selected - look at prop), to avoid unnecessary emits/updates.
   if (isSameAsInitial.value) return;
   if (hasPage.value) {
     if (isPageValid.value) {
@@ -393,14 +378,10 @@ const confirm = () => {
       localState.verse as number
     );
     
-    // Even if page is 0 (not found), we might want to let the user know,
-    // but here we only emit if valid.
     if (page > 0) {
-      // Emit the full data object + the calculated page
       emit('save', { ...localState }, page);
       close();
     } else {
-      // DONE 12: use sweetalert instead
       Swal.fire({
         icon: 'warning',
         title: t('noResults'),

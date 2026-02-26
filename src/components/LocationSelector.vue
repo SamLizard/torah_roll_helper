@@ -1,10 +1,6 @@
 <template>
-  <!-- DONE 15: make the components of a reading the same for calendar and TargetOptionsGrid -->
-  <!-- DONE 11: The book (i18n) + perek (+ verse if there is one) should be displayed in the component -->
-  <!-- DONE: it is not working when the page was chosen manually -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
     <v-card-item class="location-card-item">
-      <!-- DONE 7.9: fix subtitle hidden by actions. -->
       <div class="location-header">
         <div class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
@@ -65,12 +61,7 @@
     </v-card-text>
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
-      <!-- DONE 9.5: fix the texts that are one on the other in french (should go over another line?) -->
       <div v-if="page !== null" class="text-center w-100">
-        <!-- DONE 4: display the name of the page. Base on the selection if manually selected, or if fits exactly a reading. Else take from json. -->
-        <!-- So, there should be a utils method that returns the title id based on the page number, for the case that it doesn't have a selection from the options (TargetOptionsGrid) -->
-        <!-- The method checks the readings for a corresponding, and if there isn't, get the page id/ids from page_titles_keys.json. -->
-        <!-- When there are multiple ids, join them using / (take from i18n, because hebrew "/" is "\", and english/french "/" is "/"...) -->
         <div class="location-page-number font-weight-black text-primary mb-2">{{ page }}</div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
@@ -171,7 +162,7 @@ interface TargetRefOption {
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
-  selectedRef: { type: Object as () => ManualData | null, default: null }, // Received from HomeView
+  selectedRef: { type: Object as () => ManualData | null, default: null },
   allowPhotoForTo: { type: Boolean, default: false },
   targetKey: { type: String as () => string | null, default: null },
 });
@@ -179,7 +170,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'open-dicta'): void;
   (e: 'choose-manual'): void;
-  (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void; // Updated signature
+  (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void;
 }>();
 
 const { t, locale } = useI18n();
@@ -189,7 +180,6 @@ const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
 
-// Stores the draft/selected book, chapter, verse
 const currentRef = ref<ManualData>({
   book: 1,
   chapter: null,
@@ -386,29 +376,23 @@ const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
   emit('manual-set', targetRef.page, refData, matchedTarget.value.key);
 };
 
-// Sync local state when the prop changes (e.g., selection from TargetOptionsGrid)
 watch(() => props.selectedRef, (newRef) => {
   if (newRef) {
     currentRef.value = { ...newRef };
   } else if (props.page === null) {
-    // Only reset if page is also cleared, otherwise keep last draft
     currentRef.value = { book: 1, chapter: null, verse: null };
   }
 }, { immediate: true });
 
-// Logic for DONE 4 & 11
 const computedPageTitle = computed(() => {
   if (props.page === null) return '';
 
-  // Use the updated utility that accepts (page, refData)
-  // We pass currentRef.value which contains {book, chapter, verse}
   const keys = getPageTitleKeys(props.page, currentRef.value);
   
   if (keys && keys.length > 0) {
     return keys.map(key => t(key)).join(t('separator'));
   }
 
-  // Last resort: empty (just shows page number)
   return '';
 });
 
@@ -429,15 +413,14 @@ const onManualSave = (data: ManualData, page: number) => {
     const refData = toManualData(targetRef);
 
     currentRef.value = refData;
-    emit('manual-set', targetRef.page, refData, matchedManualTarget.key); // Emit both page and ref data
+    emit('manual-set', targetRef.page, refData, matchedManualTarget.key);
     return;
   }
 
   currentRef.value = data;
-  emit('manual-set', page, data, null); // Emit both page and ref data
+  emit('manual-set', page, data, null);
 };
 
-// When Typing in Manual Dialog (Draft)
 const onManualDraft = (data: ManualData) => {
   if (props.page === null) {
     currentRef.value = data;
@@ -446,9 +429,6 @@ const onManualDraft = (data: ManualData) => {
 
 const clear = () => {
   emit('manual-set', null, undefined);
-  // We do NOT clear currentRef here. 
-  // This means if the user clears the page, the "Draft" remains in memory 
-  // and will appear if they open the input dialog again.
 };
 </script>
 

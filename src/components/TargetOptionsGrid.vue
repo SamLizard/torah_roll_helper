@@ -1,5 +1,4 @@
 <template>
-  <!-- DONE 7.5: Change it so the navbar is always accessible. Maybe add a navbar instance? Or change from v-dialog to regular page? -->
   <transition name="dialog-bottom-transition">
     <div 
       v-if="open" 
@@ -36,8 +35,6 @@
               {{ $t('targets.showingAll') }} 
               <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
             </div>
-            
-            <!-- DONE 7.6: maybe put it directly in the navbar? Wait to have a special part for the user details/settings? -->
           </div>
 
           <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
@@ -145,7 +142,7 @@ import { storeToRefs } from 'pinia';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
-import { computeRoll } from '@/composables/utils'; // Import computeRoll
+import { computeRoll } from '@/composables/utils';
 import type { TorahRef } from '@/types';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
@@ -169,7 +166,6 @@ const props = defineProps({
   side: { type: String as () => 'from' | 'to', default: 'to' },
   allowGola: { type: Boolean, default: false },
   selectedTargetKey: { type: String, default: null },
-  // Future DONE 8.5: Pass the group key here (e.g. 'genesis') to auto-open it
   initialOpenGroup: { type: String, default: null },
 });
 
@@ -184,12 +180,7 @@ const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const filter = ref('');
 const isFullList = ref(true); 
 
-// Tracks which Outer Sections (Types) are collapsed.
-// Default: empty object means all are expanded (false).
 const sectionCollapsed = ref<Record<string, boolean>>({});
-
-// Tracks which Inner Groups (Accordion) are open. 
-// Bound to v-model of v-expansion-panels.
 const openGroupsByType = ref<Record<SectionType, string[]>>({
   parasha: [],
   holyday: [],
@@ -291,21 +282,17 @@ const setOpenGroups = (type: string, value: unknown) => {
   };
 };
 
-// --- Watchers ---
-
 const open = computed({
   get: () => props.modelValue,
   set: (v: boolean) => emit('update:modelValue', v)
 });
 
-// Handle ESC key to close
 const onKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && open.value) {
     close();
   }
 };
 
-// Toggle body scroll when opened/closed
 watch(open, (isOpen) => {
   if (isOpen) {
     filter.value = '';
@@ -324,7 +311,6 @@ onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown);
 });
 
-// Watch for the prop to set initial open group (For DONE 8.5)
 watch(() => props.initialOpenGroup, (newVal) => {
   if (newVal) {
     if (!openGroupsByType.value.parasha.includes(newVal)) {
@@ -336,8 +322,6 @@ watch(() => props.initialOpenGroup, (newVal) => {
   }
 }, { immediate: true });
 
-// --- Logic ---
-
 const toggleSection = (type: string) => {
   sectionCollapsed.value[type] = !sectionCollapsed.value[type];
 };
@@ -347,13 +331,8 @@ const filtered = computed(() => {
   const list = targetsData as TargetItem[];
   
   return list.filter((target) => {
-    // Exclude gola-only items when the store says we're not in Gola
     if (target.gola && !store.isInGola) return false;
-
-    // If no query, include the item (already passed gola check)
     if (!q) return true;
-
-    // Search matches: key, type, page, or translated name
     const searchStr = `${target.key} ${target.type} ${target.ref.page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
     return searchStr.includes(q);
   });
@@ -361,17 +340,13 @@ const filtered = computed(() => {
 
 const pagedOptions = computed(() => filtered.value);
 
-// 2. Grouping Logic
 const groupedSections = computed(() => {
-  // Buckets for types
   const buckets: Record<string, { groups: Record<string, TargetItem[]>, singles: TargetItem[] }> = {
     parasha: { groups: {}, singles: [] },
     holyday: { groups: {}, singles: [] }
   };
 
-  // Step A: Distribute items into buckets
   filtered.value.forEach(item => {
-    // Determine type bucket (fallback to 'holyday' if unknown type appears, or skip)
     const typeKey = (item.type === 'parasha') ? 'parasha' : 'holyday';
     
     if (item.group) {
@@ -384,8 +359,6 @@ const groupedSections = computed(() => {
     }
   });
 
-  // Step B: Transform to array structure and handle "Single Item Groups"
-  // Order: Parasha first, then Holyday (or strict array order)
   const result = [];
   
   for (const type of ['parasha', 'holyday']) {
@@ -393,7 +366,6 @@ const groupedSections = computed(() => {
     const finalGroups: { key: string, items: TargetItem[] }[] = [];
     const finalSingles = [...data.singles];
 
-    // Process groups: if > 1 item, keep as group. Else, move to singles.
     Object.entries(data.groups).forEach(([groupKey, items]) => {
       if (items.length > 1) {
         finalGroups.push({ key: groupKey, items });
@@ -402,16 +374,14 @@ const groupedSections = computed(() => {
       }
     });
 
-    // Calculate total count for this Type section
     const totalCount = finalSingles.length + finalGroups.reduce((sum, g) => sum + g.items.length, 0);
 
-    // Only add section if it has content
     if (totalCount > 0) {
       result.push({
         type,
-        groups: finalGroups, // You might want to sort these keys if needed
+        groups: finalGroups,
         singles: finalSingles,
-        count: totalCount // <--- Added this line
+        count: totalCount
       });
     }
   }
@@ -441,24 +411,18 @@ const close = () => {
   open.value = false;
 };
 
-// Logic for DONE 5
 const getRollPreview = (targetPage: number) => {
-  // Only show preview if we are selecting 'TO' and we have a 'FROM' page
   const fromPage = store.fromPage;
 
   if (props.side !== 'to' || fromPage === null || fromPage === targetPage) {
     return null;
   }
 
-  // Calculate logic
   const result = computeRoll(fromPage, targetPage);
   if (!result) return null;
 
   const isForward = result.rollDirection === 'forward';
   
-  // RTL Logic for Icon Direction
-  // In LTR: Forward = Right Arrow, Backward = Left Arrow
-  // In RTL (Hebrew): Forward (Next Columns) = Left Arrow, Backward = Right Arrow
   let iconName = '';
   if (isRtl.value) {
     iconName = isForward ? 'mdi-arrow-left' : 'mdi-arrow-right';
@@ -475,26 +439,15 @@ const getRollPreview = (targetPage: number) => {
 </script>
 
 <style scoped>
-/* FULL SCREEN OVERLAY
-  - Fixed position
-  - z-index: 950 (Below NavBar which is usually >1000)
-  - padding-top: 64px (To prevent content from hiding behind NavBar)
-*/
 .target-overlay {
   position: fixed;
-  inset: 0; /* top:0, right:0, bottom:0, left:0 */
+  inset: 0;
   z-index: 950;
-  
-  /* Safe area for navbar - usually 56px-64px depending on density */
-  padding-top: 64px; 
-  
+  padding-top: 64px;
   display: flex;
   flex-direction: column;
 }
 
-/* ANIMATION 
-  Replicating the dialog-bottom-transition 
-*/
 .dialog-bottom-transition-enter-active,
 .dialog-bottom-transition-leave-active {
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
@@ -530,10 +483,6 @@ const getRollPreview = (targetPage: number) => {
   }
 }
 
-/* Modern CSS Grid:
-   Creates columns that are at least 180px wide.
-   Fills the row automatically. No media queries needed.
-*/
 .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -541,13 +490,6 @@ const getRollPreview = (targetPage: number) => {
   padding-bottom: 24px;
 }
 
-/* .targets-dialog :deep(.v-overlay__content) {
-  top: var(--v-layout-top, 64px);
-  height: calc(100% - var(--v-layout-top, 64px));
-  max-height: none;
-} */
-
-/* Specific style to make expansion panels blend better */
 :deep(.v-expansion-panel) {
   border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
@@ -555,7 +497,6 @@ const getRollPreview = (targetPage: number) => {
   border-bottom: none !important;
 }
 
-/* Animations for chevron */
 .rotate-minus-90 {
   transform: rotate(-90deg);
 }

@@ -1,4 +1,3 @@
-// DONE 14: pass rules to here (if possible)
 import type { ComputedRef, Ref } from 'vue';
 
 type Translate = (key: string) => string;
