@@ -99,94 +99,34 @@
                       
                       <v-expansion-panel-text>
                         <div class="options-grid pt-2">
-                          <div
+                          <ReadingOptionCard
                             v-for="item in group.items"
                             :key="item.key"
                             :ref="(el) => setCardRef(item.key, el)"
-                            class="option-card"
-                            :class="{ 'gola-card': item.gola, 'next-parasha-card': isNextParasha(item) }"
+                            :reading-key="item.key"
+                            :page="item.ref.page"
+                            :is-gola="item.gola"
+                            :highlight-next-parasha="isNextParasha(item)"
+                            :roll-preview="getRollPreview(item.ref.page)"
                             @click="select(item)"
-                            v-ripple
-                          >
-                            <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
-                            <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
-                            <div v-if="item.gola" class="gola-badge">
-                              <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
-                              <span>{{ $t('targets.golaBadge') }}</span>
-                            </div>
-
-                            <div v-if="isNextParasha(item)" class="next-parasha-badge">
-                              <v-icon size="11" color="primary">mdi-book-marker</v-icon>
-                            </div>
-
-                            <div class="d-flex justify-space-between align-start mb-2">
-                              <span class="option-name text-truncate">
-                                {{ $t(`readingTargets.${item.key}`) }}
-                              </span>
-                            </div>
-                            
-                            <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
-                            <!-- DONE 7: add special display for the only gola readings. -->
-                            <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                              <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                              <div 
-                                v-if="getRollPreview(item.ref.page)" 
-                                :class="`text-${getRollPreview(item.ref.page)?.color} d-flex align-center gap-1`"
-                              >
-                                <v-icon size="x-small">
-                                  {{ getRollPreview(item.ref.page)?.icon }}
-                                </v-icon>
-                                
-                                <span class="font-weight-bold mx-1">
-                                  {{ getRollPreview(item.ref.page)?.text }}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                          />
                         </div>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
                   </v-expansion-panels>
 
                   <div v-if="section.singles.length > 0" class="options-grid">
-                    <div
+                    <ReadingOptionCard
                       v-for="item in section.singles"
                       :key="item.key"
                       :ref="(el) => setCardRef(item.key, el)"
-                      class="option-card"
-                      :class="{ 'gola-card': item.gola, 'next-parasha-card': isNextParasha(item) }"
+                      :reading-key="item.key"
+                      :page="item.ref.page"
+                      :is-gola="item.gola"
+                      :highlight-next-parasha="isNextParasha(item)"
+                      :roll-preview="getRollPreview(item.ref.page)"
                       @click="select(item)"
-                      v-ripple
-                    >
-                      <div v-if="item.gola" class="gola-badge">
-                        <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
-                        <span>{{ $t('targets.golaBadge') }}</span>
-                      </div>
-
-                      <div v-if="isNextParasha(item)" class="next-parasha-badge">
-                        <v-icon size="11" color="primary">mdi-book-marker</v-icon>
-                      </div>
-
-                      <div class="d-flex justify-space-between align-start mb-2">
-                        <span class="option-name text-truncate">
-                          {{ $t(`readingTargets.${item.key}`) }}
-                        </span>
-                      </div>
-                      
-                      <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                        <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                        <div v-if="getRollPreview(item.ref.page)" :class="`text-${getRollPreview(item.ref.page)?.color}`">
-                          <v-icon size="x-small" class="me-1">
-                            {{ getRollPreview(item.ref.page)?.icon }}
-                          </v-icon>
-                          <span class="font-weight-bold">
-                            {{ getRollPreview(item.ref.page)?.text }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    />
                   </div>
 
                 </div>
@@ -209,6 +149,7 @@ import { computeRoll } from '@/composables/utils'; // Import computeRoll
 import type { TorahRef } from '@/types';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
+import ReadingOptionCard from './ReadingOptionCard.vue';
 const { t } = useI18n();
 const { isRtl } = useRtl();
 
@@ -598,77 +539,6 @@ const getRollPreview = (targetPage: number) => {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   padding-bottom: 24px;
-}
-
-.option-card {
-  background-color: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.option-card:hover { 
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-  border-color: rgb(var(--v-theme-primary));
-}
-
-.next-parasha-card {
-  border-color: rgba(var(--v-theme-primary), 0.55);
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.2);
-}
-
-.next-parasha-badge {
-  position: absolute;
-  top: 8px;
-  inset-inline-start: 8px;
-  width: 20px;
-  height: 20px;
-  background-color: rgba(var(--v-theme-surface), 0.92);
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.next-parasha-card .option-name {
-  padding-inline-start: 20px;
-}
-
-/* Styles for Gola items */
-.gola-card {
-  border-color: rgba(var(--v-theme-primary), 0.3);
-  background-color: rgba(var(--v-theme-primary), 0.03); /* Very light tint */
-}
-
-.gola-badge {
-  position: absolute;
-  top: 8px;
-  inset-inline-end: 8px; /* Use logical CSS if preferred: inset-inline-end: 8px */
-  background-color: rgba(var(--v-theme-surface), 0.9);
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: rgb(var(--v-theme-primary));
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-}
-
-.option-name { 
-  font-weight: 600; 
-  font-size: 1rem;
-  line-height: 1.2;
-  /* Ensure text doesn't overlap the badge if name is long */
-  padding-inline-end: 20px;
 }
 
 /* .targets-dialog :deep(.v-overlay__content) {

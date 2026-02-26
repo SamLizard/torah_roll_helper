@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO 15: make the components of a reading the same for calendar and TargetOptionsGrid -->
+  <!-- DONE 15: make the components of a reading the same for calendar and TargetOptionsGrid -->
   <!-- DONE 11: The book (i18n) + perek (+ verse if there is one) should be displayed in the component -->
   <!-- DONE: it is not working when the page was chosen manually -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
@@ -46,36 +46,19 @@
             v-for="entry in calendarEntries"
             :key="`${side}-${entry.key}-${entry.dateIso}`"
           >
-            <v-card
-              class="calendar-reading-card"
-              :class="{ 'calendar-reading-card--active': isSelectedCalendarEntry(entry) }"
-              variant="outlined"
+            <ReadingOptionCard
+              :reading-key="entry.key"
+              :page="entry.target.ref.page"
+              :active="isSelectedCalendarEntry(entry)"
+              :is-gola="entry.target.gola"
+              :highlight-next-parasha="isNextParasha(entry)"
+              :show-next-parasha-badge="false"
+              :date-label="entry.dateLabel"
+              :show-date-icon="true"
+              :roll-preview="getCalendarRollPreview(entry)"
+              :compact-calendar="true"
               @click="selectCalendarEntry(entry)"
-              v-ripple
-            >
-              <div class="d-flex align-center text-caption text-medium-emphasis">
-                <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
-                <span>{{ entry.dateLabel }}</span>
-              </div>
-
-              <div class="text-body-2 font-weight-bold text-truncate mt-1 mb-1">
-                {{ $t(`readingTargets.${entry.key}`) }}
-              </div>
-
-              <div class="d-flex align-center justify-space-between gap-1">
-                <div class="text-caption text-medium-emphasis font-weight-medium">
-                  {{ entry.target.ref.page }} -> {{ entry.target.refEnd.page }}
-                </div>
-
-                <div
-                  v-if="getCalendarRollPreview(entry)"
-                  :class="`text-${getCalendarRollPreview(entry)?.color} d-flex align-center gap-1 text-caption`"
-                >
-                  <v-icon size="14">{{ getCalendarRollPreview(entry)?.icon }}</v-icon>
-                  <span class="font-weight-bold">{{ getCalendarRollPreview(entry)?.text }}</span>
-                </div>
-              </div>
-            </v-card>
+            />
           </v-slide-group-item>
         </v-slide-group>
       </div>
@@ -152,6 +135,7 @@ import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
+import ReadingOptionCard from './ReadingOptionCard.vue';
 import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
@@ -162,6 +146,7 @@ import type { TorahRef } from '@/types';
 
 interface TargetItem {
   key: string;
+  type: 'parasha' | 'holyday';
   gola: boolean;
   ref: TorahRef;
   refEndPartial?: TorahRef;
@@ -313,6 +298,21 @@ const calendarEntries = computed(() => {
       : a.dateIso.localeCompare(b.dateIso)
   );
 });
+
+const nextParashaKey = computed(() => {
+  const nextReadings = monthlyReadings.value.nextMonth;
+
+  for (const reading of nextReadings) {
+    const target = targetsByKey.get(reading.readingId);
+    if (!target) continue;
+    if (target.gola && !options.isInGola) continue;
+    if (target.type === 'parasha') return target.key;
+  }
+
+  return null;
+});
+
+const isNextParasha = (entry: CalendarEntry) => entry.key === nextParashaKey.value;
 
 const isSelectedCalendarEntry = (entry: CalendarEntry) => {
   if (props.targetKey) return props.targetKey === entry.key;
@@ -503,25 +503,6 @@ const clear = () => {
   margin-inline: -4px;
 }
 
-.calendar-reading-card {
-  min-width: 166px;
-  max-width: 184px;
-  padding: 8px 10px;
-  margin-inline: 4px;
-  cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.calendar-reading-card:hover {
-  border-color: rgb(var(--v-theme-primary));
-  transform: translateY(-2px);
-}
-
-.calendar-reading-card--active {
-  border-color: rgb(var(--v-theme-primary));
-  background-color: rgba(var(--v-theme-primary), 0.08);
-}
-
 .target-ref-toggle {
   width: 100%;
 }
@@ -612,7 +593,7 @@ const clear = () => {
     scrollbar-width: thin;
   }
 
-  .calendar-reading-card {
+  .calendar-slide-group :deep(.reading-option-card--calendar) {
     min-width: 154px;
   }
 }
