@@ -106,6 +106,7 @@ import { getPageNumber } from '@/composables/utils'; // Adjust path if needed
 import realDb from '@/data/real_db.json'; // Ensure this path is correct
 import type { RealDb } from '@/types';
 import { useOptionsStore } from '@/stores/options';
+import Swal from 'sweetalert2';
 
 // Data interface
 export interface ManualData {
@@ -415,9 +416,13 @@ const confirm = () => {
       emit('save', { ...localState }, page);
       close();
     } else {
-      // TODO 12: use sweetalert instead
-      // Optional: Handle "Page not found" error
-      console.warn('Page not found for coordinates');
+      // DONE 12: use sweetalert instead
+      Swal.fire({
+        icon: 'warning',
+        title: t('noResults'),
+        text: t('manual.page_not_found'),
+        confirmButtonText: t('actions.close')
+      });
     }
   }
 };

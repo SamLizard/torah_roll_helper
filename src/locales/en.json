@@ -89,7 +89,8 @@
     "must_be_positive": "Must be positive",
     "max_chapter": "Max chapter is",
     "max_verse": "Max verse is",
-    "max_page": "Max page is"
+    "max_page": "Max page is",
+    "page_not_found": "Page not found for the selected reference."
   },
   "type": {
     "parasha": "Parashot",

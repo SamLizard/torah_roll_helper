@@ -89,7 +89,8 @@
     "must_be_positive": "Doit être positif",
     "max_chapter": "Le chapitre max est",
     "max_verse": "Le verset max est",
-    "max_page": "La page max est"
+    "max_page": "La page max est",
+    "page_not_found": "Page introuvable pour la référence sélectionnée."
   },
   "type": {
     "parasha": "Parachot",
