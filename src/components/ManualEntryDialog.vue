@@ -103,6 +103,7 @@
 import { ref, computed, watch, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getPageNumber } from '@/composables/utils'; // Adjust path if needed
+import { useManualEntryRules } from '@/composables/rules';
 import realDb from '@/data/real_db.json'; // Ensure this path is correct
 import type { RealDb } from '@/types';
 import { useOptionsStore } from '@/stores/options';
@@ -329,29 +330,12 @@ const canConfirm = computed(() =>
   (hasPage.value ? isPageValid.value : isRefValid.value) && !isSameAsInitial.value
 );
 
-// Rules
-const requiredIfNoPage = (v: number | null) =>
-  hasPage.value || !!v || t('manual.required');
-
-const positiveRule = (v: number | null) =>
-  v == null || v > 0 || t('manual.must_be_positive');
-
-const chapterRules = [
-  requiredIfNoPage,
-  positiveRule,
-  (v: number) => v == null || (v <= maxChapters.value) || `${t('manual.max_chapter')} ${maxChapters.value}`
-];
-
-const verseRules = [
-  requiredIfNoPage,
-  positiveRule,
-  (v: number) => v == null || (v <= 90) || `${t('manual.max_verse')} 90`
-];
-
-const pageRules = [
-  positiveRule,
-  (v: number | null) => v == null || (v <= maxPage.value) || `${t('manual.max_page')} ${maxPage.value}`
-];
+const { chapterRules, verseRules, pageRules } = useManualEntryRules({
+  hasPage,
+  maxChapters,
+  maxPage,
+  t
+});
 
 // --- Actions ---
 
