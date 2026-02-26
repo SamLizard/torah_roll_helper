@@ -31,6 +31,40 @@
       "refEndPartial": "Fin du chéni/hamichi",
       "refEnd": "Fin complète de la paracha"
     },
+    "dicta": {
+      "title": "Dicta Illuminate",
+      "loadingOcr": "Lecture de l'image avec OCR Dicta...",
+      "loadingSearch": "Recherche des sources Dicta...",
+      "noResultTitle": "Aucune source trouvée",
+      "noResultSubtitle": "Essayez une nouvelle photo ou un autre texte",
+      "idleTitle": "Prenez une photo avec Dicta",
+      "idleSubtitle": "Utilisez le cadre pour bien aligner le texte avant la capture.",
+      "errorTitle": "Le scan Dicta n'a pas pu être terminé",
+      "cameraUnavailable": "L'API caméra n'est pas disponible dans ce contexte navigateur.",
+      "captureFailed": "Impossible de capturer l'image.",
+      "capture": "Capturer",
+      "chooseFile": "Choisir un fichier",
+      "retryCamera": "Réessayer la caméra",
+      "newPhoto": "Nouvelle photo",
+      "backToOptions": "Retour aux options",
+      "instructions": {
+        "1": "Placez le texte pour que la largeur de la ligne reste dans le cadre blanc",
+        "2": "Utilisez les lignes jaunes pour aligner l'image",
+        "3": "Capturez au moins quatre lignes de texte"
+      },
+      "chooseTitle": "Choisir le résultat Torah",
+      "chooseSubtitle": "Plusieurs correspondances Torah ont été trouvées. Choisissez la page correcte.",
+      "result": {
+        "source": "Source",
+        "matches": "correspondances",
+        "choose": "Choisir",
+        "rank": "Priorité",
+        "rankHigh": "Meilleur",
+        "rankMedium": "Bon",
+        "rankLow": "Autre",
+        "pageTitle": "Titre de page"
+      }
+    },
     "actions": { "photo": "Prendre photo", "choose": "Choisir manuellement", "clear": "Effacer", "input": "Saisie" },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"

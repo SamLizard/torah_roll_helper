@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
@@ -60,19 +61,238 @@
       @select="onTargetSelected"
     />
 
-    </v-container>
+    <v-dialog
+      v-model="dictaOpen"
+      :fullscreen="smAndDown"
+      max-width="1200"
+      class="dicta-dialog"
+      scrollable
+    >
+      <v-card class="dicta-card">
+        <v-card-title class="dicta-card-title">
+          <span>{{ $t('home.dicta.title') }}</span>
+          <div class="dicta-card-toolbar">
+            <v-btn
+              v-if="hasCachedOptionsForActiveSide"
+              size="small"
+              variant="text"
+              :prepend-icon="backToOptionsIcon"
+              :disabled="isDictaBusy"
+              @click="onDictaShowCachedOptions"
+            >
+              {{ $t('home.dicta.backToOptions') }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="text"
+              prepend-icon="mdi-camera-retake"
+              :disabled="isDictaBusy"
+              @click="onDictaRetake"
+            >
+              {{ $t('home.dicta.newPhoto') }}
+            </v-btn>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
+          </div>
+        </v-card-title>
+
+        <v-divider />
+
+        <v-card-text class="dicta-card-content">
+          <div
+            v-if="dictaFlowState === 'analyzing-ocr' || dictaFlowState === 'analyzing-parallels'"
+            class="dicta-state dicta-state--loading"
+          >
+            <v-progress-circular indeterminate color="primary" size="54" width="5" />
+            <div class="text-subtitle-1 font-weight-medium mt-4">
+              {{
+                dictaFlowState === 'analyzing-ocr'
+                  ? $t('home.dicta.loadingOcr')
+                  : $t('home.dicta.loadingSearch')
+              }}
+            </div>
+          </div>
+
+          <div v-else class="dicta-state">
+            <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
+              <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
+              <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
+              <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+            </div>
+
+            <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
+              <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
+              <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
+              <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+            </div>
+
+            <div v-else class="dicta-state-headline">
+              <v-icon size="46" class="mb-2 text-primary">mdi-camera</v-icon>
+              <div class="dicta-idle-title">{{ $t('home.dicta.idleTitle') }}</div>
+              <div class="dicta-idle-subtitle">{{ $t('home.dicta.idleSubtitle') }}</div>
+            </div>
+
+            <DictaCameraCapture
+              v-if="dictaOpen"
+              :key="dictaCaptureKey"
+              :busy="isDictaBusy"
+              @captured="onDictaCaptured"
+              @error="onDictaCameraError"
+            />
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="dictaChoiceOpen"
+      :fullscreen="smAndDown"
+      max-width="1180"
+      class="dicta-choice-dialog"
+      scrollable
+    >
+      <v-card>
+        <v-card-title class="dicta-card-title">
+          <span>{{ $t('home.dicta.chooseTitle') }}</span>
+          <div class="dicta-card-toolbar">
+            <v-btn
+              size="small"
+              variant="text"
+              prepend-icon="mdi-camera-retake"
+              @click="onDictaChoiceRetake"
+            >
+              {{ $t('home.dicta.newPhoto') }}
+            </v-btn>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="onDictaChoiceCancel" />
+          </div>
+        </v-card-title>
+        <v-card-text>
+          <p class="text-body-2 mb-4">{{ $t('home.dicta.chooseSubtitle') }}</p>
+          <v-table
+            v-if="!smAndDown"
+            density="compact"
+            class="dicta-choice-table"
+          >
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ $t('home.dicta.result.matches') }}</th>
+                <th>{{ $t('home.dicta.result.rank') }}</th>
+                <th>{{ $t('home.dicta.result.source') }}</th>
+                <th>{{ $t('manual.book') }}</th>
+                <th>{{ $t('manual.chapter') }}</th>
+                <th>{{ $t('manual.verse') }}</th>
+                <th>{{ $t('manual.page') }}</th>
+                <th>{{ $t('home.dicta.result.pageTitle') }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(option, index) in dictaChoiceOptions"
+                :key="option.key"
+              >
+                <td>{{ index + 1 }}</td>
+                <td>{{ option.matchCount }}</td>
+                <td>
+                  <v-chip
+                    size="x-small"
+                    :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
+                    variant="tonal"
+                  >
+                    {{ option.scoreLabel }}
+                  </v-chip>
+                </td>
+                <td class="dicta-choice-source">{{ option.sourceLabel }}</td>
+                <td>{{ getBookLabel(option.candidate.reference.book) }}</td>
+                <td>{{ option.candidate.reference.chapter }}</td>
+                <td>{{ option.candidate.reference.verse ?? '-' }}</td>
+                <td>{{ option.page }}</td>
+                <td class="dicta-choice-page-title">{{ option.pageTitle }}</td>
+                <td>
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    @click="onDictaChoiceSelect(option)"
+                  >
+                    {{ $t('home.dicta.result.choose') }}
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+
+          <v-row v-else dense>
+            <v-col
+              v-for="(option, index) in dictaChoiceOptions"
+              :key="option.key"
+              cols="12"
+            >
+              <v-card variant="outlined" class="dicta-choice-card">
+                <v-card-text class="py-2 px-3">
+                  <div class="d-flex align-center justify-space-between mb-1">
+                    <strong>#{{ index + 1 }}</strong>
+                    <v-chip
+                      size="x-small"
+                      :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
+                      variant="tonal"
+                    >
+                      {{ option.scoreLabel }}
+                    </v-chip>
+                  </div>
+                  <div class="d-flex flex-wrap ga-2 text-body-2 mb-1">
+                    <strong>{{ $t('manual.page') }} {{ option.page }}</strong>
+                    <span>{{ option.pageTitle }}</span>
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    {{ option.matchCount }} {{ $t('home.dicta.result.matches') }} · {{ option.sourceLabel }}
+                  </div>
+                </v-card-text>
+                <v-card-actions class="pt-0 px-3 pb-2">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    block
+                    variant="tonal"
+                    @click="onDictaChoiceSelect(option)"
+                  >
+                    {{ $t('home.dicta.result.choose') }}
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <input
+      ref="dictaFallbackInput"
+      class="d-none"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      @change="onDictaFallbackPicked"
+    />
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useDisplay } from 'vuetify';
+import { useRtl } from 'vuetify';
 import { useOptionsStore } from '@/stores/options';
 import LocationSelector from '@/components/LocationSelector.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
+import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
 import type { ManualData } from '@/components/ManualEntryDialog.vue';
-
-import { computeRoll } from '@/composables/utils';
-import type { RollInstructions, TorahRef } from '@/types';
+import { computeRoll, getPageNumber, getApproximatePages, getPageTitleKeys } from '@/composables/utils';
+import realDb from '@/data/real_db.json';
+import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
+import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
+import type { RealDb, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
   key: string;
@@ -81,9 +301,34 @@ interface HomeTargetItem {
   refEnd: TorahRef;
 }
 
-const options = useOptionsStore();
-const fromRef = ref<ManualData | null>(null);
+const BOOK_LABEL_KEYS = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'] as const;
+type DictaFlowState = 'idle' | 'analyzing-ocr' | 'analyzing-parallels' | 'no-result' | 'error';
 
+interface DictaCandidate {
+  index: number;
+  page: number;
+  reference: DictaReference;
+  source: DictaParallelItem;
+}
+
+interface DictaPageOption {
+  key: string;
+  candidate: DictaCandidate;
+  page: number;
+  sourceLabel: string;
+  pageTitle: string;
+  scoreLabel: string;
+  rank: 'high' | 'medium' | 'low';
+  matchCount: number;
+  sourceCount: number;
+}
+
+const options = useOptionsStore();
+const { t } = useI18n();
+const { smAndDown } = useDisplay();
+const { isRtl } = useRtl();
+const db = realDb as RealDb;
+const fromRef = ref<ManualData | null>(null);
 const toRef = ref<ManualData | null>(null);
 const fromTargetKey = ref<string | null>(null);
 const toTargetKey = ref<string | null>(null);
@@ -94,6 +339,20 @@ const activeSide = ref<'from' | 'to'>('to');
 const allowPhotoForTo = ref(false);
 
 const dictaOpen = ref(false);
+const dictaFlowState = ref<DictaFlowState>('idle');
+const dictaErrorMessage = ref('');
+const dictaRawResults = ref<DictaParallelItem[]>([]);
+const dictaCandidates = ref<DictaCandidate[]>([]);
+const dictaFallbackInput = ref<HTMLInputElement | null>(null);
+const dictaChoiceOpen = ref(false);
+const dictaChoiceOptions = ref<DictaPageOption[]>([]);
+const dictaChoiceResolver = ref<((option: DictaPageOption | null) => void) | null>(null);
+const dictaCaptureKey = ref(0);
+const dictaAnalyzeJobId = ref(0);
+const dictaOptionsBySide = ref<Record<'from' | 'to', DictaPageOption[]>>({
+  from: [],
+  to: [],
+});
 
 const allowGolaInTargets = computed(() => {
   return true;
@@ -124,9 +383,379 @@ const getDefaultRefForSide = (target: HomeTargetItem, side: 'from' | 'to'): Tora
   return target.ref;
 };
 
+const closeDictaDialog = (preserveJob = false) => {
+  dictaOpen.value = false;
+  if (!preserveJob) {
+    dictaAnalyzeJobId.value += 1;
+  }
+};
+
+const resetDictaSession = () => {
+  dictaFlowState.value = 'idle';
+  dictaErrorMessage.value = '';
+  dictaRawResults.value = [];
+  dictaCandidates.value = [];
+};
+
+const applyDictaReference = (reference: DictaReference, page: number): void => {
+  const resolvedPage = getPageNumber(db, reference.book, reference.chapter, reference.verse ?? 1);
+  const finalPage = page > 0 ? page : resolvedPage;
+  if (finalPage <= 0) return;
+
+  const data: ManualData = {
+    book: reference.book,
+    chapter: reference.chapter,
+    verse: reference.verse,
+  };
+
+  if (activeSide.value === 'from') {
+    onSetFromPage(finalPage, data, null);
+  } else {
+    onSetToPage(finalPage, data, null);
+  }
+};
+
+const getBookLabel = (book: number): string => {
+  const key = BOOK_LABEL_KEYS[book - 1];
+  return key ? t(`group.${key}`) : `${book}`;
+};
+
+const dictaNoResultTitle = computed(() => t('home.dicta.noResultTitle'));
+const dictaNoResultSubtitle = computed(() => t('home.dicta.noResultSubtitle'));
+const isDictaBusy = computed(
+  () => dictaFlowState.value === 'analyzing-ocr' || dictaFlowState.value === 'analyzing-parallels'
+);
+const hasCachedOptionsForActiveSide = computed(
+  () => dictaOptionsBySide.value[activeSide.value].length > 0
+);
+const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
+
+const getPageTitleLabel = (page: number, reference: DictaReference): string => {
+  const keys = getPageTitleKeys(page, {
+    book: reference.book,
+    chapter: reference.chapter,
+    verse: reference.verse,
+  });
+  if (!keys.length) return '-';
+  return keys.map((key) => t(key)).join(t('separator'));
+};
+
+const getRankFromPosition = (position: number): 'high' | 'medium' | 'low' => {
+  if (position === 0) return 'high';
+  if (position <= 4) return 'medium';
+  return 'low';
+};
+
+const getRankLabel = (rank: 'high' | 'medium' | 'low'): string => {
+  if (rank === 'high') return t('home.dicta.result.rankHigh');
+  if (rank === 'medium') return t('home.dicta.result.rankMedium');
+  return t('home.dicta.result.rankLow');
+};
+
+const isTorahResult = (source: DictaParallelItem): boolean => {
+  const xml = typeof source.compBookXmlId === 'string' ? source.compBookXmlId.toLowerCase() : '';
+  if (xml.includes('tanakh.torah')) return true;
+
+  const url = typeof source.url === 'string' ? source.url.toLowerCase() : '';
+  return (
+    url.includes('/genesis.') ||
+    url.includes('/exodus.') ||
+    url.includes('/leviticus.') ||
+    url.includes('/numbers.') ||
+    url.includes('/deuteronomy.')
+  );
+};
+
+const getSourceLabel = (source: DictaParallelItem): string => {
+  if (typeof source.compNameHe === 'string' && source.compNameHe.trim()) return source.compNameHe.trim();
+  if (typeof source.compName === 'string' && source.compName.trim()) return source.compName.trim();
+  if (typeof source.url === 'string' && source.url.trim()) return source.url.trim();
+  return 'Dicta source';
+};
+
+const buildDictaCandidates = (results: DictaParallelItem[]): DictaCandidate[] => {
+  const candidates = results
+    .map((item, index) => {
+      if (!isTorahResult(item)) return null;
+      const reference = parseDictaPayload(item);
+      if (!reference) return null;
+
+      const page = getPageNumber(db, reference.book, reference.chapter, reference.verse ?? 1);
+      return {
+        index,
+        page,
+        reference,
+        source: item,
+      } as DictaCandidate;
+    })
+    .filter((candidate): candidate is DictaCandidate => candidate !== null);
+
+  return candidates.sort((a, b) => a.index - b.index);
+};
+
+const expandCandidatePages = (candidate: DictaCandidate): number[] => {
+  if (candidate.reference.verse != null) {
+    return candidate.page > 0 ? [candidate.page] : [];
+  }
+
+  return getApproximatePages(db, candidate.reference.book, candidate.reference.chapter)
+    .filter((page) => page > 0);
+};
+
+const compareByChapterAndVerse = (a: DictaCandidate, b: DictaCandidate): number => {
+  const chapterDiff = a.reference.chapter - b.reference.chapter;
+  if (chapterDiff !== 0) return chapterDiff;
+
+  const aVerse = a.reference.verse ?? Number.MAX_SAFE_INTEGER;
+  const bVerse = b.reference.verse ?? Number.MAX_SAFE_INTEGER;
+  const verseDiff = aVerse - bVerse;
+  if (verseDiff !== 0) return verseDiff;
+
+  const bookDiff = a.reference.book - b.reference.book;
+  if (bookDiff !== 0) return bookDiff;
+
+  return a.index - b.index;
+};
+
+const getRepresentativeCandidate = (candidates: DictaCandidate[]): DictaCandidate => {
+  const sorted = [...candidates].sort(compareByChapterAndVerse);
+  const withVerse = sorted.find((candidate) => candidate.reference.verse != null);
+  return withVerse ?? sorted[0];
+};
+
+const buildDictaPageOptions = (candidates: DictaCandidate[]): DictaPageOption[] => {
+  const optionsByPage = new Map<
+    number,
+    {
+      candidates: DictaCandidate[];
+      sourceLabels: Set<string>;
+      matchCount: number;
+    }
+  >();
+
+  candidates.forEach((candidate) => {
+    const pages = expandCandidatePages(candidate);
+    const sourceLabel = getSourceLabel(candidate.source);
+
+    pages.forEach((page) => {
+      const existing = optionsByPage.get(page);
+      if (!existing) {
+        optionsByPage.set(page, {
+          candidates: [candidate],
+          sourceLabels: new Set([sourceLabel]),
+          matchCount: 1,
+        });
+        return;
+      }
+
+      existing.candidates.push(candidate);
+      existing.sourceLabels.add(sourceLabel);
+      existing.matchCount += 1;
+    });
+  });
+
+  const sorted = Array.from(optionsByPage.entries())
+    .map(([page, value]) => {
+      const candidate = getRepresentativeCandidate(value.candidates);
+      const sources = Array.from(value.sourceLabels);
+      const sourceCount = sources.length;
+      const firstSource = sources[0] ?? 'Dicta source';
+
+      return {
+        key: `page-${page}`,
+        candidate,
+        page,
+        pageTitle: getPageTitleLabel(page, candidate.reference),
+        scoreLabel: '',
+        rank: 'low' as const,
+        matchCount: value.matchCount,
+        sourceCount,
+        sourceLabel: sourceCount > 1 ? `${firstSource} (+${sourceCount - 1})` : firstSource,
+      };
+    })
+    .sort((a, b) => {
+      const matchDiff = b.matchCount - a.matchCount;
+      if (matchDiff !== 0) return matchDiff;
+
+      const candidateDiff = compareByChapterAndVerse(a.candidate, b.candidate);
+      if (candidateDiff !== 0) return candidateDiff;
+
+      return a.page - b.page;
+    });
+
+  return sorted.map((option, index) => {
+    const rank = getRankFromPosition(index);
+    return {
+      ...option,
+      rank,
+      scoreLabel: getRankLabel(rank),
+    };
+  });
+};
+
+const pickDictaPageOption = async (options: DictaPageOption[]): Promise<DictaPageOption | null> => {
+  if (options.length === 0) return null;
+  if (options.length === 1) return options[0];
+
+  dictaChoiceOptions.value = options;
+  dictaChoiceOpen.value = true;
+
+  return await new Promise((resolve) => {
+    dictaChoiceResolver.value = resolve;
+  });
+};
+
+const isCurrentAnalyzeJob = (jobId: number): boolean => jobId === dictaAnalyzeJobId.value;
+
+const processDictaFile = async (file: File): Promise<void> => {
+  const jobId = ++dictaAnalyzeJobId.value;
+
+  try {
+    if (!isCurrentAnalyzeJob(jobId)) return;
+    dictaErrorMessage.value = '';
+    dictaFlowState.value = 'analyzing-ocr';
+
+    const analysis = await analyzeDictaImage(file);
+    if (!isCurrentAnalyzeJob(jobId)) return;
+
+    if (!analysis.ocrText) {
+      dictaFlowState.value = 'no-result';
+      return;
+    }
+
+    dictaFlowState.value = 'analyzing-parallels';
+    dictaRawResults.value = analysis.parallels;
+
+    if (analysis.parallels.length === 0) {
+      dictaFlowState.value = 'no-result';
+      return;
+    }
+
+    const candidates = buildDictaCandidates(analysis.parallels);
+    dictaCandidates.value = candidates;
+    const pageOptions = buildDictaPageOptions(candidates);
+
+    if (pageOptions.length === 0) {
+      dictaFlowState.value = 'no-result';
+      return;
+    }
+
+    dictaOptionsBySide.value[activeSide.value] = pageOptions;
+
+    closeDictaDialog(true);
+    if (!isCurrentAnalyzeJob(jobId)) return;
+
+    const selectedOption = await pickDictaPageOption(pageOptions);
+    if (!isCurrentAnalyzeJob(jobId)) return;
+
+    if (!selectedOption) {
+      return;
+    }
+
+    applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+  } catch (error) {
+    if (!isCurrentAnalyzeJob(jobId)) return;
+    dictaFlowState.value = 'error';
+    dictaErrorMessage.value = error instanceof Error ? error.message : 'Unexpected Dicta error.';
+  }
+};
+
+const onDictaCaptured = (file: File): void => {
+  void processDictaFile(file);
+};
+
+const onDictaCameraError = (message: string): void => {
+  dictaFlowState.value = 'error';
+  dictaErrorMessage.value = message;
+};
+
+const resolveDictaChoice = (choice: DictaPageOption | null): void => {
+  dictaChoiceOpen.value = false;
+  dictaChoiceOptions.value = [];
+  if (dictaChoiceResolver.value) {
+    const resolver = dictaChoiceResolver.value;
+    dictaChoiceResolver.value = null;
+    resolver(choice);
+  }
+};
+
+const onDictaChoiceSelect = (option: DictaPageOption): void => {
+  resolveDictaChoice(option);
+};
+
+const onDictaChoiceCancel = (): void => {
+  resolveDictaChoice(null);
+};
+
+const onDictaChoiceRetake = (): void => {
+  resolveDictaChoice(null);
+  openDictaCaptureForSide(activeSide.value);
+};
+
+const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
+  const cachedOptions = dictaOptionsBySide.value[side];
+  if (cachedOptions.length === 0) return;
+
+  void pickDictaPageOption(cachedOptions).then((selectedOption) => {
+    if (!selectedOption) return;
+    applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+  });
+};
+
+const canUseLiveCamera = (): boolean =>
+  typeof window !== 'undefined' &&
+  window.isSecureContext &&
+  typeof navigator !== 'undefined' &&
+  !!navigator.mediaDevices &&
+  typeof navigator.mediaDevices.getUserMedia === 'function';
+
+const openDictaFallbackPicker = (): void => {
+  const input = dictaFallbackInput.value;
+  if (!input) return;
+  input.value = '';
+  input.click();
+};
+
+const openDictaCaptureForSide = (side: 'from' | 'to'): void => {
+  activeSide.value = side;
+  dictaAnalyzeJobId.value += 1;
+  resetDictaSession();
+  dictaCaptureKey.value += 1;
+
+  if (canUseLiveCamera()) {
+    dictaOpen.value = true;
+  } else {
+    openDictaFallbackPicker();
+  }
+};
+
+const onDictaRetake = (): void => {
+  openDictaCaptureForSide(activeSide.value);
+};
+
+const onDictaShowCachedOptions = (): void => {
+  closeDictaDialog();
+  openCachedOptionsForSide(activeSide.value);
+};
+
+const onDictaFallbackPicked = (event: Event): void => {
+  const target = event.target as HTMLInputElement | null;
+  const file = target?.files?.[0] ?? null;
+  if (!file) return;
+
+  dictaErrorMessage.value = '';
+  dictaFlowState.value = 'analyzing-ocr';
+  dictaOpen.value = true;
+  void processDictaFile(file);
+};
+
 const openDictaFor = (side: 'from' | 'to') => {
   activeSide.value = side;
-  dictaOpen.value = true;
+  if (dictaOptionsBySide.value[side].length > 0) {
+    openCachedOptionsForSide(side);
+    return;
+  }
+  openDictaCaptureForSide(side);
 };
 
 const openTargets = (side: 'from' | 'to') => {
@@ -169,4 +798,128 @@ const onTargetSelected = (item: HomeTargetItem) => {
   }
   targetsOpen.value = false;
 };
+
+watch(dictaOpen, (isOpen) => {
+  if (!isOpen) {
+    resetDictaSession();
+  }
+});
+
+watch(dictaChoiceOpen, (isOpen) => {
+  if (!isOpen && dictaChoiceResolver.value) {
+    resolveDictaChoice(null);
+  }
+});
 </script>
+
+<style scoped>
+.dicta-dialog :deep(.v-overlay__content) {
+  margin: 12px;
+  max-height: calc(100% - 24px);
+}
+
+.dicta-card {
+  overflow: clip;
+  height: min(94vh, 980px);
+  display: flex;
+  flex-direction: column;
+}
+
+.dicta-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.dicta-card-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+
+.dicta-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px 20px;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.dicta-state {
+  width: 100%;
+  text-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dicta-state-headline {
+  width: 100%;
+  text-align: center;
+}
+
+.dicta-state--loading {
+  min-height: 230px;
+}
+
+.dicta-no-result-title,
+.dicta-error-title,
+.dicta-idle-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dicta-no-result-subtitle,
+.dicta-error-message,
+.dicta-idle-subtitle {
+  color: rgba(var(--v-theme-on-surface), 0.72);
+  margin-bottom: 16px;
+  max-width: 36ch;
+}
+
+.dicta-choice-table {
+  width: 100%;
+}
+
+.dicta-choice-source {
+  max-width: 380px;
+  overflow-wrap: anywhere;
+}
+
+.dicta-choice-page-title {
+  max-width: 270px;
+  overflow-wrap: anywhere;
+}
+
+.dicta-choice-card {
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .dicta-dialog :deep(.v-overlay__content) {
+    margin: 0;
+    max-height: 100%;
+  }
+
+  .dicta-card-content {
+    min-height: 250px;
+    padding: 12px;
+  }
+
+  .dicta-card-title {
+    padding-inline: 8px;
+  }
+
+  .dicta-card-toolbar :deep(.v-btn) {
+    min-width: 0;
+    padding-inline: 8px;
+    font-size: 0.75rem;
+  }
+}
+</style>

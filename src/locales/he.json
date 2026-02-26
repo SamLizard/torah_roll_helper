@@ -31,6 +31,40 @@
       "refEndPartial": "סוף שני/חמישי",
       "refEnd": "סוף הפרשה המלאה"
     },
+    "dicta": {
+      "title": "דיקטה Illuminate",
+      "loadingOcr": "מפענח את התמונה עם OCR של דיקטה...",
+      "loadingSearch": "מחפש מקורות בדיקטה...",
+      "noResultTitle": "לא נמצא מקור",
+      "noResultSubtitle": "נסו לצלם שוב או צלמו טקסט שונה",
+      "idleTitle": "צלם תמונה עם דיקטה",
+      "idleSubtitle": "השתמש בקווי המסגרת כדי ליישר את הטקסט לפני הצילום.",
+      "errorTitle": "לא ניתן להשלים את סריקת דיקטה",
+      "cameraUnavailable": "ממשק המצלמה אינו זמין בהקשר הדפדפן הנוכחי.",
+      "captureFailed": "לא ניתן ללכוד את התמונה.",
+      "capture": "צלם",
+      "chooseFile": "בחר קובץ",
+      "retryCamera": "נסה שוב מצלמה",
+      "newPhoto": "צילום חדש",
+      "backToOptions": "חזרה לאפשרויות",
+      "instructions": {
+        "1": "הצב את הטקסט כך שרוחב השורה יישאר בתוך המסגרת הלבנה",
+        "2": "היעזר בקווים הצהובים כדי ליישר את התמונה",
+        "3": "יש לצלם לפחות ארבע שורות טקסט"
+      },
+      "chooseTitle": "בחר תוצאת תורה",
+      "chooseSubtitle": "נמצאו כמה התאמות לתורה. בחר את העמוד הנכון.",
+      "result": {
+        "source": "מקור",
+        "matches": "התאמות",
+        "choose": "בחר",
+        "rank": "עדיפות",
+        "rankHigh": "טוב ביותר",
+        "rankMedium": "טוב",
+        "rankLow": "אחר",
+        "pageTitle": "כותרת עמוד"
+      }
+    },
     "actions": { "photo": "צלם", "choose": "בחר ידנית", "clear": "נקה", "input": "הקלדה" },
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"
