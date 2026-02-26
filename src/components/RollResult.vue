@@ -43,8 +43,9 @@ const props = defineProps({
 
 <style scoped>
 .big-number {
-  font-size: 3.5rem;
-  font-weight: 700;
-  letter-spacing: 6px;
+  font-size: clamp(2.25rem, 9vw, 3.25rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: normal;
 }
 </style>

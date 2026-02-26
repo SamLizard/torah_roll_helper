@@ -31,7 +31,7 @@
         <!-- The options for the book should be taken from i18n, with keys: genesis, exodus, leviticus, numbers, deuteronomy -->
         <!-- The minimum number for a perek is 1, and there are [50, 40, 27, 36, 34] perek for the books (so don't let user enter value bigger than it, depending on the book) -->
         <!-- The minimum number for a verse is 1, and the maximum is 90 (don't check for each perek, but put global maximum of 90) -->
-        <!-- TODO 9: Make it reactive, so it works on phones. -->
+        <!-- DONE 9: Make it reactive, so it works on phones. -->
         <!-- reusable selector used for FROM -->
         <LocationSelector
           key="from"

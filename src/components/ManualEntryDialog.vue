@@ -4,25 +4,30 @@
   <!-- DONE 8.2: There is a bug - when the manual data is empty, if the user enters the chapter and verse, it doesn't let him define the page using it... -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rounded-xl pa-4">
-      <v-card-title class="text-h6 font-weight-bold">
-        {{ $t('manual.title') }}
-        <v-btn
-          icon="mdi-restore"
-          variant="text"
-          size="small"
-          :title="$t('actions.restore')"
-          :disabled="!hasInitialSelection"
-          @click="restoreInitial"
-        />
-        <v-btn
-          icon="mdi-delete-outline"
-          variant="text"
-          color="error"
-          size="small"
-          :title="$t('actions.clear')"
-          :disabled="isLocalEmpty"
-          @click="clearLocal"
-        />
+      <v-card-title class="manual-dialog-title">
+        <div class="manual-dialog-title-text text-h6 font-weight-bold">
+          {{ $t('manual.title') }}
+        </div>
+
+        <div class="manual-dialog-title-actions">
+          <v-btn
+            icon="mdi-restore"
+            variant="text"
+            size="small"
+            :title="$t('actions.restore')"
+            :disabled="!hasInitialSelection"
+            @click="restoreInitial"
+          />
+          <v-btn
+            icon="mdi-delete-outline"
+            variant="text"
+            color="error"
+            size="small"
+            :title="$t('actions.clear')"
+            :disabled="isLocalEmpty"
+            @click="clearLocal"
+          />
+        </div>
       </v-card-title>
       
       <v-card-text>
@@ -421,5 +426,37 @@ const confirm = () => {
 <style scoped>
 .gap-4 {
   gap: 16px;
+}
+
+.manual-dialog-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: normal;
+}
+
+.manual-dialog-title-text {
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.manual-dialog-title-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+@media (max-width: 420px) {
+  .manual-dialog-title {
+    flex-wrap: wrap;
+  }
+
+  .manual-dialog-title-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 </style>

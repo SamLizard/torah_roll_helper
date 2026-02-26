@@ -11,13 +11,11 @@
           <v-btn icon @click="close">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title class="text-subtitle-1 font-weight-bold">
+          <v-toolbar-title class="target-toolbar-title text-subtitle-1 font-weight-bold">
             {{ $t('targets.title') }}
           </v-toolbar-title>
-          
-          <v-spacer />
-          
-          <div class="search-container me-4">
+
+          <div class="search-container">
             <v-text-field
               v-model="filter"
               :placeholder="$t('actions.search')"
@@ -570,8 +568,25 @@ const getRollPreview = (targetPage: number) => {
 }
 
 .search-container {
-  width: 100%;
-  max-width: 300px;
+  width: 300px;
+  min-width: 140px;
+  flex: 0 1 300px;
+  margin-inline-start: 8px;
+  margin-inline-end: 16px;
+}
+
+.target-toolbar-title {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .search-container {
+    width: 140px;
+    min-width: 100px;
+    flex-basis: 140px;
+    margin-inline-end: 8px;
+  }
 }
 
 /* Modern CSS Grid:

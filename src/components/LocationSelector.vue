@@ -10,22 +10,24 @@
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <div class="location-actions">
-          <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
-            {{ $t('home.actions.choose') }}
-          </v-btn>          
-          <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
-            {{ $t('home.actions.photo') }}
-          </v-btn>
-          <v-btn 
-            size="small" 
-            variant="tonal" 
-            color="secondary" 
-            prepend-icon="mdi-pencil" 
-            @click="isManualOpen = true"
-          >
-            {{ $t('home.actions.input') }}
-          </v-btn>
+        <div class="location-actions-shell">
+          <div class="location-actions">
+            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
+              {{ $t('home.actions.choose') }}
+            </v-btn>          
+            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
+              {{ $t('home.actions.photo') }}
+            </v-btn>
+            <v-btn 
+              size="small" 
+              variant="tonal" 
+              color="secondary" 
+              prepend-icon="mdi-pencil" 
+              @click="isManualOpen = true"
+            >
+              {{ $t('home.actions.input') }}
+            </v-btn>
+          </div>
         </div>
       </div>
     </v-card-item>
@@ -86,7 +88,7 @@
         <!-- So, there should be a utils method that returns the title id based on the page number, for the case that it doesn't have a selection from the options (TargetOptionsGrid) -->
         <!-- The method checks the readings for a corresponding, and if there isn't, get the page id/ids from page_titles_keys.json. -->
         <!-- When there are multiple ids, join them using / (take from i18n, because hebrew "/" is "\", and english/french "/" is "/"...) -->
-        <div class="text-h2 font-weight-black text-primary mb-2">{{ page }}</div>
+        <div class="location-page-number font-weight-black text-primary mb-2">{{ page }}</div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
         <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
@@ -478,13 +480,23 @@ const clear = () => {
 .location-actions {
   display: flex;
   gap: 8px;
-  flex: 0 1 420px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
+.location-actions-shell {
+  min-width: 0;
+  flex: 0 1 420px;
+}
+
 .location-actions :deep(.v-btn) {
   white-space: nowrap;
+}
+
+.location-page-number {
+  font-size: clamp(2.25rem, 9vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: normal;
 }
 
 .calendar-slide-group {
@@ -539,6 +551,10 @@ const clear = () => {
     width: 100%;
     justify-content: flex-start;
   }
+
+  .location-actions-shell {
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -550,13 +566,50 @@ const clear = () => {
     flex: 0 0 auto;
   }
 
-  .location-actions {
+  .location-actions-shell {
     flex: 0 0 auto;
+    width: 100%;
+    position: relative;
+  }
+
+  .location-actions-shell::before,
+  .location-actions-shell::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 2px;
+    width: 14px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .location-actions-shell::before {
+    left: 0;
+    background: linear-gradient(
+      to right,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0)
+    );
+  }
+
+  .location-actions-shell::after {
+    right: 0;
+    background: linear-gradient(
+      to left,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0)
+    );
+  }
+
+  .location-actions {
     width: 100%;
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 2px;
+    padding-inline: 6px;
+    scroll-padding-inline: 6px;
+    scrollbar-width: thin;
   }
 
   .calendar-reading-card {
