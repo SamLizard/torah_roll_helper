@@ -2,7 +2,11 @@
   "language": "English",
   "dir": "ltr",
   "title": "Torah Roll Assistant",
-  "routes": { "home": "Home", "about": "About", "howTo": "How To Use" },
+  "routes": {
+    "home": "Home",
+    "about": "About",
+    "howTo": "How To Use"
+  },
   "about": {
     "title": "About",
     "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current opening of the Sefer Torah and a target reading, it calculates the exact rolling direction and number of columns needed to reach it.",
@@ -11,11 +15,20 @@
     "dataCreditsPrefix": "The database for this project is based on open-source files from",
     "dataCreditsMiddle": ", which in turn utilize data from",
     "dataCreditsThanks": "Our thanks go to the tikkun.io project for sharing their work with the community.",
-    "issueInvite": "If you have an improvement idea or wish to add a language, please open an issue on GitHub."
+    "issueInvite": "If you have an improvement idea or wish to add a language, please open an issue on GitHub.",
+    "dictaThanksPrefix": "Special thanks to",
+    "dictaThanksMiddle": "and to the",
+    "dictaThanksSuffix": "website for making their API available and for inspiring this project."
   },
-  "directions": { "forward": "Forward", "backward": "Backward" },
+  "directions": {
+    "forward": "Forward",
+    "backward": "Backward"
+  },
   "home": {
-    "from": { "title": "FROM", "subtitle": "Current location (photo or manual)" },
+    "from": {
+      "title": "FROM",
+      "subtitle": "Current location (photo or manual)"
+    },
     "to": {
       "title": "TO",
       "subtitle": "Target reading (select upcoming or full list)",
@@ -65,7 +78,12 @@
         "pageTitle": "Page title"
       }
     },
-    "actions": { "photo": "Take photo", "choose": "Choose manually", "clear": "Clear", "input": "Input" },
+    "actions": {
+      "photo": "Take photo",
+      "choose": "Choose manually",
+      "clear": "Clear",
+      "input": "Input"
+    },
     "selected": "Selected",
     "noSelection": "No page selected"
   },
@@ -97,14 +115,29 @@
       "klaf_245": "רמ\"ה (245 pages)"
     }
   },
-  "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode", "golaBadge": "Gola" },
-  "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page", "clear": "Clear", "restore": "Restore" },
+  "targets": {
+    "title": "Choose a target",
+    "showingAll": "Showing full list",
+    "golaLabel": "Gola (Diaspora) mode",
+    "golaBadge": "Gola"
+  },
+  "actions": {
+    "close": "Close",
+    "search": "Search...",
+    "cancel": "Cancel",
+    "confirm": "Set Page",
+    "clear": "Clear",
+    "restore": "Restore"
+  },
   "result": {
     "title": "Rolling Instructions",
     "noData": "Select both FROM and TO to compute roll",
     "from": "From",
     "to": "To",
-    "direction": { "forward": "Forward", "backward": "Backward" }
+    "direction": {
+      "forward": "Forward",
+      "backward": "Backward"
+    }
   },
   "page": "Page",
   "separator": " / ",

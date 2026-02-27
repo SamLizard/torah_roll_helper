@@ -2,7 +2,11 @@
   "language": "עברית",
   "dir": "rtl",
   "title": "עוזר גלילת התורה",
-  "routes": { "home": "בית", "about": "אודות", "howTo": "איך להשתמש" },
+  "routes": {
+    "home": "בית",
+    "about": "אודות",
+    "howTo": "איך להשתמש"
+  },
   "about": {
     "title": "אודות",
     "description": "אפליקציה זו נועדה לסייע לגבאים ובעלי קריאה לייעל את הכנת ספר התורה למניעת טורח ציבור. הכלי מאפשר לחשב במהירות את כיוון ומרחק הגלילה המדויק בין המיקום הנוכחי לקריאת היעד המבוקשת.",
@@ -11,11 +15,20 @@
     "dataCreditsPrefix": "מסד הנתונים מבוסס על פרויקט הקוד הפתוח של",
     "dataCreditsMiddle": ", המסתמך על נתוני",
     "dataCreditsThanks": "תודה מיוחדת לצוות tikkun.io על הנגשת המידע לטובת הכלל.",
-    "issueInvite": "יש לכם רעיון לשיפור או הצעה לתרגום? נשמח שתפתחו issue ב-GitHub."
+    "issueInvite": "יש לכם רעיון לשיפור או הצעה לתרגום? נשמח שתפתחו issue ב-GitHub.",
+    "dictaThanksPrefix": "תודה גדולה ל־",
+    "dictaThanksMiddle": "ולאתר",
+    "dictaThanksSuffix": "על הנגשת ה-API שלהם ועל ההשראה שהובילה ליצירת הפרויקט הזה."
   },
-  "directions": { "forward": "קדימה", "backward": "לאחור" },
+  "directions": {
+    "forward": "קדימה",
+    "backward": "לאחור"
+  },
   "home": {
-    "from": { "title": "נקודת התחלה", "subtitle": "מיקום נוכחי (צילום או ידני)" },
+    "from": {
+      "title": "נקודת התחלה",
+      "subtitle": "מיקום נוכחי (צילום או ידני)"
+    },
     "to": {
       "title": "יעד",
       "subtitle": "קריאת יעד (בחר קריאות קרובות או רשימה מלאה)",
@@ -65,7 +78,12 @@
         "pageTitle": "כותרת עמוד"
       }
     },
-    "actions": { "photo": "צלם", "choose": "בחר ידנית", "clear": "נקה", "input": "הקלדה" },
+    "actions": {
+      "photo": "צלם",
+      "choose": "בחר ידנית",
+      "clear": "נקה",
+      "input": "הקלדה"
+    },
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"
   },
@@ -97,14 +115,29 @@
       "klaf_245": "רמ״ה (245 עמודים)"
     }
   },
-  "targets": { "title": "בחר יעד", "showingAll": "הצגת כל הרשימה", "golaLabel": "מצב גולה", "golaBadge": "גולה" },
-  "actions": { "close": "סגור", "search": "חיפוש...", "cancel": "ביטול", "confirm": "קבע עמוד", "clear": "נקה", "restore": "שחזר" },
+  "targets": {
+    "title": "בחר יעד",
+    "showingAll": "הצגת כל הרשימה",
+    "golaLabel": "מצב גולה",
+    "golaBadge": "גולה"
+  },
+  "actions": {
+    "close": "סגור",
+    "search": "חיפוש...",
+    "cancel": "ביטול",
+    "confirm": "קבע עמוד",
+    "clear": "נקה",
+    "restore": "שחזר"
+  },
   "result": {
     "title": "הוראות גלילה",
     "noData": "בחר גם 'מ־' וגם 'ל־' כדי לחשב גלילה",
     "from": "מ־",
     "to": "ל־",
-    "direction": { "forward": "לגלול קדימה", "backward": "לגלול לאחור" }
+    "direction": {
+      "forward": "לגלול קדימה",
+      "backward": "לגלול לאחור"
+    }
   },
   "page": "עמוד",
   "separator": " \\ ",

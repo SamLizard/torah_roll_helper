@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO 18: Add a thank to dicta, and the illuminate website for the inspiration. https://dicta.org.il/ ; https://illuminate.dicta.org.il/ -->
+  <!-- DONE 18: Add a thank to dicta, and the illuminate website for the inspiration. https://dicta.org.il/ ; https://illuminate.dicta.org.il/ -->
   <v-container fluid class="pa-4">
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6">
@@ -32,6 +32,25 @@
               </a>.
             </p>
             <p>{{ $t('about.dataCreditsThanks') }}</p>
+            <p class="mt-4">
+              {{ $t('about.dictaThanksPrefix') }}
+              <a
+                href="https://dicta.org.il/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Dicta
+              </a>
+              {{ $t('about.dictaThanksMiddle') }}
+              <a
+                href="https://illuminate.dicta.org.il/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Illuminate
+              </a>
+              {{ $t('about.dictaThanksSuffix') }}
+            </p>
             <p class="mt-4">{{ $t('about.issueInvite') }}</p>
 
             <p class="mt-4">
