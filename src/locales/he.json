@@ -53,6 +53,7 @@
       "idleTitle": "צלם תמונה עם דיקטה",
       "idleSubtitle": "השתמש בקווי המסגרת כדי ליישר את הטקסט לפני הצילום.",
       "errorTitle": "לא ניתן להשלים את סריקת דיקטה",
+      "unexpectedError": "שגיאת דיקטה לא צפויה.",
       "cameraUnavailable": "ממשק המצלמה אינו זמין בהקשר הדפדפן הנוכחי.",
       "captureFailed": "לא ניתן ללכוד את התמונה.",
       "capture": "צלם",
@@ -68,7 +69,9 @@
       "chooseTitle": "בחר תוצאת תורה",
       "chooseSubtitle": "נמצאו כמה התאמות לתורה. בחר את העמוד הנכון.",
       "result": {
-        "source": "מקור",
+        "index": "#",
+        "reference": "ייחוס",
+        "sourceSummary": "{source} (+{count})",
         "matches": "התאמות",
         "choose": "בחר",
         "rank": "עדיפות",

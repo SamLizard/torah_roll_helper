@@ -307,10 +307,10 @@
             >
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>{{ $t('home.dicta.result.index') }}</th>
                   <th>{{ $t('home.dicta.result.matches') }}</th>
                   <th>{{ $t('home.dicta.result.rank') }}</th>
-                  <th>{{ $t('home.dicta.result.source') }}</th>
+                  <th>{{ $t('home.dicta.result.reference') }}</th>
                   <th>{{ $t('manual.book') }}</th>
                   <th>{{ $t('manual.chapter') }}</th>
                   <th>{{ $t('manual.verse') }}</th>
@@ -332,15 +332,15 @@
                       :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
                       variant="tonal"
                     >
-                      {{ option.scoreLabel }}
+                      {{ getRankLabel(option.rank) }}
                     </v-chip>
                   </td>
-                  <td class="dicta-choice-source">{{ option.sourceLabel }}</td>
+                  <td class="dicta-choice-source">{{ getOptionExtraMatchesLabel(option) }}</td>
                   <td>{{ getBookLabel(option.candidate.reference.book) }}</td>
                   <td>{{ option.candidate.reference.chapter }}</td>
                   <td>{{ option.candidate.reference.verse ?? '-' }}</td>
                   <td>{{ option.page }}</td>
-                  <td class="dicta-choice-page-title">{{ option.pageTitle }}</td>
+                  <td class="dicta-choice-page-title">{{ getOptionPageTitle(option) }}</td>
                   <td>
                     <v-btn
                       size="small"
@@ -370,15 +370,23 @@
                         :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
                         variant="tonal"
                       >
-                        {{ option.scoreLabel }}
+                        {{ getRankLabel(option.rank) }}
                       </v-chip>
                     </div>
                     <div class="d-flex flex-wrap ga-2 text-body-2 mb-1">
                       <strong>{{ $t('manual.page') }} {{ option.page }}</strong>
-                      <span>{{ option.pageTitle }}</span>
+                      <span>{{ getOptionPageTitle(option) }}</span>
+                    </div>
+                    <div class="text-caption text-medium-emphasis mb-1">
+                      {{ $t('manual.book') }} {{ getBookLabel(option.candidate.reference.book) }} ·
+                      {{ $t('manual.chapter') }} {{ option.candidate.reference.chapter }} ·
+                      {{ $t('manual.verse') }} {{ option.candidate.reference.verse ?? '-' }}
                     </div>
                     <div class="text-caption text-medium-emphasis">
-                      {{ option.matchCount }} {{ $t('home.dicta.result.matches') }} · {{ option.sourceLabel }}
+                      {{ option.matchCount }} {{ $t('home.dicta.result.matches') }}
+                      <template v-if="option.sourceCount > 1">
+                        · {{ getOptionExtraMatchesLabel(option) }}
+                      </template>
                     </div>
                   </v-card-text>
                   <v-card-actions class="pt-0 px-3 pb-2">
@@ -434,16 +442,12 @@ interface DictaCandidate {
   index: number;
   page: number;
   reference: DictaReference;
-  source: DictaParallelItem;
 }
 
 interface DictaPageOption {
   key: string;
   candidate: DictaCandidate;
   page: number;
-  sourceLabel: string;
-  pageTitle: string;
-  scoreLabel: string;
   rank: 'high' | 'medium' | 'low';
   matchCount: number;
   sourceCount: number;
@@ -598,11 +602,13 @@ const isTorahResult = (source: DictaParallelItem): boolean => {
   );
 };
 
-const getSourceLabel = (source: DictaParallelItem): string => {
-  if (typeof source.compNameHe === 'string' && source.compNameHe.trim()) return source.compNameHe.trim();
-  if (typeof source.compName === 'string' && source.compName.trim()) return source.compName.trim();
-  if (typeof source.url === 'string' && source.url.trim()) return source.url.trim();
-  return 'Dicta source';
+const getOptionExtraMatchesLabel = (option: DictaPageOption): string => {
+  if (option.sourceCount <= 1) return '-';
+  return `(+${option.sourceCount - 1})`;
+};
+
+const getOptionPageTitle = (option: DictaPageOption): string => {
+  return getPageTitleLabel(option.page, option.candidate.reference);
 };
 
 const buildDictaCandidates = (results: DictaParallelItem[]): DictaCandidate[] => {
@@ -617,7 +623,6 @@ const buildDictaCandidates = (results: DictaParallelItem[]): DictaCandidate[] =>
         index,
         page,
         reference,
-        source: item,
       } as DictaCandidate;
     })
     .filter((candidate): candidate is DictaCandidate => candidate !== null);
@@ -660,28 +665,28 @@ const buildDictaPageOptions = (candidates: DictaCandidate[]): DictaPageOption[] 
     number,
     {
       candidates: DictaCandidate[];
-      sourceLabels: Set<string>;
+      referenceKeys: Set<string>;
       matchCount: number;
     }
   >();
 
   candidates.forEach((candidate) => {
     const pages = expandCandidatePages(candidate);
-    const sourceLabel = getSourceLabel(candidate.source);
+    const referenceKey = `${candidate.reference.book}:${candidate.reference.chapter}:${candidate.reference.verse ?? '-'}`;
 
     pages.forEach((page) => {
       const existing = optionsByPage.get(page);
       if (!existing) {
         optionsByPage.set(page, {
           candidates: [candidate],
-          sourceLabels: new Set([sourceLabel]),
+          referenceKeys: new Set([referenceKey]),
           matchCount: 1,
         });
         return;
       }
 
       existing.candidates.push(candidate);
-      existing.sourceLabels.add(sourceLabel);
+      existing.referenceKeys.add(referenceKey);
       existing.matchCount += 1;
     });
   });
@@ -689,20 +694,15 @@ const buildDictaPageOptions = (candidates: DictaCandidate[]): DictaPageOption[] 
   const sorted = Array.from(optionsByPage.entries())
     .map(([page, value]) => {
       const candidate = getRepresentativeCandidate(value.candidates);
-      const sources = Array.from(value.sourceLabels);
-      const sourceCount = sources.length;
-      const firstSource = sources[0] ?? 'Dicta source';
+      const sourceCount = value.referenceKeys.size;
 
       return {
         key: `page-${page}`,
         candidate,
         page,
-        pageTitle: getPageTitleLabel(page, candidate.reference),
-        scoreLabel: '',
         rank: 'low' as const,
         matchCount: value.matchCount,
         sourceCount,
-        sourceLabel: sourceCount > 1 ? `${firstSource} (+${sourceCount - 1})` : firstSource,
       };
     })
     .sort((a, b) => {
@@ -720,7 +720,6 @@ const buildDictaPageOptions = (candidates: DictaCandidate[]): DictaPageOption[] 
     return {
       ...option,
       rank,
-      scoreLabel: getRankLabel(rank),
     };
   });
 };
@@ -799,7 +798,7 @@ const processDictaFile = async (file: File): Promise<void> => {
   } catch (error) {
     if (!isCurrentAnalyzeJob(jobId)) return;
     dictaFlowState.value = 'error';
-    dictaErrorMessage.value = error instanceof Error ? error.message : 'Unexpected Dicta error.';
+    dictaErrorMessage.value = error instanceof Error ? error.message : t('home.dicta.unexpectedError');
   }
 };
 

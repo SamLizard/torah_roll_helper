@@ -53,6 +53,7 @@
       "idleTitle": "Take a photo with Dicta",
       "idleSubtitle": "Use the frame lines to align text before capture.",
       "errorTitle": "Could not complete Dicta scan",
+      "unexpectedError": "Unexpected Dicta error.",
       "cameraUnavailable": "Camera API is not available in this browser context.",
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
@@ -68,7 +69,9 @@
       "chooseTitle": "Choose Torah Result",
       "chooseSubtitle": "Multiple Torah matches were found. Select the correct page.",
       "result": {
-        "source": "Source",
+        "index": "#",
+        "reference": "Reference",
+        "sourceSummary": "{source} (+{count})",
         "matches": "matches",
         "choose": "Choose",
         "rank": "Rank",
