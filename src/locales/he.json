@@ -55,6 +55,7 @@
       "errorTitle": "לא ניתן להשלים את סריקת דיקטה",
       "unexpectedError": "שגיאת דיקטה לא צפויה.",
       "cameraUnavailable": "ממשק המצלמה אינו זמין בהקשר הדפדפן הנוכחי.",
+      "cameraHttpsHint": "אישור מצלמה אינו זמין ב-localhost. פתח את האפליקציה ב-HTTPS במקום localhost.",
       "captureFailed": "לא ניתן ללכוד את התמונה.",
       "capture": "צלם",
       "chooseFile": "בחר קובץ",

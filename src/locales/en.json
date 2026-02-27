@@ -55,6 +55,7 @@
       "errorTitle": "Could not complete Dicta scan",
       "unexpectedError": "Unexpected Dicta error.",
       "cameraUnavailable": "Camera API is not available in this browser context.",
+      "cameraHttpsHint": "Camera authorization is not available on localhost. Open the app over HTTPS instead of localhost.",
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
       "chooseFile": "Choose file",
