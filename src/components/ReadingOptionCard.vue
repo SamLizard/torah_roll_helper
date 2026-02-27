@@ -27,7 +27,7 @@
 
     <div class="d-flex justify-space-between align-start mb-2">
       <span class="reading-option-card__name text-truncate">
-        {{ $t(`readingTargets.${readingKey}`) }}
+        {{ readingLabel ?? $t(`readingTargets.${readingKey}`) }}
       </span>
     </div>
 
@@ -54,6 +54,7 @@ interface RollPreview {
 
 withDefaults(defineProps<{
   readingKey: string;
+  readingLabel?: string | null;
   page: number;
   active?: boolean;
   isGola?: boolean;
@@ -64,6 +65,7 @@ withDefaults(defineProps<{
   rollPreview?: RollPreview | null;
   compactCalendar?: boolean;
 }>(), {
+  readingLabel: null,
   active: false,
   isGola: false,
   highlightNextParasha: false,

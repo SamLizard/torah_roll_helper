@@ -143,6 +143,7 @@ import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils';
+import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
 import type { TorahRef } from '@/types';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
@@ -217,7 +218,9 @@ const nextParashaKey = computed(() => {
   const nextReadings = monthlyReadings.value.nextMonth;
 
   for (const reading of nextReadings) {
-    const target = targetsByKey.get(reading.readingId);
+    const pairedParashaIds = splitPairedParashaReadingId(reading.readingId);
+    const readingKey = pairedParashaIds ? pairedParashaIds[0] : reading.readingId;
+    const target = targetsByKey.get(readingKey);
     if (!target) continue;
     if (target.gola && !store.isInGola) continue;
     if (target.type === 'parasha') return target.key;

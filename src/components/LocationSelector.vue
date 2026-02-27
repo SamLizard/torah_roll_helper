@@ -43,7 +43,8 @@
             :key="`${side}-${entry.key}-${entry.dateIso}`"
           >
             <ReadingOptionCard
-              :reading-key="entry.key"
+              :reading-key="entry.target.key"
+              :reading-label="entry.readingLabel"
               :page="entry.target.ref.page"
               :active="isSelectedCalendarEntry(entry)"
               :is-gola="entry.target.gola"
@@ -132,7 +133,10 @@ import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
-import type { MonthlyReadingEntry } from '@/composables/calendar/calendar';
+import {
+  splitPairedParashaReadingId,
+  type MonthlyReadingEntry,
+} from '@/composables/calendar/calendar';
 import { useRtl } from 'vuetify';
 import type { TorahRef } from '@/types';
 
@@ -147,6 +151,7 @@ interface TargetItem {
 
 interface CalendarEntry {
   key: string;
+  readingLabel: string | null;
   dateIso: string;
   dateLabel: string;
   target: TargetItem;
@@ -188,6 +193,34 @@ const currentRef = ref<ManualData>({
 });
 
 const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+
+const resolveCalendarReading = (
+  readingId: string
+): { target: TargetItem; readingLabel: string | null } | null => {
+  const pairedParashaIds = splitPairedParashaReadingId(readingId);
+  if (!pairedParashaIds) {
+    const target = targetsByKey.get(readingId);
+    if (!target) return null;
+    return { target, readingLabel: null };
+  }
+
+  const [startParashaId, endParashaId] = pairedParashaIds;
+  const startParashaTarget = targetsByKey.get(startParashaId);
+  const endParashaTarget = targetsByKey.get(endParashaId);
+  if (!startParashaTarget || !endParashaTarget) return null;
+
+  return {
+    target: {
+      ...startParashaTarget,
+      key: readingId,
+      gola: startParashaTarget.gola || endParashaTarget.gola,
+      ref: startParashaTarget.ref,
+      refEndPartial: startParashaTarget.refEndPartial,
+      refEnd: endParashaTarget.refEnd,
+    },
+    readingLabel: `${t(`readingTargets.${startParashaId}`)}-${t(`readingTargets.${endParashaId}`)}`,
+  };
+};
 
 const toManualData = (torahRef: TorahRef): ManualData => ({
   book: torahRef.book,
@@ -255,8 +288,9 @@ const formatCalendarDate = (dateIso: string) => {
 };
 
 const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => {
-  const target = targetsByKey.get(reading.readingId);
-  if (!target) return null;
+  const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
+  if (!resolvedCalendarReading) return null;
+  const { target, readingLabel } = resolvedCalendarReading;
   if (target.gola && !options.isInGola) return null;
 
   const dateIso = props.side === 'from'
@@ -266,6 +300,7 @@ const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => 
 
   return {
     key: reading.readingId,
+    readingLabel,
     dateIso,
     dateLabel: formatCalendarDate(dateIso),
     target,
@@ -294,8 +329,9 @@ const nextParashaKey = computed(() => {
   const nextReadings = monthlyReadings.value.nextMonth;
 
   for (const reading of nextReadings) {
-    const target = targetsByKey.get(reading.readingId);
-    if (!target) continue;
+    const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
+    if (!resolvedCalendarReading) continue;
+    const { target } = resolvedCalendarReading;
     if (target.gola && !options.isInGola) continue;
     if (target.type === 'parasha') return target.key;
   }
@@ -312,8 +348,8 @@ const isSelectedCalendarEntry = (entry: CalendarEntry) => {
 
 const matchedTarget = computed(() => {
   if (props.targetKey) {
-    const explicitTarget = targetsByKey.get(props.targetKey);
-    if (explicitTarget) return explicitTarget;
+    const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
+    if (explicitCalendarTarget) return explicitCalendarTarget.target;
   }
 
   if (props.page == null || currentRef.value.chapter == null || currentRef.value.verse == null) {
