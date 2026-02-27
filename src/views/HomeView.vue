@@ -100,17 +100,26 @@
 
         <v-card-text class="dicta-card-content">
           <div
-            v-if="dictaFlowState === 'analyzing-ocr' || dictaFlowState === 'analyzing-parallels'"
+            v-if="
+              dictaFlowState === 'analyzing-ocr' ||
+              dictaFlowState === 'analyzing-parallels' ||
+              dictaFlowState === 'success'
+            "
             class="dicta-state dicta-state--loading"
           >
-            <v-progress-circular indeterminate color="primary" size="54" width="5" />
-            <div class="text-subtitle-1 font-weight-medium mt-4">
-              {{
-                dictaFlowState === 'analyzing-ocr'
-                  ? $t('home.dicta.loadingOcr')
-                  : $t('home.dicta.loadingSearch')
-              }}
+            <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
+              <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
             </div>
+            <template v-else>
+              <v-progress-circular indeterminate color="primary" size="54" width="5" />
+              <div class="text-subtitle-1 font-weight-medium mt-4">
+                {{
+                  dictaFlowState === 'analyzing-ocr'
+                    ? $t('home.dicta.loadingOcr')
+                    : $t('home.dicta.loadingSearch')
+                }}
+              </div>
+            </template>
           </div>
 
           <div v-else class="dicta-state">
@@ -126,10 +135,6 @@
               <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
             </div>
 
-            <div v-else-if="dictaFlowState === 'success'" class="dicta-state-headline">
-              <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
-            </div>
-
             <div
               v-else
               class="dicta-state-headline"
@@ -141,7 +146,7 @@
             </div>
 
             <DictaCameraCapture
-              v-if="dictaOpen && dictaFlowState !== 'success'"
+              v-if="dictaOpen"
               :key="dictaCaptureKey"
               :busy="isDictaBusy"
               :auto-fallback="isPhoneCameraMode"
@@ -188,17 +193,26 @@
 
       <div class="dicta-mobile-screen__content">
         <div
-          v-if="dictaFlowState === 'analyzing-ocr' || dictaFlowState === 'analyzing-parallels'"
+          v-if="
+            dictaFlowState === 'analyzing-ocr' ||
+            dictaFlowState === 'analyzing-parallels' ||
+            dictaFlowState === 'success'
+          "
           class="dicta-state dicta-state--loading"
         >
-          <v-progress-circular indeterminate color="primary" size="54" width="5" />
-          <div class="text-subtitle-1 font-weight-medium mt-4">
-            {{
-              dictaFlowState === 'analyzing-ocr'
-                ? $t('home.dicta.loadingOcr')
-                : $t('home.dicta.loadingSearch')
-            }}
+          <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
+            <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
           </div>
+          <template v-else>
+            <v-progress-circular indeterminate color="primary" size="54" width="5" />
+            <div class="text-subtitle-1 font-weight-medium mt-4">
+              {{
+                dictaFlowState === 'analyzing-ocr'
+                  ? $t('home.dicta.loadingOcr')
+                  : $t('home.dicta.loadingSearch')
+              }}
+            </div>
+          </template>
         </div>
 
         <div v-else class="dicta-state">
@@ -214,12 +228,8 @@
             <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
           </div>
 
-          <div v-else-if="dictaFlowState === 'success'" class="dicta-state-headline">
-            <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
-          </div>
-
           <DictaCameraCapture
-            v-if="dictaOpen && dictaFlowState !== 'success'"
+            v-if="dictaOpen"
             :key="dictaCaptureKey"
             :busy="isDictaBusy"
             :auto-fallback="isPhoneCameraMode"
@@ -508,7 +518,7 @@ const isDictaBusy = computed(
   () => dictaFlowState.value === 'analyzing-ocr' || dictaFlowState.value === 'analyzing-parallels'
 );
 const hasCachedOptionsForActiveSide = computed(
-  () => dictaOptionsBySide.value[activeSide.value].length > 0
+  () => dictaOptionsBySide.value[activeSide.value].length > 1
 );
 const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
 const isPhoneCameraMode = computed(() => {
@@ -794,7 +804,10 @@ const onDictaChoiceRetake = (): void => {
 
 const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
   const cachedOptions = dictaOptionsBySide.value[side];
-  if (cachedOptions.length === 0) return;
+  if (cachedOptions.length <= 1) {
+    openDictaCaptureForSide(side);
+    return;
+  }
 
   void pickDictaPageOption(cachedOptions).then((selectedOption) => {
     if (!selectedOption) return;
@@ -821,7 +834,7 @@ const onDictaShowCachedOptions = (): void => {
 
 const openDictaFor = (side: 'from' | 'to') => {
   activeSide.value = side;
-  if (dictaOptionsBySide.value[side].length > 0) {
+  if (dictaOptionsBySide.value[side].length > 1) {
     openCachedOptionsForSide(side);
     return;
   }
