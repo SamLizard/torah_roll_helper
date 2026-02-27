@@ -144,6 +144,7 @@
     "noData": "Sélectionnez DE et À pour calculer le roulement",
     "from": "De",
     "to": "À",
+    "remainingAfterBook": "{count} pages restantes après {book}",
     "direction": {
       "forward": "Vers l'avant",
       "backward": "Vers l'arrière"

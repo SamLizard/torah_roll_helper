@@ -144,6 +144,7 @@
     "noData": "Select both FROM and TO to compute roll",
     "from": "From",
     "to": "To",
+    "remainingAfterBook": "{count} pages remaining after {book}",
     "direction": {
       "forward": "Forward",
       "backward": "Backward"

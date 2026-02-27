@@ -144,6 +144,7 @@
     "noData": "בחר גם 'מ־' וגם 'ל־' כדי לחשב גלילה",
     "from": "מ־",
     "to": "ל־",
+    "remainingAfterBook": "נותרו {count} עמודים לגלול אחרי {book}",
     "direction": {
       "forward": "לגלול קדימה",
       "backward": "לגלול לאחור"

@@ -1,10 +1,17 @@
 <template>
-  <!-- TODO 21: When a result is displayed, if there are more then a book of distance, add a small text with the number of remaining pages to roll after the last book he will go through. -->
   <v-sheet class="pa-6 d-flex flex-column align-center" elevation="2">
     <div class="text-subtitle-1 mb-2">{{ $t('result.title') }}</div>
 
     <div v-if="pages !== null" class="text-center">
       <div class="big-number">{{ pages }}</div>
+      <div v-if="remainingAfterBook !== null" class="text-caption mt-1 text-medium-emphasis">
+        {{
+          $t('result.remainingAfterBook', {
+            count: remainingAfterBook.count,
+            book: $t(`group.${remainingAfterBook.bookKey}`)
+          })
+        }}
+      </div>
       <div
         class="text-h6 mt-2"
         :class="direction === 'forward' ? 'text-primary' : direction === 'backward' ? 'text-secondary' : ''"
@@ -33,11 +40,35 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import realDb from '@/data/real_db.json';
+import type { RealDb } from '@/types';
+import { getRemainingAfterBookForRoll } from '@/composables/rollResultUtils';
+
+const bookLabelKeys = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'] as const;
+type BookLabelKey = (typeof bookLabelKeys)[number];
+
 const props = defineProps({
   pages: { type: Number as () => number | null, default: null },
   direction: { type: String as () => 'forward' | 'backward' | null, default: null },
   fromPage: { type: Number as () => number | null, default: null },
   toPage: { type: Number as () => number | null, default: null }
+});
+
+const remainingAfterBook = computed<{ count: number; bookKey: BookLabelKey } | null>(() => {
+  if (props.pages === null || props.fromPage === null || props.toPage === null || props.fromPage === props.toPage) {
+    return null;
+  }
+
+  const remaining = getRemainingAfterBookForRoll(props.fromPage, props.toPage, realDb as RealDb);
+  if (!remaining) return null;
+  const bookKey = bookLabelKeys[remaining.bookIndex];
+  if (!bookKey) return null;
+
+  return {
+    count: remaining.count,
+    bookKey
+  };
 });
 </script>
 
