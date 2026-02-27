@@ -1,49 +1,99 @@
 <template>
-  <!-- DONE 11: The book (i18n) + perek (+ verse if there is one) should be displayed in the component -->
-  <!-- DONE: it is not working when the page was chosen manually -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
-    <v-card-item>
-      <template #title>
-        <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
-      </template>
-      <template #subtitle>
-        <div class="text-caption">{{ $t(`home.${side}.subtitle`) }}</div>
-      </template>
-      <template #append>
-        <div class="d-flex gap-2">
-          <v-btn 
-            size="small" 
-            variant="tonal" 
-            color="secondary" 
-            prepend-icon="mdi-pencil" 
-            @click="isManualOpen = true"
-          >
-            {{ $t('home.actions.input') }}
-          </v-btn>
-
-          <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
-            {{ $t('home.actions.photo') }}
-          </v-btn>
-          <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
-            {{ $t('home.actions.choose') }}
-          </v-btn>
+    <v-card-item class="location-card-item">
+      <div class="location-header">
+        <div class="location-text">
+          <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
+          <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-      </template>
+        <div class="location-actions-shell">
+          <div class="location-actions">
+            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
+              {{ $t('home.actions.choose') }}
+            </v-btn>          
+            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
+              {{ $t('home.actions.photo') }}
+            </v-btn>
+            <v-btn 
+              size="small" 
+              variant="tonal" 
+              color="secondary" 
+              prepend-icon="mdi-pencil" 
+              @click="isManualOpen = true"
+            >
+              {{ $t('home.actions.input') }}
+            </v-btn>
+          </div>
+        </div>
+      </div>
     </v-card-item>
 
     <v-divider />
 
+    <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
+      <div class="mt-4" style="display: grid; min-width: 0;">
+        <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
+          <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+          <span>{{ $t(`home.calendar.${side}`) }}</span>
+        </div>
+
+        <v-slide-group show-arrows class="calendar-slide-group">
+          <v-slide-group-item
+            v-for="entry in calendarEntries"
+            :key="`${side}-${entry.key}-${entry.dateIso}`"
+          >
+            <ReadingOptionCard
+              :reading-key="entry.target.key"
+              :reading-label="entry.readingLabel"
+              :page="entry.target.ref.page"
+              :active="isSelectedCalendarEntry(entry)"
+              :is-gola="entry.target.gola"
+              :highlight-next-parasha="isNextParasha(entry)"
+              :show-next-parasha-badge="false"
+              :date-label="entry.dateLabel"
+              :show-date-icon="true"
+              :roll-preview="getCalendarRollPreview(entry)"
+              :compact-calendar="true"
+              @click="selectCalendarEntry(entry)"
+            />
+          </v-slide-group-item>
+        </v-slide-group>
+      </div>
+    </v-card-text>
+
+    <!-- TODO 20: when a page found is diplayed, add a "preview page" button that will display the first line of the page, with a link for the full page in tikkunio. -->
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
-        <!-- DONE 4: display the name of the page. Base on the selection if manually selected, or if fits exactly a reading. Else take from json. -->
-        <!-- So, there should be a utils method that returns the title id based on the page number, for the case that it doesn't have a selection from the options (TargetOptionsGrid) -->
-        <!-- The method checks the readings for a corresponding, and if there isn't, get the page id/ids from page_titles_keys.json. -->
-        <!-- When there are multiple ids, join them using / (take from i18n, because hebrew "/" is "\", and english/french "/" is "/"...) -->
-        <div class="text-h2 font-weight-black text-primary mb-2">{{ page }}</div>
+        <div class="location-page-number font-weight-black text-primary mb-2">{{ page }}</div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
-        <div v-if="computedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
-          {{ computedPageTitle }}
+        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
+          {{ resolvedPageTitle }}
+        </div>
+
+        <div v-if="targetRefOptions.length > 1" class="mt-2">
+          <div class="text-caption text-medium-emphasis mb-2">
+            {{ $t('home.targetRef.title') }}
+          </div>
+
+          <v-btn-toggle
+            :model-value="selectedTargetRefMode"
+            divided
+            density="compact"
+            class="target-ref-toggle"
+            @update:model-value="onTargetRefModeChanged"
+          >
+            <v-btn
+              v-for="option in targetRefOptions"
+              :key="option.mode"
+              :value="option.mode"
+              size="small"
+              variant="text"
+              class="text-caption"
+            >
+              {{ $t(option.labelKey) }}
+            </v-btn>
+          </v-btn-toggle>
         </div>
 
         <v-btn class="mt-4" size="small" color="error" variant="text" @click="clear">
@@ -66,6 +116,7 @@
     <ManualEntryDialog 
       v-model="isManualOpen"
       :initial-data="currentRef"
+      :initial-page="page"
       @save="onManualSave"
       @draft="onManualDraft"
     />
@@ -75,64 +126,338 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
-import { getPageTitleKeys } from '@/composables/utils';
+import ReadingOptionCard from './ReadingOptionCard.vue';
+import { computeRoll, getPageTitleKeys } from '@/composables/utils';
+import { useOptionsStore } from '@/stores/options';
+import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
+import targetsData from '@/data/target_pages.json';
+import {
+  splitPairedParashaReadingId,
+  type MonthlyReadingEntry,
+} from '@/composables/calendar/calendar';
+import { useRtl } from 'vuetify';
+import type { TorahRef } from '@/types';
+
+interface TargetItem {
+  key: string;
+  type: 'parasha' | 'holyday';
+  gola: boolean;
+  ref: TorahRef;
+  refEndPartial?: TorahRef;
+  refEnd: TorahRef;
+}
+
+interface CalendarEntry {
+  key: string;
+  readingLabel: string | null;
+  dateIso: string;
+  dateLabel: string;
+  target: TargetItem;
+}
+
+type TargetRefMode = 'ref' | 'refEndPartial' | 'refEnd';
+
+interface TargetRefOption {
+  mode: TargetRefMode;
+  labelKey: string;
+  ref: TorahRef;
+}
 
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
-  selectedRef: { type: Object as () => ManualData | null, default: null }, // Received from HomeView
-  allowPhotoForTo: { type: Boolean, default: false }
+  selectedRef: { type: Object as () => ManualData | null, default: null },
+  allowPhotoForTo: { type: Boolean, default: false },
+  targetKey: { type: String as () => string | null, default: null },
 });
 
 const emit = defineEmits<{
   (e: 'open-dicta'): void;
   (e: 'choose-manual'): void;
-  (e: 'manual-set', page: number | null, data?: ManualData): void; // Updated signature
+  (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const { isRtl } = useRtl();
+const options = useOptionsStore();
+const monthlyReadingsStore = useMonthlyReadingsStore();
+const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
 
-// Stores the draft/selected book, chapter, verse
 const currentRef = ref<ManualData>({
   book: 1,
   chapter: null,
   verse: null
 });
 
-// Sync local state when the prop changes (e.g., selection from TargetOptionsGrid)
+const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+
+const resolveCalendarReading = (
+  readingId: string
+): { target: TargetItem; readingLabel: string | null } | null => {
+  const pairedParashaIds = splitPairedParashaReadingId(readingId);
+  if (!pairedParashaIds) {
+    const target = targetsByKey.get(readingId);
+    if (!target) return null;
+    return { target, readingLabel: null };
+  }
+
+  const [startParashaId, endParashaId] = pairedParashaIds;
+  const startParashaTarget = targetsByKey.get(startParashaId);
+  const endParashaTarget = targetsByKey.get(endParashaId);
+  if (!startParashaTarget || !endParashaTarget) return null;
+
+  return {
+    target: {
+      ...startParashaTarget,
+      key: readingId,
+      gola: startParashaTarget.gola || endParashaTarget.gola,
+      ref: startParashaTarget.ref,
+      refEndPartial: startParashaTarget.refEndPartial,
+      refEnd: endParashaTarget.refEnd,
+    },
+    readingLabel: `${t(`readingTargets.${startParashaId}`)}-${t(`readingTargets.${endParashaId}`)}`,
+  };
+};
+
+const toManualData = (torahRef: TorahRef): ManualData => ({
+  book: torahRef.book,
+  chapter: torahRef.chapter,
+  verse: torahRef.verse,
+});
+
+const isSameTorahRef = (
+  torahRef: TorahRef,
+  page: number | null,
+  refData: ManualData | null
+) =>
+  page === torahRef.page &&
+  refData?.chapter != null &&
+  refData?.verse != null &&
+  refData.book === torahRef.book &&
+  refData.chapter === torahRef.chapter &&
+  refData.verse === torahRef.verse;
+
+const getTargetRefOptions = (target: TargetItem): TargetRefOption[] => {
+  const options: TargetRefOption[] = [
+    {
+      mode: 'ref',
+      labelKey: 'home.targetRef.ref',
+      ref: target.ref,
+    },
+  ];
+
+  if (target.refEndPartial) {
+    options.push({
+      mode: 'refEndPartial',
+      labelKey: 'home.targetRef.refEndPartial',
+      ref: target.refEndPartial,
+    });
+  }
+
+  options.push({
+    mode: 'refEnd',
+    labelKey: 'home.targetRef.refEnd',
+    ref: target.refEnd,
+  });
+
+  return options;
+};
+
+const getDefaultTargetRefMode = (target: TargetItem, side: 'from' | 'to'): TargetRefMode => {
+  if (side === 'from') return target.refEndPartial ? 'refEndPartial' : 'refEnd';
+  return 'ref';
+};
+
+const getRefForMode = (target: TargetItem, mode: TargetRefMode): TorahRef => {
+  if (mode === 'ref') return target.ref;
+  if (mode === 'refEndPartial' && target.refEndPartial) return target.refEndPartial;
+  return target.refEnd;
+};
+
+const formatCalendarDate = (dateIso: string) => {
+  const parsedDate = new Date(`${dateIso}T12:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return dateIso;
+
+  return new Intl.DateTimeFormat(locale.value, {
+    month: 'short',
+    day: 'numeric',
+  }).format(parsedDate);
+};
+
+const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => {
+  const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
+  if (!resolvedCalendarReading) return null;
+  const { target, readingLabel } = resolvedCalendarReading;
+  if (target.gola && !options.isInGola) return null;
+
+  const dateIso = props.side === 'from'
+    ? reading.dates[reading.dates.length - 1]
+    : reading.dates[0];
+  if (!dateIso) return null;
+
+  return {
+    key: reading.readingId,
+    readingLabel,
+    dateIso,
+    dateLabel: formatCalendarDate(dateIso),
+    target,
+  };
+};
+
+const isCalendarEntry = (entry: CalendarEntry | null): entry is CalendarEntry => entry !== null;
+
+const calendarEntries = computed(() => {
+  const sourceReadings = props.side === 'from'
+    ? monthlyReadings.value.lastMonth
+    : monthlyReadings.value.nextMonth;
+
+  const mappedEntries = sourceReadings
+    .map((reading) => toCalendarEntry(reading))
+    .filter(isCalendarEntry);
+
+  return mappedEntries.sort((a, b) =>
+    props.side === 'from'
+      ? b.dateIso.localeCompare(a.dateIso)
+      : a.dateIso.localeCompare(b.dateIso)
+  );
+});
+
+const nextParashaKey = computed(() => {
+  const nextReadings = monthlyReadings.value.nextMonth;
+
+  for (const reading of nextReadings) {
+    const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
+    if (!resolvedCalendarReading) continue;
+    const { target } = resolvedCalendarReading;
+    if (target.gola && !options.isInGola) continue;
+    if (target.type === 'parasha') return target.key;
+  }
+
+  return null;
+});
+
+const isNextParasha = (entry: CalendarEntry) => entry.key === nextParashaKey.value;
+
+const isSelectedCalendarEntry = (entry: CalendarEntry) => {
+  if (props.targetKey) return props.targetKey === entry.key;
+  return props.page === entry.target.ref.page;
+};
+
+const matchedTarget = computed(() => {
+  if (props.targetKey) {
+    const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
+    if (explicitCalendarTarget) return explicitCalendarTarget.target;
+  }
+
+  if (props.page == null || currentRef.value.chapter == null || currentRef.value.verse == null) {
+    return null;
+  }
+
+  return (targetsData as TargetItem[]).find((target) =>
+    getTargetRefOptions(target).some((option) =>
+      isSameTorahRef(option.ref, props.page, currentRef.value)
+    )
+  ) ?? null;
+});
+
+const targetRefOptions = computed(() =>
+  matchedTarget.value ? getTargetRefOptions(matchedTarget.value) : []
+);
+
+const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
+  const selectedOption = targetRefOptions.value.find((option) =>
+    isSameTorahRef(option.ref, props.page, currentRef.value)
+  );
+
+  return selectedOption?.mode ?? null;
+});
+
+const getCalendarRollPreview = (entry: CalendarEntry) => {
+  if (props.side !== 'to') return null;
+  if (options.fromPage === null || options.fromPage === entry.target.ref.page) return null;
+
+  const roll = computeRoll(options.fromPage, entry.target.ref.page);
+  if (!roll) return null;
+
+  const isForward = roll.rollDirection === 'forward';
+  const icon = isRtl.value
+    ? (isForward ? 'mdi-arrow-left' : 'mdi-arrow-right')
+    : (isForward ? 'mdi-arrow-right' : 'mdi-arrow-left');
+
+  return {
+    icon,
+    color: isForward ? 'primary' : 'secondary',
+    text: t('preview.cols', { count: roll.pages }),
+  };
+};
+
+const selectCalendarEntry = (entry: CalendarEntry) => {
+  const defaultMode = getDefaultTargetRefMode(entry.target, props.side);
+  const targetRef = getRefForMode(entry.target, defaultMode);
+  const refData = toManualData(targetRef);
+
+  currentRef.value = refData;
+  emit('manual-set', targetRef.page, refData, entry.target.key);
+};
+
+const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
+  if (!mode || !matchedTarget.value) return;
+
+  const targetRef = getRefForMode(matchedTarget.value, mode);
+  const refData = toManualData(targetRef);
+
+  currentRef.value = refData;
+  emit('manual-set', targetRef.page, refData, matchedTarget.value.key);
+};
+
 watch(() => props.selectedRef, (newRef) => {
   if (newRef) {
     currentRef.value = { ...newRef };
   } else if (props.page === null) {
-    // Only reset if page is also cleared, otherwise keep last draft
     currentRef.value = { book: 1, chapter: null, verse: null };
   }
 }, { immediate: true });
 
-// Logic for DONE 4 & 11
 const computedPageTitle = computed(() => {
   if (props.page === null) return '';
 
-  // Use the updated utility that accepts (page, refData)
-  // We pass currentRef.value which contains {book, chapter, verse}
   const keys = getPageTitleKeys(props.page, currentRef.value);
   
   if (keys && keys.length > 0) {
     return keys.map(key => t(key)).join(t('separator'));
   }
 
-  // Last resort: empty (just shows page number)
+  return '';
+});
+
+const resolvedPageTitle = computed(() => {
+  if (computedPageTitle.value) return computedPageTitle.value;
+  if (matchedTarget.value) return t(`readingTargets.${matchedTarget.value.key}`);
   return '';
 });
 
 const onManualSave = (data: ManualData, page: number) => {
+  const matchedManualTarget = (targetsData as TargetItem[]).find((target) =>
+    getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
+  );
+
+  if (matchedManualTarget) {
+    const defaultMode = getDefaultTargetRefMode(matchedManualTarget, props.side);
+    const targetRef = getRefForMode(matchedManualTarget, defaultMode);
+    const refData = toManualData(targetRef);
+
+    currentRef.value = refData;
+    emit('manual-set', targetRef.page, refData, matchedManualTarget.key);
+    return;
+  }
+
   currentRef.value = data;
-  emit('manual-set', page, data); // Emit both page and ref data
+  emit('manual-set', page, data, null);
 };
 
-// When Typing in Manual Dialog (Draft)
 const onManualDraft = (data: ManualData) => {
   if (props.page === null) {
     currentRef.value = data;
@@ -141,14 +466,152 @@ const onManualDraft = (data: ManualData) => {
 
 const clear = () => {
   emit('manual-set', null, undefined);
-  // We do NOT clear currentRef here. 
-  // This means if the user clears the page, the "Draft" remains in memory 
-  // and will appear if they open the input dialog again.
 };
 </script>
 
 <style scoped>
 .gap-2 {
   gap: 8px;
+}
+
+.gap-1 {
+  gap: 4px;
+}
+
+.location-subtitle {
+  white-space: normal;
+}
+
+.location-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.location-text {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.location-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.location-actions-shell {
+  min-width: 0;
+  flex: 0 1 420px;
+}
+
+.location-actions :deep(.v-btn) {
+  white-space: nowrap;
+}
+
+.location-page-number {
+  font-size: clamp(2.25rem, 9vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: normal;
+}
+
+.calendar-slide-group {
+  margin-inline: -4px;
+}
+
+.target-ref-toggle {
+  width: 100%;
+}
+
+.target-ref-toggle :deep(.v-btn) {
+  flex: 1 1 0;
+  min-width: 0;
+  text-transform: none;
+  height: auto;
+  min-height: 32px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.target-ref-toggle :deep(.v-btn__content) {
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .location-text {
+    flex-basis: 100%;
+  }
+
+  .location-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .location-actions-shell {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .location-header {
+    flex-direction: column;
+  }
+
+  .location-text {
+    flex: 0 0 auto;
+  }
+
+  .location-actions-shell {
+    flex: 0 0 auto;
+    width: 100%;
+    position: relative;
+  }
+
+  .location-actions-shell::before,
+  .location-actions-shell::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 2px;
+    width: 14px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .location-actions-shell::before {
+    left: 0;
+    background: linear-gradient(
+      to right,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0)
+    );
+  }
+
+  .location-actions-shell::after {
+    right: 0;
+    background: linear-gradient(
+      to left,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0)
+    );
+  }
+
+  .location-actions {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    padding-inline: 6px;
+    scroll-padding-inline: 6px;
+    scrollbar-width: thin;
+  }
+
+  .calendar-slide-group :deep(.reading-option-card--calendar) {
+    min-width: 154px;
+  }
 }
 </style>

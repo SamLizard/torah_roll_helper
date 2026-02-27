@@ -1,7 +1,8 @@
 <template>
+  <!-- DONE 23: do a real readme.md -->
   <v-app>
     <nav-bar />
-    <v-main class="mt-6">
+    <v-main>
       <router-view />
     </v-main>
   </v-app>
@@ -24,18 +25,8 @@ watch(isRtl, (newRtl) => {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* text-align: center; */
   color: #2c3e50;
 }
-
-/* nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-} */
 
 nav a.router-link-exact-active {
   color: #42b983;

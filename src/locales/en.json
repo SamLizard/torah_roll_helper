@@ -2,27 +2,153 @@
   "language": "English",
   "dir": "ltr",
   "title": "Torah Roll Assistant",
-  "routes": { "home": "Home" },
-  "directions": { "forward": "Forward", "backward": "Backward" },
+  "routes": {
+    "home": "Home",
+    "about": "About",
+    "howTo": "How To Use"
+  },
+  "about": {
+    "title": "About",
+    "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current opening of the Sefer Torah and a target reading, it calculates the exact rolling direction and number of columns needed to reach it.",
+    "github": "View on GitHub",
+    "dataCreditsTitle": "Data Sources & Credits",
+    "dataCreditsPrefix": "The database for this project is based on open-source files from",
+    "dataCreditsMiddle": ", which in turn utilize data from",
+    "dataCreditsThanks": "Our thanks go to the tikkun.io project for sharing their work with the community.",
+    "issueInvite": "If you have an improvement idea or wish to add a language, please open an issue on GitHub.",
+    "dictaThanksPrefix": "Special thanks to",
+    "dictaThanksMiddle": "and to the",
+    "dictaThanksSuffix": "website for making their API available and for inspiring this project."
+  },
+  "directions": {
+    "forward": "Forward",
+    "backward": "Backward"
+  },
   "home": {
-    "from": { "title": "FROM", "subtitle": "Current location (photo or manual)" },
+    "from": {
+      "title": "FROM",
+      "subtitle": "Current location (photo or manual)"
+    },
     "to": {
       "title": "TO",
       "subtitle": "Target reading (select upcoming or full list)",
       "canUsePhoto": "You may use photo for TO (optional)"
     },
-    "actions": { "photo": "Take photo", "choose": "Choose manually", "clear": "Clear", "input": "Input" },
+    "calendar": {
+      "from": "Recent readings",
+      "to": "Upcoming readings"
+    },
+    "targetRef": {
+      "title": "Parasha Reference Point",
+      "ref": "Parasha start",
+      "refEndPartial": "Sheni/Hamishi end",
+      "refEnd": "Full parasha end"
+    },
+    "dicta": {
+      "title": "Dicta Illuminate",
+      "loadingOcr": "Reading image with Dicta OCR...",
+      "loadingSearch": "Searching Dicta sources...",
+      "noResultTitle": "No source found",
+      "noResultSubtitle": "Try again or search for a new source",
+      "idleTitle": "Take a photo with Dicta",
+      "idleSubtitle": "Use the frame lines to align text before capture.",
+      "errorTitle": "Could not complete Dicta scan",
+      "unexpectedError": "Unexpected Dicta error.",
+      "cameraUnavailable": "Camera API is not available in this browser context.",
+      "captureFailed": "Could not capture image.",
+      "capture": "Capture",
+      "chooseFile": "Choose file",
+      "retryCamera": "Retry camera",
+      "newPhoto": "New photo",
+      "backToOptions": "Back to options",
+      "instructions": {
+        "1": "Place the text so the line width stays inside the white frame",
+        "2": "Use the yellow lines to align the image",
+        "3": "Capture at least four lines of text"
+      },
+      "chooseTitle": "Choose Torah Result",
+      "chooseSubtitle": "Multiple Torah matches were found. Select the correct page.",
+      "result": {
+        "index": "#",
+        "reference": "Reference",
+        "sourceSummary": "{source} (+{count})",
+        "matches": "matches",
+        "choose": "Choose",
+        "rank": "Rank",
+        "rankHigh": "Best",
+        "rankMedium": "Good",
+        "rankLow": "Other",
+        "pageTitle": "Page title"
+      }
+    },
+    "actions": {
+      "photo": "Take photo",
+      "choose": "Choose manually",
+      "clear": "Clear",
+      "input": "Input"
+    },
     "selected": "Selected",
     "noSelection": "No page selected"
   },
-  "targets": { "title": "Choose a target", "showingAll": "Showing full list", "golaLabel": "Gola (Diaspora) mode" },
-  "actions": { "close": "Close", "search": "Search...", "cancel": "Cancel", "confirm": "Set Page", "clear": "Clear" },
+  "howTo": {
+    "title": "How To Use",
+    "subtitle": "Follow these quick steps to get clear rolling instructions.",
+    "steps": {
+      "step1": "Identify the current location of the scroll (the column it is currently open to) using the camera or manual input.",
+      "step2": "Select your target reading from the upcoming list or the full index.",
+      "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
+    },
+    "tip": "Tip: update FROM first, then choose TO.",
+    "camera": {
+      "title": "Camera usage",
+      "step1": "Allow camera access when prompted by your browser.",
+      "step2": "Place the Torah text inside the frame in good, even lighting.",
+      "step3": "Hold steady for a moment so detection can lock correctly.",
+      "step4": "If detection fails, use manual input to set the current location."
+    }
+  },
+  "settings": {
+    "label": "Settings",
+    "subtitle": "Reading and scroll options",
+    "golaLabel": "Gola (Diaspora) mode",
+    "nusachLabel": "Nusach",
+    "torahTypeLabel": "Scroll layout",
+    "help": {
+      "gola": "Enable this if you are outside Israel to synchronize the weekly Parasha readings and special Diaspora holiday readings with the Diaspora calendar.",
+      "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
+      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
+    },
+    "nusachOptions": {
+      "sefaradic": "Sefaradic"
+    },
+    "torahTypeOptions": {
+      "klaf_245": "רמ\"ה (245 pages)"
+    }
+  },
+  "targets": {
+    "title": "Choose a target",
+    "showingAll": "Showing full list",
+    "golaLabel": "Gola (Diaspora) mode",
+    "golaBadge": "Gola"
+  },
+  "actions": {
+    "close": "Close",
+    "search": "Search...",
+    "cancel": "Cancel",
+    "confirm": "Set Page",
+    "clear": "Clear",
+    "restore": "Restore"
+  },
   "result": {
-    "title": "Roll instruction",
+    "title": "Rolling Instructions",
     "noData": "Select both FROM and TO to compute roll",
     "from": "From",
     "to": "To",
-    "direction": { "forward": "Forward", "backward": "Backward" }
+    "remainingAfterBook": "{count} pages remaining after {book}",
+    "direction": {
+      "forward": "Forward",
+      "backward": "Backward"
+    }
   },
   "page": "Page",
   "separator": " / ",
@@ -35,9 +161,14 @@
     "book": "Book",
     "chapter": "Chapter",
     "verse": "Verse",
+    "use_page": "I already have the page",
+    "page": "Page",
     "required": "Required",
+    "must_be_positive": "Must be positive",
     "max_chapter": "Max chapter is",
-    "max_verse": "Max verse is"
+    "max_verse": "Max verse is",
+    "max_page": "Max page is",
+    "page_not_found": "Page not found for the selected reference."
   },
   "type": {
     "parasha": "Parashot",
@@ -53,7 +184,8 @@
     "exodus": "Exodus",
     "leviticus": "Leviticus",
     "numbers": "Numbers",
-    "deuteronomy": "Deuteronomy"
+    "deuteronomy": "Deuteronomy",
+    "four-readings": "Four Parashiot"
   },
   "readingTargets": {
     "bereshit": "Bereshit",
@@ -144,6 +276,10 @@
     "pesach-8": "Pesach (Day 8)",
     "shavuot-1": "Shavuot (Day 1)",
     "shavuot-2": "Shavuot (Day 2)",
-    "tisha-bav": "Tish'a B'Av"
+    "tisha-bav": "Tish'a B'Av",
+    "shekalim": "Shekalim",
+    "zachor": "Zachor",
+    "parah": "Parah",
+    "hachodesh": "HaChodesh"
   }
 }

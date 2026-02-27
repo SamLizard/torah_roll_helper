@@ -1,197 +1,153 @@
 <template>
-  <!-- TODO 7.5: Change it so the navbar is always accessible. Maybe add a navbar instance? Or change from v-dialog to regular page? -->
-  <v-dialog 
-    v-model="open" 
-    fullscreen 
-    transition="dialog-bottom-transition"
-    scrollable
-  >
-    <v-card class="bg-background">
-      <v-toolbar color="surface" elevation="1">
-        <v-btn icon @click="close">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ $t('targets.title') }}</v-toolbar-title>
+  <transition name="dialog-bottom-transition">
+    <div 
+      v-if="open" 
+      class="target-overlay bg-background"
+    >
+      <v-card class="h-100 d-flex flex-column" rounded="0" elevation="0">
         
-        <v-spacer />
-        
-        <div class="search-container me-4">
-          <v-text-field
-            v-model="filter"
-            :placeholder="$t('actions.search')"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            density="compact"
-            hide-details
-            clearable
-            single-line
-            rounded="lg"
-          />
-        </div>
-      </v-toolbar>
+        <v-toolbar color="surface" elevation="1" density="compact">
+          <v-btn icon @click="close">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title class="target-toolbar-title text-subtitle-1 font-weight-bold">
+            {{ $t('targets.title') }}
+          </v-toolbar-title>
 
-      <v-card-text class="pa-4">
-        <div v-if="isFullList" class="d-flex align-center justify-space-between mb-6">
-          <div class="text-subtitle-1 font-weight-medium">
-            {{ $t('targets.showingAll') }} 
-            <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
-          </div>
-          
-          <div v-if="allowGola" class="d-flex align-center bg-surface px-4 rounded-lg border">
-            <v-switch
-              v-model="localIsInGola"
-              :label="$t('targets.golaLabel')"
-              color="primary"
-              hide-details
+          <div class="search-container">
+            <v-text-field
+              v-model="filter"
+              :placeholder="$t('actions.search')"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
               density="compact"
-              inset
+              hide-details
+              clearable
+              single-line
+              rounded="lg"
             />
           </div>
-        </div>
+        </v-toolbar>
 
-        <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
-          {{ $t('noResults') }}
-        </div>
-
-        <template v-else>
-          <div v-for="section in groupedSections" :key="section.type" class="mb-8">
-            
-            <div 
-              class="d-flex align-center mb-3 cursor-pointer user-select-none" 
-              @click="toggleSection(section.type)"
-              v-ripple
-              style="width: fit-content; border-radius: 8px; padding: 4px 8px; margin-left: -8px;"
-            >
-              <v-icon 
-                class="me-2 transition-transform" 
-                :class="{ 'rotate-minus-90': sectionCollapsed[section.type] }"
-                color="primary"
-              >
-                mdi-chevron-down
-              </v-icon>
-              
-              <v-icon color="primary" class="me-2" size="small">mdi-bookmark-outline</v-icon>
-              <h3 class="text-h6 font-weight-bold mb-0">
-                {{ $t(`type.${section.type}`) }}
-                <span class="text-body-2 text-medium-emphasis ms-2">({{ section.count }})</span>
-              </h3>
+        <v-card-text class="pa-4 flex-grow-1 overflow-y-auto">
+          <div v-if="isFullList" class="d-flex align-center justify-space-between mb-6">
+            <div class="text-subtitle-1 font-weight-medium">
+              {{ $t('targets.showingAll') }} 
+              <span class="text-medium-emphasis">({{ pagedOptions.length }})</span>
             </div>
-
-            <v-expand-transition>
-              <div v-show="!sectionCollapsed[section.type]">
-                
-                <v-expansion-panels 
-                  v-if="section.groups.length > 0" 
-                  v-model="openGroups" 
-                  variant="accordion" 
-                  class="mb-4 rounded-lg border" 
-                  flat
-                  multiple
-                >
-                  <v-expansion-panel
-                    v-for="group in section.groups"
-                    :key="group.key"
-                    :value="group.key"
-                    elevation="0"
-                    bg-color="surface"
-                  >
-                    <v-expansion-panel-title class="font-weight-medium">
-                      <span>
-                        {{ $t(`group.${group.key}`) }}
-                        <span class="text-caption text-medium-emphasis ms-2">({{ group.items.length }})</span>
-                      </span>
-                      <template #actions="{ expanded }">
-                        <v-icon :icon="expanded ? 'mdi-folder-open-outline' : 'mdi-folder-outline'" />
-                      </template>
-                    </v-expansion-panel-title>
-                    
-                    <v-expansion-panel-text>
-                      <div class="options-grid pt-2">
-                        <div
-                          v-for="item in group.items"
-                          :key="item.key"
-                          class="option-card"
-                          @click="select(item)"
-                          v-ripple
-                        >
-                          <!-- DONE: change it to have only a key, and take the i18n value. Stay with a fallback. -->
-                          <!-- The key is readingTargets.id (so in en.json, there is readingTargets.bereshit...) -->
-                          <div class="d-flex justify-space-between align-start mb-2">
-                            <span class="option-name text-truncate">
-                              {{ $t(`readingTargets.${item.key}`) }}
-                            </span>
-                          </div>
-                          
-                          <!-- DONE 5: display a roll preview for the TO (and FROM is filled)? When hover? -->
-                          <!-- TODO 7: add special display for the only gola(/israel) readings. -->
-                          <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                            <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                            <div 
-                              v-if="getRollPreview(item.ref.page)" 
-                              :class="`text-${getRollPreview(item.ref.page)?.color} d-flex align-center gap-1`"
-                            >
-                              <v-icon size="x-small">
-                                {{ getRollPreview(item.ref.page)?.icon }}
-                              </v-icon>
-                              
-                              <span class="font-weight-bold mx-1">
-                                {{ getRollPreview(item.ref.page)?.text }}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-
-                <div v-if="section.singles.length > 0" class="options-grid">
-                  <div
-                    v-for="item in section.singles"
-                    :key="item.key"
-                    class="option-card"
-                    @click="select(item)"
-                    v-ripple
-                  >
-                    <div class="d-flex justify-space-between align-start mb-2">
-                      <span class="option-name text-truncate">
-                        {{ $t(`readingTargets.${item.key}`) }}
-                      </span>
-                    </div>
-                    
-                    <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between">
-                      <span>{{ $t('page') }} {{ item.ref.page }}</span>
-
-                      <div v-if="getRollPreview(item.ref.page)" :class="`text-${getRollPreview(item.ref.page)?.color}`">
-                        <v-icon size="x-small" class="me-1">
-                          {{ getRollPreview(item.ref.page)?.icon }}
-                        </v-icon>
-                        <span class="font-weight-bold">
-                          {{ getRollPreview(item.ref.page)?.text }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </v-expand-transition>
           </div>
-        </template>
 
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+          <div v-if="pagedOptions.length === 0" class="text-center mt-12 text-medium-emphasis">
+            {{ $t('noResults') }}
+          </div>
+
+          <template v-else>
+            <div v-for="section in groupedSections" :key="section.type" class="mb-8">
+              
+              <div 
+                class="d-flex align-center mb-3 cursor-pointer user-select-none" 
+                @click="toggleSection(section.type)"
+                v-ripple
+                style="width: fit-content; border-radius: 8px; padding: 4px 8px; margin-left: -8px;"
+              >
+                <v-icon 
+                  class="me-2 transition-transform" 
+                  :class="{ 'rotate-minus-90': sectionCollapsed[section.type] }"
+                  color="primary"
+                >
+                  mdi-chevron-down
+                </v-icon>
+                
+                <v-icon color="primary" class="me-2" size="small">mdi-bookmark-outline</v-icon>
+                <h3 class="text-h6 font-weight-bold mb-0">
+                  {{ $t(`type.${section.type}`) }}
+                  <span class="text-body-2 text-medium-emphasis ms-2">({{ section.count }})</span>
+                </h3>
+              </div>
+
+              <v-expand-transition>
+                <div v-show="!sectionCollapsed[section.type]">
+                  
+                  <v-expansion-panels 
+                    v-if="section.groups.length > 0" 
+                    :model-value="getOpenGroups(section.type)"
+                    @update:model-value="(value) => setOpenGroups(section.type, value)"
+                    variant="accordion" 
+                    class="mb-4 rounded-lg border" 
+                    flat
+                    multiple
+                  >
+                    <v-expansion-panel
+                      v-for="group in section.groups"
+                      :key="group.key"
+                      :value="group.key"
+                      elevation="0"
+                      bg-color="surface"
+                    >
+                      <v-expansion-panel-title class="font-weight-medium">
+                        <span>
+                          {{ $t(`group.${group.key}`) }}
+                          <span class="text-caption text-medium-emphasis ms-2">({{ group.items.length }})</span>
+                        </span>
+                        <template #actions="{ expanded }">
+                          <v-icon :icon="expanded ? 'mdi-folder-open-outline' : 'mdi-folder-outline'" />
+                        </template>
+                      </v-expansion-panel-title>
+                      
+                      <v-expansion-panel-text>
+                        <div class="options-grid pt-2">
+                          <ReadingOptionCard
+                            v-for="item in group.items"
+                            :key="item.key"
+                            :ref="(el) => setCardRef(item.key, el)"
+                            :reading-key="item.key"
+                            :page="item.ref.page"
+                            :is-gola="item.gola"
+                            :highlight-next-parasha="isNextParasha(item)"
+                            :roll-preview="getRollPreview(item.ref.page)"
+                            @click="select(item)"
+                          />
+                        </div>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+
+                  <div v-if="section.singles.length > 0" class="options-grid">
+                    <ReadingOptionCard
+                      v-for="item in section.singles"
+                      :key="item.key"
+                      :ref="(el) => setCardRef(item.key, el)"
+                      :reading-key="item.key"
+                      :page="item.ref.page"
+                      :is-gola="item.gola"
+                      :highlight-next-parasha="isNextParasha(item)"
+                      :roll-preview="getRollPreview(item.ref.page)"
+                      @click="select(item)"
+                    />
+                  </div>
+
+                </div>
+              </v-expand-transition>
+            </div>
+          </template>
+        </v-card-text>
+      </v-card>
+    </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted, type ComponentPublicInstance } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useOptionsStore } from '@/stores/options';
+import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
-import { computeRoll } from '@/composables/utils'; // Import computeRoll
+import { computeRoll } from '@/composables/utils';
+import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
+import type { TorahRef } from '@/types';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
+import ReadingOptionCard from './ReadingOptionCard.vue';
 const { t } = useI18n();
 const { isRtl } = useRtl();
 
@@ -200,19 +156,17 @@ interface TargetItem {
   group: string;
   gola: boolean;
   type: 'parasha' | 'holyday';
-  ref: {
-    book: number;
-    chapter: number;
-    verse: number;
-    page: number;
-  };
+  ref: TorahRef;
+  refEndPartial?: TorahRef;
+  refEnd: TorahRef;
 }
+type SectionType = TargetItem['type'];
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   side: { type: String as () => 'from' | 'to', default: 'to' },
   allowGola: { type: Boolean, default: false },
-  // Future TODO 8.5: Pass the group key here (e.g. 'genesis') to auto-open it
+  selectedTargetKey: { type: String, default: null },
   initialOpenGroup: { type: String, default: null },
 });
 
@@ -222,55 +176,166 @@ const emit = defineEmits<{
 }>();
 
 const store = useOptionsStore();
+const monthlyReadingsStore = useMonthlyReadingsStore();
+const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const filter = ref('');
 const isFullList = ref(true); 
-const localIsInGola = ref(store.isInGola);
 
-// Tracks which Outer Sections (Types) are collapsed.
-// Default: empty object means all are expanded (false).
 const sectionCollapsed = ref<Record<string, boolean>>({});
+const openGroupsByType = ref<Record<SectionType, string[]>>({
+  parasha: [],
+  holyday: [],
+});
+const cardRefs = ref<Record<string, HTMLElement>>({});
+const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+const hasAutoFocusedNextParasha = ref(false);
 
-// Tracks which Inner Groups (Accordion) are open. 
-// Bound to v-model of v-expansion-panels.
-const openGroups = ref<string[]>([]);
+const isSectionType = (type: string): type is SectionType => type === 'parasha' || type === 'holyday';
 
-// --- Watchers ---
+const setCardRef = (
+  key: string,
+  el: Element | ComponentPublicInstance | null
+) => {
+  if (!el) {
+    delete cardRefs.value[key];
+    return;
+  }
 
-watch(localIsInGola, (v) => store.changeIsInGola(v));
+  if (el instanceof Element) {
+    if (el instanceof HTMLElement) {
+      cardRefs.value[key] = el;
+    }
+    return;
+  }
+
+  const rootElement = (el as ComponentPublicInstance).$el;
+  if (rootElement instanceof HTMLElement) {
+    cardRefs.value[key] = rootElement;
+  }
+};
+
+const nextParashaKey = computed(() => {
+  const nextReadings = monthlyReadings.value.nextMonth;
+
+  for (const reading of nextReadings) {
+    const pairedParashaIds = splitPairedParashaReadingId(reading.readingId);
+    const readingKey = pairedParashaIds ? pairedParashaIds[0] : reading.readingId;
+    const target = targetsByKey.get(readingKey);
+    if (!target) continue;
+    if (target.gola && !store.isInGola) continue;
+    if (target.type === 'parasha') return target.key;
+  }
+
+  return null;
+});
+
+const isNextParasha = (item: TargetItem) => item.key === nextParashaKey.value;
+
+const getPreferredFocusTargetKey = () => {
+  if (props.selectedTargetKey && filtered.value.some((target) => target.key === props.selectedTargetKey)) {
+    return props.selectedTargetKey;
+  }
+
+  return nextParashaKey.value;
+};
+
+const revealFocusGroup = () => {
+  const targetKey = getPreferredFocusTargetKey();
+  if (!targetKey) return;
+
+  const focusTarget = targetsByKey.get(targetKey);
+  if (!focusTarget) return;
+
+  sectionCollapsed.value[focusTarget.type] = false;
+  if (focusTarget.group && !openGroupsByType.value[focusTarget.type].includes(focusTarget.group)) {
+    openGroupsByType.value = {
+      ...openGroupsByType.value,
+      [focusTarget.type]: [...openGroupsByType.value[focusTarget.type], focusTarget.group],
+    };
+  }
+};
+
+const focusPreferredTarget = () => {
+  const targetKey = getPreferredFocusTargetKey();
+  if (!targetKey) return;
+
+  const focusCard = cardRefs.value[targetKey];
+  if (!focusCard) return;
+
+  focusCard.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+  hasAutoFocusedNextParasha.value = true;
+};
+
+const normalizeGroupValues = (value: unknown) => {
+  if (Array.isArray(value)) return value.map((item) => String(item));
+  if (value == null) return [];
+  return [String(value)];
+};
+
+const getOpenGroups = (type: string) => {
+  if (!isSectionType(type)) return [];
+  return openGroupsByType.value[type];
+};
+
+const setOpenGroups = (type: string, value: unknown) => {
+  if (!isSectionType(type)) return;
+  openGroupsByType.value = {
+    ...openGroupsByType.value,
+    [type]: normalizeGroupValues(value),
+  };
+};
 
 const open = computed({
   get: () => props.modelValue,
   set: (v: boolean) => emit('update:modelValue', v)
 });
 
-// Watch for the prop to set initial open group (For TODO 8.5)
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && open.value) {
+    close();
+  }
+};
+
+watch(open, (isOpen) => {
+  if (isOpen) {
+    filter.value = '';
+    hasAutoFocusedNextParasha.value = false;
+    revealFocusGroup();
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeydown);
+  } else {
+    document.body.style.overflow = '';
+    window.removeEventListener('keydown', onKeydown);
+  }
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+  window.removeEventListener('keydown', onKeydown);
+});
+
 watch(() => props.initialOpenGroup, (newVal) => {
   if (newVal) {
-    // Add the group to the open list if not already there
-    if (!openGroups.value.includes(newVal)) {
-      openGroups.value.push(newVal);
+    if (!openGroupsByType.value.parasha.includes(newVal)) {
+      openGroupsByType.value.parasha = [...openGroupsByType.value.parasha, newVal];
+    }
+    if (!openGroupsByType.value.holyday.includes(newVal)) {
+      openGroupsByType.value.holyday = [...openGroupsByType.value.holyday, newVal];
     }
   }
 }, { immediate: true });
-
-// --- Logic ---
 
 const toggleSection = (type: string) => {
   sectionCollapsed.value[type] = !sectionCollapsed.value[type];
 };
 
-const filtered = computed(() => {
-  const q = filter.value.trim().toLowerCase();
+const filtered = computed(() => {  
+  const q = filter.value?.trim()?.toLowerCase();
   const list = targetsData as TargetItem[];
   
   return list.filter((target) => {
-    // Exclude gola-only items when the store says we're not in Gola
     if (target.gola && !store.isInGola) return false;
-
-    // If no query, include the item (already passed gola check)
     if (!q) return true;
-
-    // Search matches: key, type, page, or translated name
     const searchStr = `${target.key} ${target.type} ${target.ref.page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
     return searchStr.includes(q);
   });
@@ -278,17 +343,13 @@ const filtered = computed(() => {
 
 const pagedOptions = computed(() => filtered.value);
 
-// 2. Grouping Logic
 const groupedSections = computed(() => {
-  // Buckets for types
   const buckets: Record<string, { groups: Record<string, TargetItem[]>, singles: TargetItem[] }> = {
     parasha: { groups: {}, singles: [] },
     holyday: { groups: {}, singles: [] }
   };
 
-  // Step A: Distribute items into buckets
   filtered.value.forEach(item => {
-    // Determine type bucket (fallback to 'holyday' if unknown type appears, or skip)
     const typeKey = (item.type === 'parasha') ? 'parasha' : 'holyday';
     
     if (item.group) {
@@ -301,8 +362,6 @@ const groupedSections = computed(() => {
     }
   });
 
-  // Step B: Transform to array structure and handle "Single Item Groups"
-  // Order: Parasha first, then Holyday (or strict array order)
   const result = [];
   
   for (const type of ['parasha', 'holyday']) {
@@ -310,7 +369,6 @@ const groupedSections = computed(() => {
     const finalGroups: { key: string, items: TargetItem[] }[] = [];
     const finalSingles = [...data.singles];
 
-    // Process groups: if > 1 item, keep as group. Else, move to singles.
     Object.entries(data.groups).forEach(([groupKey, items]) => {
       if (items.length > 1) {
         finalGroups.push({ key: groupKey, items });
@@ -319,16 +377,14 @@ const groupedSections = computed(() => {
       }
     });
 
-    // Calculate total count for this Type section
     const totalCount = finalSingles.length + finalGroups.reduce((sum, g) => sum + g.items.length, 0);
 
-    // Only add section if it has content
     if (totalCount > 0) {
       result.push({
         type,
-        groups: finalGroups, // You might want to sort these keys if needed
+        groups: finalGroups,
         singles: finalSingles,
-        count: totalCount // <--- Added this line
+        count: totalCount
       });
     }
   }
@@ -336,7 +392,20 @@ const groupedSections = computed(() => {
   return result;
 });
 
+watch(
+  () => [open.value, props.selectedTargetKey, nextParashaKey.value, groupedSections.value.length, filter.value],
+  () => {
+    if (!open.value || hasAutoFocusedNextParasha.value) return;
+    if (filter.value.trim().length > 0) return;
+
+    focusPreferredTarget();
+  },
+  { flush: 'post' }
+);
+
 const select = (item: TargetItem) => {  
+  filter.value = '';
+  
   emit('select', item);
   open.value = false;
 };
@@ -345,24 +414,18 @@ const close = () => {
   open.value = false;
 };
 
-// Logic for DONE 5
 const getRollPreview = (targetPage: number) => {
-  // Only show preview if we are selecting 'TO' and we have a 'FROM' page
   const fromPage = store.fromPage;
 
   if (props.side !== 'to' || fromPage === null || fromPage === targetPage) {
     return null;
   }
 
-  // Calculate logic
   const result = computeRoll(fromPage, targetPage);
   if (!result) return null;
 
   const isForward = result.rollDirection === 'forward';
   
-  // RTL Logic for Icon Direction
-  // In LTR: Forward = Right Arrow, Backward = Left Arrow
-  // In RTL (Hebrew): Forward (Next Columns) = Left Arrow, Backward = Right Arrow
   let iconName = '';
   if (isRtl.value) {
     iconName = isForward ? 'mdi-arrow-left' : 'mdi-arrow-right';
@@ -379,19 +442,50 @@ const getRollPreview = (targetPage: number) => {
 </script>
 
 <style scoped>
+.target-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  padding-top: 64px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-bottom-transition-enter-active,
+.dialog-bottom-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.dialog-bottom-transition-enter-from,
+.dialog-bottom-transition-leave-to {
+  transform: translateY(100%);
+}
+
 .gap-1 {
   gap: 4px;
 }
 
 .search-container {
-  width: 100%;
-  max-width: 300px;
+  width: 300px;
+  min-width: 140px;
+  flex: 0 1 300px;
+  margin-inline-start: 8px;
+  margin-inline-end: 16px;
 }
 
-/* Modern CSS Grid:
-   Creates columns that are at least 180px wide.
-   Fills the row automatically. No media queries needed.
-*/
+.target-toolbar-title {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .search-container {
+    width: 140px;
+    min-width: 100px;
+    flex-basis: 140px;
+    margin-inline-end: 8px;
+  }
+}
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -399,31 +493,6 @@ const getRollPreview = (targetPage: number) => {
   padding-bottom: 24px;
 }
 
-.option-card {
-  background-color: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.option-card:hover { 
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-  border-color: rgb(var(--v-theme-primary));
-}
-
-.option-name { 
-  font-weight: 600; 
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-/* Specific style to make expansion panels blend better */
 :deep(.v-expansion-panel) {
   border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
@@ -431,7 +500,6 @@ const getRollPreview = (targetPage: number) => {
   border-bottom: none !important;
 }
 
-/* Animations for chevron */
 .rotate-minus-90 {
   transform: rotate(-90deg);
 }

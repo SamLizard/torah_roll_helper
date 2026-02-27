@@ -1,21 +1,31 @@
-export interface Verse {
+interface TorahRef {
   book: number;
   chapter: number;
   verse: number;
+  page: number;
 }
 
-export interface PageEntry {
+type Verse = Omit<TorahRef, 'page'>;
+
+interface PageEntry {
   page: number;
   firstVerse: Verse;
 }
 
-// A Book is an array of [chapter, verse, page] tuples
-export type BookData = [number, number, number][];
+type BookData = [number, number, number][];
 
-// The RealDb is an array containing 5 BookData arrays
-export type RealDb = BookData[];
+type RealDb = BookData[];
 
-export interface RollInstructions {
+interface RollInstructions {
   pages: number;
   rollDirection: 'forward' | 'backward';
 }
+
+export {
+  type TorahRef,
+  type Verse,
+  type PageEntry,
+  type BookData,
+  type RealDb,
+  type RollInstructions,
+};

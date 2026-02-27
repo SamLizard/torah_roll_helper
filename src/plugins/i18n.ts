@@ -1,8 +1,4 @@
 import { createI18n } from 'vue-i18n';
-/*
- * All i18n resources specified in the plugin `include` option can be loaded
- * at once using the import syntax
- */
 import sourceMessages from '@intlify/unplugin-vue-i18n/messages';
 import { he, en, fr } from 'vuetify/locale';
 import { defaults, mapValues } from 'lodash';

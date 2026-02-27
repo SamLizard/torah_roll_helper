@@ -2,31 +2,153 @@
   "language": "Français",
   "dir": "ltr",
   "title": "Assistant de Roulement de la Torah",
-  "routes": { "home": "Accueil" },
-  "directions": { "forward": "Avant", "backward": "Arrière" },
+  "routes": {
+    "home": "Accueil",
+    "about": "À propos",
+    "howTo": "Mode d'emploi"
+  },
+  "about": {
+    "title": "À propos",
+    "description": "Cet outil aide les Gabbaim et Ba'al Koré à préparer le Sefer Torah efficacement afin d'éviter le Tora'h Tzibur. Il calcule la direction et la distance précise (nombre de colonnes) pour rouler le parchemin entre deux lectures.",
+    "github": "Voir sur GitHub",
+    "dataCreditsTitle": "Données et Remerciements",
+    "dataCreditsPrefix": "La base de données de ce projet repose sur les fichiers open source de",
+    "dataCreditsMiddle": ", qui utilisent eux-mêmes les données de",
+    "dataCreditsThanks": "Merci au projet tikkun.io pour le partage de ces ressources précieuses.",
+    "issueInvite": "Vous avez une idée d'amélioration ou souhaitez ajouter une langue ? N'hésitez pas à ouvrir une issue sur GitHub.",
+    "dictaThanksPrefix": "Un grand merci à",
+    "dictaThanksMiddle": "et au site",
+    "dictaThanksSuffix": "pour la mise à disposition de leur API, ainsi que pour l'inspiration à l'origine de ce projet."
+  },
+  "directions": {
+    "forward": "Avant",
+    "backward": "Arrière"
+  },
   "home": {
-    "from": { "title": "DE", "subtitle": "Emplacement actuel (photo ou manuel)" },
+    "from": {
+      "title": "DE",
+      "subtitle": "Emplacement actuel (photo ou manuel)"
+    },
     "to": {
       "title": "À",
       "subtitle": "Lecture cible (sélectionnez à venir ou complet)",
       "canUsePhoto": "Vous pouvez utiliser une photo pour la destination (optionnel)"
     },
-    "actions": { "photo": "Prendre photo", "choose": "Choisir manuellement", "clear": "Effacer", "input": "Saisie" },
+    "calendar": {
+      "from": "Lectures récentes",
+      "to": "Lectures à venir"
+    },
+    "targetRef": {
+      "title": "Point de référence de la paracha",
+      "ref": "Début de la paracha",
+      "refEndPartial": "Fin du chéni/hamichi",
+      "refEnd": "Fin complète de la paracha"
+    },
+    "dicta": {
+      "title": "Dicta Illuminate",
+      "loadingOcr": "Lecture de l'image avec OCR Dicta...",
+      "loadingSearch": "Recherche des sources Dicta...",
+      "noResultTitle": "Aucune source trouvée",
+      "noResultSubtitle": "Essayez une nouvelle photo ou un autre texte",
+      "idleTitle": "Prenez une photo avec Dicta",
+      "idleSubtitle": "Utilisez le cadre pour bien aligner le texte avant la capture.",
+      "errorTitle": "Le scan Dicta n'a pas pu être terminé",
+      "unexpectedError": "Erreur Dicta inattendue.",
+      "cameraUnavailable": "L'API caméra n'est pas disponible dans ce contexte navigateur.",
+      "captureFailed": "Impossible de capturer l'image.",
+      "capture": "Capturer",
+      "chooseFile": "Choisir un fichier",
+      "retryCamera": "Réessayer la caméra",
+      "newPhoto": "Nouvelle photo",
+      "backToOptions": "Retour aux options",
+      "instructions": {
+        "1": "Placez le texte pour que la largeur de la ligne reste dans le cadre blanc",
+        "2": "Utilisez les lignes jaunes pour aligner l'image",
+        "3": "Capturez au moins quatre lignes de texte"
+      },
+      "chooseTitle": "Choisir le résultat Torah",
+      "chooseSubtitle": "Plusieurs correspondances Torah ont été trouvées. Choisissez la page correcte.",
+      "result": {
+        "index": "#",
+        "reference": "Référence",
+        "sourceSummary": "{source} (+{count})",
+        "matches": "correspondances",
+        "choose": "Choisir",
+        "rank": "Priorité",
+        "rankHigh": "Meilleur",
+        "rankMedium": "Bon",
+        "rankLow": "Autre",
+        "pageTitle": "Titre de page"
+      }
+    },
+    "actions": {
+      "photo": "Prendre photo",
+      "choose": "Choisir manuellement",
+      "clear": "Effacer",
+      "input": "Saisie"
+    },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
+  },
+  "howTo": {
+    "title": "Mode d'emploi",
+    "subtitle": "Suivez ces étapes courtes pour obtenir des instructions de roulement claires.",
+    "steps": {
+      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo ou saisie manuelle.",
+      "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
+      "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
+    },
+    "tip": "Astuce : commencez par définir DE, puis choisissez À.",
+    "camera": {
+      "title": "Utilisation de la caméra",
+      "step1": "Autorisez l'accès à la caméra lorsque le navigateur le demande.",
+      "step2": "Placez le texte de la Torah dans le cadre avec un éclairage homogène.",
+      "step3": "Restez immobile un instant pour laisser la détection se stabiliser.",
+      "step4": "En cas d'échec, utilisez la saisie manuelle pour définir la position actuelle."
+    }
+  },
+  "settings": {
+    "label": "Paramètres",
+    "subtitle": "Options de lecture et de rouleau",
+    "golaLabel": "Mode Diaspora (Gola)",
+    "nusachLabel": "Noussah",
+    "torahTypeLabel": "Mise en page",
+    "help": {
+      "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures hebdomadaires et les lectures spéciales des fêtes avec le calendrier de la Diaspora.",
+      "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
+      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats, comme רמ״ח (248), pourront être ajoutés."
+    },
+    "nusachOptions": {
+      "sefaradic": "Séfarade"
+    },
+    "torahTypeOptions": {
+      "klaf_245": "רמ״ה (245 pages)"
+    }
   },
   "targets": {
     "title": "Choisir une cible",
     "showingAll": "Affichage de la liste complète",
-    "golaLabel": "Mode Diaspora (Gola)"
+    "golaLabel": "Mode Diaspora (Gola)",
+    "golaBadge": "Gola"
   },
-  "actions": { "close": "Fermer", "search": "Rechercher...", "cancel": "Annuler", "confirm": "Valider", "clear": "Effacer" },
+  "actions": {
+    "close": "Fermer",
+    "search": "Rechercher...",
+    "cancel": "Annuler",
+    "confirm": "Valider",
+    "clear": "Effacer",
+    "restore": "Restaurer"
+  },
   "result": {
     "title": "Instruction de roulement",
     "noData": "Sélectionnez DE et À pour calculer le roulement",
     "from": "De",
     "to": "À",
-    "direction": { "forward": "Vers l'avant", "backward": "Vers l'arrière" }
+    "remainingAfterBook": "{count} pages restantes après {book}",
+    "direction": {
+      "forward": "Vers l'avant",
+      "backward": "Vers l'arrière"
+    }
   },
   "page": "Page",
   "separator": " / ",
@@ -35,13 +157,18 @@
     "cols": "{count} col."
   },
   "manual": {
-    "title": "Entrer le lieu manuellement",
+    "title": "Entrer l'emplacement manuellement",
     "book": "Livre",
     "chapter": "Chapitre",
     "verse": "Verset",
+    "use_page": "J'ai déjà la page",
+    "page": "Page",
     "required": "Requis",
+    "must_be_positive": "Doit être positif",
     "max_chapter": "Le chapitre max est",
-    "max_verse": "Le verset max est"
+    "max_verse": "Le verset max est",
+    "max_page": "La page max est",
+    "page_not_found": "Page introuvable pour la référence sélectionnée."
   },
   "type": {
     "parasha": "Parachot",
@@ -57,7 +184,8 @@
     "exodus": "Exode",
     "leviticus": "Lévitique",
     "numbers": "Nombres",
-    "deuteronomy": "Deutéronome"
+    "deuteronomy": "Deutéronome",
+    "four-readings": "Quatre Parachiot"
   },
   "readingTargets": {
     "bereshit": "Béréchit",
@@ -85,7 +213,7 @@
     "pekudei": "Pékoudé",
     "vayikra": "Vayikra",
     "tzav": "Tzav",
-    "shmini": "Chimini",
+    "shmini": "Chemini",
     "tazria": "Tazria",
     "metzora": "Metsora",
     "achrei_mot": "Achrei Mot",
@@ -148,6 +276,10 @@
     "pesach-8": "Pessah (8ème jour)",
     "shavuot-1": "Chavouot (1er jour)",
     "shavuot-2": "Chavouot (2ème jour)",
-    "tisha-bav": "Tich'a B'Av"
+    "tisha-bav": "Tich'a B'Av",
+    "shekalim": "Chekalim",
+    "zachor": "Zachor",
+    "parah": "Parah",
+    "hachodesh": "HaChodesh"
   }
 }
