@@ -1,7 +1,7 @@
 <template>
   <!-- DONE 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue. So for computers it should be like this in both times the popup is open, and in phones only in the popup to choose from multiple results. -->
   <!-- DONE 17: Look at the jumelées parachiots, and be sure the calendar will work with them, taking the first parasha fort start and middle, and second parasha for end. Look at "For DONE 17" in calendar.ts -->
-  <!-- TODO 24: make the photo things rtl/ltr as needed... -->
+  <!-- DONE 24: make the photo things rtl/ltr as needed... -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
@@ -67,6 +67,7 @@
       <div
         v-if="!isPhoneCameraMode && dictaOpen"
         class="dicta-overlay bg-background"
+        :dir="photoUiDirection"
       >
         <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
           <v-card-title class="dicta-card-title">
@@ -166,6 +167,7 @@
       <div
         v-if="isPhoneCameraMode && dictaOpen && dictaFlowState !== 'idle'"
         class="dicta-overlay bg-background"
+        :dir="photoUiDirection"
       >
         <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
           <v-card-title class="dicta-card-title">
@@ -231,6 +233,7 @@
     <section
       v-if="isPhoneCameraMode && dictaOpen && dictaFlowState === 'idle'"
       class="dicta-mobile-screen"
+      :dir="photoUiDirection"
     >
       <div class="dicta-mobile-screen__header">
         <span class="dicta-mobile-screen__title">{{ $t('home.dicta.title') }}</span>
@@ -282,6 +285,7 @@
       <div
         v-if="dictaChoiceOpen"
         class="dicta-choice-overlay bg-background"
+        :dir="photoUiDirection"
       >
         <v-card class="dicta-choice-shell" rounded="0" elevation="0">
           <v-card-title class="dicta-card-title">
@@ -557,6 +561,7 @@ const isDictaBusy = computed(
 const hasCachedOptionsForActiveSide = computed(
   () => dictaOptionsBySide.value[activeSide.value].length > 1
 );
+const photoUiDirection = computed<'rtl' | 'ltr'>(() => (isRtl.value ? 'rtl' : 'ltr'));
 const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
 const isPhoneCameraMode = computed(() => {
   if (typeof navigator === 'undefined') return false;
