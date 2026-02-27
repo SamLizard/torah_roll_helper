@@ -95,7 +95,14 @@
       "step2": "Select your target reading from the upcoming list or the full index.",
       "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
     },
-    "tip": "Tip: update FROM first, then choose TO."
+    "tip": "Tip: update FROM first, then choose TO.",
+    "camera": {
+      "title": "Camera usage",
+      "step1": "Allow camera access when prompted by your browser.",
+      "step2": "Place the Torah text inside the frame in good, even lighting.",
+      "step3": "Hold steady for a moment so detection can lock correctly.",
+      "step4": "If detection fails, use manual input to set the current location."
+    }
   },
   "settings": {
     "label": "Settings",

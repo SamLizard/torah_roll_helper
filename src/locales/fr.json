@@ -95,7 +95,14 @@
       "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
       "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
     },
-    "tip": "Astuce : commencez par définir DE, puis choisissez À."
+    "tip": "Astuce : commencez par définir DE, puis choisissez À.",
+    "camera": {
+      "title": "Utilisation de la caméra",
+      "step1": "Autorisez l'accès à la caméra lorsque le navigateur le demande.",
+      "step2": "Placez le texte de la Torah dans le cadre avec un éclairage homogène.",
+      "step3": "Restez immobile un instant pour laisser la détection se stabiliser.",
+      "step4": "En cas d'échec, utilisez la saisie manuelle pour définir la position actuelle."
+    }
   },
   "settings": {
     "label": "Paramètres",
