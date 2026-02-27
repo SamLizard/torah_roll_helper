@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue -->
+  <!-- DONE 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue. So for computers it should be like this in both times the popup is open, and in phones only in the popup to choose from multiple results. -->
   <!-- TODO 17: Look at the jumelées parachiots, and be sure the calendar will work with them, taking the first parasha fort start and middle, and second parasha for end. -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
@@ -62,107 +62,175 @@
       @select="onTargetSelected"
     />
 
-    <v-dialog
-      v-if="!isPhoneCameraMode"
-      v-model="dictaOpen"
-      max-width="1200"
-      class="dicta-dialog"
-      scrollable
-    >
-      <v-card class="dicta-card">
-        <v-card-title class="dicta-card-title">
-          <span>{{ $t('home.dicta.title') }}</span>
-          <div class="dicta-card-toolbar">
-            <v-btn
-              v-if="hasCachedOptionsForActiveSide"
-              size="small"
-              variant="text"
-              :prepend-icon="backToOptionsIcon"
-              :disabled="isDictaBusy"
-              @click="onDictaShowCachedOptions"
-            >
-              {{ $t('home.dicta.backToOptions') }}
-            </v-btn>
-            <v-btn
-              size="small"
-              variant="text"
-              prepend-icon="mdi-camera-retake"
-              :disabled="isDictaBusy"
-              @click="onDictaRetake"
-            >
-              {{ $t('home.dicta.newPhoto') }}
-            </v-btn>
-            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
-          </div>
-        </v-card-title>
-
-        <v-divider />
-
-        <v-card-text class="dicta-card-content">
-          <div
-            v-if="
-              dictaFlowState === 'analyzing-ocr' ||
-              dictaFlowState === 'analyzing-parallels' ||
-              dictaFlowState === 'success'
-            "
-            class="dicta-state dicta-state--loading"
-          >
-            <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
-              <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
+    <transition name="dialog-bottom-transition">
+      <div
+        v-if="!isPhoneCameraMode && dictaOpen"
+        class="dicta-overlay bg-background"
+      >
+        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
+          <v-card-title class="dicta-card-title">
+            <span>{{ $t('home.dicta.title') }}</span>
+            <div class="dicta-card-toolbar">
+              <v-btn
+                v-if="hasCachedOptionsForActiveSide"
+                size="small"
+                variant="text"
+                :prepend-icon="backToOptionsIcon"
+                :disabled="isDictaBusy"
+                @click="onDictaShowCachedOptions"
+              >
+                {{ $t('home.dicta.backToOptions') }}
+              </v-btn>
+              <v-btn
+                size="small"
+                variant="text"
+                prepend-icon="mdi-camera-retake"
+                :disabled="isDictaBusy"
+                @click="onDictaRetake"
+              >
+                {{ $t('home.dicta.newPhoto') }}
+              </v-btn>
+              <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
             </div>
-            <template v-else>
-              <v-progress-circular indeterminate color="primary" size="54" width="5" />
-              <div class="text-subtitle-1 font-weight-medium mt-4">
-                {{
-                  dictaFlowState === 'analyzing-ocr'
-                    ? $t('home.dicta.loadingOcr')
-                    : $t('home.dicta.loadingSearch')
-                }}
-              </div>
-            </template>
-          </div>
+          </v-card-title>
 
-          <div v-else class="dicta-state">
-            <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
-              <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
-              <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
-              <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-            </div>
+          <v-divider />
 
-            <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
-              <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
-              <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
-              <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-            </div>
-
+          <v-card-text class="dicta-card-content">
             <div
-              v-else
-              class="dicta-state-headline"
-              :class="{ 'dicta-state-headline--compact': smAndDown }"
+              v-if="
+                dictaFlowState === 'analyzing-ocr' ||
+                dictaFlowState === 'analyzing-parallels' ||
+                dictaFlowState === 'success'
+              "
+              class="dicta-state dicta-state--loading"
             >
-              <v-icon size="46" class="mb-2 text-primary">mdi-camera</v-icon>
-              <div class="dicta-idle-title">{{ $t('home.dicta.idleTitle') }}</div>
-              <div class="dicta-idle-subtitle">{{ $t('home.dicta.idleSubtitle') }}</div>
+              <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
+                <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
+              </div>
+              <template v-else>
+                <v-progress-circular indeterminate color="primary" size="54" width="5" />
+                <div class="text-subtitle-1 font-weight-medium mt-4">
+                  {{
+                    dictaFlowState === 'analyzing-ocr'
+                      ? $t('home.dicta.loadingOcr')
+                      : $t('home.dicta.loadingSearch')
+                  }}
+                </div>
+              </template>
             </div>
 
-            <DictaCameraCapture
-              v-if="dictaOpen"
-              :key="dictaCaptureKey"
-              :busy="isDictaBusy"
-              :auto-fallback="isPhoneCameraMode"
-              :hide-file-button="isPhoneCameraMode"
-              :suppress-errors="isPhoneCameraMode"
-              :mobile-mode="isPhoneCameraMode"
-              @captured="onDictaCaptured"
-              @error="onDictaCameraError"
-              @close="closeDictaDialog"
-            />
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+            <div v-else class="dicta-state">
+              <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
+                <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
+                <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
+                <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+              </div>
 
-    <section v-if="isPhoneCameraMode && dictaOpen" class="dicta-mobile-screen">
+              <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
+                <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
+                <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
+                <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+              </div>
+
+              <div
+                v-else
+                class="dicta-state-headline"
+                :class="{ 'dicta-state-headline--compact': smAndDown }"
+              >
+                <v-icon size="46" class="mb-2 text-primary">mdi-camera</v-icon>
+                <div class="dicta-idle-title">{{ $t('home.dicta.idleTitle') }}</div>
+                <div class="dicta-idle-subtitle">{{ $t('home.dicta.idleSubtitle') }}</div>
+              </div>
+
+              <DictaCameraCapture
+                v-if="dictaOpen"
+                :key="dictaCaptureKey"
+                :busy="isDictaBusy"
+                :auto-fallback="isPhoneCameraMode"
+                :hide-file-button="isPhoneCameraMode"
+                :suppress-errors="isPhoneCameraMode"
+                :mobile-mode="isPhoneCameraMode"
+                @captured="onDictaCaptured"
+                @error="onDictaCameraError"
+                @close="closeDictaDialog"
+              />
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
+    </transition>
+
+    <transition name="dialog-bottom-transition">
+      <div
+        v-if="isPhoneCameraMode && dictaOpen && dictaFlowState !== 'idle'"
+        class="dicta-overlay bg-background"
+      >
+        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
+          <v-card-title class="dicta-card-title">
+            <span>{{ $t('home.dicta.title') }}</span>
+            <div class="dicta-card-toolbar">
+              <v-btn
+                size="small"
+                variant="text"
+                prepend-icon="mdi-camera-retake"
+                :disabled="isDictaBusy"
+                @click="onDictaRetake"
+              >
+                {{ $t('home.dicta.newPhoto') }}
+              </v-btn>
+              <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
+            </div>
+          </v-card-title>
+
+          <v-divider />
+
+          <v-card-text class="dicta-card-content">
+            <div
+              v-if="
+                dictaFlowState === 'analyzing-ocr' ||
+                dictaFlowState === 'analyzing-parallels' ||
+                dictaFlowState === 'success'
+              "
+              class="dicta-state dicta-state--loading"
+            >
+              <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
+                <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
+              </div>
+              <template v-else>
+                <v-progress-circular indeterminate color="primary" size="54" width="5" />
+                <div class="text-subtitle-1 font-weight-medium mt-4">
+                  {{
+                    dictaFlowState === 'analyzing-ocr'
+                      ? $t('home.dicta.loadingOcr')
+                      : $t('home.dicta.loadingSearch')
+                  }}
+                </div>
+              </template>
+            </div>
+
+            <div v-else class="dicta-state">
+              <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
+                <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
+                <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
+                <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+              </div>
+
+              <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
+                <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
+                <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
+                <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
+    </transition>
+
+    <section
+      v-if="isPhoneCameraMode && dictaOpen && dictaFlowState === 'idle'"
+      class="dicta-mobile-screen"
+    >
       <div class="dicta-mobile-screen__header">
         <span class="dicta-mobile-screen__title">{{ $t('home.dicta.title') }}</span>
         <div class="dicta-mobile-screen__toolbar">
@@ -192,42 +260,7 @@
       <v-divider />
 
       <div class="dicta-mobile-screen__content">
-        <div
-          v-if="
-            dictaFlowState === 'analyzing-ocr' ||
-            dictaFlowState === 'analyzing-parallels' ||
-            dictaFlowState === 'success'
-          "
-          class="dicta-state dicta-state--loading"
-        >
-          <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
-            <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
-          </div>
-          <template v-else>
-            <v-progress-circular indeterminate color="primary" size="54" width="5" />
-            <div class="text-subtitle-1 font-weight-medium mt-4">
-              {{
-                dictaFlowState === 'analyzing-ocr'
-                  ? $t('home.dicta.loadingOcr')
-                  : $t('home.dicta.loadingSearch')
-              }}
-            </div>
-          </template>
-        </div>
-
-        <div v-else class="dicta-state">
-          <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
-            <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
-            <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
-            <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-          </div>
-
-          <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
-            <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
-            <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
-            <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-          </div>
-
+        <div class="dicta-state">
           <DictaCameraCapture
             v-if="dictaOpen"
             :key="dictaCaptureKey"
@@ -244,95 +277,55 @@
       </div>
     </section>
 
-    <v-dialog
-      v-model="dictaChoiceOpen"
-      :fullscreen="smAndDown"
-      max-width="1180"
-      class="dicta-choice-dialog"
-      scrollable
-    >
-      <v-card>
-        <v-card-title class="dicta-card-title">
-          <span>{{ $t('home.dicta.chooseTitle') }}</span>
-          <div class="dicta-card-toolbar">
-            <v-btn
-              size="small"
-              variant="text"
-              prepend-icon="mdi-camera-retake"
-              @click="onDictaChoiceRetake"
-            >
-              {{ $t('home.dicta.newPhoto') }}
-            </v-btn>
-            <v-btn icon="mdi-close" variant="text" size="small" @click="onDictaChoiceCancel" />
-          </div>
-        </v-card-title>
-        <v-card-text>
-          <p class="text-body-2 mb-4">{{ $t('home.dicta.chooseSubtitle') }}</p>
-          <v-table
-            v-if="!smAndDown"
-            density="compact"
-            class="dicta-choice-table"
-          >
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>{{ $t('home.dicta.result.matches') }}</th>
-                <th>{{ $t('home.dicta.result.rank') }}</th>
-                <th>{{ $t('home.dicta.result.source') }}</th>
-                <th>{{ $t('manual.book') }}</th>
-                <th>{{ $t('manual.chapter') }}</th>
-                <th>{{ $t('manual.verse') }}</th>
-                <th>{{ $t('manual.page') }}</th>
-                <th>{{ $t('home.dicta.result.pageTitle') }}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(option, index) in dictaChoiceOptions"
-                :key="option.key"
+    <transition name="dialog-bottom-transition">
+      <div
+        v-if="dictaChoiceOpen"
+        class="dicta-choice-overlay bg-background"
+      >
+        <v-card class="dicta-choice-shell" rounded="0" elevation="0">
+          <v-card-title class="dicta-card-title">
+            <span>{{ $t('home.dicta.chooseTitle') }}</span>
+            <div class="dicta-card-toolbar">
+              <v-btn
+                size="small"
+                variant="text"
+                prepend-icon="mdi-camera-retake"
+                @click="onDictaChoiceRetake"
               >
-                <td>{{ index + 1 }}</td>
-                <td>{{ option.matchCount }}</td>
-                <td>
-                  <v-chip
-                    size="x-small"
-                    :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
-                    variant="tonal"
-                  >
-                    {{ option.scoreLabel }}
-                  </v-chip>
-                </td>
-                <td class="dicta-choice-source">{{ option.sourceLabel }}</td>
-                <td>{{ getBookLabel(option.candidate.reference.book) }}</td>
-                <td>{{ option.candidate.reference.chapter }}</td>
-                <td>{{ option.candidate.reference.verse ?? '-' }}</td>
-                <td>{{ option.page }}</td>
-                <td class="dicta-choice-page-title">{{ option.pageTitle }}</td>
-                <td>
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    @click="onDictaChoiceSelect(option)"
-                  >
-                    {{ $t('home.dicta.result.choose') }}
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
-
-          <v-row v-else dense>
-            <v-col
-              v-for="(option, index) in dictaChoiceOptions"
-              :key="option.key"
-              cols="12"
+                {{ $t('home.dicta.newPhoto') }}
+              </v-btn>
+              <v-btn icon="mdi-close" variant="text" size="small" @click="onDictaChoiceCancel" />
+            </div>
+          </v-card-title>
+          <v-card-text class="dicta-choice-content">
+            <p class="text-body-2 mb-4">{{ $t('home.dicta.chooseSubtitle') }}</p>
+            <v-table
+              v-if="!smAndDown"
+              density="compact"
+              class="dicta-choice-table"
             >
-              <v-card variant="outlined" class="dicta-choice-card">
-                <v-card-text class="py-2 px-3">
-                  <div class="d-flex align-center justify-space-between mb-1">
-                    <strong>#{{ index + 1 }}</strong>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>{{ $t('home.dicta.result.matches') }}</th>
+                  <th>{{ $t('home.dicta.result.rank') }}</th>
+                  <th>{{ $t('home.dicta.result.source') }}</th>
+                  <th>{{ $t('manual.book') }}</th>
+                  <th>{{ $t('manual.chapter') }}</th>
+                  <th>{{ $t('manual.verse') }}</th>
+                  <th>{{ $t('manual.page') }}</th>
+                  <th>{{ $t('home.dicta.result.pageTitle') }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(option, index) in dictaChoiceOptions"
+                  :key="option.key"
+                >
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ option.matchCount }}</td>
+                  <td>
                     <v-chip
                       size="x-small"
                       :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
@@ -340,38 +333,77 @@
                     >
                       {{ option.scoreLabel }}
                     </v-chip>
-                  </div>
-                  <div class="d-flex flex-wrap ga-2 text-body-2 mb-1">
-                    <strong>{{ $t('manual.page') }} {{ option.page }}</strong>
-                    <span>{{ option.pageTitle }}</span>
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    {{ option.matchCount }} {{ $t('home.dicta.result.matches') }} · {{ option.sourceLabel }}
-                  </div>
-                </v-card-text>
-                <v-card-actions class="pt-0 px-3 pb-2">
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    block
-                    variant="tonal"
-                    @click="onDictaChoiceSelect(option)"
-                  >
-                    {{ $t('home.dicta.result.choose') }}
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+                  </td>
+                  <td class="dicta-choice-source">{{ option.sourceLabel }}</td>
+                  <td>{{ getBookLabel(option.candidate.reference.book) }}</td>
+                  <td>{{ option.candidate.reference.chapter }}</td>
+                  <td>{{ option.candidate.reference.verse ?? '-' }}</td>
+                  <td>{{ option.page }}</td>
+                  <td class="dicta-choice-page-title">{{ option.pageTitle }}</td>
+                  <td>
+                    <v-btn
+                      size="small"
+                      color="primary"
+                      variant="tonal"
+                      @click="onDictaChoiceSelect(option)"
+                    >
+                      {{ $t('home.dicta.result.choose') }}
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+
+            <v-row v-else dense>
+              <v-col
+                v-for="(option, index) in dictaChoiceOptions"
+                :key="option.key"
+                cols="12"
+              >
+                <v-card variant="outlined" class="dicta-choice-card">
+                  <v-card-text class="py-2 px-3">
+                    <div class="d-flex align-center justify-space-between mb-1">
+                      <strong>#{{ index + 1 }}</strong>
+                      <v-chip
+                        size="x-small"
+                        :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
+                        variant="tonal"
+                      >
+                        {{ option.scoreLabel }}
+                      </v-chip>
+                    </div>
+                    <div class="d-flex flex-wrap ga-2 text-body-2 mb-1">
+                      <strong>{{ $t('manual.page') }} {{ option.page }}</strong>
+                      <span>{{ option.pageTitle }}</span>
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ option.matchCount }} {{ $t('home.dicta.result.matches') }} · {{ option.sourceLabel }}
+                    </div>
+                  </v-card-text>
+                  <v-card-actions class="pt-0 px-3 pb-2">
+                    <v-btn
+                      size="small"
+                      color="primary"
+                      block
+                      variant="tonal"
+                      @click="onDictaChoiceSelect(option)"
+                    >
+                      {{ $t('home.dicta.result.choose') }}
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </div>
+    </transition>
 
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { useRtl } from 'vuetify';
@@ -802,6 +834,17 @@ const onDictaChoiceRetake = (): void => {
   openDictaCaptureForSide(activeSide.value);
 };
 
+const onDictaOverlayKeydown = (event: KeyboardEvent): void => {
+  if (event.key !== 'Escape') return;
+  if (dictaChoiceOpen.value) {
+    onDictaChoiceCancel();
+    return;
+  }
+  if (dictaOpen.value) {
+    closeDictaDialog();
+  }
+};
+
 const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
   const cachedOptions = dictaOptionsBySide.value[side];
   if (cachedOptions.length <= 1) {
@@ -893,19 +936,71 @@ watch(dictaChoiceOpen, (isOpen) => {
     resolveDictaChoice(null);
   }
 });
+
+watch(
+  [
+    () => !isPhoneCameraMode.value && dictaOpen.value,
+    () => isPhoneCameraMode.value && dictaOpen.value && dictaFlowState.value !== 'idle',
+    () => dictaChoiceOpen.value,
+  ],
+  ([isDesktopCameraOverlayOpen, isPhoneLoadingOverlayOpen, isChoiceOverlayOpen]) => {
+    const hasOverlay = isDesktopCameraOverlayOpen || isPhoneLoadingOverlayOpen || isChoiceOverlayOpen;
+    if (hasOverlay) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', onDictaOverlayKeydown);
+      return;
+    }
+    document.body.style.overflow = '';
+    window.removeEventListener('keydown', onDictaOverlayKeydown);
+  }
+);
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+  window.removeEventListener('keydown', onDictaOverlayKeydown);
+});
 </script>
 
 <style scoped>
-.dicta-dialog :deep(.v-overlay__content) {
-  margin: 12px;
-  max-height: calc(100% - 24px);
+.dicta-overlay,
+.dicta-choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  padding-top: 64px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-bottom-transition-enter-active,
+.dialog-bottom-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+.dialog-bottom-transition-enter-from,
+.dialog-bottom-transition-leave-to {
+  transform: translateY(100%);
 }
 
 .dicta-card {
   overflow: clip;
-  height: min(94vh, 980px);
   display: flex;
   flex-direction: column;
+}
+
+.dicta-card--camera,
+.dicta-choice-shell {
+  width: min(1200px, calc(100% - 24px));
+  margin: 12px auto;
+  height: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+}
+
+.dicta-choice-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }
 
 .dicta-mobile-screen {
@@ -1028,9 +1123,21 @@ watch(dictaChoiceOpen, (isOpen) => {
 }
 
 @media (max-width: 600px) {
-  .dicta-dialog :deep(.v-overlay__content) {
+  .dicta-overlay,
+  .dicta-choice-overlay {
+    padding-top: 56px;
+  }
+
+  .dicta-choice-shell {
+    width: 100%;
     margin: 0;
-    max-height: 100%;
+    height: 100%;
+  }
+
+  .dicta-card--camera {
+    width: 100%;
+    margin: 0;
+    height: 100%;
   }
 
   .dicta-card {
