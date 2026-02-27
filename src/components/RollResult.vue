@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 21: When a result is displayed, if there are more then a book of distance, add a small text with the number of remaining pages to roll after the last book he will go through. -->
   <v-sheet class="pa-6 d-flex flex-column align-center" elevation="2">
     <div class="text-subtitle-1 mb-2">{{ $t('result.title') }}</div>
 

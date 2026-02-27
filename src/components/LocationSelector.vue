@@ -60,6 +60,7 @@
       </div>
     </v-card-text>
 
+    <!-- TODO 20: when a page found is diplayed, add a "preview page" button that will display the first line of the page, with a link for the full page in tikkunio. -->
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
         <div class="location-page-number font-weight-black text-primary mb-2">{{ page }}</div>

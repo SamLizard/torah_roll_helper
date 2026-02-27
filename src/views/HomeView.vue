@@ -1,5 +1,6 @@
 <template>
   <!-- TODO 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue -->
+  <!-- TODO 17: Look at the jumelées parachiots, and be sure the calendar will work with them, taking the first parasha fort start and middle, and second parasha for end. -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
@@ -62,8 +63,8 @@
     />
 
     <v-dialog
+      v-if="!isPhoneCameraMode"
       v-model="dictaOpen"
-      :fullscreen="smAndDown"
       max-width="1200"
       class="dicta-dialog"
       scrollable
@@ -125,23 +126,113 @@
               <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
             </div>
 
-            <div v-else class="dicta-state-headline">
+            <div v-else-if="dictaFlowState === 'success'" class="dicta-state-headline">
+              <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
+            </div>
+
+            <div
+              v-else
+              class="dicta-state-headline"
+              :class="{ 'dicta-state-headline--compact': smAndDown }"
+            >
               <v-icon size="46" class="mb-2 text-primary">mdi-camera</v-icon>
               <div class="dicta-idle-title">{{ $t('home.dicta.idleTitle') }}</div>
               <div class="dicta-idle-subtitle">{{ $t('home.dicta.idleSubtitle') }}</div>
             </div>
 
             <DictaCameraCapture
-              v-if="dictaOpen"
+              v-if="dictaOpen && dictaFlowState !== 'success'"
               :key="dictaCaptureKey"
               :busy="isDictaBusy"
+              :auto-fallback="isPhoneCameraMode"
+              :hide-file-button="isPhoneCameraMode"
+              :suppress-errors="isPhoneCameraMode"
+              :mobile-mode="isPhoneCameraMode"
               @captured="onDictaCaptured"
               @error="onDictaCameraError"
+              @close="closeDictaDialog"
             />
           </div>
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <section v-if="isPhoneCameraMode && dictaOpen" class="dicta-mobile-screen">
+      <div class="dicta-mobile-screen__header">
+        <span class="dicta-mobile-screen__title">{{ $t('home.dicta.title') }}</span>
+        <div class="dicta-mobile-screen__toolbar">
+          <v-btn
+            v-if="hasCachedOptionsForActiveSide"
+            size="small"
+            variant="text"
+            :prepend-icon="backToOptionsIcon"
+            :disabled="isDictaBusy"
+            @click="onDictaShowCachedOptions"
+          >
+            {{ $t('home.dicta.backToOptions') }}
+          </v-btn>
+          <v-btn
+            size="small"
+            variant="text"
+            prepend-icon="mdi-camera-retake"
+            :disabled="isDictaBusy"
+            @click="onDictaRetake"
+          >
+            {{ $t('home.dicta.newPhoto') }}
+          </v-btn>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
+        </div>
+      </div>
+
+      <v-divider />
+
+      <div class="dicta-mobile-screen__content">
+        <div
+          v-if="dictaFlowState === 'analyzing-ocr' || dictaFlowState === 'analyzing-parallels'"
+          class="dicta-state dicta-state--loading"
+        >
+          <v-progress-circular indeterminate color="primary" size="54" width="5" />
+          <div class="text-subtitle-1 font-weight-medium mt-4">
+            {{
+              dictaFlowState === 'analyzing-ocr'
+                ? $t('home.dicta.loadingOcr')
+                : $t('home.dicta.loadingSearch')
+            }}
+          </div>
+        </div>
+
+        <div v-else class="dicta-state">
+          <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
+            <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
+            <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
+            <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+          </div>
+
+          <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
+            <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
+            <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
+            <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+          </div>
+
+          <div v-else-if="dictaFlowState === 'success'" class="dicta-state-headline">
+            <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
+          </div>
+
+          <DictaCameraCapture
+            v-if="dictaOpen && dictaFlowState !== 'success'"
+            :key="dictaCaptureKey"
+            :busy="isDictaBusy"
+            :auto-fallback="isPhoneCameraMode"
+            :hide-file-button="isPhoneCameraMode"
+            :suppress-errors="isPhoneCameraMode"
+            :mobile-mode="isPhoneCameraMode"
+            @captured="onDictaCaptured"
+            @error="onDictaCameraError"
+            @close="closeDictaDialog"
+          />
+        </div>
+      </div>
+    </section>
 
     <v-dialog
       v-model="dictaChoiceOpen"
@@ -266,14 +357,6 @@
       </v-card>
     </v-dialog>
 
-    <input
-      ref="dictaFallbackInput"
-      class="d-none"
-      type="file"
-      accept="image/*"
-      capture="environment"
-      @change="onDictaFallbackPicked"
-    />
   </v-container>
 </template>
 
@@ -302,7 +385,7 @@ interface HomeTargetItem {
 }
 
 const BOOK_LABEL_KEYS = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'] as const;
-type DictaFlowState = 'idle' | 'analyzing-ocr' | 'analyzing-parallels' | 'no-result' | 'error';
+type DictaFlowState = 'idle' | 'analyzing-ocr' | 'analyzing-parallels' | 'success' | 'no-result' | 'error';
 
 interface DictaCandidate {
   index: number;
@@ -343,7 +426,6 @@ const dictaFlowState = ref<DictaFlowState>('idle');
 const dictaErrorMessage = ref('');
 const dictaRawResults = ref<DictaParallelItem[]>([]);
 const dictaCandidates = ref<DictaCandidate[]>([]);
-const dictaFallbackInput = ref<HTMLInputElement | null>(null);
 const dictaChoiceOpen = ref(false);
 const dictaChoiceOptions = ref<DictaPageOption[]>([]);
 const dictaChoiceResolver = ref<((option: DictaPageOption | null) => void) | null>(null);
@@ -429,6 +511,13 @@ const hasCachedOptionsForActiveSide = computed(
   () => dictaOptionsBySide.value[activeSide.value].length > 0
 );
 const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
+const isPhoneCameraMode = computed(() => {
+  if (typeof navigator === 'undefined') return false;
+  const userAgent = navigator.userAgent.toLowerCase();
+  const mobileUserAgent = /android|iphone|ipod|windows phone|mobile/.test(userAgent);
+  const iPadLike = /ipad/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return mobileUserAgent || iPadLike;
+});
 
 const getPageTitleLabel = (page: number, reference: DictaReference): string => {
   const keys = getPageTitleKeys(page, {
@@ -606,6 +695,11 @@ const pickDictaPageOption = async (options: DictaPageOption[]): Promise<DictaPag
 };
 
 const isCurrentAnalyzeJob = (jobId: number): boolean => jobId === dictaAnalyzeJobId.value;
+const wait = async (ms: number): Promise<void> => {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
 
 const processDictaFile = async (file: File): Promise<void> => {
   const jobId = ++dictaAnalyzeJobId.value;
@@ -641,6 +735,12 @@ const processDictaFile = async (file: File): Promise<void> => {
     }
 
     dictaOptionsBySide.value[activeSide.value] = pageOptions;
+
+    if (pageOptions.length === 1) {
+      dictaFlowState.value = 'success';
+      await wait(500);
+      if (!isCurrentAnalyzeJob(jobId)) return;
+    }
 
     closeDictaDialog(true);
     if (!isCurrentAnalyzeJob(jobId)) return;
@@ -702,31 +802,12 @@ const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
   });
 };
 
-const canUseLiveCamera = (): boolean =>
-  typeof window !== 'undefined' &&
-  window.isSecureContext &&
-  typeof navigator !== 'undefined' &&
-  !!navigator.mediaDevices &&
-  typeof navigator.mediaDevices.getUserMedia === 'function';
-
-const openDictaFallbackPicker = (): void => {
-  const input = dictaFallbackInput.value;
-  if (!input) return;
-  input.value = '';
-  input.click();
-};
-
 const openDictaCaptureForSide = (side: 'from' | 'to'): void => {
   activeSide.value = side;
   dictaAnalyzeJobId.value += 1;
   resetDictaSession();
   dictaCaptureKey.value += 1;
-
-  if (canUseLiveCamera()) {
-    dictaOpen.value = true;
-  } else {
-    openDictaFallbackPicker();
-  }
+  dictaOpen.value = true;
 };
 
 const onDictaRetake = (): void => {
@@ -736,17 +817,6 @@ const onDictaRetake = (): void => {
 const onDictaShowCachedOptions = (): void => {
   closeDictaDialog();
   openCachedOptionsForSide(activeSide.value);
-};
-
-const onDictaFallbackPicked = (event: Event): void => {
-  const target = event.target as HTMLInputElement | null;
-  const file = target?.files?.[0] ?? null;
-  if (!file) return;
-
-  dictaErrorMessage.value = '';
-  dictaFlowState.value = 'analyzing-ocr';
-  dictaOpen.value = true;
-  void processDictaFile(file);
 };
 
 const openDictaFor = (side: 'from' | 'to') => {
@@ -825,6 +895,44 @@ watch(dictaChoiceOpen, (isOpen) => {
   flex-direction: column;
 }
 
+.dicta-mobile-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2400;
+  background: rgb(var(--v-theme-surface));
+  display: flex;
+  flex-direction: column;
+}
+
+.dicta-mobile-screen__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px 8px;
+  background: rgb(var(--v-theme-surface));
+}
+
+.dicta-mobile-screen__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dicta-mobile-screen__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+
+.dicta-mobile-screen__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
 .dicta-card-title {
   display: flex;
   align-items: center;
@@ -856,11 +964,16 @@ watch(dictaChoiceOpen, (isOpen) => {
   justify-content: center;
   flex-direction: column;
   gap: 12px;
+  overflow: auto;
 }
 
 .dicta-state-headline {
   width: 100%;
   text-align: center;
+}
+
+.dicta-state-headline--compact {
+  display: none;
 }
 
 .dicta-state--loading {
@@ -907,9 +1020,13 @@ watch(dictaChoiceOpen, (isOpen) => {
     max-height: 100%;
   }
 
+  .dicta-card {
+    height: 100dvh;
+  }
+
   .dicta-card-content {
-    min-height: 250px;
-    padding: 12px;
+    min-height: 0;
+    padding: 0;
   }
 
   .dicta-card-title {
@@ -917,6 +1034,12 @@ watch(dictaChoiceOpen, (isOpen) => {
   }
 
   .dicta-card-toolbar :deep(.v-btn) {
+    min-width: 0;
+    padding-inline: 8px;
+    font-size: 0.75rem;
+  }
+
+  .dicta-mobile-screen__toolbar :deep(.v-btn) {
     min-width: 0;
     padding-inline: 8px;
     font-size: 0.75rem;
