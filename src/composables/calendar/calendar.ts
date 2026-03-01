@@ -145,14 +145,6 @@ const getTorahOccurrences = (
   day: Date,
   leining: Leyning | LeyningWeekday
 ): TorahOccurrence[] => {
-  // For DONE 17:
-  // Pay attention to the jumelée parashiots. It looks like this:
-  // {"name":{"en":"Vayakhel-Pekudei","he":"וַיַּקְהֵל־פְקוּדֵי"},"type":"weekday","parsha":["Vayakhel","Pekudei"],"parshaNum":[22,23],"weekday":{"1":{"k":"Exodus","b":"35:1","e":"35:3","v":3},"2":{"k":"Exodus","b":"35:4","e":"35:10","v":7},"3":{"k":"Exodus","b":"35:11","e":"35:20","v":10}},"summary":"Exodus 35:1-20"}
-  // Or this:
-  // {"name":{"en":"Vayakhel-Pekudei","he":"וַיַּקְהֵל־פְקוּדֵי"},"type":"shabbat","parsha":["Vayakhel","Pekudei"],"parshaNum":[22,23],"summary":"Exodus 35:1-40:38, 12:1-20","fullkriyah":{"1":{"k":"Exodus","b":"35:1","e":"35:29","v":29},"2":{"k":"Exodus","b":"35:30","e":"37:16","v":60},"3":{"k":"Exodus","b":"37:17","e":"37:29","v":13},"4":{"k":"Exodus","b":"38:1","e":"39:1","v":32},"5":{"k":"Exodus","b":"39:2","e":"39:21","v":20},"6":{"k":"Exodus","b":"39:22","e":"39:43","v":22},"7":{"k":"Exodus","b":"40:1","e":"40:38","v":38},"M":{"p":15,"k":"Exodus","b":"12:1","e":"12:20","v":20,"reason":"Shabbat HaChodesh"}},"haftara":"Ezekiel 45:16-46:18","haft":{"k":"Ezekiel","b":"45:16","e":"46:18","v":28,"reason":"Shabbat HaChodesh"},"haftaraNumV":28,"seph":{"k":"Ezekiel","b":"45:18","e":"46:15","v":23,"reason":"Shabbat HaChodesh"},"sephardic":"Ezekiel 45:18-46:15","sephardicNumV":23,"summaryParts":[{"k":"Exodus","b":"35:1","e":"40:38"},{"k":"Exodus","b":"12:1","e":"12:20"}],"reason":{"haftara":"Shabbat HaChodesh","sephardic":"Shabbat HaChodesh","M":"Shabbat HaChodesh"}}
-
-  // In this case, we will return a special result that tell that it is two parashiot, with both ids. In the front, we will display them with join("-"), and the full end will be the end of the second one.
-  
   const titleEn = normalizeTitleEn(leining.name.en)
   const readingId = toCanonicalReadingId(leining, titleEn)
   const dateIso = toISODateString(day)

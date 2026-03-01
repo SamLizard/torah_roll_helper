@@ -61,9 +61,6 @@
       </div>
     </v-card-text>
 
-    <!-- DONE 20: when a page found is diplayed, add a "preview page" button that will display the first line of the page, with a link for the full page in tikkunio. -->
-    <!-- Link to tikkun.io must be like this for parasha: https://tikkun.io/#/p/bereshit, and this for holyday: https://tikkun.io/#/h/sukkot-6. We have the same keys until for the four parashiot (zachor, parah, shekalim and hahodesh). -->
-    <!-- Link to tikkun.io can also be like: https://tikkun.io/#/r/<book>-<chapter>-<verse>. -->
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
         <div class="location-page-number-shell mb-2" :class="{ 'mod-rtl': isRtl }">
@@ -243,12 +240,6 @@
         <div>{{ $t('home.noSelection') }}</div>
       </div>
     </v-card-text>
-
-    <v-card-actions v-if="side === 'to' && allowPhotoForTo" class="bg-grey-lighten-5">
-      <small class="text-caption text-medium-emphasis mx-auto">
-        {{ $t('home.to.canUsePhoto') }}
-      </small>
-    </v-card-actions>
     
     <ManualEntryDialog 
       v-model="isManualOpen"
@@ -309,7 +300,6 @@ const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
   selectedRef: { type: Object as () => ManualData | null, default: null },
-  allowPhotoForTo: { type: Boolean, default: false },
   targetKey: { type: String as () => string | null, default: null },
 });
 

@@ -1,13 +1,4 @@
 <template>
-  <!-- DONE 23: do a real readme.md -->
-  <!-- DONE 26: add a matomo? Use goatcounter. I would like to have stats on the buttons (actions) used in the FROM and TO, 
-   How much the language is changed (to which language), 
-   how much each other view than home is used, 
-   how much the preview button is used (and how much time link to tikkun.io opened). 
-   How much different roll results are displayed. 
-   How much the calendar is used (but I want to be able to make difference between FROM calendar and TO calendar), and how much days ago/next they choose. 
-   How much the parasha reference point is changed (FROM / TO separate in stats). -->
-  <!-- DONE 28: update the readme to explain how someone can help developping the project. Add that codex (chatgpt) helped in an important part of the project, and the code may be less clean. -->
   <!-- TODO 29: Use localStorage, or make PWA (progressive web app) so the user settings are remembered more long term. -->
   <!-- TODO 30: Add a part to explain how to put on apple screen (like an application). -->
   <v-app>

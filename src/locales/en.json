@@ -9,30 +9,27 @@
   },
   "about": {
     "title": "About",
-    "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current opening of the Sefer Torah and a target reading, it calculates the exact rolling direction and number of columns needed to reach it.",
+    "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current Torah position and the next reading, it calculates the exact rolling direction and number of columns required.",
     "github": "View on GitHub",
-    "dataCreditsTitle": "Data Sources & Credits",
+    "dataCreditsTitle": "Data Sources & Acknowledgements",
     "dataCreditsPrefix": "The database for this project is based on open-source files from",
     "dataCreditsMiddle": ", which in turn utilize data from",
     "dataCreditsThanks": "Our thanks go to the tikkun.io project for sharing their work with the community.",
     "issueInvite": "If you have an improvement idea or wish to add a language, please open an issue on GitHub.",
+    "emailInvite": "For direct contact, you are welcome to reach us by email.",
+    "email": "Contact by Email",
     "dictaThanksPrefix": "Special thanks to",
     "dictaThanksMiddle": "and to the",
     "dictaThanksSuffix": "website for making their API available and for inspiring this project."
   },
-  "directions": {
-    "forward": "Forward",
-    "backward": "Backward"
-  },
   "home": {
     "from": {
       "title": "FROM",
-      "subtitle": "Current location (photo or manual)"
+      "subtitle": "Current location"
     },
     "to": {
       "title": "TO",
-      "subtitle": "Target reading (select upcoming or full list)",
-      "canUsePhoto": "You may use photo for TO (optional)"
+      "subtitle": "Target reading"
     },
     "calendar": {
       "from": "Recent readings",
@@ -67,8 +64,8 @@
         "2": "Use the yellow lines to align the image",
         "3": "Capture at least four lines of text"
       },
-      "chooseTitle": "Choose Torah Result",
-      "chooseSubtitle": "Multiple Torah matches were found. Select the correct page.",
+      "chooseTitle": "Choose Result",
+      "chooseSubtitle": "Multiple matches were found. Select the correct page.",
       "result": {
         "index": "#",
         "reference": "Reference",
@@ -95,7 +92,7 @@
     "title": "How To Use",
     "subtitle": "Follow these quick steps to get clear rolling instructions.",
     "steps": {
-      "step1": "Identify the current location of the scroll (the column it is currently open to) using the camera or manual input.",
+      "step1": "Identify the current location of the Torah scroll (the parasha it is currently open on) using the camera or manual input.",
       "step2": "Select your target reading from the upcoming list or the full index.",
       "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
     },
@@ -112,7 +109,7 @@
     "label": "Settings",
     "subtitle": "Reading and scroll options",
     "golaLabel": "Gola (Diaspora) mode",
-    "nusachLabel": "Nusach",
+    "nusachLabel": "Rite",
     "torahTypeLabel": "Scroll layout",
     "help": {
       "gola": "Enable this if you are outside Israel to synchronize the weekly Parasha readings and special Diaspora holiday readings with the Diaspora calendar.",
@@ -127,7 +124,7 @@
     }
   },
   "targets": {
-    "title": "Choose a target",
+    "title": "Choose a reading",
     "showingAll": "Showing full list",
     "golaLabel": "Gola (Diaspora) mode",
     "golaBadge": "Gola"

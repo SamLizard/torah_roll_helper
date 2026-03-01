@@ -1,5 +1,4 @@
 <template>
-  <!-- DONE 19: Add informations for camera usage. -->
   <v-container fluid class="pa-4">
     <v-row justify="center">
       <v-col cols="12" md="9" lg="7">

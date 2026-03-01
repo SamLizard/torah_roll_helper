@@ -1,5 +1,4 @@
 <template>
-  <!-- DONE 18: Add a thank to dicta, and the illuminate website for the inspiration. https://dicta.org.il/ ; https://illuminate.dicta.org.il/ -->
   <v-container fluid class="pa-4">
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6">
@@ -62,6 +61,18 @@
                 variant="outlined"
               >
                 {{ $t('about.github') }}
+              </v-btn>
+            </p>
+
+            <p class="mt-4">{{ $t('about.emailInvite') }}</p>
+
+            <p class="mt-4">
+              <v-btn
+                href="mailto:shiur.613.torah@gmail.com"
+                prepend-icon="mdi-email-outline"
+                variant="outlined"
+              >
+                {{ $t('about.email') }}
               </v-btn>
             </p>
           </v-card-text>
