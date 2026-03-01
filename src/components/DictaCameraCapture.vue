@@ -761,7 +761,6 @@ onBeforeUnmount(() => {
   width: 100%; height: 100%;
   overflow: auto;
   background-color: white; color: black;
-  direction: ltr;
   padding: 20px;
   white-space: pre-wrap;
   text-align: left;

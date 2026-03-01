@@ -243,12 +243,6 @@
         <div>{{ $t('home.noSelection') }}</div>
       </div>
     </v-card-text>
-
-    <v-card-actions v-if="side === 'to' && allowPhotoForTo" class="bg-grey-lighten-5">
-      <small class="text-caption text-medium-emphasis mx-auto">
-        {{ $t('home.to.canUsePhoto') }}
-      </small>
-    </v-card-actions>
     
     <ManualEntryDialog 
       v-model="isManualOpen"
@@ -309,7 +303,6 @@ const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
   selectedRef: { type: Object as () => ManualData | null, default: null },
-  allowPhotoForTo: { type: Boolean, default: false },
   targetKey: { type: String as () => string | null, default: null },
 });
 

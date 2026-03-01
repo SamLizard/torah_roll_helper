@@ -36,7 +36,6 @@
           :page="options.toPage" 
           :selected-ref="toRef"
           :target-key="toTargetKey"
-          :allow-photo-for-to="allowPhotoForTo"
           @open-dicta="openDictaFor('to')"
           @choose-manual="openTargets('to')"
           @manual-set="onSetToPage"
@@ -470,8 +469,6 @@ const toTargetKey = ref<string | null>(null);
 
 const targetsOpen = ref(false);
 const activeSide = ref<'from' | 'to'>('to');
-
-const allowPhotoForTo = ref(false);
 
 const dictaOpen = ref(false);
 const dictaFlowState = ref<DictaFlowState>('idle');

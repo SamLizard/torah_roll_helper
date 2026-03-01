@@ -9,30 +9,27 @@
   },
   "about": {
     "title": "À propos",
-    "description": "Cet outil aide les Gabbaim et Ba'al Koré à préparer le Sefer Torah efficacement afin d'éviter le Tora'h Tzibur. Il calcule la direction et la distance précise (nombre de colonnes) pour rouler le parchemin entre deux lectures.",
+    "description": "Cet outil aide les Gabbaim et Ba'al Koré à préparer efficacement le Sefer Torah afin d'éviter le Tora'h Tzibur. Il calcule rapidement la direction et le nombre exact de colonnes nécessaires pour rouler le parchemin entre deux lectures.",
     "github": "Voir sur GitHub",
-    "dataCreditsTitle": "Données et Remerciements",
+    "dataCreditsTitle": "Sources de données et remerciements",
     "dataCreditsPrefix": "La base de données de ce projet repose sur les fichiers open source de",
     "dataCreditsMiddle": ", qui utilisent eux-mêmes les données de",
-    "dataCreditsThanks": "Merci au projet tikkun.io pour le partage de ces ressources précieuses.",
+    "dataCreditsThanks": "Merci au projet tikkun.io pour avoir rendu ces données accessibles à la communauté.",
     "issueInvite": "Vous avez une idée d'amélioration ou souhaitez ajouter une langue ? N'hésitez pas à ouvrir une issue sur GitHub.",
+    "emailInvite": "Pour un contact direct, vous pouvez nous écrire par e-mail.",
+    "email": "Contacter par e-mail",
     "dictaThanksPrefix": "Un grand merci à",
     "dictaThanksMiddle": "et au site",
     "dictaThanksSuffix": "pour la mise à disposition de leur API, ainsi que pour l'inspiration à l'origine de ce projet."
   },
-  "directions": {
-    "forward": "Avant",
-    "backward": "Arrière"
-  },
   "home": {
     "from": {
       "title": "DE",
-      "subtitle": "Emplacement actuel (photo ou manuel)"
+      "subtitle": "Emplacement actuel"
     },
     "to": {
       "title": "À",
-      "subtitle": "Lecture cible (sélectionnez à venir ou complet)",
-      "canUsePhoto": "Vous pouvez utiliser une photo pour la destination (optionnel)"
+      "subtitle": "Lecture cible"
     },
     "calendar": {
       "from": "Lectures récentes",
@@ -67,8 +64,8 @@
         "2": "Utilisez les lignes jaunes pour aligner l'image",
         "3": "Capturez au moins quatre lignes de texte"
       },
-      "chooseTitle": "Choisir le résultat Torah",
-      "chooseSubtitle": "Plusieurs correspondances Torah ont été trouvées. Choisissez la page correcte.",
+      "chooseTitle": "Choisir le résultat",
+      "chooseSubtitle": "Plusieurs correspondances ont été trouvées. Choisissez la page correcte.",
       "result": {
         "index": "#",
         "reference": "Référence",
@@ -83,7 +80,7 @@
       }
     },
     "actions": {
-      "photo": "Prendre photo",
+      "photo": "Photo",
       "choose": "Choisir manuellement",
       "clear": "Effacer",
       "input": "Saisie"
@@ -99,7 +96,7 @@
       "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
       "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
     },
-    "tip": "Astuce : commencez par définir DE, puis choisissez À.",
+    "tip": "Astuce: commencez par définir DE, puis choisissez À.",
     "camera": {
       "title": "Utilisation de la caméra",
       "step1": "Autorisez l'accès à la caméra lorsque le navigateur le demande.",
@@ -112,7 +109,7 @@
     "label": "Paramètres",
     "subtitle": "Options de lecture et de rouleau",
     "golaLabel": "Mode Diaspora (Gola)",
-    "nusachLabel": "Noussah",
+    "nusachLabel": "Rite",
     "torahTypeLabel": "Mise en page",
     "help": {
       "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures hebdomadaires et les lectures spéciales des fêtes avec le calendrier de la Diaspora.",
@@ -127,7 +124,7 @@
     }
   },
   "targets": {
-    "title": "Choisir une cible",
+    "title": "Choisir une lecture",
     "showingAll": "Affichage de la liste complète",
     "golaLabel": "Mode Diaspora (Gola)",
     "golaBadge": "Gola"
@@ -164,7 +161,7 @@
     "openTikkunShort": "Page complete",
     "withNikud": "Avec nikoud",
     "withoutNikud": "Sans nikoud",
-    "shiftTip": "Astuce : maintenez Shift pour basculer rapidement"
+    "shiftTip": "Astuce: maintenez Shift pour basculer rapidement"
   },
   "manual": {
     "title": "Entrer l'emplacement manuellement",

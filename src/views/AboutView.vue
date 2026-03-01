@@ -64,6 +64,18 @@
                 {{ $t('about.github') }}
               </v-btn>
             </p>
+
+            <p class="mt-4">{{ $t('about.emailInvite') }}</p>
+
+            <p class="mt-4">
+              <v-btn
+                href="mailto:shiur.613.torah@gmail.com"
+                prepend-icon="mdi-email-outline"
+                variant="outlined"
+              >
+                {{ $t('about.email') }}
+              </v-btn>
+            </p>
           </v-card-text>
         </v-card>
       </v-col>
