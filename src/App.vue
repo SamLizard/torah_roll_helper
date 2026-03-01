@@ -2,6 +2,8 @@
   <!-- DONE 23: do a real readme.md -->
   <!-- TODO 26: add a matomo? -->
   <!-- DONE 28: update the readme to explain how someone can help developping the project. Add that codex (chatgpt) helped in an important part of the project, and the code may be less clean. -->
+  <!-- TODO 29: Use localStorage, or make PWA (progressive web app) so the user settings are remembered more long term. -->
+  <!-- TODO 30: Add a part to explain how to put on apple screen (like an application). -->
   <v-app>
     <nav-bar />
     <v-main>
