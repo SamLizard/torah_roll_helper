@@ -159,3 +159,42 @@ Vitest is configured. Current test coverage is minimal and focuses on roll-resul
 ## Project Status
 
 Active development. Feature set is usable, with ongoing improvements to UX, camera flow, and data/option expansion.
+
+## How To Help Develop
+
+Here are the most useful contribution areas right now.
+
+### 1) Add a language
+
+1. Create a new locale file in `src/locales/<lang>.json`.
+2. Use `src/locales/en.json` as a template and keep exactly the same keys.
+3. Add the matching flag file in `public/flags/<lang>.svg` (same `<lang>` code).
+4. Register the locale in `src/plugins/i18n.ts` and update RTL mapping in `src/plugins/vuetify.ts` when needed.
+
+### 2) Add a new nusach option
+
+1. Add a new nusach id in `NUSACH_OPTIONS` in `src/stores/options.ts`.
+2. Add translated labels for this id under `settings.nusachOptions` in all locale files in `src/locales/`.
+3. Update `src/data/target_pages.json` for this nusach, including all sheni/hamishi ends for all readings (currently represented by `refEndPartial`).
+4. Make sure selection of nusach uses the correct target data in the UI.
+
+### 3) Add a new scroll layout option
+
+1. Add a new layout id and page count in `TORAH_TYPE_OPTIONS` in `src/stores/options.ts`.
+2. Add translated labels for this id under `settings.torahTypeOptions` in all locale files in `src/locales/`.
+3. Provide an updated `src/data/real_db.json` for that layout (book/chapter/verse to page mapping).
+4. With that `real_db.json`, I can generate the rest of the derived data.
+
+### 4) Add links to other online tikkun providers
+
+1. Document how the target provider builds links for:
+   - parasha pages
+   - holiday pages
+   - direct references (`book/chapter/verse` or `page`)
+2. Generalize link generation currently in `src/components/LocationSelector.vue` (`toRefUrl` and `tikkunUrl`).
+3. Add a user setting to choose the provider (`src/stores/options.ts` + `src/components/SettingsDialog.vue` + locale labels).
+4. Keep `tikkun.io` as the default provider.
+
+Important note:
+- Codex (ChatGPT) helped with an important part of this project.
+- Because of that, some code areas may be less clean than ideal and may benefit from refactoring/review.

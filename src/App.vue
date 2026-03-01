@@ -1,6 +1,7 @@
 <template>
   <!-- DONE 23: do a real readme.md -->
   <!-- TODO 26: add a matomo? -->
+  <!-- DONE 28: update the readme to explain how someone can help developping the project. Add that codex (chatgpt) helped in an important part of the project, and the code may be less clean. -->
   <v-app>
     <nav-bar />
     <v-main>
