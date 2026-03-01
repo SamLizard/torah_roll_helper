@@ -61,10 +61,29 @@
       </div>
     </v-card-text>
 
-    <!-- TODO 20: when a page found is diplayed, add a "preview page" button that will display the first line of the page, with a link for the full page in tikkunio. -->
+    <!-- DONE 20: when a page found is diplayed, add a "preview page" button that will display the first line of the page, with a link for the full page in tikkunio. -->
+    <!-- Link to tikkun.io must be like this for parasha: https://tikkun.io/#/p/bereshit, and this for holyday: https://tikkun.io/#/h/sukkot-6. We have the same keys until for the four parashiot (zachor, parah, shekalim and hahodesh). -->
+    <!-- Link to tikkun.io can also be like: https://tikkun.io/#/r/<book>-<chapter>-<verse>. -->
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
-        <div class="location-page-number font-weight-black text-primary mb-2">{{ page }}</div>
+        <div class="location-page-number-shell mb-2" :class="{ 'mod-rtl': isRtl }">
+          <button
+            type="button"
+            class="location-page-number location-page-number-btn font-weight-black text-primary"
+            @click="openPagePreview"
+          >
+            {{ page }}
+          </button>
+          <v-btn
+            icon="mdi-book-open-page-variant-outline"
+            size="small"
+            variant="text"
+            color="primary"
+            class="location-page-preview-btn"
+            :aria-label="$t('preview.openPage')"
+            @click="openPagePreview"
+          />
+        </div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
         <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
@@ -99,6 +118,123 @@
         <v-btn class="mt-4" size="small" color="error" variant="text" @click="clear">
           {{ $t('home.actions.clear') }}
         </v-btn>
+
+        <v-dialog
+          v-model="isPagePreviewOpen"
+          max-width="920"
+        >
+          <v-card class="rounded-xl preview-dialog-card">
+            <v-card-title class="preview-dialog-title">
+              <span class="text-subtitle-1 font-weight-bold">
+                {{ $t('preview.pageTitle', { page }) }}
+              </span>
+              <v-btn
+                icon="mdi-close"
+                variant="text"
+                size="small"
+                @click="isPagePreviewOpen = false"
+              />
+            </v-card-title>
+
+            <v-card-text>
+              <div class="preview-top-row mb-2">
+                <div class="text-caption text-medium-emphasis">
+                  {{ $t('preview.firstLine') }}
+                </div>
+
+                <v-tooltip v-if="!smAndDown" :text="$t('preview.shiftTip')">
+                  <template #activator="{ props: tooltipProps }">
+                    <button
+                      v-bind="tooltipProps"
+                      type="button"
+                      class="preview-annotations-toggle"
+                      :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
+                      :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
+                      @click="togglePreviewNikud"
+                    >
+                      <div class="preview-toggle">
+                        <div class="preview-shadowed-circle">
+                          <input
+                            type="checkbox"
+                            :checked="effectivePreviewWithNikud"
+                            tabindex="-1"
+                            aria-hidden="true"
+                          >
+                          <span class="preview-toggle-state mod-off">א</span>
+                          <span class="preview-toggle-state mod-on">אֶ֨</span>
+                        </div>
+                      </div>
+                    </button>
+                  </template>
+                </v-tooltip>
+                <button
+                  v-else
+                  type="button"
+                  class="preview-annotations-toggle"
+                  :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
+                  :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
+                  @click="togglePreviewNikud"
+                >
+                  <div class="preview-toggle">
+                    <div class="preview-shadowed-circle">
+                      <input
+                        type="checkbox"
+                        :checked="effectivePreviewWithNikud"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      >
+                      <span class="preview-toggle-state mod-off">א</span>
+                      <span class="preview-toggle-state mod-on">אֶ֨</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div v-if="hasPagePreview" class="tikkun-preview-line-shell">
+                <div
+                  class="tikkun-preview-line"
+                  dir="rtl"
+                  lang="he"
+                >
+                  <div
+                    v-for="(column, columnIndex) in pagePreviewColumns"
+                    :key="`${page}-${columnIndex}`"
+                    class="preview-column"
+                  >
+                    <span
+                      v-for="(fragment, fragmentIndex) in column"
+                      :key="`${page}-${columnIndex}-${fragmentIndex}`"
+                      class="tikkun-preview-fragment"
+                      :class="{ 'mod-setuma': column.length > 1 }"
+                      v-html="fragment"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-body-2 text-medium-emphasis">
+                {{ $t('preview.lineUnavailable') }}
+              </div>
+            </v-card-text>
+
+            <v-card-actions class="justify-space-between">
+              <v-btn variant="text" @click="isPagePreviewOpen = false">
+                {{ $t('actions.close') }}
+              </v-btn>
+              <v-btn
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-open-in-new"
+                :href="tikkunUrl ?? undefined"
+                target="_blank"
+                rel="noopener noreferrer"
+                :disabled="!tikkunUrl"
+                class="preview-open-btn"
+              >
+                {{ openTikkunLabel }}
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </div>
 
       <div v-else class="text-center text-medium-emphasis py-6">
@@ -124,7 +260,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
@@ -133,12 +269,14 @@ import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
+import pageFirstLinesData from '@/data/page_first_lines.json';
+import realDb from '@/data/real_db.json';
 import {
   splitPairedParashaReadingId,
   type MonthlyReadingEntry,
 } from '@/composables/calendar/calendar';
-import { useRtl } from 'vuetify';
-import type { TorahRef } from '@/types';
+import { useDisplay, useRtl } from 'vuetify';
+import type { RealDb, TorahRef, Verse } from '@/types';
 
 interface TargetItem {
   key: string;
@@ -181,10 +319,19 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n();
 const { isRtl } = useRtl();
+const { smAndDown } = useDisplay();
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
+const isPagePreviewOpen = ref(false);
+const previewWithNikud = ref(true);
+const isShiftPressed = ref(false);
+const pageFirstLines = pageFirstLinesData as unknown[];
+const db = realDb as RealDb;
+
+const NUN_HAFUCHA = '׆';
+const FOUR_PARASHIOT_USING_REF = new Set(['shekalim', 'zachor', 'parah', 'hachodesh', 'hahodesh']);
 
 const currentRef = ref<ManualData>({
   book: 1,
@@ -227,6 +374,149 @@ const toManualData = (torahRef: TorahRef): ManualData => ({
   chapter: torahRef.chapter,
   verse: torahRef.verse,
 });
+
+const ketiv = (text: string) =>
+  text
+    .replace('#(פ)', '')
+    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
+    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
+    .split(' ')
+    .map((maqafSeparatedWord) =>
+      maqafSeparatedWord
+        .split('־')
+        .map((word) => {
+          const parts = word.split('#');
+
+          if (parts.length <= 1) {
+            return parts[0];
+          }
+
+          return parts.slice(1);
+        })
+        .join('־')
+    )
+    .join(' ')
+    .replace(/\[/g, '{')
+    .replace(/\]/g, '}');
+
+const kri = (text: string) =>
+  text
+    .replace('#(פ)', '')
+    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
+    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
+    .replace(/־/g, ' ')
+    .replace(/#\[.+?\]/g, ' ')
+    .replace(new RegExp(`[^א-ת\\s${NUN_HAFUCHA}]`, 'g'), '')
+    .replace(/\s{2,}/g, ' ');
+
+const textFilter = ({ text, annotated }: { text: string; annotated: boolean }) =>
+  annotated ? ketiv(text) : kri(text);
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const ktivKriAnnotation = (text: string) =>
+  escapeHtml(text)
+    .replace(/[{]/g, '<span class="ktiv-kri">')
+    .replace(/[}]/g, '</span>')
+    .trim();
+
+const toLegacyTikkunSlug = (key: string) => {
+  const normalizedKey = key === 'hachodesh' ? 'hahodesh' : key;
+  if (normalizedKey.includes('::')) {
+    return normalizedKey
+      .split('::')
+      .map((part) => part.replace(/_/g, '-'))
+      .join('-');
+  }
+
+  return normalizedKey.replace(/_/g, '-');
+};
+
+const getPageStartRef = (page: number | null): Verse | null => {
+  if (page == null) return null;
+
+  for (let bookIndex = 0; bookIndex < db.length; bookIndex += 1) {
+    const bookEntries = db[bookIndex];
+    const match = bookEntries.find((entry) => entry[2] === page);
+    if (!match) continue;
+
+    return {
+      book: bookIndex + 1,
+      chapter: match[0],
+      verse: match[1],
+    };
+  }
+
+  return null;
+};
+
+const toPreviewColumns = (entry: unknown): string[][] => {
+  if (typeof entry === 'string') return [[entry]];
+  if (!Array.isArray(entry)) return [];
+  if (entry.length === 0) return [];
+
+  if (entry.every((item) => typeof item === 'string')) {
+    return [entry as string[]];
+  }
+
+  if (entry.every((item) => Array.isArray(item))) {
+    return (entry as unknown[])
+      .map((column) =>
+        Array.isArray(column)
+          ? column.filter((fragment): fragment is string => typeof fragment === 'string')
+          : []
+      )
+      .filter((column) => column.length > 0);
+  }
+
+  return [];
+};
+
+const pagePreviewRawColumns = computed<string[][]>(() => {
+  if (props.page == null) return [];
+  return toPreviewColumns(pageFirstLines[props.page - 1]);
+});
+
+const pagePreviewColumns = computed(() =>
+  pagePreviewRawColumns.value.map((column) =>
+    column.map((fragment) =>
+      ktivKriAnnotation(
+        textFilter({ text: fragment, annotated: effectivePreviewWithNikud.value })
+      )
+    )
+  )
+);
+
+const hasPagePreview = computed(() => pagePreviewColumns.value.length > 0);
+const effectivePreviewWithNikud = computed(() =>
+  isShiftPressed.value ? !previewWithNikud.value : previewWithNikud.value
+);
+const openTikkunLabel = computed(() =>
+  smAndDown.value ? t('preview.openTikkunShort') : t('preview.openTikkun')
+);
+
+const hasCurrentRef = computed(() =>
+  currentRef.value.chapter != null && currentRef.value.verse != null
+);
+
+const currentRefAsVerse = computed<Verse | null>(() => {
+  if (!hasCurrentRef.value) return null;
+
+  return {
+    book: currentRef.value.book,
+    chapter: currentRef.value.chapter as number,
+    verse: currentRef.value.verse as number,
+  };
+});
+
+const toRefUrl = (ref: Verse) =>
+  `https://tikkun.io/#/r/${ref.book}-${ref.chapter}-${ref.verse}`;
 
 const isSameTorahRef = (
   torahRef: TorahRef,
@@ -375,6 +665,27 @@ const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
   return selectedOption?.mode ?? null;
 });
 
+const tikkunUrl = computed(() => {
+  if (matchedTarget.value && !FOUR_PARASHIOT_USING_REF.has(matchedTarget.value.key)) {
+    const slug = toLegacyTikkunSlug(matchedTarget.value.key);
+    const route = matchedTarget.value.type === 'parasha' ? 'p' : 'h';
+    return `https://tikkun.io/#/${route}/${slug}`;
+  }
+
+  if (currentRefAsVerse.value) {
+    return toRefUrl(currentRefAsVerse.value);
+  }
+
+  if (matchedTarget.value) {
+    return toRefUrl(matchedTarget.value.ref);
+  }
+
+  const pageStartRef = getPageStartRef(props.page);
+  if (!pageStartRef) return null;
+
+  return toRefUrl(pageStartRef);
+});
+
 const getCalendarRollPreview = (entry: CalendarEntry) => {
   if (props.side !== 'to') return null;
   if (options.fromPage === null || options.fromPage === entry.target.ref.page) return null;
@@ -420,6 +731,24 @@ watch(() => props.selectedRef, (newRef) => {
     currentRef.value = { book: 1, chapter: null, verse: null };
   }
 }, { immediate: true });
+
+watch(() => props.page, (newPage) => {
+  if (newPage == null) {
+    isPagePreviewOpen.value = false;
+  }
+});
+
+const onPreviewKeydown = (event: KeyboardEvent) => {
+  if (!isPagePreviewOpen.value) return;
+  if (event.key !== 'Shift') return;
+  isShiftPressed.value = true;
+};
+
+const onPreviewKeyup = (event: KeyboardEvent) => {
+  if (!isPagePreviewOpen.value) return;
+  if (event.key !== 'Shift') return;
+  isShiftPressed.value = false;
+};
 
 const computedPageTitle = computed(() => {
   if (props.page === null) return '';
@@ -467,6 +796,32 @@ const onManualDraft = (data: ManualData) => {
 const clear = () => {
   emit('manual-set', null, undefined);
 };
+
+const togglePreviewNikud = () => {
+  previewWithNikud.value = !previewWithNikud.value;
+};
+
+const openPagePreview = () => {
+  if (props.page == null) return;
+  isPagePreviewOpen.value = true;
+};
+
+watch(isPagePreviewOpen, (isOpen) => {
+  if (isOpen) {
+    window.addEventListener('keydown', onPreviewKeydown);
+    window.addEventListener('keyup', onPreviewKeyup);
+    return;
+  }
+
+  window.removeEventListener('keydown', onPreviewKeydown);
+  window.removeEventListener('keyup', onPreviewKeyup);
+  isShiftPressed.value = false;
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onPreviewKeydown);
+  window.removeEventListener('keyup', onPreviewKeyup);
+});
 </script>
 
 <style scoped>
@@ -511,13 +866,234 @@ const clear = () => {
 }
 
 .location-page-number {
-  font-size: clamp(2.25rem, 9vw, 3.25rem);
+  font-size: clamp(1.86rem, 7.35vw, 2.75rem);
   line-height: 1;
   letter-spacing: normal;
 }
 
+.location-page-number-btn {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  min-width: max-content;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: isolate;
+  cursor: pointer;
+}
+
+.location-page-number-btn:focus-visible {
+  outline: 2px solid rgba(var(--v-theme-primary), 0.45);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.location-page-number-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding-inline: 40px;
+}
+
+.location-page-preview-btn {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 4px;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  padding: 0;
+}
+
+.location-page-number-shell.mod-rtl .location-page-preview-btn {
+  inset-inline-end: auto;
+  inset-inline-start: 4px;
+}
+
+.location-page-preview-btn :deep(.v-btn__overlay),
+.location-page-preview-btn :deep(.v-btn__underlay) {
+  border-radius: 9999px;
+}
+
 .calendar-slide-group {
   margin-inline: -4px;
+}
+
+.preview-dialog-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preview-dialog-card {
+  max-height: min(66vh, 520px);
+  overflow: hidden;
+}
+
+.preview-dialog-card :deep(.v-card-text) {
+  overflow-y: auto;
+}
+
+.preview-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-annotations-toggle {
+  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.preview-toggle {
+  --annotations-toggle-active-color: white;
+  --annotations-toggle-inactive-color: hsla(0, 0%, 100%, 0.6);
+  text-align: middle;
+  display: flex;
+  align-items: center;
+  direction: ltr;
+  unicode-bidi: isolate;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.preview-toggle [type='checkbox'] {
+  display: none;
+}
+
+.preview-toggle-state {
+  color: var(--annotations-toggle-inactive-color);
+  transition: all 0.1s;
+  position: relative;
+  right: 3px;
+}
+
+.preview-toggle-state.mod-off {
+  display: inline-block;
+  margin-right: 0.25em;
+}
+
+.preview-toggle [type='checkbox']:checked ~ .preview-toggle-state.mod-on,
+.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
+  transform: scale(1.5);
+  color: var(--annotations-toggle-active-color);
+}
+
+.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-on,
+.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
+  right: -3px;
+}
+
+.preview-shadowed-circle {
+  padding: 0.72em;
+  height: 2.95em;
+  width: 2.95em;
+  display: flex;
+  direction: ltr;
+  unicode-bidi: isolate;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: black;
+  color: white;
+  transition: 0.15s transform;
+}
+
+.preview-shadowed-circle:hover {
+  transform: scale(1.08);
+}
+
+.tikkun-preview-line-shell {
+  width: min(100%, 44rem);
+  margin-inline: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tikkun-preview-line {
+  --preview-line-width: 27.5em;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 12px;
+  background-color: rgba(var(--v-theme-surface-variant), 0.18);
+  position: relative;
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: justify;
+  line-height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-width: var(--preview-line-width);
+  width: var(--preview-line-width);
+  padding: 12px 14px 10px;
+  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
+  font-size: clamp(1rem, 2.1vw, 1.55rem);
+}
+
+.preview-column {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  direction: rtl;
+  min-width: 18ch;
+}
+
+.preview-column:nth-child(2) {
+  margin-right: 5em;
+  width: 12em;
+}
+
+.tikkun-preview-fragment {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tikkun-preview-fragment.mod-setuma {
+  width: auto;
+}
+
+.tikkun-preview-fragment::after {
+  content: '';
+  width: 100%;
+  display: inline-block;
+}
+
+.tikkun-preview-line :deep(.ktiv-kri) {
+  background-color: rgba(var(--v-theme-primary), 0.1);
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+  border-radius: 8px;
+  padding: 0.1rem;
+}
+
+.preview-open-btn {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.preview-open-btn :deep(.v-btn__content) {
+  white-space: normal;
+  line-height: 1.15;
+  text-align: center;
 }
 
 .target-ref-toggle {
@@ -556,6 +1132,26 @@ const clear = () => {
 }
 
 @media (max-width: 600px) {
+  .tikkun-preview-line-shell {
+    width: 100%;
+  }
+
+  .tikkun-preview-line {
+    font-size: 0.83rem;
+    --preview-line-width: 100%;
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .preview-column {
+    min-width: 0;
+  }
+
+  .preview-column:nth-child(2) {
+    margin-right: 1.4em;
+    width: 8.6em;
+  }
+
   .location-header {
     flex-direction: column;
   }

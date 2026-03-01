@@ -155,7 +155,16 @@
   "separator": " \\ ",
   "noResults": "לא נמצאו תוצאות",
   "preview": {
-    "cols": "{count} עמ׳"
+    "cols": "{count} עמ׳",
+    "openPage": "תצוגה מקדימה לעמוד",
+    "pageTitle": "תצוגה מקדימה לעמוד {page}",
+    "firstLine": "שורה ראשונה",
+    "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",
+    "openTikkun": "צפה בעמוד המלא ב-tikkun.io",
+    "openTikkunShort": "עמוד מלא",
+    "withNikud": "עם ניקוד",
+    "withoutNikud": "ללא ניקוד",
+    "shiftTip": "טיפ: החזק Shift כדי להחליף במהירות"
   },
   "manual": {
     "title": "הכנס מיקום ידנית",

@@ -155,7 +155,16 @@
   "separator": " / ",
   "noResults": "No results found",
   "preview": {
-    "cols": "{count} cols"
+    "cols": "{count} cols",
+    "openPage": "Preview page",
+    "pageTitle": "Page {page} preview",
+    "firstLine": "First line",
+    "lineUnavailable": "First line is unavailable for this page.",
+    "openTikkun": "See full page in tikkun.io",
+    "openTikkunShort": "Full page",
+    "withNikud": "With nikud",
+    "withoutNikud": "No nikud",
+    "shiftTip": "Tip: Hold Shift to toggle quickly"
   },
   "manual": {
     "title": "Enter Location Manually",

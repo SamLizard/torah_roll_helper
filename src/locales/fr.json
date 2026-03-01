@@ -155,7 +155,16 @@
   "separator": " / ",
   "noResults": "Aucun résultat trouvé",
   "preview": {
-    "cols": "{count} col."
+    "cols": "{count} col.",
+    "openPage": "Aperçu de la page",
+    "pageTitle": "Aperçu de la page {page}",
+    "firstLine": "Première ligne",
+    "lineUnavailable": "La première ligne n'est pas disponible pour cette page.",
+    "openTikkun": "Voir la page complete dans tikkun.io",
+    "openTikkunShort": "Page complete",
+    "withNikud": "Avec nikoud",
+    "withoutNikud": "Sans nikoud",
+    "shiftTip": "Astuce : maintenez Shift pour basculer rapidement"
   },
   "manual": {
     "title": "Entrer l'emplacement manuellement",

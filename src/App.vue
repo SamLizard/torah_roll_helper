@@ -1,5 +1,6 @@
 <template>
   <!-- DONE 23: do a real readme.md -->
+  <!-- TODO 26: add a matomo? -->
   <v-app>
     <nav-bar />
     <v-main>
