@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 25: maybe add an option to see the result in full screen, with an option to retake a picture for the FROM, and looking at all the details directly, in big. -->
   <v-sheet class="pa-6 d-flex flex-column align-center" elevation="2">
     <div class="text-subtitle-1 mb-2">{{ $t('result.title') }}</div>
 

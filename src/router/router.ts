@@ -3,6 +3,7 @@ import {
   createWebHashHistory,
   type RouteRecordRaw,
 } from "vue-router";
+import { trackPageView } from '@/composables/analytics';
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import HowToUseView from "../views/HowToUseView.vue";
@@ -35,6 +36,10 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+router.afterEach((to) => {
+  trackPageView(to.path, typeof to.name === 'string' ? to.name : undefined);
 });
 
 export default router;

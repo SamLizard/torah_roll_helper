@@ -55,6 +55,7 @@
       "errorTitle": "לא ניתן להשלים את סריקת דיקטה",
       "unexpectedError": "שגיאת דיקטה לא צפויה.",
       "cameraUnavailable": "ממשק המצלמה אינו זמין בהקשר הדפדפן הנוכחי.",
+      "cameraHttpsHint": "אישור מצלמה אינו זמין ב-localhost. פתח את האפליקציה ב-HTTPS במקום localhost.",
       "captureFailed": "לא ניתן ללכוד את התמונה.",
       "capture": "צלם",
       "chooseFile": "בחר קובץ",
@@ -154,7 +155,16 @@
   "separator": " \\ ",
   "noResults": "לא נמצאו תוצאות",
   "preview": {
-    "cols": "{count} עמ׳"
+    "cols": "{count} עמ׳",
+    "openPage": "תצוגה מקדימה לעמוד",
+    "pageTitle": "תצוגה מקדימה לעמוד {page}",
+    "firstLine": "שורה ראשונה",
+    "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",
+    "openTikkun": "צפה בעמוד המלא ב-tikkun.io",
+    "openTikkunShort": "עמוד מלא",
+    "withNikud": "עם ניקוד",
+    "withoutNikud": "ללא ניקוד",
+    "shiftTip": "טיפ: החזק Shift כדי להחליף במהירות"
   },
   "manual": {
     "title": "הכנס מיקום ידנית",

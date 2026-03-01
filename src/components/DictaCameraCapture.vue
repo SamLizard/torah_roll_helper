@@ -1,5 +1,6 @@
 <template>
   <!-- DONE 22: Review all the texts, and make sure they are translated properly, and the texts displayed in multiple results are splitted by the keys I want to display, and not text like dicta displays -->
+  <!-- DONE 27: in localhost in chrome in phones, the chrome doesn't ask for permissions - directly denied - and there is a small ios thing that let use a photo from a file/library/retry camera. This thing isn't in the regular https phones that doesn't allow the camera. Why? -->
   <!--
     ┌─────────────────────────────────────────────────────────────────┐
     │  CONFIRM SCREEN                                                  │
@@ -71,7 +72,31 @@
 
       <!-- Error (replaces video entirely, like Dicta's v-if="error") -->
       <div v-if="mobileError" class="dcc-mobile-error">
-        <p>{{ mobileError }}</p>
+        <div class="dcc-mobile-error-content">
+          <p class="dcc-mobile-error-title">{{ t('home.dicta.cameraUnavailable') }}</p>
+          <p class="dcc-mobile-error-hint">
+            {{ isHttpsError ? t('home.dicta.cameraHttpsHint') : mobileError }}
+          </p>
+          <div class="dcc-mobile-error-actions">
+            <v-btn
+              v-if="!isHttpsError"
+              color="primary"
+              size="small"
+              prepend-icon="mdi-refresh"
+              @click="startCamera"
+            >
+              {{ t('home.dicta.retryCamera') }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              prepend-icon="mdi-image"
+              @click="openFilePicker"
+            >
+              {{ t('home.dicta.chooseFile') }}
+            </v-btn>
+          </div>
+        </div>
       </div>
 
       <template v-else>
@@ -419,7 +444,8 @@ async function startCamera(): Promise<void> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : t('home.dicta.cameraUnavailable');
     if (props.mobileMode) {
-      if (!props.suppressErrors) { mobileError.value = msg; emit('error', msg); }
+      if (!props.suppressErrors) emit('error', msg);
+      if (!props.suppressErrors || props.autoFallback) mobileError.value = msg;
       if (props.autoFallback) openFilePicker();
     } else {
       desktopError.value = msg;
@@ -740,6 +766,36 @@ onBeforeUnmount(() => {
   white-space: pre-wrap;
   text-align: left;
   display: flex; align-items: center; justify-content: center;
+}
+
+.dcc-mobile-error-content {
+  width: min(460px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dcc-mobile-error-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.dcc-mobile-error-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+}
+
+.dcc-mobile-error-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* Mobile video */
