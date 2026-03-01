@@ -8,10 +8,10 @@
         </div>
         <div class="location-actions-shell">
           <div class="location-actions">
-            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="$emit('choose-manual')">
+            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="onChooseManual">
               {{ $t('home.actions.choose') }}
             </v-btn>          
-            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="$emit('open-dicta')">
+            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="onOpenDicta">
               {{ $t('home.actions.photo') }}
             </v-btn>
             <v-btn 
@@ -19,7 +19,7 @@
               variant="tonal" 
               color="secondary" 
               prepend-icon="mdi-pencil" 
-              @click="isManualOpen = true"
+              @click="onOpenManualInput"
             >
               {{ $t('home.actions.input') }}
             </v-btn>
@@ -115,7 +115,7 @@
           </v-btn-toggle>
         </div>
 
-        <v-btn class="mt-4" size="small" color="error" variant="text" @click="clear">
+        <v-btn class="mt-4" size="small" color="error" variant="text" @click="onClear">
           {{ $t('home.actions.clear') }}
         </v-btn>
 
@@ -229,6 +229,7 @@
                 rel="noopener noreferrer"
                 :disabled="!tikkunUrl"
                 class="preview-open-btn"
+                @click="onOpenTikkun"
               >
                 {{ openTikkunLabel }}
               </v-btn>
@@ -271,6 +272,7 @@ import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import targetsData from '@/data/target_pages.json';
 import pageFirstLinesData from '@/data/page_first_lines.json';
 import realDb from '@/data/real_db.json';
+import { trackFromToAction } from '@/composables/analytics';
 import {
   splitPairedParashaReadingId,
   type MonthlyReadingEntry,
@@ -332,6 +334,7 @@ const db = realDb as RealDb;
 
 const NUN_HAFUCHA = '׆';
 const FOUR_PARASHIOT_USING_REF = new Set(['shekalim', 'zachor', 'parah', 'hachodesh', 'hahodesh']);
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const currentRef = ref<ManualData>({
   book: 1,
@@ -436,6 +439,42 @@ const toLegacyTikkunSlug = (key: string) => {
   }
 
   return normalizedKey.replace(/_/g, '-');
+};
+
+const trackAction = (action: string, value?: string | number | null) => {
+  trackFromToAction({ side: props.side, action, value });
+};
+
+const onChooseManual = () => {
+  trackAction('choose-target');
+  emit('choose-manual');
+};
+
+const onOpenDicta = () => {
+  trackAction('photo');
+  emit('open-dicta');
+};
+
+const onOpenManualInput = () => {
+  trackAction('manual-input');
+  isManualOpen.value = true;
+};
+
+const getCalendarDayOffset = (dateIso: string): number | null => {
+  const pickedDate = new Date(`${dateIso}T12:00:00`);
+  if (Number.isNaN(pickedDate.getTime())) return null;
+
+  const today = new Date();
+  const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const selectedDate = new Date(pickedDate.getFullYear(), pickedDate.getMonth(), pickedDate.getDate());
+
+  return Math.round((selectedDate.getTime() - currentDate.getTime()) / MS_PER_DAY);
+};
+
+const toDayOffsetLabel = (offset: number) => {
+  if (offset === 0) return 'today';
+  if (offset > 0) return `next-${offset}`;
+  return `ago-${Math.abs(offset)}`;
 };
 
 const getPageStartRef = (page: number | null): Verse | null => {
@@ -706,6 +745,12 @@ const getCalendarRollPreview = (entry: CalendarEntry) => {
 };
 
 const selectCalendarEntry = (entry: CalendarEntry) => {
+  trackAction('calendar-select', entry.key);
+  const dayOffset = getCalendarDayOffset(entry.dateIso);
+  if (dayOffset !== null) {
+    trackAction('calendar-day-offset', toDayOffsetLabel(dayOffset));
+  }
+
   const defaultMode = getDefaultTargetRefMode(entry.target, props.side);
   const targetRef = getRefForMode(entry.target, defaultMode);
   const refData = toManualData(targetRef);
@@ -716,6 +761,7 @@ const selectCalendarEntry = (entry: CalendarEntry) => {
 
 const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
   if (!mode || !matchedTarget.value) return;
+  trackAction('target-ref-mode', mode);
 
   const targetRef = getRefForMode(matchedTarget.value, mode);
   const refData = toManualData(targetRef);
@@ -773,6 +819,8 @@ const onManualSave = (data: ManualData, page: number) => {
     getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
   );
 
+  trackAction('manual-save', matchedManualTarget ? 'target' : 'custom');
+
   if (matchedManualTarget) {
     const defaultMode = getDefaultTargetRefMode(matchedManualTarget, props.side);
     const targetRef = getRefForMode(matchedManualTarget, defaultMode);
@@ -797,13 +845,24 @@ const clear = () => {
   emit('manual-set', null, undefined);
 };
 
+const onClear = () => {
+  trackAction('clear');
+  clear();
+};
+
 const togglePreviewNikud = () => {
   previewWithNikud.value = !previewWithNikud.value;
 };
 
 const openPagePreview = () => {
   if (props.page == null) return;
+  trackAction('preview-open');
   isPagePreviewOpen.value = true;
+};
+
+const onOpenTikkun = () => {
+  if (!tikkunUrl.value) return;
+  trackAction('preview-open-tikkun');
 };
 
 watch(isPagePreviewOpen, (isOpen) => {

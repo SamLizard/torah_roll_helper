@@ -1,7 +1,17 @@
 <template>
   <div>
-    <v-select :items="otherLocales" item-title="text" item-value="lang" v-model="$i18n.locale" hide-details="auto" flat
-      variant="solo" bg-color="transparent" type="hide">
+    <v-select
+      :items="otherLocales"
+      item-title="text"
+      item-value="lang"
+      :model-value="selectedLocale"
+      hide-details="auto"
+      flat
+      variant="solo"
+      bg-color="transparent"
+      type="hide"
+      @update:model-value="onLocaleChanged"
+    >
       <template #selection="{ item }">
         <v-img :src="`${baseUrl}flags/${item.value}.svg`" width="50" />
         <div class="ms-2">
@@ -19,8 +29,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, type Ref } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { trackLanguageChange } from '@/composables/analytics';
 
 const i18n = useI18n();
 const t = i18n.t;
@@ -32,12 +43,22 @@ interface LocaleItem {
   text: string;
 }
 
+const selectedLocale = computed(() => i18n.locale.value);
+
+const onLocaleChanged = (nextLocale: string | null) => {
+  if (!nextLocale || nextLocale === i18n.locale.value) return;
+
+  const previousLocale = i18n.locale.value;
+  i18n.locale.value = nextLocale;
+  trackLanguageChange(previousLocale, nextLocale);
+};
+
 const otherLocales = computed((): LocaleItem[] => {
   return i18n.availableLocales.filter((locale) => locale !== i18n.locale.value).map((lang) => ({
     lang: lang,
     text: t("language", 1, { locale: lang }) as string
   }))
-})
+});
 </script>
 <style scoped>
 .v-text-field :deep(.v-field__input) {

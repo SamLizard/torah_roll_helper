@@ -427,6 +427,7 @@ import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
 import type { ManualData } from '@/components/ManualEntryDialog.vue';
 import { computeRoll, getPageNumber, getApproximatePages, getPageTitleKeys } from '@/composables/utils';
+import { trackRollResultDisplayed } from '@/composables/analytics';
 import realDb from '@/data/real_db.json';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
@@ -497,7 +498,12 @@ watch(
   [() => options.fromPage, () => options.toPage], 
   ([newFrom, newTo]) => {
     if (newFrom != null && newTo != null) {
-      roll.value = computeRoll(newFrom, newTo);
+      const computedRoll = computeRoll(newFrom, newTo);
+      roll.value = computedRoll;
+      trackRollResultDisplayed({
+        direction: computedRoll.rollDirection,
+        pages: computedRoll.pages,
+      });
     } else {
       roll.value = null;
     }
