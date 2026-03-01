@@ -1,6 +1,4 @@
 <template>
-  <!-- DONE 22: Review all the texts, and make sure they are translated properly, and the texts displayed in multiple results are splitted by the keys I want to display, and not text like dicta displays -->
-  <!-- DONE 27: in localhost in chrome in phones, the chrome doesn't ask for permissions - directly denied - and there is a small ios thing that let use a photo from a file/library/retry camera. This thing isn't in the regular https phones that doesn't allow the camera. Why? -->
   <!--
     ┌─────────────────────────────────────────────────────────────────┐
     │  CONFIRM SCREEN                                                  │

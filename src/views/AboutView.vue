@@ -1,5 +1,4 @@
 <template>
-  <!-- DONE 18: Add a thank to dicta, and the illuminate website for the inspiration. https://dicta.org.il/ ; https://illuminate.dicta.org.il/ -->
   <v-container fluid class="pa-4">
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6">

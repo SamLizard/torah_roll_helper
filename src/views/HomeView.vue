@@ -1,7 +1,4 @@
 <template>
-  <!-- DONE 16: pay attention that the camera popups also have the navbar reachable - like TargetOptionsGrid.vue. So for computers it should be like this in both times the popup is open, and in phones only in the popup to choose from multiple results. -->
-  <!-- DONE 17: Look at the jumelées parachiots, and be sure the calendar will work with them, taking the first parasha fort start and middle, and second parasha for end. Look at "For DONE 17" in calendar.ts -->
-  <!-- DONE 24: make the photo things rtl/ltr as needed... -->
   <v-container fluid class="pa-4">
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
