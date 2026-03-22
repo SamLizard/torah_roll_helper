@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 24.5: fix the calendar component of a reading that when hover (computer), the card is going a little up and the top is hidden. -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
     <v-card-item class="location-card-item">
       <div class="location-header">
@@ -47,7 +48,7 @@
               :reading-label="entry.readingLabel"
               :page="entry.target.ref.page"
               :active="isSelectedCalendarEntry(entry)"
-              :is-gola="entry.target.gola"
+              :specific-badge="getTargetBadgeKind(entry.target)"
               :highlight-next-parasha="isNextParasha(entry)"
               :show-next-parasha-badge="false"
               :date-label="entry.dateLabel"
@@ -260,7 +261,6 @@ import ReadingOptionCard from './ReadingOptionCard.vue';
 import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
-import targetsData from '@/data/target_pages.json';
 import pageFirstLinesData from '@/data/page_first_lines.json';
 import realDb from '@/data/real_db.json';
 import { trackFromToAction } from '@/composables/analytics';
@@ -268,17 +268,16 @@ import {
   splitPairedParashaReadingId,
   type MonthlyReadingEntry,
 } from '@/composables/calendar/calendar';
+import {
+  findReadingTargetByKey,
+  getTargetBadgeKind,
+  getVisibleReadingTargets,
+  type ReadingTarget,
+} from '@/composables/readingTargets';
 import { useDisplay, useRtl } from 'vuetify';
 import type { RealDb, TorahRef, Verse } from '@/types';
 
-interface TargetItem {
-  key: string;
-  type: 'parasha' | 'holyday';
-  gola: boolean;
-  ref: TorahRef;
-  refEndPartial?: TorahRef;
-  refEnd: TorahRef;
-}
+type TargetItem = ReadingTarget;
 
 interface CalendarEntry {
   key: string;
@@ -332,28 +331,31 @@ const currentRef = ref<ManualData>({
   verse: null
 });
 
-const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
+const visibleTargets = computed(() => getVisibleReadingTargets(options.isInGola) as TargetItem[]);
 
 const resolveCalendarReading = (
   readingId: string
 ): { target: TargetItem; readingLabel: string | null } | null => {
   const pairedParashaIds = splitPairedParashaReadingId(readingId);
   if (!pairedParashaIds) {
-    const target = targetsByKey.get(readingId);
+    const target = findReadingTargetByKey(readingId, options.isInGola) as TargetItem | null;
     if (!target) return null;
     return { target, readingLabel: null };
   }
 
   const [startParashaId, endParashaId] = pairedParashaIds;
-  const startParashaTarget = targetsByKey.get(startParashaId);
-  const endParashaTarget = targetsByKey.get(endParashaId);
+  const startParashaTarget = findReadingTargetByKey(startParashaId, options.isInGola) as TargetItem | null;
+  const endParashaTarget = findReadingTargetByKey(endParashaId, options.isInGola) as TargetItem | null;
   if (!startParashaTarget || !endParashaTarget) return null;
 
   return {
     target: {
       ...startParashaTarget,
       key: readingId,
-      gola: startParashaTarget.gola || endParashaTarget.gola,
+      specific:
+        startParashaTarget.specific === endParashaTarget.specific
+          ? startParashaTarget.specific
+          : 'both',
       ref: startParashaTarget.ref,
       refEndPartial: startParashaTarget.refEndPartial,
       refEnd: endParashaTarget.refEnd,
@@ -610,7 +612,6 @@ const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => 
   const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
   if (!resolvedCalendarReading) return null;
   const { target, readingLabel } = resolvedCalendarReading;
-  if (target.gola && !options.isInGola) return null;
 
   const dateIso = props.side === 'from'
     ? reading.dates[reading.dates.length - 1]
@@ -651,7 +652,6 @@ const nextParashaKey = computed(() => {
     const resolvedCalendarReading = resolveCalendarReading(reading.readingId);
     if (!resolvedCalendarReading) continue;
     const { target } = resolvedCalendarReading;
-    if (target.gola && !options.isInGola) continue;
     if (target.type === 'parasha') return target.key;
   }
 
@@ -675,7 +675,7 @@ const matchedTarget = computed(() => {
     return null;
   }
 
-  return (targetsData as TargetItem[]).find((target) =>
+  return visibleTargets.value.find((target) =>
     getTargetRefOptions(target).some((option) =>
       isSameTorahRef(option.ref, props.page, currentRef.value)
     )
@@ -805,7 +805,7 @@ const resolvedPageTitle = computed(() => {
 });
 
 const onManualSave = (data: ManualData, page: number) => {
-  const matchedManualTarget = (targetsData as TargetItem[]).find((target) =>
+  const matchedManualTarget = visibleTargets.value.find((target) =>
     getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
   );
 

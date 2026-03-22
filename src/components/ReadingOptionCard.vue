@@ -4,16 +4,20 @@
     :class="{
       'reading-option-card--calendar': compactCalendar,
       'reading-option-card--active': active,
-      'reading-option-card--gola': isGola,
+      'reading-option-card--specific': Boolean(specificBadge),
+      'reading-option-card--gola': specificBadge === 'gola',
+      'reading-option-card--israel': specificBadge === 'israel',
       'reading-option-card--next': highlightNextParasha,
       'reading-option-card--with-next-badge': highlightNextParasha && showNextParashaBadge,
     }"
     @click="onClick"
     v-ripple
   >
-    <div v-if="isGola" class="reading-option-card__gola-badge">
-      <v-icon size="10" color="primary" class="me-1">mdi-earth</v-icon>
-      <span>{{ $t('targets.golaBadge') }}</span>
+    <div v-if="specificBadge" class="reading-option-card__specific-badge">
+      <v-icon size="10" color="primary" class="me-1">
+        {{ specificBadge === 'gola' ? 'mdi-earth' : 'mdi-map-marker-radius' }}
+      </v-icon>
+      <span>{{ $t(`targets.${specificBadge}Badge`) }}</span>
     </div>
 
     <div v-if="highlightNextParasha && showNextParashaBadge" class="reading-option-card__next-badge">
@@ -46,6 +50,8 @@
 </template>
 
 <script setup lang="ts">
+type TargetBadgeKind = 'gola' | 'israel';
+
 interface RollPreview {
   icon: string;
   color: string;
@@ -57,7 +63,7 @@ withDefaults(defineProps<{
   readingLabel?: string | null;
   page: number;
   active?: boolean;
-  isGola?: boolean;
+  specificBadge?: TargetBadgeKind | null;
   highlightNextParasha?: boolean;
   showNextParashaBadge?: boolean;
   dateLabel?: string | null;
@@ -67,7 +73,7 @@ withDefaults(defineProps<{
 }>(), {
   readingLabel: null,
   active: false,
-  isGola: false,
+  specificBadge: null,
   highlightNextParasha: false,
   showNextParashaBadge: true,
   dateLabel: null,
@@ -143,12 +149,17 @@ const onClick = () => {
   padding-inline-start: 20px;
 }
 
-.reading-option-card--gola {
+.reading-option-card--specific {
   border-color: rgba(var(--v-theme-primary), 0.3);
   background-color: rgba(var(--v-theme-primary), 0.03);
 }
 
-.reading-option-card__gola-badge {
+.reading-option-card--israel {
+  border-color: rgba(var(--v-theme-secondary), 0.35);
+  background-color: rgba(var(--v-theme-secondary), 0.04);
+}
+
+.reading-option-card__specific-badge {
   position: absolute;
   top: 8px;
   inset-inline-end: 8px;
