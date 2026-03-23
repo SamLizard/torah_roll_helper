@@ -102,7 +102,7 @@
                             :ref="(el) => setCardRef(item.key, el)"
                             :reading-key="item.key"
                             :page="item.ref.page"
-                            :is-gola="item.gola"
+                            :specific-badge="getTargetBadgeKind(item)"
                             :highlight-next-parasha="isNextParasha(item)"
                             :roll-preview="getRollPreview(item.ref.page)"
                             @click="select(item)"
@@ -119,7 +119,7 @@
                       :ref="(el) => setCardRef(item.key, el)"
                       :reading-key="item.key"
                       :page="item.ref.page"
-                      :is-gola="item.gola"
+                      :specific-badge="getTargetBadgeKind(item)"
                       :highlight-next-parasha="isNextParasha(item)"
                       :roll-preview="getRollPreview(item.ref.page)"
                       @click="select(item)"
@@ -141,25 +141,21 @@ import { ref, computed, watch, onUnmounted, type ComponentPublicInstance } from 
 import { storeToRefs } from 'pinia';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
-import targetsData from '@/data/target_pages.json';
 import { computeRoll } from '@/composables/utils';
 import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
-import type { TorahRef } from '@/types';
+import {
+  findReadingTargetByKey,
+  getTargetBadgeKind,
+  getVisibleReadingTargets,
+  type ReadingTarget,
+} from '@/composables/readingTargets';
 import { useI18n } from 'vue-i18n';
 import { useRtl } from 'vuetify';
 import ReadingOptionCard from './ReadingOptionCard.vue';
 const { t } = useI18n();
 const { isRtl } = useRtl();
 
-interface TargetItem {
-  key: string;
-  group: string;
-  gola: boolean;
-  type: 'parasha' | 'holyday';
-  ref: TorahRef;
-  refEndPartial?: TorahRef;
-  refEnd: TorahRef;
-}
+type TargetItem = ReadingTarget;
 type SectionType = TargetItem['type'];
 
 const props = defineProps({
@@ -187,10 +183,14 @@ const openGroupsByType = ref<Record<SectionType, string[]>>({
   holyday: [],
 });
 const cardRefs = ref<Record<string, HTMLElement>>({});
-const targetsByKey = new Map((targetsData as TargetItem[]).map((target) => [target.key, target]));
 const hasAutoFocusedNextParasha = ref(false);
+const visibleTargets = computed(() => getVisibleReadingTargets(store.isInGola) as TargetItem[]);
 
 const isSectionType = (type: string): type is SectionType => type === 'parasha' || type === 'holyday';
+
+const findVisibleTargetByKey = (key: string) => {
+  return findReadingTargetByKey(key, store.isInGola) as TargetItem | null;
+};
 
 const setCardRef = (
   key: string,
@@ -220,9 +220,8 @@ const nextParashaKey = computed(() => {
   for (const reading of nextReadings) {
     const pairedParashaIds = splitPairedParashaReadingId(reading.readingId);
     const readingKey = pairedParashaIds ? pairedParashaIds[0] : reading.readingId;
-    const target = targetsByKey.get(readingKey);
+    const target = findVisibleTargetByKey(readingKey);
     if (!target) continue;
-    if (target.gola && !store.isInGola) continue;
     if (target.type === 'parasha') return target.key;
   }
 
@@ -243,7 +242,7 @@ const revealFocusGroup = () => {
   const targetKey = getPreferredFocusTargetKey();
   if (!targetKey) return;
 
-  const focusTarget = targetsByKey.get(targetKey);
+  const focusTarget = findVisibleTargetByKey(targetKey);
   if (!focusTarget) return;
 
   sectionCollapsed.value[focusTarget.type] = false;
@@ -331,10 +330,9 @@ const toggleSection = (type: string) => {
 
 const filtered = computed(() => {  
   const q = filter.value?.trim()?.toLowerCase();
-  const list = targetsData as TargetItem[];
+  const list = visibleTargets.value;
   
   return list.filter((target) => {
-    if (target.gola && !store.isInGola) return false;
     if (!q) return true;
     const searchStr = `${target.key} ${target.type} ${target.ref.page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
     return searchStr.includes(q);
