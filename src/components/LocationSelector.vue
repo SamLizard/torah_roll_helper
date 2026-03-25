@@ -276,6 +276,7 @@ import {
 } from '@/composables/readingTargets';
 import { useDisplay, useRtl } from 'vuetify';
 import type { RealDb, TorahRef, Verse } from '@/types';
+import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
 
 type TargetItem = ReadingTarget;
 
@@ -322,7 +323,6 @@ const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
 const NUN_HAFUCHA = '׆';
-const FOUR_PARASHIOT_USING_REF = new Set(['shekalim', 'zachor', 'parah', 'hachodesh', 'hahodesh']);
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const currentRef = ref<ManualData>({
@@ -420,18 +420,6 @@ const ktivKriAnnotation = (text: string) =>
     .replace(/[{]/g, '<span class="ktiv-kri">')
     .replace(/[}]/g, '</span>')
     .trim();
-
-const toLegacyTikkunSlug = (key: string) => {
-  const normalizedKey = key === 'hachodesh' ? 'hahodesh' : key;
-  if (normalizedKey.includes('::')) {
-    return normalizedKey
-      .split('::')
-      .map((part) => part.replace(/_/g, '-'))
-      .join('-');
-  }
-
-  return normalizedKey.replace(/_/g, '-');
-};
 
 const trackAction = (action: string, value?: string | number | null) => {
   trackFromToAction({ side: props.side, action, value });
@@ -545,9 +533,6 @@ const currentRefAsVerse = computed<Verse | null>(() => {
     verse: currentRef.value.verse as number,
   };
 });
-
-const toRefUrl = (ref: Verse) =>
-  `https://tikkun.io/#/r/${ref.book}-${ref.chapter}-${ref.verse}`;
 
 const isSameTorahRef = (
   torahRef: TorahRef,
@@ -694,12 +679,51 @@ const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
   return selectedOption?.mode ?? null;
 });
 
+// DONE 24.1: there are few bugs. 
+// I added holidays that are not in tikkun.io, so h/my-created-id will not work. In this case we have to use the ref. So it is not only the four parashiot that doesn't have a corresponding id in the tikkunio.
+// Pay attention that now I have ids that are the same but one for israel and one for gola, and the references are not the same. So don't just use the key, but also verify that the ref is the good one.
+// Those are the keys (of holidays) that are tikkun.io (with the ref - start - and if it is for both or only gola):
+/*
+rosh-chodesh | 4:28:1 | both
+rosh-1 | 1:21:1 | both
+rosh-2 | 1:22:1 | both
+yom-kippur | 3:16:1 | both
+sukkot-1 | 3:22:26 | both
+sukkot-2 | 3:22:26 | both
+sukkot-3 | 4:29:17 | both
+sukkot-4 | 4:29:20 | both
+sukkot-5 | 4:29:23 | both
+sukkot-6 | 4:29:26 | both
+sukkot-7 | 4:29:26 | both
+sukkot-shabbat-chol-hamoed | 2:33:12 | both
+shmini-atzeret | 5:14:22 | both
+simchat-torah | 5:33:1 | both
+chanukah-1 | 4:7:1 | both
+chanukah-2 | 4:7:18 | both
+chanukah-3 | 4:7:24 | both
+chanukah-4 | 4:7:30 | both
+chanukah-5 | 4:7:36 | both
+chanukah-7 | 4:7:48 | both
+chanukah-8 | 4:7:54 | both
+purim | 2:17:8 | both
+taanit-tzibur | 2:32:11 | both
+pesach-1 | 2:12:21 | both
+pesach-2 | 3:22:26 | both
+pesach-3 | 2:13:1 | both
+pesach-4 | 2:22:24 | both
+pesach-5 | 2:34:1 | both
+pesach-6 | 4:9:1 | both
+pesach-shabbat-chol-hamoed | 2:33:12 | both
+pesach-7 | 2:13:17 | both
+pesach-8 | 5:14:22 | gola
+shavuot-1 | 2:19:1 | both
+shavuot-2 | 5:14:22 | gola
+tisha-bav | 5:4:25 | both
+*/
+// The parashiot that are jumelées also have a wrong id in tikkun.io. We should put the id of the first parasha, not of both.
 const tikkunUrl = computed(() => {
-  if (matchedTarget.value && !FOUR_PARASHIOT_USING_REF.has(matchedTarget.value.key)) {
-    const slug = toLegacyTikkunSlug(matchedTarget.value.key);
-    const route = matchedTarget.value.type === 'parasha' ? 'p' : 'h';
-    return `https://tikkun.io/#/${route}/${slug}`;
-  }
+  const targetUrl = toTikkunUrl(matchedTarget.value);
+  if (targetUrl) return targetUrl;
 
   if (currentRefAsVerse.value) {
     return toRefUrl(currentRefAsVerse.value);

@@ -85,6 +85,7 @@ export const computeRoll = (fromPage: number, toPage: number): RollInstructions 
   return { pages, rollDirection };
 };
 
+// TODO 24.3: Pay attention that the page titles that are from the targets are also filtered by the isInGola option. 
 export const getPageTitleKeys = (pageNumber: number, ref: ManualData): string[] => {
   const readingMatches = targetsData.filter(t => 
     t.ref.book === ref.book && 
