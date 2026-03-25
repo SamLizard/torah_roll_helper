@@ -10,7 +10,7 @@ const TORAH_TYPE_OPTIONS = [
 type TorahTypeOption = (typeof TORAH_TYPE_OPTIONS)[number]['id'];
 
 interface State {
-  isInGola: boolean; // TODO 24.2: there is something that we didn't thought about. When the user switch this option, we have to pay attention that if he was on a page this is only for gola or only for israel, that it will continue to be displayed the same (and not disappear because the it is filtered out). Maybe the name of the page should contain the word "gola" or "israel" to make it more clear for the user. Pay attention that for the moment there is a bug that the reference point disappears (in this case).
+  isInGola: boolean; // DONE 24.2: there is something that we didn't thought about. When the user switch this option, we have to pay attention that if he was on a page this is only for gola or only for israel, that it will continue to be displayed the same (and not disappear because the it is filtered out). Maybe the name of the page should contain the word "gola" or "israel" to make it more clear for the user. Pay attention that for the moment there is a bug that the reference point disappears (in this case).
   nusach: NusachOption;
   torahType: TorahTypeOption;
   fromPage: number | null;

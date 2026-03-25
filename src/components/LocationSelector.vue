@@ -272,6 +272,8 @@ import {
   findReadingTargetByKey,
   getTargetBadgeKind,
   getVisibleReadingTargets,
+  matchesTargetSpecific,
+  readingTargets,
   type ReadingTarget,
 } from '@/composables/readingTargets';
 import { useDisplay, useRtl } from 'vuetify';
@@ -330,6 +332,8 @@ const currentRef = ref<ManualData>({
   chapter: null,
   verse: null
 });
+
+const allTargets = readingTargets as TargetItem[];
 
 const visibleTargets = computed(() => getVisibleReadingTargets(options.isInGola) as TargetItem[]);
 
@@ -572,6 +576,32 @@ const getTargetRefOptions = (target: TargetItem): TargetRefOption[] => {
   return options;
 };
 
+const resolveExplicitTarget = (): TargetItem | null => {
+  if (!props.targetKey) return null;
+
+  const exactTarget = allTargets.find((target) =>
+    target.key === props.targetKey &&
+    getTargetRefOptions(target).some((option) =>
+      isSameTorahRef(option.ref, props.page, currentRef.value)
+    )
+  );
+  if (exactTarget) return exactTarget;
+
+  const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
+  if (explicitCalendarTarget) return explicitCalendarTarget.target;
+
+  return null;
+};
+
+const formatTargetTitle = (target: TargetItem): string => {
+  const targetTitle = t(`readingTargets.${target.key}`);
+  if (target.specific === 'both' || matchesTargetSpecific(target.specific, options.isInGola)) {
+    return targetTitle;
+  }
+
+  return `${targetTitle}${t('separator')}${t(`targets.${target.specific}Badge`)}`;
+};
+
 const getDefaultTargetRefMode = (target: TargetItem, side: 'from' | 'to'): TargetRefMode => {
   if (side === 'from') return target.refEndPartial ? 'refEndPartial' : 'refEnd';
   return 'ref';
@@ -646,15 +676,22 @@ const nextParashaKey = computed(() => {
 const isNextParasha = (entry: CalendarEntry) => entry.key === nextParashaKey.value;
 
 const isSelectedCalendarEntry = (entry: CalendarEntry) => {
-  if (props.targetKey) return props.targetKey === entry.key;
+  if (props.targetKey) {
+    const explicitTarget = resolveExplicitTarget();
+    if (!explicitTarget) return props.targetKey === entry.key;
+
+    return (
+      props.targetKey === entry.key &&
+      isSameTorahRef(entry.target.ref, explicitTarget.ref.page, toManualData(explicitTarget.ref))
+    );
+  }
+
   return props.page === entry.target.ref.page;
 };
 
 const matchedTarget = computed(() => {
-  if (props.targetKey) {
-    const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
-    if (explicitCalendarTarget) return explicitCalendarTarget.target;
-  }
+  const explicitTarget = resolveExplicitTarget();
+  if (explicitTarget) return explicitTarget;
 
   if (props.page == null || currentRef.value.chapter == null || currentRef.value.verse == null) {
     return null;
@@ -812,6 +849,7 @@ const onPreviewKeyup = (event: KeyboardEvent) => {
 
 const computedPageTitle = computed(() => {
   if (props.page === null) return '';
+  if (props.targetKey) return '';
 
   const keys = getPageTitleKeys(props.page, currentRef.value);
   
@@ -823,8 +861,9 @@ const computedPageTitle = computed(() => {
 });
 
 const resolvedPageTitle = computed(() => {
+  if (props.targetKey && matchedTarget.value) return formatTargetTitle(matchedTarget.value);
   if (computedPageTitle.value) return computedPageTitle.value;
-  if (matchedTarget.value) return t(`readingTargets.${matchedTarget.value.key}`);
+  if (matchedTarget.value) return formatTargetTitle(matchedTarget.value);
   return '';
 });
 
