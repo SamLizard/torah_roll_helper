@@ -97,7 +97,6 @@ const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
   return { pages, rollDirection };
 };
 
-// DONE 24.3: Pay attention that the page titles that are from the targets are also filtered by the isInGola option. Also, now that we did the TODO 24.2 (now it is DONE 24.2), the title of the page that appears is only the current one, not all the one of all the same readings. Fix it back.
 const getPageTitleKeys = (pageNumber: number, ref: ManualData, isInGola: boolean): string[] => {
   const readingMatches: string[] = [];
 

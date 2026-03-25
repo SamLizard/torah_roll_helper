@@ -858,13 +858,3 @@ export {
   generateMonthlyReadings,
   splitPairedParashaReadingId,
 }
-
-/* pay attention:
-there are 4 parashiyot that the last verse is finishing at the following page of the start of the last verse:
-- Vayestse
-- Ki tisa
-- Emor
-- Ekev
-
-But there is no parasha that the last verse is finishing at the end of current page, and the next verse is in next page.
-*/

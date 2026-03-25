@@ -1,4 +1,3 @@
-// DONE 24.4: Add analytics to know if the user choose gola or israel.
 type LocationSide = 'from' | 'to';
 type RollDirection = 'forward' | 'backward';
 
