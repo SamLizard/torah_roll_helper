@@ -1,9 +1,21 @@
 import type { RealDb, RollInstructions } from '../types';
-import targetsData from '@/data/target_pages.json';
-import pageTitlesData from '@/data/page_titles_keys.json'; 
+import pageTitlesData from '@/data/page_titles_keys.json';
 import type { ManualData } from '@/components/ManualEntryDialog.vue';
+import { matchesTargetSpecific, readingTargets } from './readingTargets';
+import type { ReadingTarget } from './readingTargets';
 
-export const getPageNumber = (
+const pageTitles = pageTitlesData as string[][];
+const readingTargetsByKey = new Map<string, ReadingTarget>(
+  readingTargets.map((target) => [target.key, target])
+);
+
+const isVisiblePageTitleKey = (key: string, isInGola: boolean): boolean => {
+  const target = readingTargetsByKey.get(key);
+  if (!target) return true;
+  return matchesTargetSpecific(target.specific, isInGola);
+};
+
+const getPageNumber = (
   realDb: RealDb, 
   bookNumber: number, 
   chapterNumber: number, 
@@ -42,7 +54,7 @@ export const getPageNumber = (
   return resultPage;
 };
 
-export const getApproximatePages = (
+const getApproximatePages = (
   realDb: RealDb, 
   bookNumber: number, 
   chapterNumber: number
@@ -78,29 +90,42 @@ export const getApproximatePages = (
   return pages;
 };
 
-export const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
+const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
   const pages = Math.abs(toPage - fromPage);
   const rollDirection = toPage > fromPage ? 'forward' : 'backward';
 
   return { pages, rollDirection };
 };
 
-export const getPageTitleKeys = (pageNumber: number, ref: ManualData): string[] => {
-  const readingMatches = targetsData.filter(t => 
-    t.ref.book === ref.book && 
-    t.ref.chapter === ref.chapter && 
-    t.ref.verse === ref.verse
-  );
-  
+const getPageTitleKeys = (pageNumber: number, ref: ManualData, isInGola: boolean): string[] => {
+  const readingMatches: string[] = [];
+
+  if (ref.chapter !== null && ref.verse !== null) {
+    for (const target of readingTargets) {
+      if (
+        target.ref.book === ref.book &&
+        target.ref.chapter === ref.chapter &&
+        target.ref.verse === ref.verse &&
+        matchesTargetSpecific(target.specific, isInGola)
+      ) {
+        readingMatches.push(target.key);
+      }
+    }
+  }
+
   if (readingMatches.length > 0) {
-    return readingMatches.map(m => `readingTargets.${m.key}`);
+    return readingMatches.map((key) => `readingTargets.${key}`);
   }
 
-  const titles = (pageTitlesData as string[][])[pageNumber - 1];
-  
-  if (titles && titles.length > 0) {
-    return titles.map(key => `readingTargets.${key}`);
-  }
+  const titleKeys = pageTitles[pageNumber - 1] ?? [];
+  return titleKeys
+    .filter((key) => isVisiblePageTitleKey(key, isInGola))
+    .map((key) => `readingTargets.${key}`);
+};
 
-  return [];
+export {
+  computeRoll,
+  getApproximatePages,
+  getPageNumber,
+  getPageTitleKeys,
 };

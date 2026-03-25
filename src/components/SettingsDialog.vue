@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { trackGolaChoice } from '@/composables/analytics';
 import {
   NUSACH_OPTIONS,
   TORAH_TYPE_OPTIONS,
@@ -117,7 +118,10 @@ const dialog = computed<boolean>({
 
 const isInGola = computed<boolean>({
   get: () => optionsStore.isInGola,
-  set: (value) => optionsStore.changeIsInGola(value),
+  set: (value) => {
+    optionsStore.changeIsInGola(value);
+    trackGolaChoice(value);
+  },
 });
 
 const nusach = computed<NusachOption>({

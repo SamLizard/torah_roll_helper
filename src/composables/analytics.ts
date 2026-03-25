@@ -134,6 +134,20 @@ const trackLanguageChange = (fromLocale: string, toLocale: string) => {
   });
 };
 
+const trackGolaChoice = (isInGola: boolean) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const selectedLocation = isInGola ? 'gola' : 'israel';
+  const path = `${EVENT_PATH_PREFIX}/location-mode/${selectedLocation}`;
+  const title = `location-mode:${selectedLocation}`;
+
+  trackGoatCounterEvent({
+    path,
+    title,
+    event: true,
+  });
+};
+
 const trackRollResultDisplayed = ({ direction, pages }: TrackRollResultDisplayedInput) => {
   if (!isAnalyticsEnabled()) return;
 
@@ -163,6 +177,7 @@ const trackPageView = (routePath: string, routeName?: string) => {
 export {
   bootstrapAnalytics,
   trackFromToAction,
+  trackGolaChoice,
   trackLanguageChange,
   trackRollResultDisplayed,
   trackPageView,

@@ -576,7 +576,7 @@ const getPageTitleLabel = (page: number, reference: DictaReference): string => {
     book: reference.book,
     chapter: reference.chapter,
     verse: reference.verse,
-  });
+  }, options.isInGola);
   if (!keys.length) return '-';
   return keys.map((key) => t(key)).join(t('separator'));
 };

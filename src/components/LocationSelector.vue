@@ -1,5 +1,4 @@
 <template>
-  <!-- TODO 24.5: fix the calendar component of a reading that when hover (computer), the card is going a little up and the top is hidden. -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
     <v-card-item class="location-card-item">
       <div class="location-header">
@@ -32,7 +31,7 @@
     <v-divider />
 
     <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
-      <div class="mt-4" style="display: grid; min-width: 0;">
+      <div ref="calendarSlideShellRef" class="mt-4" style="display: grid; min-width: 0;">
         <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
           <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
           <span>{{ $t(`home.calendar.${side}`) }}</span>
@@ -253,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
@@ -272,10 +271,13 @@ import {
   findReadingTargetByKey,
   getTargetBadgeKind,
   getVisibleReadingTargets,
+  matchesTargetSpecific,
+  readingTargets,
   type ReadingTarget,
 } from '@/composables/readingTargets';
 import { useDisplay, useRtl } from 'vuetify';
 import type { RealDb, TorahRef, Verse } from '@/types';
+import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
 
 type TargetItem = ReadingTarget;
 
@@ -318,18 +320,21 @@ const isManualOpen = ref(false);
 const isPagePreviewOpen = ref(false);
 const previewWithNikud = ref(true);
 const isShiftPressed = ref(false);
+const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
 const NUN_HAFUCHA = '׆';
-const FOUR_PARASHIOT_USING_REF = new Set(['shekalim', 'zachor', 'parah', 'hachodesh', 'hahodesh']);
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const PERSISTED_TARGET_SEPARATOR = ' | ';
 
 const currentRef = ref<ManualData>({
   book: 1,
   chapter: null,
   verse: null
 });
+
+const allTargets = readingTargets as TargetItem[];
 
 const visibleTargets = computed(() => getVisibleReadingTargets(options.isInGola) as TargetItem[]);
 
@@ -420,18 +425,6 @@ const ktivKriAnnotation = (text: string) =>
     .replace(/[{]/g, '<span class="ktiv-kri">')
     .replace(/[}]/g, '</span>')
     .trim();
-
-const toLegacyTikkunSlug = (key: string) => {
-  const normalizedKey = key === 'hachodesh' ? 'hahodesh' : key;
-  if (normalizedKey.includes('::')) {
-    return normalizedKey
-      .split('::')
-      .map((part) => part.replace(/_/g, '-'))
-      .join('-');
-  }
-
-  return normalizedKey.replace(/_/g, '-');
-};
 
 const trackAction = (action: string, value?: string | number | null) => {
   trackFromToAction({ side: props.side, action, value });
@@ -546,9 +539,6 @@ const currentRefAsVerse = computed<Verse | null>(() => {
   };
 });
 
-const toRefUrl = (ref: Verse) =>
-  `https://tikkun.io/#/r/${ref.book}-${ref.chapter}-${ref.verse}`;
-
 const isSameTorahRef = (
   torahRef: TorahRef,
   page: number | null,
@@ -585,6 +575,32 @@ const getTargetRefOptions = (target: TargetItem): TargetRefOption[] => {
   });
 
   return options;
+};
+
+const resolveExplicitTarget = (): TargetItem | null => {
+  if (!props.targetKey) return null;
+
+  const exactTarget = allTargets.find((target) =>
+    target.key === props.targetKey &&
+    getTargetRefOptions(target).some((option) =>
+      isSameTorahRef(option.ref, props.page, currentRef.value)
+    )
+  );
+  if (exactTarget) return exactTarget;
+
+  const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
+  if (explicitCalendarTarget) return explicitCalendarTarget.target;
+
+  return null;
+};
+
+const formatTargetTitle = (target: TargetItem): string => {
+  const targetTitle = t(`readingTargets.${target.key}`);
+  if (target.specific === 'both' || matchesTargetSpecific(target.specific, options.isInGola)) {
+    return targetTitle;
+  }
+
+  return `${targetTitle}${PERSISTED_TARGET_SEPARATOR}${t(`targets.${target.specific}Badge`)}`;
 };
 
 const getDefaultTargetRefMode = (target: TargetItem, side: 'from' | 'to'): TargetRefMode => {
@@ -661,15 +677,22 @@ const nextParashaKey = computed(() => {
 const isNextParasha = (entry: CalendarEntry) => entry.key === nextParashaKey.value;
 
 const isSelectedCalendarEntry = (entry: CalendarEntry) => {
-  if (props.targetKey) return props.targetKey === entry.key;
+  if (props.targetKey) {
+    const explicitTarget = resolveExplicitTarget();
+    if (!explicitTarget) return props.targetKey === entry.key;
+
+    return (
+      props.targetKey === entry.key &&
+      isSameTorahRef(entry.target.ref, explicitTarget.ref.page, toManualData(explicitTarget.ref))
+    );
+  }
+
   return props.page === entry.target.ref.page;
 };
 
 const matchedTarget = computed(() => {
-  if (props.targetKey) {
-    const explicitCalendarTarget = resolveCalendarReading(props.targetKey);
-    if (explicitCalendarTarget) return explicitCalendarTarget.target;
-  }
+  const explicitTarget = resolveExplicitTarget();
+  if (explicitTarget) return explicitTarget;
 
   if (props.page == null || currentRef.value.chapter == null || currentRef.value.verse == null) {
     return null;
@@ -695,11 +718,8 @@ const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
 });
 
 const tikkunUrl = computed(() => {
-  if (matchedTarget.value && !FOUR_PARASHIOT_USING_REF.has(matchedTarget.value.key)) {
-    const slug = toLegacyTikkunSlug(matchedTarget.value.key);
-    const route = matchedTarget.value.type === 'parasha' ? 'p' : 'h';
-    return `https://tikkun.io/#/${route}/${slug}`;
-  }
+  const targetUrl = toTikkunUrl(matchedTarget.value);
+  if (targetUrl) return targetUrl;
 
   if (currentRefAsVerse.value) {
     return toRefUrl(currentRefAsVerse.value);
@@ -749,6 +769,92 @@ const selectCalendarEntry = (entry: CalendarEntry) => {
   emit('manual-set', targetRef.page, refData, entry.target.key);
 };
 
+let teardownCalendarMouseDrag: (() => void) | null = null;
+
+const setupCalendarMouseDrag = () => {
+  teardownCalendarMouseDrag?.();
+
+  const slideContainer = calendarSlideShellRef.value?.querySelector('.v-slide-group__container') as HTMLElement | null;
+  if (!slideContainer) return;
+
+  let isDragging = false;
+  let dragMoved = false;
+  let ignoreNextClick = false;
+  let startX = 0;
+  let startScrollLeft = 0;
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+
+    isDragging = true;
+    dragMoved = false;
+    startX = event.clientX;
+    startScrollLeft = slideContainer.scrollLeft;
+    slideContainer.classList.add('calendar-slide-group__container--dragging');
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!isDragging) return;
+
+    const deltaX = event.clientX - startX;
+    if (Math.abs(deltaX) > 3) {
+      dragMoved = true;
+    }
+
+    if (!dragMoved) return;
+
+    slideContainer.scrollLeft = startScrollLeft - deltaX;
+    event.preventDefault();
+  };
+
+  const stopDragging = () => {
+    if (!isDragging) return;
+
+    isDragging = false;
+    slideContainer.classList.remove('calendar-slide-group__container--dragging');
+
+    if (dragMoved) {
+      ignoreNextClick = true;
+      window.setTimeout(() => {
+        ignoreNextClick = false;
+      }, 0);
+    }
+  };
+
+  const onClickCapture = (event: MouseEvent) => {
+    if (!ignoreNextClick) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    ignoreNextClick = false;
+  };
+
+  slideContainer.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove, { passive: false });
+  window.addEventListener('pointerup', stopDragging);
+  window.addEventListener('pointercancel', stopDragging);
+  slideContainer.addEventListener('click', onClickCapture, true);
+
+  teardownCalendarMouseDrag = () => {
+    slideContainer.removeEventListener('pointerdown', onPointerDown);
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', stopDragging);
+    window.removeEventListener('pointercancel', stopDragging);
+    slideContainer.removeEventListener('click', onClickCapture, true);
+    slideContainer.classList.remove('calendar-slide-group__container--dragging');
+  };
+};
+
+watch(
+  () => calendarEntries.value.length,
+  () => {
+    void nextTick(() => {
+      setupCalendarMouseDrag();
+    });
+  },
+  { immediate: true }
+);
+
 const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
   if (!mode || !matchedTarget.value) return;
   trackAction('target-ref-mode', mode);
@@ -787,20 +893,45 @@ const onPreviewKeyup = (event: KeyboardEvent) => {
 };
 
 const computedPageTitle = computed(() => {
-  if (props.page === null) return '';
-
-  const keys = getPageTitleKeys(props.page, currentRef.value);
-  
-  if (keys && keys.length > 0) {
-    return keys.map(key => t(key)).join(t('separator'));
-  }
-
-  return '';
+  if (props.page === null) return [] as string[];
+  return getPageTitleKeys(props.page, currentRef.value, options.isInGola);
 });
 
+const getVisibleReadingTitleKeysForCurrentRef = (): string[] => {
+  return allTargets
+    .filter((target) =>
+      matchesTargetSpecific(target.specific, options.isInGola) &&
+      isSameTorahRef(target.ref, props.page, currentRef.value)
+    )
+    .map((target) => `readingTargets.${target.key}`);
+};
+
 const resolvedPageTitle = computed(() => {
-  if (computedPageTitle.value) return computedPageTitle.value;
-  if (matchedTarget.value) return t(`readingTargets.${matchedTarget.value.key}`);
+  const titleKeys = [...computedPageTitle.value];
+  const defaultSeparator = t('separator');
+
+  if (props.targetKey && matchedTarget.value) {
+    const explicitTitleKey = `readingTargets.${matchedTarget.value.key}`;
+    const explicitTitleIndex = titleKeys.indexOf(explicitTitleKey);
+
+    if (explicitTitleIndex >= 0) {
+      titleKeys.splice(explicitTitleIndex, 1);
+      titleKeys.unshift(explicitTitleKey);
+      return titleKeys.map((key) => t(key)).join(defaultSeparator);
+    }
+
+    if (!matchesTargetSpecific(matchedTarget.value.specific, options.isInGola)) {
+      const visibleTitles = getVisibleReadingTitleKeysForCurrentRef().map((key) => t(key));
+      if (visibleTitles.length > 0) {
+        return [formatTargetTitle(matchedTarget.value), ...visibleTitles].join(defaultSeparator);
+      }
+
+      return formatTargetTitle(matchedTarget.value);
+    }
+  }
+
+  if (titleKeys.length > 0) return titleKeys.map((key) => t(key)).join(defaultSeparator);
+  if (matchedTarget.value) return formatTargetTitle(matchedTarget.value);
   return '';
 });
 
@@ -868,6 +999,7 @@ watch(isPagePreviewOpen, (isOpen) => {
 });
 
 onUnmounted(() => {
+  teardownCalendarMouseDrag?.();
   window.removeEventListener('keydown', onPreviewKeydown);
   window.removeEventListener('keyup', onPreviewKeyup);
 });
@@ -974,6 +1106,21 @@ onUnmounted(() => {
 
 .calendar-slide-group {
   margin-inline: -4px;
+}
+
+.calendar-slide-group :deep(.v-slide-group__content) {
+  padding-top: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .calendar-slide-group :deep(.v-slide-group__container) {
+    cursor: grab;
+  }
+
+  .calendar-slide-group :deep(.v-slide-group__container.calendar-slide-group__container--dragging) {
+    cursor: grabbing;
+    user-select: none;
+  }
 }
 
 .preview-dialog-title {
