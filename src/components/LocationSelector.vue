@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO 24.5: fix the calendar component of a reading that when hover (computer), the card is going a little up and the top is hidden. -->
+  <!-- DONE 24.5: fix the calendar component of a reading that when hover (computer), the card is going a little up and the top is hidden. -->
   <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
     <v-card-item class="location-card-item">
       <div class="location-header">
@@ -1061,6 +1061,15 @@ onUnmounted(() => {
 
 .calendar-slide-group {
   margin-inline: -4px;
+  padding-top: 4px;
+}
+
+.calendar-slide-group :deep(.v-slide-group__container) {
+  overflow: visible;
+}
+
+.calendar-slide-group :deep(.v-slide-group__content) {
+  padding-top: 4px;
 }
 
 .preview-dialog-title {
