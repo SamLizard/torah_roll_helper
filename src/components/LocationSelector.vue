@@ -326,6 +326,7 @@ const db = realDb as RealDb;
 
 const NUN_HAFUCHA = '׆';
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const PERSISTED_TARGET_SEPARATOR = ' | ';
 
 const currentRef = ref<ManualData>({
   book: 1,
@@ -599,7 +600,7 @@ const formatTargetTitle = (target: TargetItem): string => {
     return targetTitle;
   }
 
-  return `${targetTitle}${t('separator')}${t(`targets.${target.specific}Badge`)}`;
+  return `${targetTitle}${PERSISTED_TARGET_SEPARATOR}${t(`targets.${target.specific}Badge`)}`;
 };
 
 const getDefaultTargetRefMode = (target: TargetItem, side: 'from' | 'to'): TargetRefMode => {
@@ -848,21 +849,44 @@ const onPreviewKeyup = (event: KeyboardEvent) => {
 };
 
 const computedPageTitle = computed(() => {
-  if (props.page === null) return '';
-  if (props.targetKey) return '';
-
-  const keys = getPageTitleKeys(props.page, currentRef.value);
-  
-  if (keys && keys.length > 0) {
-    return keys.map(key => t(key)).join(t('separator'));
-  }
-
-  return '';
+  if (props.page === null) return [] as string[];
+  return getPageTitleKeys(props.page, currentRef.value, options.isInGola);
 });
 
+const getVisibleReadingTitleKeysForCurrentRef = (): string[] => {
+  return allTargets
+    .filter((target) =>
+      matchesTargetSpecific(target.specific, options.isInGola) &&
+      isSameTorahRef(target.ref, props.page, currentRef.value)
+    )
+    .map((target) => `readingTargets.${target.key}`);
+};
+
 const resolvedPageTitle = computed(() => {
-  if (props.targetKey && matchedTarget.value) return formatTargetTitle(matchedTarget.value);
-  if (computedPageTitle.value) return computedPageTitle.value;
+  const titleKeys = [...computedPageTitle.value];
+  const defaultSeparator = t('separator');
+
+  if (props.targetKey && matchedTarget.value) {
+    const explicitTitleKey = `readingTargets.${matchedTarget.value.key}`;
+    const explicitTitleIndex = titleKeys.indexOf(explicitTitleKey);
+
+    if (explicitTitleIndex >= 0) {
+      titleKeys.splice(explicitTitleIndex, 1);
+      titleKeys.unshift(explicitTitleKey);
+      return titleKeys.map((key) => t(key)).join(defaultSeparator);
+    }
+
+    if (!matchesTargetSpecific(matchedTarget.value.specific, options.isInGola)) {
+      const visibleTitles = getVisibleReadingTitleKeysForCurrentRef().map((key) => t(key));
+      if (visibleTitles.length > 0) {
+        return [formatTargetTitle(matchedTarget.value), ...visibleTitles].join(defaultSeparator);
+      }
+
+      return formatTargetTitle(matchedTarget.value);
+    }
+  }
+
+  if (titleKeys.length > 0) return titleKeys.map((key) => t(key)).join(defaultSeparator);
   if (matchedTarget.value) return formatTargetTitle(matchedTarget.value);
   return '';
 });
