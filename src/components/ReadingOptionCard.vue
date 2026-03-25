@@ -108,12 +108,6 @@ const onClick = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.reading-option-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-  border-color: rgb(var(--v-theme-primary));
-}
-
 .reading-option-card--calendar {
   min-width: 166px;
   max-width: 184px;
@@ -180,5 +174,21 @@ const onClick = () => {
   font-size: 1rem;
   line-height: 1.2;
   padding-inline-end: 20px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reading-option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgb(var(--v-theme-primary));
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .reading-option-card:active {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgb(var(--v-theme-primary));
+  }
 }
 </style>

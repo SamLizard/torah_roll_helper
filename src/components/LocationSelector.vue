@@ -32,7 +32,7 @@
     <v-divider />
 
     <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
-      <div class="mt-4" style="display: grid; min-width: 0;">
+      <div ref="calendarSlideShellRef" class="mt-4" style="display: grid; min-width: 0;">
         <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
           <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
           <span>{{ $t(`home.calendar.${side}`) }}</span>
@@ -253,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
@@ -321,6 +321,7 @@ const isManualOpen = ref(false);
 const isPagePreviewOpen = ref(false);
 const previewWithNikud = ref(true);
 const isShiftPressed = ref(false);
+const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
@@ -811,6 +812,92 @@ const selectCalendarEntry = (entry: CalendarEntry) => {
   emit('manual-set', targetRef.page, refData, entry.target.key);
 };
 
+let teardownCalendarMouseDrag: (() => void) | null = null;
+
+const setupCalendarMouseDrag = () => {
+  teardownCalendarMouseDrag?.();
+
+  const slideContainer = calendarSlideShellRef.value?.querySelector('.v-slide-group__container') as HTMLElement | null;
+  if (!slideContainer) return;
+
+  let isDragging = false;
+  let dragMoved = false;
+  let ignoreNextClick = false;
+  let startX = 0;
+  let startScrollLeft = 0;
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+
+    isDragging = true;
+    dragMoved = false;
+    startX = event.clientX;
+    startScrollLeft = slideContainer.scrollLeft;
+    slideContainer.classList.add('calendar-slide-group__container--dragging');
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!isDragging) return;
+
+    const deltaX = event.clientX - startX;
+    if (Math.abs(deltaX) > 3) {
+      dragMoved = true;
+    }
+
+    if (!dragMoved) return;
+
+    slideContainer.scrollLeft = startScrollLeft - deltaX;
+    event.preventDefault();
+  };
+
+  const stopDragging = () => {
+    if (!isDragging) return;
+
+    isDragging = false;
+    slideContainer.classList.remove('calendar-slide-group__container--dragging');
+
+    if (dragMoved) {
+      ignoreNextClick = true;
+      window.setTimeout(() => {
+        ignoreNextClick = false;
+      }, 0);
+    }
+  };
+
+  const onClickCapture = (event: MouseEvent) => {
+    if (!ignoreNextClick) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    ignoreNextClick = false;
+  };
+
+  slideContainer.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove, { passive: false });
+  window.addEventListener('pointerup', stopDragging);
+  window.addEventListener('pointercancel', stopDragging);
+  slideContainer.addEventListener('click', onClickCapture, true);
+
+  teardownCalendarMouseDrag = () => {
+    slideContainer.removeEventListener('pointerdown', onPointerDown);
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', stopDragging);
+    window.removeEventListener('pointercancel', stopDragging);
+    slideContainer.removeEventListener('click', onClickCapture, true);
+    slideContainer.classList.remove('calendar-slide-group__container--dragging');
+  };
+};
+
+watch(
+  () => calendarEntries.value.length,
+  () => {
+    void nextTick(() => {
+      setupCalendarMouseDrag();
+    });
+  },
+  { immediate: true }
+);
+
 const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
   if (!mode || !matchedTarget.value) return;
   trackAction('target-ref-mode', mode);
@@ -955,6 +1042,7 @@ watch(isPagePreviewOpen, (isOpen) => {
 });
 
 onUnmounted(() => {
+  teardownCalendarMouseDrag?.();
   window.removeEventListener('keydown', onPreviewKeydown);
   window.removeEventListener('keyup', onPreviewKeyup);
 });
@@ -1061,15 +1149,21 @@ onUnmounted(() => {
 
 .calendar-slide-group {
   margin-inline: -4px;
-  padding-top: 4px;
-}
-
-.calendar-slide-group :deep(.v-slide-group__container) {
-  overflow: visible;
 }
 
 .calendar-slide-group :deep(.v-slide-group__content) {
   padding-top: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .calendar-slide-group :deep(.v-slide-group__container) {
+    cursor: grab;
+  }
+
+  .calendar-slide-group :deep(.v-slide-group__container.calendar-slide-group__container--dragging) {
+    cursor: grabbing;
+    user-select: none;
+  }
 }
 
 .preview-dialog-title {
