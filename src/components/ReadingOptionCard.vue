@@ -3,6 +3,7 @@
     class="reading-option-card"
     :class="{
       'reading-option-card--calendar': compactCalendar,
+      'reading-option-card--calendar-balanced': compactCalendar && balanceCalendarCardHeight,
       'reading-option-card--active': active,
       'reading-option-card--specific': Boolean(specificBadge),
       'reading-option-card--gola': specificBadge === 'gola',
@@ -29,13 +30,25 @@
       <span>{{ dateLabel }}</span>
     </div>
 
-    <div class="d-flex justify-space-between align-start mb-2">
-      <span class="reading-option-card__name text-truncate">
-        {{ readingLabel ?? $t(`readingTargets.${readingKey}`) }}
+    <div ref="nameRowRef" class="reading-option-card__name-row">
+      <span
+        class="reading-option-card__name"
+        :class="{ 'reading-option-card__name--compact': isCompactName }"
+      >
+        {{ readingTitle }}
+      </span>
+
+      <span
+        v-if="compactCalendar"
+        ref="readingNameMeasureRef"
+        aria-hidden="true"
+        class="reading-option-card__name reading-option-card__name--measure"
+      >
+        {{ readingTitle }}
       </span>
     </div>
 
-    <div class="d-flex align-center text-caption text-medium-emphasis justify-space-between gap-1">
+    <div class="reading-option-card__meta d-flex align-center text-caption text-medium-emphasis justify-space-between gap-1">
       <span>{{ $t('page') }} {{ page }}</span>
 
       <div
@@ -50,6 +63,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
 type TargetBadgeKind = 'gola' | 'israel';
 
 interface RollPreview {
@@ -58,7 +74,7 @@ interface RollPreview {
   text: string;
 }
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   readingKey: string;
   readingLabel?: string | null;
   page: number;
@@ -70,6 +86,7 @@ withDefaults(defineProps<{
   showDateIcon?: boolean;
   rollPreview?: RollPreview | null;
   compactCalendar?: boolean;
+  balanceCalendarCardHeight?: boolean;
 }>(), {
   readingLabel: null,
   active: false,
@@ -80,15 +97,102 @@ withDefaults(defineProps<{
   showDateIcon: false,
   rollPreview: null,
   compactCalendar: false,
+  balanceCalendarCardHeight: false,
 });
+const { t, locale } = useI18n();
 
 const emit = defineEmits<{
   (e: 'click'): void;
+  (e: 'calendar-compact-change', compact: boolean): void;
 }>();
+
+const nameRowRef = ref<HTMLElement | null>(null);
+const readingNameMeasureRef = ref<HTMLElement | null>(null);
+const isCompactName = ref(false);
+const readingTitle = computed(() => props.readingLabel ?? t(`readingTargets.${props.readingKey}`));
+let resizeObserver: ResizeObserver | null = null;
+let measurementFrameId: number | null = null;
 
 const onClick = () => {
   emit('click');
 };
+
+const cancelScheduledMeasurement = () => {
+  if (measurementFrameId === null) return;
+
+  window.cancelAnimationFrame(measurementFrameId);
+  measurementFrameId = null;
+};
+
+const updateCompactNameState = () => {
+  if (!props.compactCalendar) {
+    isCompactName.value = false;
+    return;
+  }
+
+  const measureElement = readingNameMeasureRef.value;
+  if (!measureElement) return;
+
+  const computedStyle = window.getComputedStyle(measureElement);
+  const lineHeight = Number.parseFloat(computedStyle.lineHeight);
+
+  if (!Number.isFinite(lineHeight) || lineHeight <= 0) {
+    isCompactName.value = false;
+    return;
+  }
+
+  const renderedHeight = measureElement.getBoundingClientRect().height;
+  isCompactName.value = renderedHeight > lineHeight * 1.15;
+};
+
+const scheduleCompactNameMeasurement = () => {
+  cancelScheduledMeasurement();
+
+  measurementFrameId = window.requestAnimationFrame(() => {
+    measurementFrameId = null;
+    updateCompactNameState();
+  });
+};
+
+onMounted(() => {
+  resizeObserver = new ResizeObserver(() => {
+    scheduleCompactNameMeasurement();
+  });
+
+  if (nameRowRef.value) {
+    resizeObserver.observe(nameRowRef.value);
+  }
+
+  scheduleCompactNameMeasurement();
+});
+
+watch(
+  () => [
+    props.compactCalendar,
+    props.readingLabel,
+    props.readingKey,
+    props.highlightNextParasha,
+    props.showNextParashaBadge,
+    locale.value,
+  ],
+  async () => {
+    await nextTick();
+    scheduleCompactNameMeasurement();
+  },
+);
+
+watch(
+  () => [props.compactCalendar, isCompactName.value],
+  ([compactCalendar, compactName]) => {
+    emit('calendar-compact-change', compactCalendar && compactName);
+  },
+  { immediate: true }
+);
+
+onUnmounted(() => {
+  cancelScheduledMeasurement();
+  resizeObserver?.disconnect();
+});
 </script>
 
 <style scoped>
@@ -106,13 +210,20 @@ const onClick = () => {
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .reading-option-card--calendar {
-  min-width: 166px;
-  max-width: 184px;
-  padding: 12px;
+  min-width: 176px;
+  max-width: 208px;
+  padding: 10px;
   margin-inline: 4px;
+}
+
+.reading-option-card--calendar-balanced {
+  min-height: 96px;
 }
 
 .reading-option-card--active {
@@ -170,10 +281,60 @@ const onClick = () => {
 }
 
 .reading-option-card__name {
+  display: block;
   font-weight: 600;
   font-size: 1rem;
-  line-height: 1.2;
+  line-height: 1.25;
   padding-inline-end: 20px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.reading-option-card__name--measure {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.reading-option-card__name-row {
+  position: relative;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.reading-option-card__meta {
+  margin-top: auto;
+}
+
+.reading-option-card--calendar .text-caption {
+  font-size: 0.68rem !important;
+  line-height: 1.2;
+}
+
+.reading-option-card--calendar .reading-option-card__name--compact {
+  font-size: 0.88rem;
+  line-height: 1.18;
+}
+
+.reading-option-card--calendar .reading-option-card__name-row {
+  margin-bottom: 6px;
+}
+
+.reading-option-card--calendar .reading-option-card__specific-badge {
+  top: 6px;
+  inset-inline-end: 6px;
+  padding: 1px 5px;
+  font-size: 0.58rem;
+}
+
+.reading-option-card--calendar .reading-option-card__next-badge {
+  top: 6px;
+  inset-inline-start: 6px;
+  width: 18px;
+  height: 18px;
 }
 
 @media (hover: hover) and (pointer: fine) {

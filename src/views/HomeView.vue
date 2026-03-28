@@ -8,8 +8,10 @@
           :page="options.fromPage" 
           :selected-ref="fromRef"
           :target-key="fromTargetKey"
+          :balance-calendar-card-height="balanceCalendarCardHeight"
           @open-dicta="openDictaFor('from')"
           @choose-manual="openTargets('from')"
+          @calendar-requires-expanded-height-change="(requiresExpandedHeight) => onCalendarExpandedHeightChange('from', requiresExpandedHeight)"
           @manual-set="onSetFromPage"
         />
       </v-col>
@@ -33,8 +35,10 @@
           :page="options.toPage" 
           :selected-ref="toRef"
           :target-key="toTargetKey"
+          :balance-calendar-card-height="balanceCalendarCardHeight"
           @open-dicta="openDictaFor('to')"
           @choose-manual="openTargets('to')"
+          @calendar-requires-expanded-height-change="(requiresExpandedHeight) => onCalendarExpandedHeightChange('to', requiresExpandedHeight)"
           @manual-set="onSetToPage"
         />
       </v-col>
@@ -463,6 +467,10 @@ const fromRef = ref<ManualData | null>(null);
 const toRef = ref<ManualData | null>(null);
 const fromTargetKey = ref<string | null>(null);
 const toTargetKey = ref<string | null>(null);
+const calendarNeedsExpandedHeight = ref<Record<'from' | 'to', boolean>>({
+  from: false,
+  to: false,
+});
 
 const targetsOpen = ref(false);
 const activeSide = ref<'from' | 'to'>('to');
@@ -486,7 +494,19 @@ const allowGolaInTargets = computed(() => {
   return true;
 });
 
+const balanceCalendarCardHeight = computed(() => {
+  if (smAndDown.value) return false;
+  return calendarNeedsExpandedHeight.value.from || calendarNeedsExpandedHeight.value.to;
+});
+
 const roll = ref<RollInstructions | null>(null);
+
+const onCalendarExpandedHeightChange = (side: 'from' | 'to', requiresExpandedHeight: boolean) => {
+  calendarNeedsExpandedHeight.value = {
+    ...calendarNeedsExpandedHeight.value,
+    [side]: requiresExpandedHeight,
+  };
+};
 
 watch(
   [() => options.fromPage, () => options.toPage], 

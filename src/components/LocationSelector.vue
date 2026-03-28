@@ -30,34 +30,40 @@
 
     <v-divider />
 
-    <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
-      <div ref="calendarSlideShellRef" class="mt-4" style="display: grid; min-width: 0;">
-        <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
-          <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
-          <span>{{ $t(`home.calendar.${side}`) }}</span>
-        </div>
+    <v-card-text v-if="calendarEntries.length > 0" class="pa-0">
+      <div class="location-calendar-frame">
+        <div class="location-calendar-section">
+          <div ref="calendarSlideShellRef" class="location-calendar-slide-shell">
+            <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
+              <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+              <span>{{ $t(`home.calendar.${side}`) }}</span>
+            </div>
 
-        <v-slide-group show-arrows class="calendar-slide-group">
-          <v-slide-group-item
-            v-for="entry in calendarEntries"
-            :key="`${side}-${entry.key}-${entry.dateIso}`"
-          >
-            <ReadingOptionCard
-              :reading-key="entry.target.key"
-              :reading-label="entry.readingLabel"
-              :page="entry.target.ref.page"
-              :active="isSelectedCalendarEntry(entry)"
-              :specific-badge="getTargetBadgeKind(entry.target)"
-              :highlight-next-parasha="isNextParasha(entry)"
-              :show-next-parasha-badge="false"
-              :date-label="entry.dateLabel"
-              :show-date-icon="true"
-              :roll-preview="getCalendarRollPreview(entry)"
-              :compact-calendar="true"
-              @click="selectCalendarEntry(entry)"
-            />
-          </v-slide-group-item>
-        </v-slide-group>
+            <v-slide-group show-arrows class="calendar-slide-group">
+              <v-slide-group-item
+                v-for="entry in calendarEntries"
+                :key="`${side}-${entry.key}-${entry.dateIso}`"
+              >
+                <ReadingOptionCard
+                  :reading-key="entry.target.key"
+                  :reading-label="entry.readingLabel"
+                  :page="entry.target.ref.page"
+                  :active="isSelectedCalendarEntry(entry)"
+                  :specific-badge="getTargetBadgeKind(entry.target)"
+                  :highlight-next-parasha="isNextParasha(entry)"
+                  :show-next-parasha-badge="false"
+                  :date-label="entry.dateLabel"
+                  :show-date-icon="true"
+                  :roll-preview="getCalendarRollPreview(entry)"
+                  :compact-calendar="true"
+                  :balance-calendar-card-height="balanceCalendarCardHeight"
+                  @calendar-compact-change="(compact) => onCalendarCardCompactChange(toCalendarEntryStateKey(entry), compact)"
+                  @click="selectCalendarEntry(entry)"
+                />
+              </v-slide-group-item>
+            </v-slide-group>
+          </div>
+        </div>
       </div>
     </v-card-text>
 
@@ -302,12 +308,14 @@ const props = defineProps({
   page: { type: Number as () => number | null, default: null },
   selectedRef: { type: Object as () => ManualData | null, default: null },
   targetKey: { type: String as () => string | null, default: null },
+  balanceCalendarCardHeight: { type: Boolean, default: false },
 });
 
 const emit = defineEmits<{
   (e: 'open-dicta'): void;
   (e: 'choose-manual'): void;
   (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void;
+  (e: 'calendar-requires-expanded-height-change', requiresExpandedHeight: boolean): void;
 }>();
 
 const { t, locale } = useI18n();
@@ -321,6 +329,7 @@ const isPagePreviewOpen = ref(false);
 const previewWithNikud = ref(true);
 const isShiftPressed = ref(false);
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
+const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
@@ -754,6 +763,35 @@ const getCalendarRollPreview = (entry: CalendarEntry) => {
   };
 };
 
+const toCalendarEntryStateKey = (entry: CalendarEntry) => `${entry.key}-${entry.dateIso}`;
+
+const emitCalendarRequiresExpandedHeight = () => {
+  const requiresExpandedHeight = Object.values(compactCalendarCardStates.value).some(Boolean);
+  emit('calendar-requires-expanded-height-change', requiresExpandedHeight);
+};
+
+const syncCompactCalendarCardStates = () => {
+  const nextState: Record<string, boolean> = {};
+
+  for (const entry of calendarEntries.value) {
+    const entryKey = toCalendarEntryStateKey(entry);
+    nextState[entryKey] = compactCalendarCardStates.value[entryKey] ?? false;
+  }
+
+  compactCalendarCardStates.value = nextState;
+  emitCalendarRequiresExpandedHeight();
+};
+
+const onCalendarCardCompactChange = (entryKey: string, compact: boolean) => {
+  if (compactCalendarCardStates.value[entryKey] === compact) return;
+
+  compactCalendarCardStates.value = {
+    ...compactCalendarCardStates.value,
+    [entryKey]: compact,
+  };
+  emitCalendarRequiresExpandedHeight();
+};
+
 const selectCalendarEntry = (entry: CalendarEntry) => {
   trackAction('calendar-select', entry.key);
   const dayOffset = getCalendarDayOffset(entry.dateIso);
@@ -846,9 +884,10 @@ const setupCalendarMouseDrag = () => {
 };
 
 watch(
-  () => calendarEntries.value.length,
+  () => calendarEntries.value.map((entry) => toCalendarEntryStateKey(entry)).join('|'),
   () => {
     void nextTick(() => {
+      syncCompactCalendarCardStates();
       setupCalendarMouseDrag();
     });
   },
@@ -999,6 +1038,7 @@ watch(isPagePreviewOpen, (isOpen) => {
 });
 
 onUnmounted(() => {
+  emit('calendar-requires-expanded-height-change', false);
   teardownCalendarMouseDrag?.();
   window.removeEventListener('keydown', onPreviewKeydown);
   window.removeEventListener('keyup', onPreviewKeyup);
@@ -1106,6 +1146,16 @@ onUnmounted(() => {
 
 .calendar-slide-group {
   margin-inline: -4px;
+}
+
+.location-calendar-slide-shell {
+  display: grid;
+  min-width: 0;
+  padding-top: 16px;
+}
+
+.location-calendar-section {
+  padding: 12px 16px 8px;
 }
 
 .calendar-slide-group :deep(.v-slide-group__content) {
@@ -1403,7 +1453,7 @@ onUnmounted(() => {
   }
 
   .calendar-slide-group :deep(.reading-option-card--calendar) {
-    min-width: 154px;
+    min-width: 176px;
   }
 }
 </style>
