@@ -2,7 +2,7 @@ import { createRequire } from 'node:module'
 
 import type { RealDb, TorahRef } from '../src/types/index.ts'
 
-type RefPropertyName = 'ref' | 'refEndPartial' | 'refEnd'
+type RefPropertyName = 'refEndPartial' | 'refEnd'
 
 type TargetSpecific = 'both' | 'gola' | 'israel'
 
@@ -30,7 +30,7 @@ const require = createRequire(import.meta.url)
 const realDb = require('../src/data/real_db.json') as RealDb
 const targetPages = require('../src/data/target_pages.json') as ReadingTargetForScript[]
 
-const referencePropertyNames: RefPropertyName[] = ['ref', 'refEndPartial', 'refEnd']
+const referencePropertyNames: RefPropertyName[] = ['refEndPartial', 'refEnd']
 const startingReferences = targetPages.map((target) => ({
   id: target.key,
   specific: target.specific,
