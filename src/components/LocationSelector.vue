@@ -1453,7 +1453,8 @@ onUnmounted(() => {
   }
 
   .calendar-slide-group :deep(.reading-option-card--calendar) {
-    min-width: 176px;
+    min-width: 162px;
+    max-width: 186px;
   }
 }
 </style>
