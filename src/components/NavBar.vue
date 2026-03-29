@@ -14,6 +14,7 @@
         v-for="route in navLinks" 
         :key="route.path" 
         :to="route.path"
+        :data-tutorial="getRouteTutorialAttr(route)"
         :prepend-icon="getRouteIcon(route)"
         :title="$t('routes.' + route.name?.toString())"
       />
@@ -34,14 +35,21 @@
         </v-list>
         
         <div class="pa-4 pt-0">
-          <language-selection :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'" />
+          <language-selection
+            ref="drawerLanguageSelectionRef"
+            :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'"
+          />
         </div>
       </div>
     </template>
   </v-navigation-drawer>
 
   <v-app-bar app color="#f2f2f2" flat density="comfortable">
-    <v-app-bar-nav-icon class="d-md-none" @click="drawer = !drawer" />
+    <v-app-bar-nav-icon
+      class="d-md-none"
+      data-tutorial="menu-button"
+      @click="drawer = !drawer"
+    />
 
     <v-toolbar-title 
       class="font-weight-bold title-link text-truncate" 
@@ -50,11 +58,12 @@
       {{ $t("title") }}
     </v-toolbar-title>
 
-    <div class="d-none d-md-flex align-center flex-shrink-0">
+    <div class="d-none d-md-flex align-center flex-shrink-0" data-tutorial="top-nav-links">
       <v-btn
         v-for="route in navLinks"
         :key="route.path"
         :to="route.path"
+        :data-tutorial="getRouteTutorialAttr(route)"
         variant="text"
         class="mx-1"
         active-color="primary"
@@ -67,11 +76,15 @@
     <v-spacer class="d-md-block d-none"></v-spacer>
 
     <div class="d-flex align-center flex-shrink-0 pe-2">
-      <language-selection :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'" />
+      <language-selection
+        ref="topLanguageSelectionRef"
+        :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'"
+      />
       <v-btn
         icon="mdi-cog"
         variant="text"
         class="ms-1"
+        data-tutorial="settings-button"
         :aria-label="$t('settings.label')"
         @click="openSettingsPopup"
       />
@@ -82,14 +95,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LanguageSelection from "./LanguageSelection.vue";
 import SettingsDialog from './SettingsDialog.vue';
+import { setTutorialLanguageMenuControls } from '@/composables/tutorialUi';
+
+interface LanguageSelectionExposed {
+  openMenu: () => void;
+  closeMenu: () => void;
+  isVisible: () => boolean;
+}
 
 const router = useRouter();
 const drawer = ref(false);
 const settingsPopupOpen = ref(false);
+const topLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
+const drawerLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 
 const navLinks = computed(() => {
   return router.getRoutes().filter(route => route.meta?.showInNav);
@@ -100,10 +122,42 @@ const getRouteIcon = (route: (typeof navLinks.value)[number]): string | undefine
   return typeof icon === 'string' ? icon : undefined;
 };
 
+const getRouteTutorialAttr = (route: (typeof navLinks.value)[number]): string | undefined => {
+  return route.name === 'about' ? 'about-nav' : undefined;
+};
+
+const getTutorialLanguageSelection = (): LanguageSelectionExposed | null => {
+  if (topLanguageSelectionRef.value?.isVisible()) {
+    return topLanguageSelectionRef.value;
+  }
+
+  if (drawerLanguageSelectionRef.value?.isVisible()) {
+    return drawerLanguageSelectionRef.value;
+  }
+
+  return topLanguageSelectionRef.value ?? drawerLanguageSelectionRef.value;
+};
+
 const openSettingsPopup = (): void => {
   settingsPopupOpen.value = true;
   drawer.value = false;
 };
+
+onMounted(() => {
+  setTutorialLanguageMenuControls({
+    open: () => {
+      getTutorialLanguageSelection()?.openMenu();
+    },
+    close: () => {
+      topLanguageSelectionRef.value?.closeMenu();
+      drawerLanguageSelectionRef.value?.closeMenu();
+    },
+  });
+});
+
+onUnmounted(() => {
+  setTutorialLanguageMenuControls(null);
+});
 </script>
 
 <style scoped>

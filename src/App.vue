@@ -11,19 +11,105 @@
 
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue';
+import Swal from 'sweetalert2';
 
-import { onMounted, watch } from 'vue';
-import { useRtl } from 'vuetify';
-import { bootstrapAnalytics } from '@/composables/analytics';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import { useDisplay, useRtl } from 'vuetify';
+import {
+  bootstrapAnalytics,
+  trackTutorialPromptEvent,
+} from '@/composables/analytics';
+import {
+  initializeTutorialState,
+  markTutorialPromptSeen,
+} from '@/composables/tutorials';
 
 const { isRtl } = useRtl();
+const { smAndDown } = useDisplay();
+const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
+
+let tutorialPromptTimeoutId: number | null = null;
+
+const tutorialPromptPosition = computed(() => {
+  if (smAndDown.value) {
+    return 'top';
+  }
+
+  return isRtl.value ? 'top-start' : 'top-end';
+});
 
 watch(isRtl, (newRtl) => {
   document.documentElement.style.setProperty('--swal-direction', newRtl ? 'rtl' : 'ltr');
-});
+}, { immediate: true });
+
+const openQuickTutorialFromToast = async () => {
+  trackTutorialPromptEvent('opened-quick-tutorial');
+
+  await router.push({
+    name: 'home',
+    query: {
+      tutorial: 'quick',
+      source: 'welcome-toast',
+    },
+  });
+};
+
+const showTutorialPrompt = async () => {
+  markTutorialPromptSeen();
+  trackTutorialPromptEvent('shown');
+
+  const result = await Swal.fire({
+    toast: true,
+    position: tutorialPromptPosition.value,
+    icon: 'info',
+    title: t('tutorialPrompt.title'),
+    text: t('tutorialPrompt.text'),
+    showConfirmButton: true,
+    confirmButtonText: t('tutorialPrompt.openQuick'),
+    showCloseButton: true,
+    timer: 9000,
+    timerProgressBar: true,
+    customClass: {
+      popup: 'tutorial-toast',
+    },
+  });
+
+  if (result.isConfirmed) {
+    await openQuickTutorialFromToast();
+  }
+};
 
 onMounted(() => {
   bootstrapAnalytics();
+
+  const tutorialInitialization = initializeTutorialState();
+
+  if (
+    !tutorialInitialization.isFirstVisit ||
+    tutorialInitialization.state.hasSeenHowToPage ||
+    tutorialInitialization.state.hasStartedTutorial ||
+    route.name === 'howTo'
+  ) {
+    return;
+  }
+
+  tutorialPromptTimeoutId = window.setTimeout(() => {
+    if (route.name === 'howTo') {
+      return;
+    }
+
+    void showTutorialPrompt();
+  }, 1300);
+});
+
+onBeforeUnmount(() => {
+  if (tutorialPromptTimeoutId != null) {
+    window.clearTimeout(tutorialPromptTimeoutId);
+  }
 });
 </script>
 
@@ -49,6 +135,10 @@ nav a.router-link-exact-active {
 
 .swal2-modal {
   font-family: "roboto", sans-serif;
+}
+
+.tutorial-toast {
+  width: min(420px, calc(100vw - 24px));
 }
 
 .component {

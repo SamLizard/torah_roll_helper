@@ -1,12 +1,12 @@
 <template>
   <v-dialog v-model="dialog" max-width="500px">
-    <v-card class="rounded-xl">
+    <v-card class="rounded-xl" data-tutorial="settings-dialog">
       <v-card-title class="text-h6 font-weight-bold">
         {{ $t('settings.label') }}
       </v-card-title>
 
       <v-card-text class="pt-2">
-        <div class="setting-control setting-switch">
+        <div class="setting-control setting-switch" data-tutorial="settings-gola">
           <v-switch
             v-model="isInGola"
             :label="$t('settings.golaLabel')"
@@ -27,7 +27,7 @@
           </v-tooltip>
         </div>
 
-        <div class="setting-control">
+        <div class="setting-control" data-tutorial="settings-nusach">
           <v-select
             v-model="nusach"
             :items="nusachOptions"
@@ -52,7 +52,7 @@
           </v-tooltip>
         </div>
 
-        <div class="setting-control">
+        <div class="setting-control" data-tutorial="settings-torah-type">
           <v-select
             v-model="torahType"
             :items="torahTypeOptions"
@@ -80,7 +80,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="close">
+        <v-btn variant="text" data-tutorial="settings-close" @click="close">
           {{ $t('actions.close') }}
         </v-btn>
       </v-card-actions>

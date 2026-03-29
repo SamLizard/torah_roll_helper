@@ -3,6 +3,7 @@
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
         <LocationSelector
+          ref="fromLocationSelectorRef"
           key="from"
           side="from"
           :page="options.fromPage" 
@@ -30,6 +31,7 @@
 
       <v-col cols="12" md="6" class="px-md-5">
         <LocationSelector
+          ref="toLocationSelectorRef"
           key="to"
           side="to"
           :page="options.toPage" 
@@ -46,12 +48,14 @@
 
     <v-row class="mt-6" justify="center">
       <v-col cols="12" md="8">
-        <RollResult
-          :pages="roll?.pages ?? null"
-          :direction="roll?.rollDirection ?? null"
-          :from-page="options.fromPage"
-          :to-page="options.toPage"
-        />
+        <div data-tutorial="roll-result">
+          <RollResult
+            :pages="roll?.pages ?? null"
+            :direction="roll?.rollDirection ?? null"
+            :from-page="options.fromPage"
+            :to-page="options.toPage"
+          />
+        </div>
       </v-col>
     </v-row>
 
@@ -69,7 +73,7 @@
         class="dicta-overlay bg-background"
         :dir="photoUiDirection"
       >
-        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
+        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0" data-tutorial="dicta-dialog">
           <v-card-title class="dicta-card-title">
             <span>{{ $t('home.dicta.title') }}</span>
             <div class="dicta-card-toolbar">
@@ -149,7 +153,7 @@
                 v-if="dictaOpen"
                 :key="dictaCaptureKey"
                 :busy="isDictaBusy"
-                :auto-fallback="isPhoneCameraMode"
+                :auto-fallback="isPhoneCameraMode && !isTutorialActive"
                 :hide-file-button="isPhoneCameraMode"
                 :suppress-errors="isPhoneCameraMode"
                 :mobile-mode="isPhoneCameraMode"
@@ -169,7 +173,7 @@
         class="dicta-overlay bg-background"
         :dir="photoUiDirection"
       >
-        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0">
+        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0" data-tutorial="dicta-dialog">
           <v-card-title class="dicta-card-title">
             <span>{{ $t('home.dicta.title') }}</span>
             <div class="dicta-card-toolbar">
@@ -233,6 +237,7 @@
     <section
       v-if="isPhoneCameraMode && dictaOpen && dictaFlowState === 'idle'"
       class="dicta-mobile-screen"
+      data-tutorial="dicta-dialog"
       :dir="photoUiDirection"
     >
       <div class="dicta-mobile-screen__header">
@@ -269,7 +274,7 @@
             v-if="dictaOpen"
             :key="dictaCaptureKey"
             :busy="isDictaBusy"
-            :auto-fallback="isPhoneCameraMode"
+            :auto-fallback="isPhoneCameraMode && !isTutorialActive"
             :hide-file-button="isPhoneCameraMode"
             :suppress-errors="isPhoneCameraMode"
             :mobile-mode="isPhoneCameraMode"
@@ -412,22 +417,116 @@
       </div>
     </transition>
 
+    <VOnboardingWrapper
+      ref="onboardingWrapper"
+      class="home-onboarding"
+      :class="{ 'home-onboarding--interactive': isTutorialInteractiveStep }"
+      :steps="currentTutorialSteps"
+      :options="onboardingOptions"
+      @finish="onOnboardingFinish"
+      @exit="onOnboardingExit"
+    >
+      <template #default="{ step, previous, next, isFirst, isLast, index }">
+        <VOnboardingStep>
+          <section class="onboarding-card">
+            <div class="onboarding-card__topline">
+              <span class="onboarding-card__eyebrow">
+                {{
+                  activeTutorial === 'quick'
+                    ? $t('onboarding.labels.quick')
+                    : $t('onboarding.labels.full')
+                }}
+              </span>
+              <span class="onboarding-card__progress">
+                {{ $t('onboarding.progress', { current: index + 1, total: currentTutorialSteps.length }) }}
+              </span>
+            </div>
+
+            <h3 class="onboarding-card__title">
+              {{ step.content.title }}
+            </h3>
+            <p class="onboarding-card__description">
+              {{ step.content.description }}
+            </p>
+
+            <div class="onboarding-card__actions">
+              <v-btn variant="text" size="small" @click="requestTutorialExit()">
+                {{ $t('onboarding.actions.exit') }}
+              </v-btn>
+
+              <div class="onboarding-card__buttons">
+                <v-btn
+                  v-if="!isFirst"
+                  variant="text"
+                  size="small"
+                  @click="previous()"
+                >
+                  {{ $t('onboarding.actions.back') }}
+                </v-btn>
+
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  size="small"
+                  :disabled="!isLast && isTutorialPrimaryActionDisabled"
+                  @click="onTutorialPrimaryAction(isLast, next)"
+                >
+                  {{
+                    isLast
+                      ? (
+                        activeTutorialStepId === 'full-about'
+                          ? $t('onboarding.actions.openAbout')
+                          : $t('onboarding.actions.finish')
+                      )
+                      : $t('onboarding.actions.next')
+                  }}
+                </v-btn>
+              </div>
+            </div>
+          </section>
+        </VOnboardingStep>
+      </template>
+    </VOnboardingWrapper>
+
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue';
+import 'v-onboarding/dist/style.css';
+
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useRtl } from 'vuetify';
+import {
+  VOnboardingStep,
+  VOnboardingWrapper,
+  useVOnboarding,
+  type StepEntity,
+  type VOnboardingWrapperOptions,
+} from 'v-onboarding';
 import { useOptionsStore } from '@/stores/options';
+import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import LocationSelector from '@/components/LocationSelector.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
 import type { ManualData } from '@/components/ManualEntryDialog.vue';
 import { computeRoll, getPageNumber, getApproximatePages, getPageTitleKeys } from '@/composables/utils';
-import { trackRollResultDisplayed } from '@/composables/analytics';
+import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
+import { findReadingTargetByKey } from '@/composables/readingTargets';
+import {
+  trackRollResultDisplayed,
+  trackTutorialEvent,
+} from '@/composables/analytics';
+import { markTutorialStarted } from '@/composables/tutorials';
+import {
+  closeTutorialLanguageMenu,
+  isLanguageMenuOpen,
+  openTutorialLanguageMenu,
+} from '@/composables/tutorialUi';
 import realDb from '@/data/real_db.json';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
@@ -435,9 +534,27 @@ import type { RealDb, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
   key: string;
+  group?: string;
+  specific?: 'both' | 'gola' | 'israel';
+  type?: 'parasha' | 'holyday';
   ref: TorahRef;
   refEndPartial?: TorahRef;
   refEnd: TorahRef;
+}
+
+interface TutorialStepEntity extends StepEntity {
+  id: string;
+}
+
+type TutorialKind = 'quick' | 'full';
+
+interface TutorialSnapshot {
+  fromPage: number | null;
+  toPage: number | null;
+  fromRef: ManualData | null;
+  toRef: ManualData | null;
+  fromTargetKey: string | null;
+  toTargetKey: string | null;
 }
 
 const BOOK_LABEL_KEYS = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'] as const;
@@ -459,10 +576,20 @@ interface DictaPageOption {
 }
 
 const options = useOptionsStore();
-const { t } = useI18n();
+const monthlyReadingsStore = useMonthlyReadingsStore();
+const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
+const { t, locale } = useI18n();
+const router = useRouter();
+const route = useRoute();
 const { smAndDown } = useDisplay();
 const { isRtl } = useRtl();
 const db = realDb as RealDb;
+const onboardingWrapper = ref();
+const {
+  start: startOnboarding,
+  finish: finishOnboarding,
+  goToStep: goToOnboardingStep,
+} = useVOnboarding(onboardingWrapper);
 const fromRef = ref<ManualData | null>(null);
 const toRef = ref<ManualData | null>(null);
 const fromTargetKey = ref<string | null>(null);
@@ -474,6 +601,24 @@ const calendarNeedsExpandedHeight = ref<Record<'from' | 'to', boolean>>({
 
 const targetsOpen = ref(false);
 const activeSide = ref<'from' | 'to'>('to');
+const activeTutorial = ref<TutorialKind | null>(null);
+const activeTutorialStepId = ref<string | null>(null);
+const activeTutorialSource = ref('home-page');
+const tutorialStartedAt = ref<number | null>(null);
+const tutorialHighestStep = ref(1);
+const isTutorialActive = ref(false);
+const tutorialSnapshot = ref<TutorialSnapshot | null>(null);
+const pendingTutorialNavigation = ref<'about' | null>(null);
+
+interface LocationSelectorExposed {
+  openManualDialog: () => void;
+  closeManualDialog: () => void;
+  openPagePreview: () => void;
+  closePagePreview: () => void;
+}
+
+const fromLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
+const toLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
 
 const dictaOpen = ref(false);
 const dictaFlowState = ref<DictaFlowState>('idle');
@@ -950,6 +1095,1092 @@ const onTargetSelected = (item: HomeTargetItem) => {
   targetsOpen.value = false;
 };
 
+const cloneManualData = (value: ManualData | null): ManualData | null => {
+  return value ? { ...value } : null;
+};
+
+const captureTutorialSnapshot = (): void => {
+  if (tutorialSnapshot.value) return;
+
+  tutorialSnapshot.value = {
+    fromPage: options.fromPage,
+    toPage: options.toPage,
+    fromRef: cloneManualData(fromRef.value),
+    toRef: cloneManualData(toRef.value),
+    fromTargetKey: fromTargetKey.value,
+    toTargetKey: toTargetKey.value,
+  };
+};
+
+const restoreTutorialSnapshot = (): void => {
+  const snapshot = tutorialSnapshot.value;
+  if (!snapshot) return;
+
+  onSetFromPage(snapshot.fromPage, cloneManualData(snapshot.fromRef), snapshot.fromTargetKey);
+  onSetToPage(snapshot.toPage, cloneManualData(snapshot.toRef), snapshot.toTargetKey);
+  tutorialSnapshot.value = null;
+};
+
+const getSingleQueryValue = (value: unknown): string | null => {
+  if (Array.isArray(value)) {
+    return typeof value[0] === 'string' ? value[0] : null;
+  }
+
+  return typeof value === 'string' ? value : null;
+};
+
+const clearTutorialQuery = (): void => {
+  const tutorialQuery = getSingleQueryValue(route.query.tutorial);
+  const sourceQuery = getSingleQueryValue(route.query.source);
+
+  if (!tutorialQuery && !sourceQuery) {
+    return;
+  }
+
+  const nextQuery = {
+    ...route.query,
+  };
+
+  delete nextQuery.tutorial;
+  delete nextQuery.source;
+
+  void router.replace({ query: nextQuery });
+};
+
+const getTutorialProgressPercent = (highestStep: number, totalSteps: number): number => {
+  return Math.round((highestStep / totalSteps) * 100);
+};
+
+const getTutorialDurationSeconds = (): number => {
+  if (tutorialStartedAt.value == null) {
+    return 0;
+  }
+
+  return Math.max(0, Math.round((Date.now() - tutorialStartedAt.value) / 1000));
+};
+
+const isTutorialElementVisible = (element: HTMLElement): boolean => {
+  const style = window.getComputedStyle(element);
+  if (style.display === 'none' || style.visibility === 'hidden') {
+    return false;
+  }
+
+  const rect = element.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return false;
+  }
+
+  return (
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < window.innerHeight &&
+    rect.left < window.innerWidth
+  );
+};
+
+const getVisibleTutorialElement = (selector: string): HTMLElement | null => {
+  for (const candidate of Array.from(document.querySelectorAll(selector))) {
+    if (!(candidate instanceof HTMLElement)) continue;
+    if (isTutorialElementVisible(candidate)) return candidate;
+  }
+
+  const fallback = document.querySelector(selector);
+  return fallback instanceof HTMLElement ? fallback : null;
+};
+
+const waitForTutorialElement = async (selector: string, attempts = 12): Promise<HTMLElement | null> => {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const element = getVisibleTutorialElement(selector);
+    if (element) return element;
+
+    await nextTick();
+    await wait(80);
+  }
+
+  return null;
+};
+
+const waitForTutorialElementToDisappear = async (selector: string, attempts = 12): Promise<void> => {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (!getVisibleTutorialElement(selector)) {
+      return;
+    }
+
+    await nextTick();
+    await wait(80);
+  }
+};
+
+const clickTutorialElement = async (selector: string): Promise<boolean> => {
+  const element = await waitForTutorialElement(selector, 8);
+  if (!element) return false;
+
+  element.click();
+  await nextTick();
+  await wait(120);
+  return true;
+};
+
+const pressEscape = (): void => {
+  const keyboardEventOptions = {
+    key: 'Escape',
+    bubbles: true,
+    cancelable: true,
+  };
+
+  window.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
+  document.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
+};
+
+const resolveTutorialTarget = (selector: string, fallbackSelector?: string) => {
+  return () => {
+    const primaryElement = getVisibleTutorialElement(selector);
+    if (primaryElement) {
+      return primaryElement;
+    }
+
+    return fallbackSelector ? getVisibleTutorialElement(fallbackSelector) : null;
+  };
+};
+
+const rememberTutorialStep = (stepNumber: number): void => {
+  tutorialHighestStep.value = Math.max(tutorialHighestStep.value, stepNumber);
+};
+
+const closeLanguageMenu = async (): Promise<void> => {
+  closeTutorialLanguageMenu();
+  await nextTick();
+  if (getVisibleTutorialElement('.tutorial-language-menu')) {
+    pressEscape();
+    await nextTick();
+  }
+  await waitForTutorialElementToDisappear('.tutorial-language-menu');
+};
+
+const openLanguageMenuForTutorial = async (): Promise<void> => {
+  openTutorialLanguageMenu();
+  await nextTick();
+  await waitForTutorialElement('.tutorial-language-menu');
+};
+
+const getLocationSelectorRef = (side: 'from' | 'to'): LocationSelectorExposed | null => {
+  return side === 'from' ? fromLocationSelectorRef.value : toLocationSelectorRef.value;
+};
+
+const openManualDialogFor = async (side: 'from' | 'to'): Promise<void> => {
+  const selectorRef = getLocationSelectorRef(side);
+
+  if (selectorRef) {
+    selectorRef.openManualDialog();
+    await nextTick();
+  } else {
+    await clickTutorialElement(`[data-tutorial="${side}-input"]`);
+  }
+
+  await waitForTutorialElement('[data-tutorial="manual-dialog"]');
+  await wait(120);
+};
+
+const closeManualDialog = async (): Promise<void> => {
+  fromLocationSelectorRef.value?.closeManualDialog();
+  toLocationSelectorRef.value?.closeManualDialog();
+  await nextTick();
+
+  const closeButton = getVisibleTutorialElement('[data-tutorial="manual-close"]');
+  if (closeButton) {
+    closeButton.click();
+    await nextTick();
+  } else {
+    pressEscape();
+  }
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="manual-dialog"]');
+};
+
+const openPreviewFor = async (side: 'from' | 'to'): Promise<void> => {
+  const selectorRef = getLocationSelectorRef(side);
+
+  if (selectorRef) {
+    selectorRef.openPagePreview();
+    await nextTick();
+  } else {
+    const opened =
+      await clickTutorialElement(`[data-tutorial="${side}-page-preview-trigger"] .location-page-number-btn`) ||
+      await clickTutorialElement(`[data-tutorial="${side}-page-preview-trigger"] button`);
+
+    if (!opened) return;
+  }
+
+  await waitForTutorialElement('[data-tutorial="page-preview-dialog"]');
+  await wait(120);
+};
+
+const closePreviewDialog = async (): Promise<void> => {
+  fromLocationSelectorRef.value?.closePagePreview();
+  toLocationSelectorRef.value?.closePagePreview();
+  await nextTick();
+
+  const closeButton = getVisibleTutorialElement('[data-tutorial="page-preview-close"]');
+  if (closeButton) {
+    closeButton.click();
+    await nextTick();
+  } else {
+    pressEscape();
+  }
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="page-preview-dialog"]');
+};
+
+const openSettingsDialog = async (): Promise<void> => {
+  await clickTutorialElement('[data-tutorial="settings-button"]');
+  await waitForTutorialElement('[data-tutorial="settings-dialog"]');
+  await wait(120);
+};
+
+const closeSettingsDialog = async (): Promise<void> => {
+  const closeButton = getVisibleTutorialElement('[data-tutorial="settings-close"]');
+  if (closeButton) {
+    closeButton.click();
+  } else {
+    pressEscape();
+  }
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="settings-dialog"]');
+};
+
+const openNavDrawerIfNeeded = async (): Promise<void> => {
+  if (!smAndDown.value) return;
+  if (getVisibleTutorialElement('[data-tutorial="about-nav"]')) return;
+
+  await clickTutorialElement('[data-tutorial="menu-button"]');
+  await waitForTutorialElement('[data-tutorial="about-nav"]');
+  await wait(120);
+};
+
+const closeNavDrawer = async (): Promise<void> => {
+  if (!smAndDown.value) return;
+  if (!getVisibleTutorialElement('[data-tutorial="about-nav"]')) return;
+
+  pressEscape();
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="about-nav"]');
+};
+
+const openTargetsForTutorial = async (side: 'from' | 'to'): Promise<void> => {
+  openTargets(side);
+  await nextTick();
+  await waitForTutorialElement('[data-tutorial="target-overlay"]');
+  await wait(120);
+};
+
+const closeTargetsForTutorial = async (): Promise<void> => {
+  if (!targetsOpen.value) return;
+
+  targetsOpen.value = false;
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="target-overlay"]');
+};
+
+const openDictaForTutorial = async (side: 'from' | 'to'): Promise<void> => {
+  openDictaCaptureForSide(side);
+  await nextTick();
+  await waitForTutorialElement('[data-tutorial="dicta-dialog"]');
+  await wait(120);
+};
+
+const closeDictaForTutorial = async (): Promise<void> => {
+  let didClose = false;
+
+  if (dictaChoiceOpen.value) {
+    onDictaChoiceCancel();
+    didClose = true;
+  }
+
+  if (dictaOpen.value) {
+    closeDictaDialog();
+    didClose = true;
+  }
+
+  if (!didClose) return;
+
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="dicta-dialog"]');
+};
+
+const closeTutorialOverlays = async (
+  closeOptions: { keepLanguageMenu?: boolean; keepNavDrawer?: boolean } = {}
+): Promise<void> => {
+  await closeTargetsForTutorial();
+  await closeDictaForTutorial();
+  await closeManualDialog();
+  await closePreviewDialog();
+  await closeSettingsDialog();
+
+  if (!closeOptions.keepLanguageMenu) {
+    await closeLanguageMenu();
+  }
+
+  if (!closeOptions.keepNavDrawer) {
+    await closeNavDrawer();
+  }
+
+  await nextTick();
+  await wait(80);
+};
+
+const resolveTutorialReadingTarget = (readingId: string): HomeTargetItem | null => {
+  const pairedReadingIds = splitPairedParashaReadingId(readingId);
+  if (!pairedReadingIds) {
+    return findReadingTargetByKey(readingId, options.isInGola) as HomeTargetItem | null;
+  }
+
+  const [startReadingId, endReadingId] = pairedReadingIds;
+  const startTarget = findReadingTargetByKey(startReadingId, options.isInGola) as HomeTargetItem | null;
+  const endTarget = findReadingTargetByKey(endReadingId, options.isInGola) as HomeTargetItem | null;
+
+  if (!startTarget || !endTarget) return null;
+
+  return {
+    ...startTarget,
+    key: readingId,
+    type: 'parasha',
+    ref: startTarget.ref,
+    refEndPartial: startTarget.refEndPartial,
+    refEnd: endTarget.refEnd,
+  };
+};
+
+const getTutorialOrderedTargets = (side: 'from' | 'to', preferParasha = false): HomeTargetItem[] => {
+  const sourceReadings = [
+    ...(side === 'from' ? monthlyReadings.value.lastMonth : monthlyReadings.value.nextMonth),
+  ];
+
+  sourceReadings.sort((left, right) => {
+    const leftDate = side === 'from'
+      ? left.dates[left.dates.length - 1] ?? ''
+      : left.dates[0] ?? '';
+    const rightDate = side === 'from'
+      ? right.dates[right.dates.length - 1] ?? ''
+      : right.dates[0] ?? '';
+
+    return side === 'from'
+      ? rightDate.localeCompare(leftDate)
+      : leftDate.localeCompare(rightDate);
+  });
+
+  return sourceReadings
+    .map((reading) => resolveTutorialReadingTarget(reading.readingId))
+    .filter((target): target is HomeTargetItem => Boolean(target))
+    .filter((target) => !preferParasha || target.type === 'parasha');
+};
+
+const selectTutorialTarget = (side: 'from' | 'to', target: HomeTargetItem): boolean => {
+  const targetRef = getDefaultRefForSide(target, side);
+  const refData = toManualData(targetRef);
+
+  if (side === 'from') {
+    onSetFromPage(targetRef.page, refData, target.key);
+  } else {
+    onSetToPage(targetRef.page, refData, target.key);
+  }
+
+  return true;
+};
+
+const selectTutorialTargetKey = (side: 'from' | 'to', key: string): boolean => {
+  const target = findReadingTargetByKey(key, options.isInGola) as HomeTargetItem | null;
+  if (!target) return false;
+
+  return selectTutorialTarget(side, target);
+};
+
+const applyTutorialCalendarDemoState = async (): Promise<void> => {
+  monthlyReadingsStore.refresh();
+
+  const fromTarget = getTutorialOrderedTargets('from')[0];
+  const toTarget = getTutorialOrderedTargets('to', true)[0] ?? getTutorialOrderedTargets('to')[0];
+
+  const hasFromSelection = fromTarget
+    ? selectTutorialTarget('from', fromTarget)
+    : selectTutorialTargetKey('from', 'pekudei');
+  const hasToSelection = toTarget
+    ? selectTutorialTarget('to', toTarget)
+    : selectTutorialTargetKey('to', 'tazria');
+
+  if (!hasFromSelection && options.fromPage == null) {
+    selectTutorialTargetKey('from', 'shemot');
+  }
+
+  if (!hasToSelection && options.toPage == null) {
+    selectTutorialTargetKey('to', 'vayikra');
+  }
+
+  await nextTick();
+  await wait(120);
+};
+
+const applyLongTutorialResultDemoState = async (): Promise<void> => {
+  const hasFromSelection =
+    selectTutorialTargetKey('from', 'pekudei') ||
+    selectTutorialTargetKey('from', 'vayakhel') ||
+    selectTutorialTargetKey('from', 'shemot');
+  const hasToSelection =
+    selectTutorialTargetKey('to', 'bamidbar') ||
+    selectTutorialTargetKey('to', 'tazria') ||
+    selectTutorialTargetKey('to', 'vayikra');
+
+  if (!hasFromSelection || !hasToSelection) {
+    await applyTutorialCalendarDemoState();
+    return;
+  }
+
+  await nextTick();
+  await wait(120);
+};
+
+const prepareTutorialDemoState = async (): Promise<void> => {
+  captureTutorialSnapshot();
+  await closeTutorialOverlays();
+  await applyTutorialCalendarDemoState();
+};
+
+interface TutorialStepConfig {
+  id: string;
+  stepNumber: number;
+  selector: string;
+  fallbackSelector?: string;
+  titleKey: string;
+  descriptionKey: string;
+  options?: VOnboardingWrapperOptions;
+  beforeStep?: () => void | Promise<void>;
+  afterStep?: (options?: { isForward: boolean; isBackward: boolean }) => void | Promise<void>;
+}
+
+const createTutorialStep = ({
+  id,
+  stepNumber,
+  selector,
+  fallbackSelector,
+  titleKey,
+  descriptionKey,
+  options,
+  beforeStep,
+  afterStep,
+}: TutorialStepConfig): TutorialStepEntity => ({
+  id,
+  attachTo: {
+    element: resolveTutorialTarget(selector, fallbackSelector),
+  },
+  content: {
+    title: t(titleKey),
+    description: t(descriptionKey),
+  },
+  options,
+  on: {
+    beforeStep: async () => {
+      activeTutorialStepId.value = id;
+      rememberTutorialStep(stepNumber);
+      await beforeStep?.();
+    },
+    afterStep,
+  },
+});
+
+const interactiveTutorialStepOptions: VOnboardingWrapperOptions = {
+  overlay: {
+    preventOverlayInteraction: false,
+  },
+};
+
+const quickTutorialSteps = computed<TutorialStepEntity[]>(() => ([
+  createTutorialStep({
+    id: 'quick-language-selector',
+    stepNumber: 1,
+    selector: '[data-tutorial="language-select"] .v-field',
+    fallbackSelector: '[data-tutorial="language-selector"]',
+    titleKey: 'onboarding.quick.step1.title',
+    descriptionKey: 'onboarding.quick.step1.description',
+    options: interactiveTutorialStepOptions,
+    beforeStep: async () => {
+      await closeLanguageMenu();
+    },
+  }),
+  createTutorialStep({
+    id: 'quick-language-menu',
+    stepNumber: 2,
+    selector: '.tutorial-language-menu',
+    fallbackSelector: '[data-tutorial="language-selector"]',
+    titleKey: 'onboarding.quick.step2.title',
+    descriptionKey: 'onboarding.quick.step2.description',
+    options: interactiveTutorialStepOptions,
+    beforeStep: async () => {
+      if (!getVisibleTutorialElement('.tutorial-language-menu')) {
+        await openLanguageMenuForTutorial();
+      }
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward || stepOptions?.isBackward) {
+        await closeLanguageMenu();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'quick-from',
+    stepNumber: 3,
+    selector: '[data-tutorial="from-selector"]',
+    titleKey: 'onboarding.quick.step3.title',
+    descriptionKey: 'onboarding.quick.step3.description',
+    beforeStep: async () => {
+      await closeLanguageMenu();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isBackward) {
+        await openLanguageMenuForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'quick-to',
+    stepNumber: 4,
+    selector: '[data-tutorial="to-selector"]',
+    titleKey: 'onboarding.quick.step4.title',
+    descriptionKey: 'onboarding.quick.step4.description',
+  }),
+  createTutorialStep({
+    id: 'quick-result',
+    stepNumber: 5,
+    selector: '[data-tutorial="roll-result"]',
+    titleKey: 'onboarding.quick.step5.title',
+    descriptionKey: 'onboarding.quick.step5.description',
+  }),
+]));
+
+const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
+  createTutorialStep({
+    id: 'full-language-selector',
+    stepNumber: 1,
+    selector: '[data-tutorial="language-select"] .v-field',
+    fallbackSelector: '[data-tutorial="language-selector"]',
+    titleKey: 'onboarding.full.step1.title',
+    descriptionKey: 'onboarding.full.step1.description',
+    options: interactiveTutorialStepOptions,
+    beforeStep: async () => {
+      await closeLanguageMenu();
+    },
+  }),
+  createTutorialStep({
+    id: 'full-language-menu',
+    stepNumber: 2,
+    selector: '.tutorial-language-menu',
+    fallbackSelector: '[data-tutorial="language-selector"]',
+    titleKey: 'onboarding.full.step2.title',
+    descriptionKey: 'onboarding.full.step2.description',
+    options: interactiveTutorialStepOptions,
+    beforeStep: async () => {
+      if (!getVisibleTutorialElement('.tutorial-language-menu')) {
+        await openLanguageMenuForTutorial();
+      }
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward || stepOptions?.isBackward) {
+        await closeLanguageMenu();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-from',
+    stepNumber: 3,
+    selector: '[data-tutorial="from-selector"]',
+    titleKey: 'onboarding.full.step3.title',
+    descriptionKey: 'onboarding.full.step3.description',
+    beforeStep: async () => {
+      await closeLanguageMenu();
+      await closeTutorialOverlays();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isBackward) {
+        await openLanguageMenuForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-choose-manually-button',
+    stepNumber: 4,
+    selector: '[data-tutorial="from-choose-manual"]',
+    titleKey: 'onboarding.full.step4.title',
+    descriptionKey: 'onboarding.full.step4.description',
+    beforeStep: async () => {
+      await closeTargetsForTutorial();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openTargetsForTutorial('from');
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeTutorialOverlays();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-full-list',
+    stepNumber: 5,
+    selector: '[data-tutorial="target-search"]',
+    fallbackSelector: '[data-tutorial="target-overlay"]',
+    titleKey: 'onboarding.full.step5.title',
+    descriptionKey: 'onboarding.full.step5.description',
+    beforeStep: async () => {
+      await openTargetsForTutorial('from');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeTargetsForTutorial();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeTargetsForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-camera-button',
+    stepNumber: 6,
+    selector: '[data-tutorial="from-photo"]',
+    titleKey: 'onboarding.full.step6.title',
+    descriptionKey: 'onboarding.full.step6.description',
+    beforeStep: async () => {
+      await closeTutorialOverlays();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openDictaForTutorial('from');
+      }
+
+      if (stepOptions?.isBackward) {
+        await openTargetsForTutorial('from');
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-camera',
+    stepNumber: 7,
+    selector: '[data-tutorial="dicta-dialog"]',
+    titleKey: 'onboarding.full.step7.title',
+    descriptionKey: 'onboarding.full.step7.description',
+    beforeStep: async () => {
+      await openDictaForTutorial('from');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeDictaForTutorial();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeDictaForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-input-button',
+    stepNumber: 8,
+    selector: '[data-tutorial="from-input"]',
+    titleKey: 'onboarding.full.step8.title',
+    descriptionKey: 'onboarding.full.step8.description',
+    beforeStep: async () => {
+      await closeTutorialOverlays();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openManualDialogFor('from');
+      }
+
+      if (stepOptions?.isBackward) {
+        await openDictaForTutorial('from');
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-manual',
+    stepNumber: 9,
+    selector: '[data-tutorial="manual-dialog"]',
+    titleKey: 'onboarding.full.step9.title',
+    descriptionKey: 'onboarding.full.step9.description',
+    beforeStep: async () => {
+      await openManualDialogFor('from');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeManualDialog();
+        await applyTutorialCalendarDemoState();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeManualDialog();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-to',
+    stepNumber: 10,
+    selector: '[data-tutorial="to-selector"]',
+    titleKey: 'onboarding.full.step10.title',
+    descriptionKey: 'onboarding.full.step10.description',
+    beforeStep: async () => {
+      await closeManualDialog();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await applyLongTutorialResultDemoState();
+      }
+
+      if (stepOptions?.isBackward) {
+        await openManualDialogFor('from');
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-reference-point',
+    stepNumber: 11,
+    selector: '[data-tutorial="to-target-ref"]',
+    fallbackSelector: '[data-tutorial="to-page-preview-trigger"]',
+    titleKey: 'onboarding.full.step11.title',
+    descriptionKey: 'onboarding.full.step11.description',
+    beforeStep: async () => {
+      await applyLongTutorialResultDemoState();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isBackward) {
+        await applyTutorialCalendarDemoState();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-result',
+    stepNumber: 12,
+    selector: '[data-tutorial="roll-result"]',
+    titleKey: 'onboarding.full.step12.title',
+    descriptionKey: 'onboarding.full.step12.description',
+    beforeStep: async () => {
+      await applyLongTutorialResultDemoState();
+    },
+  }),
+  createTutorialStep({
+    id: 'full-remaining-after-book',
+    stepNumber: 13,
+    selector: '[data-tutorial="result-book-remaining"]',
+    fallbackSelector: '[data-tutorial="roll-result"]',
+    titleKey: 'onboarding.full.step13.title',
+    descriptionKey: 'onboarding.full.step13.description',
+    beforeStep: async () => {
+      await applyLongTutorialResultDemoState();
+    },
+  }),
+  createTutorialStep({
+    id: 'full-preview-trigger',
+    stepNumber: 14,
+    selector: '[data-tutorial="to-page-preview-trigger"]',
+    titleKey: 'onboarding.full.step14.title',
+    descriptionKey: 'onboarding.full.step14.description',
+    beforeStep: async () => {
+      await closePreviewDialog();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openPreviewFor('to');
+      }
+
+      if (stepOptions?.isBackward) {
+        await closePreviewDialog();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-preview',
+    stepNumber: 15,
+    selector: '[data-tutorial="page-preview-dialog"]',
+    titleKey: 'onboarding.full.step15.title',
+    descriptionKey: 'onboarding.full.step15.description',
+    beforeStep: async () => {
+      await openPreviewFor('to');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closePreviewDialog();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closePreviewDialog();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-settings-button',
+    stepNumber: 16,
+    selector: '[data-tutorial="settings-button"]',
+    titleKey: 'onboarding.full.step16.title',
+    descriptionKey: 'onboarding.full.step16.description',
+    beforeStep: async () => {
+      await closeSettingsDialog();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openSettingsDialog();
+      }
+
+      if (stepOptions?.isBackward) {
+        await openPreviewFor('to');
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-settings',
+    stepNumber: 17,
+    selector: '[data-tutorial="settings-dialog"]',
+    titleKey: 'onboarding.full.step17.title',
+    descriptionKey: 'onboarding.full.step17.description',
+    beforeStep: async () => {
+      await openSettingsDialog();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeSettingsDialog();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeSettingsDialog();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-navigation',
+    stepNumber: 18,
+    selector: smAndDown.value ? '[data-tutorial="menu-button"]' : '[data-tutorial="top-nav-links"]',
+    fallbackSelector: '[data-tutorial="menu-button"]',
+    titleKey: 'onboarding.full.step18.title',
+    descriptionKey: 'onboarding.full.step18.description',
+    beforeStep: async () => {
+      await closeSettingsDialog();
+      await closeNavDrawer();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openNavDrawerIfNeeded();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeNavDrawer();
+        await openSettingsDialog();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-about',
+    stepNumber: 19,
+    selector: '[data-tutorial="about-nav"]',
+    titleKey: 'onboarding.full.step19.title',
+    descriptionKey: 'onboarding.full.step19.description',
+    beforeStep: async () => {
+      await openNavDrawerIfNeeded();
+      await waitForTutorialElement('[data-tutorial="about-nav"]');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isBackward) {
+        await closeNavDrawer();
+        return;
+      }
+
+      await closeNavDrawer();
+    },
+  }),
+]));
+
+const isTutorialPrimaryActionDisabled = computed(() => {
+  return (
+    activeTutorialStepId.value === 'quick-language-selector' ||
+    activeTutorialStepId.value === 'full-language-selector'
+  );
+});
+
+const isTutorialInteractiveStep = computed(() => {
+  return (
+    activeTutorialStepId.value === 'quick-language-selector' ||
+    activeTutorialStepId.value === 'quick-language-menu' ||
+    activeTutorialStepId.value === 'full-language-selector' ||
+    activeTutorialStepId.value === 'full-language-menu'
+  );
+});
+
+watch(isLanguageMenuOpen, (isOpen) => {
+  if (!isTutorialActive.value) return;
+
+  if (
+    isOpen &&
+    (activeTutorialStepId.value === 'quick-language-selector' || activeTutorialStepId.value === 'full-language-selector')
+  ) {
+    goToOnboardingStep((currentStepIndex) => currentStepIndex + 1);
+  }
+});
+
+watch(() => locale.value, (nextLocale, previousLocale) => {
+  if (!isTutorialActive.value) return;
+  if (!previousLocale || nextLocale === previousLocale) return;
+
+  if (
+    activeTutorialStepId.value === 'quick-language-menu' ||
+    activeTutorialStepId.value === 'full-language-menu'
+  ) {
+    goToOnboardingStep((currentStepIndex) => currentStepIndex + 1);
+  }
+});
+
+const currentTutorialSteps = computed<TutorialStepEntity[]>(() => {
+  if (activeTutorial.value === 'quick') {
+    return quickTutorialSteps.value;
+  }
+
+  if (activeTutorial.value === 'full') {
+    return fullTutorialSteps.value;
+  }
+
+  return [];
+});
+
+const onboardingOptions = computed<VOnboardingWrapperOptions>(() => ({
+  overlay: {
+    enabled: true,
+    padding: 10,
+    borderRadius: 18,
+    preventOverlayInteraction: true,
+  },
+  hideNextStepDuringHook: true,
+  scrollToStep: {
+    enabled: true,
+    options: {
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    },
+  },
+}));
+
+const getTutorialStepCount = (tutorial: TutorialKind): number => {
+  return tutorial === 'quick' ? quickTutorialSteps.value.length : fullTutorialSteps.value.length;
+};
+
+const startTutorial = async (tutorial: TutorialKind, source = 'home-page'): Promise<void> => {
+  if (isTutorialActive.value) {
+    return;
+  }
+
+  activeTutorial.value = tutorial;
+  activeTutorialStepId.value = null;
+  activeTutorialSource.value = source;
+  tutorialStartedAt.value = Date.now();
+  tutorialHighestStep.value = 1;
+  isTutorialActive.value = true;
+  pendingTutorialNavigation.value = null;
+
+  markTutorialStarted(tutorial);
+  await nextTick();
+  await prepareTutorialDemoState();
+  await nextTick();
+
+  const totalSteps = getTutorialStepCount(tutorial);
+  trackTutorialEvent({
+    tutorial,
+    action: 'open',
+    step: 1,
+    totalSteps,
+    progressPercent: getTutorialProgressPercent(1, totalSteps),
+    source,
+  });
+
+  startOnboarding();
+};
+
+const finalizeTutorial = async (): Promise<void> => {
+  const tutorial = activeTutorial.value;
+  const pendingNavigation = pendingTutorialNavigation.value;
+  pendingTutorialNavigation.value = null;
+
+  if (!tutorial) {
+    await closeTutorialOverlays();
+    restoreTutorialSnapshot();
+    activeTutorialStepId.value = null;
+    clearTutorialQuery();
+    if (pendingNavigation === 'about') {
+      await router.push({ name: 'about' });
+    }
+    return;
+  }
+
+  const totalSteps = getTutorialStepCount(tutorial);
+  trackTutorialEvent({
+    tutorial,
+    action: 'close',
+    step: tutorialHighestStep.value,
+    totalSteps,
+    progressPercent: getTutorialProgressPercent(tutorialHighestStep.value, totalSteps),
+    durationSeconds: getTutorialDurationSeconds(),
+    source: activeTutorialSource.value,
+  });
+
+  activeTutorial.value = null;
+  activeTutorialSource.value = 'home-page';
+  tutorialStartedAt.value = null;
+  tutorialHighestStep.value = 1;
+  isTutorialActive.value = false;
+  activeTutorialStepId.value = null;
+
+  await closeTutorialOverlays();
+  restoreTutorialSnapshot();
+  clearTutorialQuery();
+
+  if (pendingNavigation === 'about') {
+    await router.push({ name: 'about' });
+  }
+};
+
+const requestTutorialExit = (): void => {
+  finishOnboarding();
+};
+
+const onTutorialPrimaryAction = (isLast: boolean, next: () => void): void => {
+  if (!isLast) {
+    next();
+    return;
+  }
+
+  if (activeTutorialStepId.value === 'full-about') {
+    pendingTutorialNavigation.value = 'about';
+  }
+
+  finishOnboarding();
+};
+
+const onOnboardingFinish = (): void => {
+  void finalizeTutorial();
+};
+
+const onOnboardingExit = (): void => {
+  void finalizeTutorial();
+};
+
+const maybeStartTutorialFromRoute = async (): Promise<void> => {
+  const tutorialQuery = getSingleQueryValue(route.query.tutorial);
+  const source = getSingleQueryValue(route.query.source) ?? 'route-query';
+
+  if (route.name !== 'home' || isTutorialActive.value) {
+    return;
+  }
+
+  if (tutorialQuery !== 'quick' && tutorialQuery !== 'full') {
+    return;
+  }
+
+  await startTutorial(tutorialQuery, source);
+};
+
 watch(dictaOpen, (isOpen) => {
   if (!isOpen) {
     resetDictaSession();
@@ -980,7 +2211,34 @@ watch(
   }
 );
 
+watch(
+  () => route.query.tutorial,
+  () => {
+    void maybeStartTutorialFromRoute();
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  void maybeStartTutorialFromRoute();
+});
+
 onUnmounted(() => {
+  if (activeTutorial.value) {
+    const totalSteps = getTutorialStepCount(activeTutorial.value);
+
+    trackTutorialEvent({
+      tutorial: activeTutorial.value,
+      action: 'close',
+      step: tutorialHighestStep.value,
+      totalSteps,
+      progressPercent: getTutorialProgressPercent(tutorialHighestStep.value, totalSteps),
+      durationSeconds: getTutorialDurationSeconds(),
+      source: activeTutorialSource.value,
+    });
+  }
+
+  restoreTutorialSnapshot();
   document.body.style.overflow = '';
   window.removeEventListener('keydown', onDictaOverlayKeydown);
 });
@@ -1147,6 +2405,78 @@ onUnmounted(() => {
   height: 100%;
 }
 
+.home-onboarding {
+  --v-onboarding-step-z: 2605;
+  --v-onboarding-overlay-z: 2600;
+  --v-onboarding-overlay-fill: rgba(8, 19, 40, 0.6);
+  --v-onboarding-overlay-opacity: 1;
+  --v-onboarding-step-arrow-background: white;
+}
+
+.home-onboarding--interactive[data-v-onboarding-wrapper] {
+  pointer-events: none !important;
+}
+
+.home-onboarding--interactive[data-v-onboarding-wrapper] .onboarding-card {
+  pointer-events: auto;
+}
+
+.onboarding-card {
+  width: min(360px, calc(100vw - 24px));
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 22px 56px rgba(15, 23, 42, 0.26);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 14px;
+}
+
+.onboarding-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.onboarding-card__eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(18, 48, 99, 0.76);
+}
+
+.onboarding-card__progress {
+  font-size: 0.82rem;
+  color: rgba(15, 23, 42, 0.65);
+}
+
+.onboarding-card__title {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.onboarding-card__description {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.82);
+  line-height: 1.55;
+}
+
+.onboarding-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.onboarding-card__buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 @media (max-width: 600px) {
   .dicta-overlay,
   .dicta-choice-overlay {
@@ -1188,6 +2518,38 @@ onUnmounted(() => {
     min-width: 0;
     padding-inline: 8px;
     font-size: 0.75rem;
+  }
+
+  .onboarding-card {
+    width: min(340px, calc(100vw - 20px));
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: min(420px, calc(100dvh - 32px));
+    max-height: calc(100dvh - 32px);
+  }
+
+  .onboarding-card__description {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .onboarding-card__actions {
+    margin-top: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .onboarding-card__buttons {
+    order: 1;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .onboarding-card__actions > .v-btn {
+    order: 2;
+    align-self: flex-start;
   }
 }
 </style>

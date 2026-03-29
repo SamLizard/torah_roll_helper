@@ -3,6 +3,7 @@
     <div 
       v-if="open" 
       class="target-overlay bg-background"
+      data-tutorial="target-overlay"
     >
       <v-card class="h-100 d-flex flex-column" rounded="0" elevation="0">
         
@@ -14,7 +15,7 @@
             {{ $t('targets.title') }}
           </v-toolbar-title>
 
-          <div class="search-container">
+          <div class="search-container" data-tutorial="target-search">
             <v-text-field
               v-model="filter"
               :placeholder="$t('actions.search')"

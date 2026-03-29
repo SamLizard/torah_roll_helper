@@ -22,6 +22,7 @@
     "lodash": "^4.17.21",
     "pinia": "^3.0.4",
     "sweetalert2": "^11.26.17",
+    "v-onboarding": "^2.12.2",
     "vue": "^3.5.27",
     "vue-i18n": "^11.2.8",
     "vue-router": "^4.6.4",

@@ -1,17 +1,35 @@
 <template>
-  <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
+  <v-card
+    class="h-100 d-flex flex-column"
+    variant="outlined"
+    style="border-radius: 16px;"
+    :data-tutorial="`${side}-selector`"
+  >
     <v-card-item class="location-card-item">
       <div class="location-header">
         <div class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <div class="location-actions-shell">
+        <div class="location-actions-shell" :data-tutorial="`${side}-actions`">
           <div class="location-actions">
-            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="onChooseManual">
+            <v-btn
+              size="small"
+              variant="text"
+              prepend-icon="mdi-format-list-bulleted"
+              :data-tutorial="`${side}-choose-manual`"
+              @click="onChooseManual"
+            >
               {{ $t('home.actions.choose') }}
-            </v-btn>          
-            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="onOpenDicta">
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="primary"
+              prepend-icon="mdi-camera"
+              :data-tutorial="`${side}-photo`"
+              @click="onOpenDicta"
+            >
               {{ $t('home.actions.photo') }}
             </v-btn>
             <v-btn 
@@ -19,6 +37,7 @@
               variant="tonal" 
               color="secondary" 
               prepend-icon="mdi-pencil" 
+              :data-tutorial="`${side}-input`"
               @click="onOpenManualInput"
             >
               {{ $t('home.actions.input') }}
@@ -31,7 +50,7 @@
     <v-divider />
 
     <v-card-text v-if="calendarEntries.length > 0" class="pa-0">
-      <div class="location-calendar-frame">
+      <div class="location-calendar-frame" :data-tutorial="`${side}-calendar`">
         <div class="location-calendar-section">
           <div ref="calendarSlideShellRef" class="location-calendar-slide-shell">
             <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
@@ -69,7 +88,11 @@
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
-        <div class="location-page-number-shell mb-2" :class="{ 'mod-rtl': isRtl }">
+        <div
+          class="location-page-number-shell mb-2"
+          :class="{ 'mod-rtl': isRtl }"
+          :data-tutorial="`${side}-page-preview-trigger`"
+        >
           <button
             type="button"
             class="location-page-number location-page-number-btn font-weight-black text-primary"
@@ -93,7 +116,7 @@
           {{ resolvedPageTitle }}
         </div>
 
-        <div v-if="targetRefOptions.length > 1" class="mt-2">
+        <div v-if="targetRefOptions.length > 1" class="mt-2" :data-tutorial="`${side}-target-ref`">
           <div class="text-caption text-medium-emphasis mb-2">
             {{ $t('home.targetRef.title') }}
           </div>
@@ -126,7 +149,7 @@
           v-model="isPagePreviewOpen"
           max-width="920"
         >
-          <v-card class="rounded-xl preview-dialog-card">
+          <v-card class="rounded-xl preview-dialog-card" data-tutorial="page-preview-dialog">
             <v-card-title class="preview-dialog-title">
               <span class="text-subtitle-1 font-weight-bold">
                 {{ $t('preview.pageTitle', { page }) }}
@@ -135,6 +158,7 @@
                 icon="mdi-close"
                 variant="text"
                 size="small"
+                data-tutorial="page-preview-close"
                 @click="isPagePreviewOpen = false"
               />
             </v-card-title>
@@ -151,6 +175,7 @@
                       v-bind="tooltipProps"
                       type="button"
                       class="preview-annotations-toggle"
+                      data-tutorial="page-preview-nikud"
                       :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
                       :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
                       @click="togglePreviewNikud"
@@ -174,6 +199,7 @@
                   v-else
                   type="button"
                   class="preview-annotations-toggle"
+                  data-tutorial="page-preview-nikud"
                   :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
                   :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
                   @click="togglePreviewNikud"
@@ -227,6 +253,7 @@
                 color="primary"
                 variant="tonal"
                 prepend-icon="mdi-open-in-new"
+                data-tutorial="page-preview-link"
                 :href="tikkunUrl ?? undefined"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -452,6 +479,10 @@ const onOpenDicta = () => {
 const onOpenManualInput = () => {
   trackAction('manual-input');
   isManualOpen.value = true;
+};
+
+const closeManualInput = () => {
+  isManualOpen.value = false;
 };
 
 const getCalendarDayOffset = (dateIso: string): number | null => {
@@ -1020,6 +1051,10 @@ const openPagePreview = () => {
   isPagePreviewOpen.value = true;
 };
 
+const closePagePreview = () => {
+  isPagePreviewOpen.value = false;
+};
+
 const onOpenTikkun = () => {
   if (!tikkunUrl.value) return;
   trackAction('preview-open-tikkun');
@@ -1035,6 +1070,13 @@ watch(isPagePreviewOpen, (isOpen) => {
   window.removeEventListener('keydown', onPreviewKeydown);
   window.removeEventListener('keyup', onPreviewKeyup);
   isShiftPressed.value = false;
+});
+
+defineExpose({
+  openManualDialog: onOpenManualInput,
+  closeManualDialog: closeManualInput,
+  openPagePreview,
+  closePagePreview,
 });
 
 onUnmounted(() => {

@@ -1,5 +1,8 @@
 type LocationSide = 'from' | 'to';
 type RollDirection = 'forward' | 'backward';
+type TutorialKind = 'quick' | 'full';
+type TutorialEventAction = 'open' | 'close' | 'advanced-details';
+type TutorialPromptAction = 'shown' | 'opened-quick-tutorial';
 
 interface GoatCounterCountPayload {
   path: string;
@@ -16,6 +19,16 @@ interface TrackFromToActionInput {
 interface TrackRollResultDisplayedInput {
   direction: RollDirection;
   pages: number;
+}
+
+interface TrackTutorialEventInput {
+  tutorial: TutorialKind;
+  action: TutorialEventAction;
+  progressPercent?: number;
+  step?: number;
+  totalSteps?: number;
+  durationSeconds?: number;
+  source?: string | null;
 }
 
 interface GoatCounterApi {
@@ -161,6 +174,60 @@ const trackRollResultDisplayed = ({ direction, pages }: TrackRollResultDisplayed
   });
 };
 
+const trackTutorialEvent = ({
+  tutorial,
+  action,
+  progressPercent,
+  step,
+  totalSteps,
+  durationSeconds,
+  source,
+}: TrackTutorialEventInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const normalizedProgress = progressPercent == null ? null : Math.max(0, Math.min(100, Math.round(progressPercent)));
+  const normalizedDurationSeconds =
+    durationSeconds == null ? null : Math.max(0, Math.round(durationSeconds));
+
+  const pathSegments = [
+    EVENT_PATH_PREFIX,
+    'tutorial',
+    tutorial,
+    action,
+    normalizedProgress == null ? '' : `progress-${normalizedProgress}`,
+    source ? `source-${toSlug(source)}` : '',
+  ].filter((segment) => segment.length > 0);
+
+  const titleSegments = [
+    'tutorial',
+    tutorial,
+    action,
+    step == null || totalSteps == null ? '' : `step:${step}/${totalSteps}`,
+    normalizedProgress == null ? '' : `progress:${normalizedProgress}`,
+    normalizedDurationSeconds == null ? '' : `duration:${normalizedDurationSeconds}`,
+    source ? `source:${source}` : '',
+  ].filter((segment) => segment.length > 0);
+
+  trackGoatCounterEvent({
+    path: pathSegments.join('/'),
+    title: titleSegments.join(':'),
+    event: true,
+  });
+};
+
+const trackTutorialPromptEvent = (action: TutorialPromptAction) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const path = `${EVENT_PATH_PREFIX}/tutorial-prompt/${toSlug(action)}`;
+  const title = `tutorial-prompt:${action}`;
+
+  trackGoatCounterEvent({
+    path,
+    title,
+    event: true,
+  });
+};
+
 const trackPageView = (routePath: string, routeName?: string) => {
   if (!isAnalyticsEnabled()) return;
 
@@ -181,4 +248,6 @@ export {
   trackLanguageChange,
   trackRollResultDisplayed,
   trackPageView,
+  trackTutorialEvent,
+  trackTutorialPromptEvent,
 };

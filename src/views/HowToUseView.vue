@@ -31,6 +31,37 @@
                 {{ $t(`howTo.camera.step${idx + 1}`) }}
               </li>
             </ul>
+
+            <v-divider class="my-6" />
+
+            <div class="howto-tour-actions">
+              <p class="text-subtitle-1 font-weight-medium mb-2">
+                {{ $t('howTo.tutorials.title') }}
+              </p>
+              <p class="text-body-2 text-medium-emphasis mb-4">
+                {{ $t('howTo.tutorials.subtitle') }}
+              </p>
+
+              <div class="howto-tour-buttons">
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-run-fast"
+                  variant="flat"
+                  @click="startTutorial('quick')"
+                >
+                  {{ $t('howTo.tutorials.quick') }}
+                </v-btn>
+
+                <v-btn
+                  color="secondary"
+                  prepend-icon="mdi-map-search-outline"
+                  variant="tonal"
+                  @click="startTutorial('full')"
+                >
+                  {{ $t('howTo.tutorials.full') }}
+                </v-btn>
+              </div>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -39,6 +70,25 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { markHowToPageSeen } from '@/composables/tutorials';
+
+const router = useRouter();
+
+const startTutorial = async (tutorial: 'quick' | 'full'): Promise<void> => {
+  await router.push({
+    name: 'home',
+    query: {
+      tutorial,
+      source: 'how-to-page',
+    },
+  });
+};
+
+onMounted(() => {
+  markHowToPageSeen();
+});
 </script>
 
 <style scoped>
@@ -61,5 +111,11 @@
   padding-inline-start: 20px;
   display: grid;
   gap: 8px;
+}
+
+.howto-tour-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 </style>
