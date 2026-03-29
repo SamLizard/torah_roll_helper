@@ -2523,33 +2523,16 @@ onUnmounted(() => {
   .onboarding-card {
     width: min(340px, calc(100vw - 20px));
     padding: 16px;
-    display: flex;
-    flex-direction: column;
-    min-height: min(420px, calc(100dvh - 32px));
-    max-height: calc(100dvh - 32px);
-  }
-
-  .onboarding-card__description {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
   }
 
   .onboarding-card__actions {
-    margin-top: auto;
-    flex-direction: column;
-    align-items: stretch;
+    margin-top: 8px;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .onboarding-card__buttons {
-    order: 1;
-    width: 100%;
     justify-content: flex-end;
-  }
-
-  .onboarding-card__actions > .v-btn {
-    order: 2;
-    align-self: flex-start;
   }
 }
 </style>
