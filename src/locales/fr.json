@@ -105,23 +105,23 @@
       "step4": "En cas d'échec, utilisez la saisie manuelle pour définir la position actuelle."
     },
     "tutorials": {
-      "title": "Visites guidees sur l'ecran reel",
-      "subtitle": "Ces visites s'ouvrent sur la page d'accueil et montrent les vraies zones du site. Prenez la visite courte pour le flux principal, ou la visite complete pour voir tous les outils a l'ecran.",
+      "title": "Visites guidées interactives",
+      "subtitle": "Ces visites vous guident à travers l'interface de l'application. Utilisez la visite courte pour l'essentiel, ou la visite complète pour découvrir tous les outils.",
       "quick": "Lancer la visite courte",
-      "full": "Lancer la visite complete"
+      "full": "Lancer la visite complète"
     }
   },
   "tutorialPrompt": {
-    "title": "Premiere visite ?",
-    "text": "Des visites guidees sont disponibles depuis la page Mode d'emploi, et vous pouvez lancer tout de suite la visite courte sur l'ecran reel.",
+    "title": "Première visite ?",
+    "text": "Des visites guidées sont disponibles dans la page 'Mode d'emploi'. Vous pouvez aussi lancer une visite rapide dès maintenant pour apprendre les bases.",
     "openQuick": "Lancer la visite courte"
   },
   "onboarding": {
     "labels": {
       "quick": "Visite courte",
-      "full": "Visite complete"
+      "full": "Visite complète"
     },
-    "progress": "Etape {current} sur {total}",
+    "progress": "Étape {current} sur {total}",
     "actions": {
       "exit": "Quitter",
       "back": "Retour",
@@ -131,102 +131,102 @@
     },
     "quick": {
       "step1": {
-        "title": "Ouvrez la liste des langues",
-        "description": "Cliquez ou touchez ce sélecteur de langue. La visite attend ici pour que vous ouvriez vous-même la liste."
+        "title": "Choix de la langue",
+        "description": "Cliquez ou touchez ici pour changer la langue de l'application. La visite se met en pause pour vous laisser ouvrir le menu."
       },
       "step2": {
-        "title": "Choisissez la langue à utiliser",
-        "description": "Choisissez une autre langue si vous le souhaitez. Le texte du tutoriel change aussitôt, ou vous pouvez garder la langue actuelle et toucher Suivant."
+        "title": "Sélectionnez votre langue",
+        "description": "Choisissez la langue souhaitée. Le texte du tutoriel se mettra à jour immédiatement. Si la langue actuelle vous convient, touchez Suivant."
       },
       "step3": {
-        "title": "Définissez où le Sefer Torah est ouvert",
-        "description": "C'est la zone DE. « Choisir manuellement » ouvre la liste complète des lectures, la caméra aide quand vous ne savez pas où le Sefer est ouvert, et la saisie sert quand vous connaissez déjà la référence ou la page du tiqoun. Les cartes en dessous montrent les lectures du mois écoulé."
+        "title": "Définir l'emplacement actuel",
+        "description": "C'est le point de DÉPART (DE). Utilisez 'Choisir manuellement' pour toutes les lectures, l'appareil photo pour identifier la page depuis le parchemin (Klaf), ou 'Saisie' si vous connaissez la référence exacte. Les cartes ci-dessous affichent les lectures du mois dernier pour un accès rapide."
       },
       "step4": {
-        "title": "Choisissez où rouler",
-        "description": "C'est la zone A. La plupart du temps, vous choisirez ici une lecture du mois à venir, donc l'une des prochaines lectures à préparer. La visite a déjà choisi un exemple pour montrer le résultat."
+        "title": "Choisir la destination",
+        "description": "C'est le point d'ARRIVÉE (À). Cette bande calendaire affiche les lectures à venir. La plupart du temps, il suffit de cliquer sur la prochaine Paracha ici. Nous avons sélectionné un exemple pour vous."
       },
       "step5": {
-        "title": "Lisez la carte de résultat avant de rouler",
-        "description": "Cette carte affiche le nombre d'amoudim à déplacer, le sens de roulement et les pages DE et A utilisées pour le calcul."
+        "title": "Instructions de roulement",
+        "description": "Cette carte affiche votre résultat : le nombre d'Amoudim (colonnes) à déplacer, le sens de roulement, et les pages DE et À exactes utilisées pour le calcul."
       }
     },
     "full": {
       "step1": {
-        "title": "Ouvrez la liste des langues",
-        "description": "Cliquez ou touchez ce sélecteur de langue. La visite attend ici pour que vous ouvriez vous-même la liste."
+        "title": "Choix de la langue",
+        "description": "Cliquez ou touchez ici pour changer la langue de l'application. La visite se met en pause pour vous laisser ouvrir le menu."
       },
       "step2": {
-        "title": "Choisissez la langue à utiliser",
-        "description": "Choisissez une autre langue si vous le souhaitez. Le texte du tutoriel change aussitôt, ou vous pouvez garder la langue actuelle et toucher Suivant."
+        "title": "Sélectionnez votre langue",
+        "description": "Choisissez la langue souhaitée. Le texte du tutoriel se mettra à jour immédiatement. Si la langue actuelle vous convient, touchez Suivant."
       },
       "step3": {
-        "title": "Toute cette carte correspond au côté DE",
-        "description": "Cette carte sert à définir où le Sefer Torah est ouvert maintenant. Les trois boutons du haut sont les trois façons de choisir une lecture, et les cartes en dessous montrent les lectures du mois écoulé pour aller plus vite."
+        "title": "La zone DÉPART (DE)",
+        "description": "Utilisez cette section pour définir où le Sefer Torah est actuellement ouvert. Les boutons du haut offrent trois méthodes pour trouver une lecture, tandis que les cartes en bas affichent les lectures du mois dernier pour une sélection rapide."
       },
       "step4": {
-        "title": "Choisir manuellement ouvre la liste complète des lectures",
-        "description": "Cliquez sur « Choisir manuellement » quand vous voulez la liste complète des parachiot, Yamim Tovim, Roch Hodech, jeûnes et lectures spéciales."
+        "title": "L'index complet des lectures",
+        "description": "Cliquez sur 'Choisir manuellement' lorsque vous devez trouver une Paracha spécifique, un Yom Tov, Roch 'Hodech, un jeûne ou un Maftir spécial."
       },
       "step5": {
-        "title": "Cette fenêtre est l'index complet des lectures",
-        "description": "Cherchez en haut, puis ouvrez les sections groupées pour trouver la qeria exacte."
+        "title": "La fenêtre de recherche",
+        "description": "Utilisez la barre de recherche en haut, ou parcourez les catégories ci-dessous pour trouver la Kria exacte dont vous avez besoin."
       },
       "step6": {
-        "title": "Le bouton caméra ouvre la reconnaissance de page",
-        "description": "Cliquez sur la caméra quand le Sefer Torah est déjà ouvert et que vous voulez laisser le site identifier l'emplacement actuel à partir du texte."
+        "title": "Reconnaissance par photo",
+        "description": "Cliquez sur l'icône d'appareil photo si le Sefer Torah est ouvert et que vous souhaitez que l'application identifie votre emplacement directement à partir du texte sur le parchemin."
       },
       "step7": {
-        "title": "Voici la fenêtre caméra",
-        "description": "Après la photo, le site essaie d'identifier la page et de proposer les résultats les plus probables."
+        "title": "Résultats de l'analyse",
+        "description": "Après avoir pris une photo, l'application analyse le texte et suggère les Amoudim les plus probables pour votre emplacement actuel."
       },
       "step8": {
-        "title": "Saisie ouvre l'entrée manuelle",
-        "description": "Cliquez sur « Saisie » quand vous connaissez déjà la référence ou la page du tiqoun et voulez l'entrer directement."
+        "title": "Saisie manuelle",
+        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts, ou le numéro de page spécifique dans le Tikkoun Korim."
       },
       "step9": {
-        "title": "Cette fenêtre permet d'entrer l'emplacement exact",
-        "description": "Vous pouvez définir le sefer, le perek, le passouk, ou aller directement à un numéro de page quand vous connaissez déjà l'endroit exact."
+        "title": "Fenêtre de saisie exacte",
+        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, ou aller directement à un numéro de page."
       },
       "step10": {
-        "title": "Le côté A sert le plus souvent à la prochaine lecture",
-        "description": "C'est ici que vous choisissez la lecture vers laquelle vous voulez rouler. La bande de cartes montre le mois à venir, et dans la plupart des cas vous choisirez l'une des prochaines lectures."
+        "title": "La zone ARRIVÉE (À)",
+        "description": "C'est ici que vous définissez votre destination. La bande calendaire affiche le mois à venir. Dans la plupart des cas, vous sélectionnerez simplement la prochaine lecture d'ici."
       },
       "step11": {
-        "title": "Le point de référence décide où A commence",
-        "description": "Pour certaines lectures, vous pouvez calculer vers le début de la qeria, vers un point pratique, ou vers la fin d'une section partielle. Ces boutons définissent le point de référence utilisé pour le côté A."
+        "title": "Point de repère",
+        "description": "Précisez votre point d'arrêt exact. Vous pouvez cibler le début de la Paracha, la fin d'une lecture de semaine (Chéni/Hamichi/Min'ha), ou la fin de la lecture complète du Chabbat."
       },
       "step12": {
-        "title": "La carte de résultat est la réponse principale",
-        "description": "Une fois DE et A définis, cette carte donne l'information utile : le nombre d'amoudim à rouler, le sens, et les pages DE et A utilisées pour le calcul."
+        "title": "La carte de résultat",
+        "description": "Une fois DE et À définis, cette carte vous donne la réponse finale : combien d'Amoudim rouler, dans quelle direction, et les pages de référence."
       },
       "step13": {
-        "title": "Cette ligne apparaît quand on change de livre",
-        "description": "Quand il faut continuer vers un autre houmach, cette ligne indique combien de pages restent à rouler après la fin du livre actuel, par exemple après Chemot."
+        "title": "Changement de Houmach",
+        "description": "S'il faut passer à un nouveau livre (ex: de Chémot à Vayikra), cette note vous indique combien de pages il reste à rouler une fois le livre cible atteint."
       },
       "step14": {
-        "title": "Ouvrez l'aperçu depuis ici",
-        "description": "Cliquez sur le numéro de page ou sur la petite icône de livre pour ouvrir l'aperçu de la page choisie."
+        "title": "Aperçu de la page",
+        "description": "Cliquez sur le numéro de page ou sur la petite icône de livre pour voir un aperçu de la colonne sélectionnée."
       },
       "step15": {
-        "title": "L'aperçu aide à vérifier la page",
-        "description": "L'aperçu montre la première ligne de la page choisie, permet d'afficher ou de masquer le nikoud, et donne un bouton pour ouvrir la page complète dans un tiqoun numérique présenté comme un Sefer Torah ordinaire."
+        "title": "Vérification avec le Tikkoun",
+        "description": "L'aperçu montre la première ligne de la colonne (avec la possibilité d'afficher ou masquer le Nikoud) et inclut un bouton pour ouvrir un affichage complet du Tikkoun afin de vérifier votre position."
       },
       "step16": {
-        "title": "La roue dentée ouvre les paramètres",
-        "description": "Cliquez sur cette roue dentée pour ouvrir la fenêtre des paramètres."
+        "title": "Paramètres",
+        "description": "Cliquez sur l'icône de roue dentée pour ouvrir vos préférences."
       },
       "step17": {
-        "title": "Les paramètres règlent le contexte communautaire",
-        "description": "Utilisez-les pour passer entre Israël et Gola, choisir le noussah, et définir la mise en page du rouleau. Ces choix influencent les lectures proposées et le calcul du roulement."
+        "title": "Coutumes communautaires",
+        "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Noussah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé."
       },
       "step18": {
-        "title": "Utilisez la navigation pour atteindre les autres pages",
-        "description": "Sur ordinateur, les pages sont dans la barre du haut. Sur mobile, touchez d'abord le bouton menu pour ouvrir la navigation latérale."
+        "title": "Navigation",
+        "description": "Utilisez la barre de navigation pour accéder aux autres outils. Sur mobile, touchez l'icône de menu pour ouvrir le panneau latéral."
       },
       "step19": {
-        "title": "À propos ouvre la page de contact",
-        "description": "Voici le lien À propos. Terminez la visite et le site ouvrira la page À propos pour voir les coordonnées du créateur et du développeur, ou signaler un problème."
+        "title": "À propos et Contact",
+        "description": "Lorsque vous terminez cette visite, la page 'À propos' s'ouvrira pour que vous puissiez voir les détails du projet, les crédits des données, ou signaler un problème sur GitHub."
       }
     }
   },

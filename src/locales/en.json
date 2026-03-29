@@ -105,15 +105,15 @@
       "step4": "If detection fails, use manual input to set the current location."
     },
     "tutorials": {
-      "title": "Guided tours on the live screen",
-      "subtitle": "These open on the Home page and point to the real parts of the app. Use the short tour for the main workflow, or the full tour to see every tool on the screen.",
+      "title": "Interactive screen tours",
+      "subtitle": "These tours guide you through the actual app interface. Use the short tour for the basic workflow, or the full tour to master every tool.",
       "quick": "Start short tour",
       "full": "Start full tour"
     }
   },
-  "tutorialPrompt": {
+"tutorialPrompt": {
     "title": "New here?",
-    "text": "There are guided tours available from the How To page, and you can start the short one right now on the live screen.",
+    "text": "Guided tours are available in the 'How To' page. You can also start a quick tour right now to learn the basics.",
     "openQuick": "Start short tour"
   },
   "onboarding": {
@@ -131,102 +131,102 @@
     },
     "quick": {
       "step1": {
-        "title": "Open the language list",
-        "description": "Click or tap this language selector. The tour waits here so you can open the list yourself."
+        "title": "Language selection",
+        "description": "Click or tap here to change the app's language. The tour will pause so you can open the menu."
       },
       "step2": {
-        "title": "Choose the language you want to use",
-        "description": "Pick a different language if you want. The tutorial text changes right away, or you can keep the current language and tap Next."
+        "title": "Choose your language",
+        "description": "Select your preferred language. The tutorial text will update immediately. If current language is good, tap Next."
       },
       "step3": {
-        "title": "Set where the Sefer Torah is open now",
-        "description": "This is the FROM side. Choose manually opens the full list of readings, the camera helps when you do not know where the Sefer is open, and Input is for when you already know the reference or tikkun page. The cards below show readings from the last month."
+        "title": "Set the current scroll location",
+        "description": "This is the FROM side. Use 'Choose manually' for all readings, 'Camera' to identify the open column from the Klaf, or 'Input' if you know the exact reference. The cards below show last month's readings for quick access."
       },
       "step4": {
-        "title": "Choose where you want to roll to",
-        "description": "This is the TO side. Most of the time you will choose one of the upcoming readings from the next month. The tour already picked an example so you can see the result."
+        "title": "Choose your destination",
+        "description": "This is the TO side. This calendar strip shows upcoming readings. Most of the time, you will simply click the next Parasha here. We've selected an example for you."
       },
       "step5": {
-        "title": "Read the result card before you roll",
-        "description": "This card shows the number of amudim to move, the direction to roll, and the FROM and TO pages used for the calculation."
+        "title": "Your rolling instructions",
+        "description": "This card provides your result: the number of Amudim (columns) to move, the rolling direction, and the exact FROM and TO pages used for the calculation."
       }
     },
     "full": {
       "step1": {
-        "title": "Open the language list",
-        "description": "Click or tap this language selector. The tour waits here so you can open the list yourself."
+        "title": "Language selection",
+        "description": "Click or tap here to change the app's language. The tour will pause so you can open the menu."
       },
       "step2": {
-        "title": "Choose the language you want to use",
-        "description": "Pick a different language if you want. The tutorial text changes right away, or you can keep the current language and tap Next."
+        "title": "Choose your language",
+        "description": "Select your preferred language. The tutorial text will update immediately. If current language is good, tap Next."
       },
       "step3": {
-        "title": "This whole card is the FROM side",
-        "description": "Use this card to define where the Sefer Torah is open now. The three buttons at the top are the three ways to choose a reading, and the cards below show readings from the last month for quick selection."
+        "title": "The FROM card",
+        "description": "Use this section to define where the Sefer Torah is currently open. The top buttons offer three ways to find a reading, while the cards below show last month's readings for a quick selection."
       },
       "step4": {
-        "title": "Choose manually opens the full reading list",
-        "description": "Click Choose manually when you want the full list of parashot, Yamim Tovim, Rosh Chodesh, fast days, and special readings."
+        "title": "The full reading list",
+        "description": "Click 'Choose manually' when you need to find a specific Parasha, Yom Tov, Rosh Chodesh, fast day, or special Maftir."
       },
       "step5": {
-        "title": "This overlay is the full reading index",
-        "description": "Search on top, then open the grouped sections below until you find the exact kriah you need."
+        "title": "The index overlay",
+        "description": "Use the search bar at the top, or expand the categories below to find the exact Kriah you need."
       },
       "step6": {
-        "title": "The camera button opens page recognition",
-        "description": "Click the camera when the Sefer Torah is already open and you want the site to identify the current place from the text on the klaf."
+        "title": "Page recognition (Camera)",
+        "description": "Click the camera icon when the Sefer Torah is open and you want the app to identify your location directly from the text on the Klaf."
       },
       "step7": {
-        "title": "This is the camera popup",
-        "description": "After the photo, the site tries to match the page and offer the most likely results for the current location."
+        "title": "Camera results",
+        "description": "After taking a photo, the app scans the text and suggests the most likely Amudim for your current location."
       },
       "step8": {
-        "title": "Input opens manual entry",
-        "description": "Click Input when you already know the reference or the tikkun page and want to enter it directly."
+        "title": "Manual input",
+        "description": "Click 'Input' when you already know the exact Perek/Pasuk or the specific page number in the Tikkun Korim."
       },
       "step9": {
-        "title": "This dialog lets you enter the exact place",
-        "description": "Set the sefer, perek, pasuk, or jump straight to a page number when you already know the exact location."
+        "title": "Exact location dialog",
+        "description": "Here you can set the Sefer, Perek, and Pasuk, or jump straight to a page number."
       },
       "step10": {
-        "title": "The TO side is usually an upcoming reading",
-        "description": "This card is where you choose the reading you want to prepare next. Its calendar strip shows the upcoming month, and most of the time you will choose one of those next readings."
+        "title": "The TO card",
+        "description": "This is where you set your destination. The calendar strip displays the upcoming month. In most cases, you will simply select the next reading from here."
       },
       "step11": {
-        "title": "Reference point lets you choose where TO begins",
-        "description": "Some readings can start from the beginning of the kriah, from a practical stopping point, or from the end of a partial section. These buttons choose which TO reference the roll should target."
+        "title": "Reference point",
+        "description": "Choose your exact stopping point. You can target the start of the Parasha, the end of a weekday reading (Sheni/Hamishi/Mincha), or the end of the full Shabbat reading."
       },
       "step12": {
-        "title": "The result card is the main answer",
-        "description": "Once FROM and TO are set, this card gives the working answer: the number of amudim to roll, the direction, and the exact FROM and TO pages used for the calculation."
+        "title": "The result card",
+        "description": "Once FROM and TO are set, this card gives you the final answer: how many Amudim to roll, which direction, and the reference pages."
       },
       "step13": {
-        "title": "This line appears when the roll crosses a book",
-        "description": "When you have to continue into a different chumash, this note tells you how many pages are still left after the end of the current book, for example after Exodus."
+        "title": "Crossing into a new Chumash",
+        "description": "If your roll crosses into a new book (e.g., from Exodus to Leviticus), this note tells you how many pages are left to roll after reaching target book."
       },
       "step14": {
-        "title": "Open the page preview from here",
-        "description": "Click the page number or the small book icon to open the preview for the selected page."
+        "title": "Page preview",
+        "description": "Click the page number or the small book icon to see a preview of the selected column."
       },
       "step15": {
-        "title": "The preview helps verify the page",
-        "description": "The preview shows the first line on the chosen page, lets you switch the nikud display, and gives a button to open the full page in a digital tikkun laid out like a regular Sefer Torah."
+        "title": "Verify with the Tikkun",
+        "description": "The preview shows the first line of the column (with an option to toggle Nikud) and includes a button to open a full digital Tikkun layout to verify your spot."
       },
       "step16": {
-        "title": "The cog opens settings",
-        "description": "Click this cog to open the settings dialog."
+        "title": "Settings",
+        "description": "Click the cog icon to open your preferences."
       },
       "step17": {
-        "title": "Settings control the community context",
-        "description": "Use settings to switch Israel or Gola mode, the nusach, and the scroll layout. These options affect which readings appear and how the roll is calculated."
+        "title": "Community customs",
+        "description": "Use settings to toggle between Israel and Diaspora (Gola) modes, select your Nusach, and choose the scroll layout (e.g., 245 columns). These options affect which readings appear and how the roll is calculated."
       },
       "step18": {
-        "title": "Use the navigation bar to reach the other pages",
-        "description": "On desktop the pages are in the top bar. On mobile, tap the menu button first to open the side navigation."
+        "title": "Navigation",
+        "description": "Use the navigation bar to access other tools. On mobile, tap the menu icon to open the sidebar."
       },
       "step19": {
-        "title": "About opens the contact page",
-        "description": "This is the About link. Finish the tour and the site will open the About page so you can see the contact details for the creator and developer, or report an issue."
+        "title": "About & Contact",
+        "description": "When you finish this tour, the 'About' page will open so you can see project details, view data credits, or report an issue on GitHub."
       }
     }
   },
