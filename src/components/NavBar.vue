@@ -99,7 +99,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LanguageSelection from "./LanguageSelection.vue";
 import SettingsDialog from './SettingsDialog.vue';
-import { setTutorialLanguageMenuControls } from '@/composables/tutorialUi';
+import {
+  setTutorialLanguageMenuControls,
+  setTutorialNavDrawerControls,
+} from '@/composables/tutorialUi';
 
 interface LanguageSelectionExposed {
   openMenu: () => void;
@@ -153,10 +156,20 @@ onMounted(() => {
       drawerLanguageSelectionRef.value?.closeMenu();
     },
   });
+
+  setTutorialNavDrawerControls({
+    open: () => {
+      drawer.value = true;
+    },
+    close: () => {
+      drawer.value = false;
+    },
+  });
 });
 
 onUnmounted(() => {
   setTutorialLanguageMenuControls(null);
+  setTutorialNavDrawerControls(null);
 });
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="pa-4">
-    <v-row justify="center">
-      <v-col cols="12" md="9" lg="7">
+    <v-row justify="center" class="howto-shell">
+      <v-col cols="12" md="8" lg="6">
         <v-card variant="flat" :dir="$vuetify.locale.isRtl ? 'rtl' : 'ltr'">
           <v-card-title class="text-h5 font-weight-bold">
             {{ $t('howTo.title') }}
@@ -70,11 +70,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 import { markHowToPageSeen } from '@/composables/tutorials';
 
 const router = useRouter();
+const { smAndDown } = useDisplay();
+let previousHtmlOverflow = '';
+let previousBodyOverflow = '';
+let previousHtmlOverscrollBehavior = '';
+let previousBodyOverscrollBehavior = '';
 
 const startTutorial = async (tutorial: 'quick' | 'full'): Promise<void> => {
   await router.push({
@@ -88,10 +94,45 @@ const startTutorial = async (tutorial: 'quick' | 'full'): Promise<void> => {
 
 onMounted(() => {
   markHowToPageSeen();
+
+  if (!smAndDown.value) return;
+
+  previousHtmlOverflow = document.documentElement.style.overflow;
+  previousBodyOverflow = document.body.style.overflow;
+  previousHtmlOverscrollBehavior = document.documentElement.style.overscrollBehaviorY;
+  previousBodyOverscrollBehavior = document.body.style.overscrollBehaviorY;
+
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overscrollBehaviorY = 'none';
+  document.body.style.overscrollBehaviorY = 'none';
+});
+
+onBeforeUnmount(() => {
+  document.documentElement.style.overflow = previousHtmlOverflow;
+  document.body.style.overflow = previousBodyOverflow;
+  document.documentElement.style.overscrollBehaviorY = previousHtmlOverscrollBehavior;
+  document.body.style.overscrollBehaviorY = previousBodyOverscrollBehavior;
 });
 </script>
 
 <style scoped>
+.howto-shell {
+  min-height: calc(100vh - 32px);
+  min-height: calc(100svh - 32px);
+}
+
+@media (max-width: 600px) {
+  .howto-shell {
+    height: calc(100vh - 32px);
+    height: calc(100svh - 32px);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    align-content: start;
+  }
+}
+
 .howto-list {
   margin: 0;
   padding-inline-start: 20px;

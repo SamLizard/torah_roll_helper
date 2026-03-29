@@ -428,7 +428,7 @@
     >
       <template #default="{ step, previous, next, isFirst, isLast, index }">
         <VOnboardingStep>
-          <section class="onboarding-card">
+          <section class="onboarding-card" :dir="$vuetify.locale.isRtl ? 'rtl' : 'ltr'">
             <div class="onboarding-card__topline">
               <span class="onboarding-card__eyebrow">
                 {{
@@ -526,6 +526,8 @@ import {
   closeTutorialLanguageMenu,
   isLanguageMenuOpen,
   openTutorialLanguageMenu,
+  closeTutorialNavDrawer,
+  openTutorialNavDrawer,
 } from '@/composables/tutorialUi';
 import realDb from '@/data/real_db.json';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
@@ -1160,6 +1162,11 @@ const getTutorialDurationSeconds = (): number => {
 };
 
 const isTutorialElementVisible = (element: HTMLElement): boolean => {
+  const drawerRoot = element.closest('.v-navigation-drawer');
+  if (drawerRoot && !drawerRoot.classList.contains('v-navigation-drawer--active')) {
+    return false;
+  }
+
   const style = window.getComputedStyle(element);
   if (style.display === 'none' || style.visibility === 'hidden') {
     return false;
@@ -1168,6 +1175,21 @@ const isTutorialElementVisible = (element: HTMLElement): boolean => {
   const rect = element.getBoundingClientRect();
   if (rect.width <= 0 || rect.height <= 0) {
     return false;
+  }
+
+  if (drawerRoot instanceof HTMLElement) {
+    const drawerRect = drawerRoot.getBoundingClientRect();
+    const drawerVisibleWidth = Math.min(drawerRect.right, window.innerWidth) - Math.max(drawerRect.left, 0);
+    const drawerVisibleHeight = Math.min(drawerRect.bottom, window.innerHeight) - Math.max(drawerRect.top, 0);
+
+    return (
+      drawerVisibleWidth > drawerRect.width * 0.8 &&
+      drawerVisibleHeight > drawerRect.height * 0.5 &&
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.top < window.innerHeight &&
+      rect.left < window.innerWidth
+    );
   }
 
   return (
@@ -1184,8 +1206,7 @@ const getVisibleTutorialElement = (selector: string): HTMLElement | null => {
     if (isTutorialElementVisible(candidate)) return candidate;
   }
 
-  const fallback = document.querySelector(selector);
-  return fallback instanceof HTMLElement ? fallback : null;
+  return null;
 };
 
 const waitForTutorialElement = async (selector: string, attempts = 12): Promise<HTMLElement | null> => {
@@ -1204,6 +1225,26 @@ const waitForTutorialElementToDisappear = async (selector: string, attempts = 12
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     if (!getVisibleTutorialElement(selector)) {
       return;
+    }
+
+    await nextTick();
+    await wait(80);
+  }
+};
+
+const waitForNavDrawerToOpen = async (attempts = 16): Promise<void> => {
+  if (!smAndDown.value) return;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const drawer = document.querySelector('.v-navigation-drawer.v-navigation-drawer--temporary.v-navigation-drawer--active');
+    if (drawer instanceof HTMLElement) {
+      const rect = drawer.getBoundingClientRect();
+      const visibleWidth = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+      if (visibleWidth > rect.width * 0.8 && visibleHeight > rect.height * 0.5) {
+        return;
+      }
     }
 
     await nextTick();
@@ -1352,7 +1393,9 @@ const openNavDrawerIfNeeded = async (): Promise<void> => {
   if (!smAndDown.value) return;
   if (getVisibleTutorialElement('[data-tutorial="about-nav"]')) return;
 
-  await clickTutorialElement('[data-tutorial="menu-button"]');
+  openTutorialNavDrawer();
+  await nextTick();
+  await waitForNavDrawerToOpen();
   await waitForTutorialElement('[data-tutorial="about-nav"]');
   await wait(120);
 };
@@ -1361,7 +1404,7 @@ const closeNavDrawer = async (): Promise<void> => {
   if (!smAndDown.value) return;
   if (!getVisibleTutorialElement('[data-tutorial="about-nav"]')) return;
 
-  pressEscape();
+  closeTutorialNavDrawer();
   await nextTick();
   await waitForTutorialElementToDisappear('[data-tutorial="about-nav"]');
 };
@@ -2423,6 +2466,7 @@ onUnmounted(() => {
 
 .onboarding-card {
   width: min(360px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
   padding: 18px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.98);
@@ -2430,6 +2474,7 @@ onUnmounted(() => {
   border: 1px solid rgba(15, 23, 42, 0.08);
   display: grid;
   gap: 14px;
+  overflow-wrap: anywhere;
 }
 
 .onboarding-card__topline {
@@ -2437,6 +2482,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  min-width: 0;
 }
 
 .onboarding-card__eyebrow {
@@ -2445,23 +2491,34 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(18, 48, 99, 0.76);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .onboarding-card__progress {
   font-size: 0.82rem;
   color: rgba(15, 23, 42, 0.65);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
 }
 
 .onboarding-card__title {
   margin: 0;
   font-size: 1.08rem;
   line-height: 1.35;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .onboarding-card__description {
   margin: 0;
   color: rgba(15, 23, 42, 0.82);
   line-height: 1.55;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .onboarding-card__actions {
@@ -2469,12 +2526,16 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .onboarding-card__buttons {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 600px) {
