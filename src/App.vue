@@ -1,6 +1,8 @@
 <template>
   <!-- TODO 29: Use localStorage, or make PWA (progressive web app) so the user settings are remembered more long term. -->
   <!-- TODO 30: Add a part to explain how to put on apple screen (like an application). -->
+  <!-- TODO 31: Add a sort of cache (local storage?) that will store the user's preferences (language + settings). When reloading the page, the app will use these preferences and if it is not like the default settings, show a popup that closes by itself to tell that the setting is set to x. If only language, don't show the popup (he will see it by himself). -->
+  <!-- TODO 32: Add some reload button / key on the date that will refetch the calendar data? -->
   <v-app>
     <nav-bar />
     <v-main>
