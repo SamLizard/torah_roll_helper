@@ -2,6 +2,8 @@
 
 Frontend app for **Gabbaim** and **Ba'alei Kriah** to quickly calculate how many Torah columns/pages to roll, and in which direction.
 
+Live site: https://samlizard.github.io/torah_roll_helper/
+
 The app accepts either:
 - a **photo** (Dicta OCR + parallels)
 - a **manual reference** (book/chapter/verse)

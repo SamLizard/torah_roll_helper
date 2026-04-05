@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://samlizard.github.io/torah_roll_helper/sitemap.xml

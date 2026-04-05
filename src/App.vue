@@ -30,9 +30,10 @@ import {
 
 const { isRtl } = useRtl();
 const { smAndDown } = useDisplay();
-const { t } = useI18n();
+const { locale, t } = useI18n();
 const router = useRouter();
 const route = useRoute();
+const canonicalUrl = 'https://samlizard.github.io/torah_roll_helper/';
 
 let tutorialPromptTimeoutId: number | null = null;
 
@@ -44,9 +45,62 @@ const tutorialPromptPosition = computed(() => {
   return isRtl.value ? 'top-start' : 'top-end';
 });
 
+const getTranslatedText = (key: string): string => {
+  const translatedValue = t(key);
+
+  return typeof translatedValue === 'string' ? translatedValue : '';
+};
+
+const updateMetaContent = (id: string, value: string): void => {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.setAttribute('content', value);
+  }
+};
+
+const updateLinkHref = (id: string, value: string): void => {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.setAttribute('href', value);
+  }
+};
+
+const updateSeo = (): void => {
+  const routeTitleKey = typeof route.meta.titleKey === 'string' ? route.meta.titleKey : 'seo.fallbackTitle';
+  const routeDescriptionKey = typeof route.meta.descriptionKey === 'string'
+    ? route.meta.descriptionKey
+    : 'seo.fallbackDescription';
+  const title = getTranslatedText(routeTitleKey) || getTranslatedText('seo.fallbackTitle');
+  const description = getTranslatedText(routeDescriptionKey) || getTranslatedText('seo.fallbackDescription');
+  const direction = getTranslatedText('dir') || 'ltr';
+
+  document.title = title;
+  document.documentElement.lang = locale.value || 'en';
+  document.documentElement.dir = direction;
+
+  updateMetaContent('app-description', description);
+  updateMetaContent('app-keywords', getTranslatedText('seo.keywords'));
+  updateMetaContent('app-og-title', title);
+  updateMetaContent('app-og-description', description);
+  updateMetaContent('app-og-url', canonicalUrl);
+  updateMetaContent('app-twitter-title', title);
+  updateMetaContent('app-twitter-description', description);
+  updateLinkHref('app-canonical', canonicalUrl);
+};
+
 watch(isRtl, (newRtl) => {
   document.documentElement.style.setProperty('--swal-direction', newRtl ? 'rtl' : 'ltr');
 }, { immediate: true });
+
+watch(
+  [() => route.fullPath, () => locale.value],
+  () => {
+    updateSeo();
+  },
+  { immediate: true },
+);
 
 const openQuickTutorialFromToast = async () => {
   trackTutorialPromptEvent('opened-quick-tutorial');

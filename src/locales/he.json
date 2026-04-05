@@ -2,6 +2,26 @@
   "language": "עברית",
   "dir": "rtl",
   "title": "עוזר גלילת התורה",
+  "seo": {
+    "siteName": "Torah Roll Helper",
+    "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
+    "fallbackDescription": "עוזר גלילת התורה הוא כלי חינמי לגבאים ולבעלי קריאה, המסייע לחשב את כיוון הגלילה ואת מספר העמודות שיש לגלול בין הקריאות. הכלי מוכר גם בשם Torah Roll Helper ובשם Assistant de roulement de la Torah.",
+    "keywords": "Torah roll helper,Torah roll assistant,assistant de roulement de la Torah,עוזר גלילת התורה,גלילת התורה,ספר תורה,Gabbai,Ba'al Koreh,Sefer Torah",
+    "routes": {
+      "home": {
+        "title": "עוזר גלילת התורה | כלי חינמי לגלילת ספר תורה",
+        "description": "כלי חינמי לגבאים ולבעלי קריאה לחישוב מספר העמודות שיש לגלול ובאיזה כיוון בין קריאות התורה."
+      },
+      "about": {
+        "title": "אודות | Torah Roll Helper",
+        "description": "קראו על פרויקט Torah Roll Helper, על מקורות הנתונים לקריאות התורה, ועל הדרכים ליצור קשר או לתרום לפרויקט."
+      },
+      "howTo": {
+        "title": "הוראות שימוש | Torah Roll Helper",
+        "description": "למדו כיצד להשתמש ב-Torah Roll Helper כדי לזהות את המיקום הנוכחי בספר התורה, לבחור את הקריאה הבאה ולקבל הוראות גלילה ברורות."
+      }
+    }
+  },
   "routes": {
     "home": "בית",
     "about": "אודות",

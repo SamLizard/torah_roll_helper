@@ -17,19 +17,34 @@ const routes: RouteRecordRaw[] = [
     path: "/home",
     name: "home",
     component: HomeView,
-    meta: { icon: 'mdi-home', showInNav: true },
+    meta: {
+      icon: 'mdi-home',
+      showInNav: true,
+      titleKey: 'seo.routes.home.title',
+      descriptionKey: 'seo.routes.home.description',
+    },
   },
   {
     path: '/about',
     name: 'about',
     component: AboutView,
-    meta: { icon: 'mdi-information', showInNav: true }
+    meta: {
+      icon: 'mdi-information',
+      showInNav: true,
+      titleKey: 'seo.routes.about.title',
+      descriptionKey: 'seo.routes.about.description',
+    }
   },
   {
     path: '/how-to',
     name: 'howTo',
     component: HowToUseView,
-    meta: { icon: 'mdi-help-circle-outline', showInNav: true }
+    meta: {
+      icon: 'mdi-help-circle-outline',
+      showInNav: true,
+      titleKey: 'seo.routes.howTo.title',
+      descriptionKey: 'seo.routes.howTo.description',
+    }
   }
 ];
 

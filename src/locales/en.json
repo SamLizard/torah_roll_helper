@@ -2,6 +2,26 @@
   "language": "English",
   "dir": "ltr",
   "title": "Torah Roll Assistant",
+  "seo": {
+    "siteName": "Torah Roll Helper",
+    "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
+    "fallbackDescription": "Free Torah scroll rolling assistant for Gabbaim and Ba'alei Kriah. Calculate the direction and number of columns to roll between Torah readings. Also known as Assistant de roulement de la Torah and עוזר גלילת התורה.",
+    "keywords": "Torah roll helper,Torah roll assistant,assistant de roulement de la Torah,עוזר גלילת התורה,Torah rolling assistant,Sefer Torah,Gabbai,Ba'al Koreh,גלילת התורה",
+    "routes": {
+      "home": {
+        "title": "Torah Roll Helper | Free Sefer Torah rolling assistant",
+        "description": "Free tool for Gabbaim and Ba'alei Kriah to calculate how many Torah columns to roll and in which direction between readings."
+      },
+      "about": {
+        "title": "About | Torah Roll Helper",
+        "description": "Learn what Torah Roll Helper does, where its Torah reading data comes from, and how to contact or contribute to the project."
+      },
+      "howTo": {
+        "title": "How To Use | Torah Roll Helper",
+        "description": "Learn how to use Torah Roll Helper to identify the current Torah position, choose the next reading, and get clear rolling instructions."
+      }
+    }
+  },
   "routes": {
     "home": "Home",
     "about": "About",
