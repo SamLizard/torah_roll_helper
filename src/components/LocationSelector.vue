@@ -145,127 +145,13 @@
           {{ $t('home.actions.clear') }}
         </v-btn>
 
-        <v-dialog
+        <PagePreviewDialog
           v-model="isPagePreviewOpen"
-          max-width="920"
-        >
-          <v-card class="rounded-xl preview-dialog-card" data-tutorial="page-preview-dialog">
-            <v-card-title class="preview-dialog-title">
-              <span class="text-subtitle-1 font-weight-bold">
-                {{ $t('preview.pageTitle', { page }) }}
-              </span>
-              <v-btn
-                icon="mdi-close"
-                variant="text"
-                size="small"
-                data-tutorial="page-preview-close"
-                @click="isPagePreviewOpen = false"
-              />
-            </v-card-title>
-
-            <v-card-text>
-              <div class="preview-top-row mb-2">
-                <div class="text-caption text-medium-emphasis">
-                  {{ $t('preview.firstLine') }}
-                </div>
-
-                <v-tooltip v-if="!smAndDown" :text="$t('preview.shiftTip')">
-                  <template #activator="{ props: tooltipProps }">
-                    <button
-                      v-bind="tooltipProps"
-                      type="button"
-                      class="preview-annotations-toggle"
-                      data-tutorial="page-preview-nikud"
-                      :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                      :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                      @click="togglePreviewNikud"
-                    >
-                      <div class="preview-toggle">
-                        <div class="preview-shadowed-circle">
-                          <input
-                            type="checkbox"
-                            :checked="effectivePreviewWithNikud"
-                            tabindex="-1"
-                            aria-hidden="true"
-                          >
-                          <span class="preview-toggle-state mod-off">א</span>
-                          <span class="preview-toggle-state mod-on">אֶ֨</span>
-                        </div>
-                      </div>
-                    </button>
-                  </template>
-                </v-tooltip>
-                <button
-                  v-else
-                  type="button"
-                  class="preview-annotations-toggle"
-                  data-tutorial="page-preview-nikud"
-                  :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                  :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                  @click="togglePreviewNikud"
-                >
-                  <div class="preview-toggle">
-                    <div class="preview-shadowed-circle">
-                      <input
-                        type="checkbox"
-                        :checked="effectivePreviewWithNikud"
-                        tabindex="-1"
-                        aria-hidden="true"
-                      >
-                      <span class="preview-toggle-state mod-off">א</span>
-                      <span class="preview-toggle-state mod-on">אֶ֨</span>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <div v-if="hasPagePreview" class="tikkun-preview-line-shell">
-                <div
-                  class="tikkun-preview-line"
-                  dir="rtl"
-                  lang="he"
-                >
-                  <div
-                    v-for="(column, columnIndex) in pagePreviewColumns"
-                    :key="`${page}-${columnIndex}`"
-                    class="preview-column"
-                  >
-                    <span
-                      v-for="(fragment, fragmentIndex) in column"
-                      :key="`${page}-${columnIndex}-${fragmentIndex}`"
-                      class="tikkun-preview-fragment"
-                      :class="{ 'mod-setuma': column.length > 1 }"
-                      v-html="fragment"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-body-2 text-medium-emphasis">
-                {{ $t('preview.lineUnavailable') }}
-              </div>
-            </v-card-text>
-
-            <v-card-actions class="justify-space-between">
-              <v-btn variant="text" @click="isPagePreviewOpen = false">
-                {{ $t('actions.close') }}
-              </v-btn>
-              <v-btn
-                color="primary"
-                variant="tonal"
-                prepend-icon="mdi-open-in-new"
-                data-tutorial="page-preview-link"
-                :href="tikkunUrl ?? undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                :disabled="!tikkunUrl"
-                class="preview-open-btn"
-                @click="onOpenTikkun"
-              >
-                {{ openTikkunLabel }}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+          :page="page"
+          :preview-columns="pagePreviewRawColumns"
+          :tikkun-url="tikkunUrl"
+          @open-tikkun="onOpenTikkun"
+        />
       </div>
 
       <div v-else class="text-center text-medium-emphasis py-6">
@@ -289,6 +175,7 @@ import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
+import PagePreviewDialog from './PagePreviewDialog.vue';
 import ReadingOptionCard from './ReadingOptionCard.vue';
 import { computeRoll, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
@@ -308,7 +195,7 @@ import {
   readingTargets,
   type ReadingTarget,
 } from '@/composables/readingTargets';
-import { useDisplay, useRtl } from 'vuetify';
+import { useRtl } from 'vuetify';
 import type { RealDb, TorahRef, Verse } from '@/types';
 import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
 
@@ -347,20 +234,16 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n();
 const { isRtl } = useRtl();
-const { smAndDown } = useDisplay();
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
 const isPagePreviewOpen = ref(false);
-const previewWithNikud = ref(true);
-const isShiftPressed = ref(false);
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
-const NUN_HAFUCHA = '׆';
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const PERSISTED_TARGET_SEPARATOR = ' | ';
 
@@ -410,57 +293,6 @@ const toManualData = (torahRef: TorahRef): ManualData => ({
   chapter: torahRef.chapter,
   verse: torahRef.verse,
 });
-
-const ketiv = (text: string) =>
-  text
-    .replace('#(פ)', '')
-    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
-    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
-    .split(' ')
-    .map((maqafSeparatedWord) =>
-      maqafSeparatedWord
-        .split('־')
-        .map((word) => {
-          const parts = word.split('#');
-
-          if (parts.length <= 1) {
-            return parts[0];
-          }
-
-          return parts.slice(1);
-        })
-        .join('־')
-    )
-    .join(' ')
-    .replace(/\[/g, '{')
-    .replace(/\]/g, '}');
-
-const kri = (text: string) =>
-  text
-    .replace('#(פ)', '')
-    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
-    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
-    .replace(/־/g, ' ')
-    .replace(/#\[.+?\]/g, ' ')
-    .replace(new RegExp(`[^א-ת\\s${NUN_HAFUCHA}]`, 'g'), '')
-    .replace(/\s{2,}/g, ' ');
-
-const textFilter = ({ text, annotated }: { text: string; annotated: boolean }) =>
-  annotated ? ketiv(text) : kri(text);
-
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const ktivKriAnnotation = (text: string) =>
-  escapeHtml(text)
-    .replace(/[{]/g, '<span class="ktiv-kri">')
-    .replace(/[}]/g, '</span>')
-    .trim();
 
 const trackAction = (action: string, value?: string | number | null) => {
   trackFromToAction({ side: props.side, action, value });
@@ -546,24 +378,6 @@ const pagePreviewRawColumns = computed<string[][]>(() => {
   if (props.page == null) return [];
   return toPreviewColumns(pageFirstLines[props.page - 1]);
 });
-
-const pagePreviewColumns = computed(() =>
-  pagePreviewRawColumns.value.map((column) =>
-    column.map((fragment) =>
-      ktivKriAnnotation(
-        textFilter({ text: fragment, annotated: effectivePreviewWithNikud.value })
-      )
-    )
-  )
-);
-
-const hasPagePreview = computed(() => pagePreviewColumns.value.length > 0);
-const effectivePreviewWithNikud = computed(() =>
-  isShiftPressed.value ? !previewWithNikud.value : previewWithNikud.value
-);
-const openTikkunLabel = computed(() =>
-  smAndDown.value ? t('preview.openTikkunShort') : t('preview.openTikkun')
-);
 
 const hasCurrentRef = computed(() =>
   currentRef.value.chapter != null && currentRef.value.verse != null
@@ -950,18 +764,6 @@ watch(() => props.page, (newPage) => {
   }
 });
 
-const onPreviewKeydown = (event: KeyboardEvent) => {
-  if (!isPagePreviewOpen.value) return;
-  if (event.key !== 'Shift') return;
-  isShiftPressed.value = true;
-};
-
-const onPreviewKeyup = (event: KeyboardEvent) => {
-  if (!isPagePreviewOpen.value) return;
-  if (event.key !== 'Shift') return;
-  isShiftPressed.value = false;
-};
-
 const computedPageTitle = computed(() => {
   if (props.page === null) return [] as string[];
   return getPageTitleKeys(props.page, currentRef.value, options.isInGola);
@@ -1041,10 +843,6 @@ const onClear = () => {
   clear();
 };
 
-const togglePreviewNikud = () => {
-  previewWithNikud.value = !previewWithNikud.value;
-};
-
 const openPagePreview = () => {
   if (props.page == null) return;
   trackAction('preview-open');
@@ -1060,18 +858,6 @@ const onOpenTikkun = () => {
   trackAction('preview-open-tikkun');
 };
 
-watch(isPagePreviewOpen, (isOpen) => {
-  if (isOpen) {
-    window.addEventListener('keydown', onPreviewKeydown);
-    window.addEventListener('keyup', onPreviewKeyup);
-    return;
-  }
-
-  window.removeEventListener('keydown', onPreviewKeydown);
-  window.removeEventListener('keyup', onPreviewKeyup);
-  isShiftPressed.value = false;
-});
-
 defineExpose({
   openManualDialog: onOpenManualInput,
   closeManualDialog: closeManualInput,
@@ -1082,8 +868,6 @@ defineExpose({
 onUnmounted(() => {
   emit('calendar-requires-expanded-height-change', false);
   teardownCalendarMouseDrag?.();
-  window.removeEventListener('keydown', onPreviewKeydown);
-  window.removeEventListener('keyup', onPreviewKeyup);
 });
 </script>
 
@@ -1215,175 +999,6 @@ onUnmounted(() => {
   }
 }
 
-.preview-dialog-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.preview-dialog-card {
-  max-height: min(66vh, 520px);
-  overflow: hidden;
-}
-
-.preview-dialog-card :deep(.v-card-text) {
-  overflow-y: auto;
-}
-
-.preview-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.preview-annotations-toggle {
-  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 9999px;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.preview-toggle {
-  --annotations-toggle-active-color: white;
-  --annotations-toggle-inactive-color: hsla(0, 0%, 100%, 0.6);
-  text-align: middle;
-  display: flex;
-  align-items: center;
-  direction: ltr;
-  unicode-bidi: isolate;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.preview-toggle [type='checkbox'] {
-  display: none;
-}
-
-.preview-toggle-state {
-  color: var(--annotations-toggle-inactive-color);
-  transition: all 0.1s;
-  position: relative;
-  right: 3px;
-}
-
-.preview-toggle-state.mod-off {
-  display: inline-block;
-  margin-right: 0.25em;
-}
-
-.preview-toggle [type='checkbox']:checked ~ .preview-toggle-state.mod-on,
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
-  transform: scale(1.5);
-  color: var(--annotations-toggle-active-color);
-}
-
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-on,
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
-  right: -3px;
-}
-
-.preview-shadowed-circle {
-  padding: 0.72em;
-  height: 2.95em;
-  width: 2.95em;
-  display: flex;
-  direction: ltr;
-  unicode-bidi: isolate;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  background: black;
-  color: white;
-  transition: 0.15s transform;
-}
-
-.preview-shadowed-circle:hover {
-  transform: scale(1.08);
-}
-
-.tikkun-preview-line-shell {
-  width: min(100%, 44rem);
-  margin-inline: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 4px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.tikkun-preview-line {
-  --preview-line-width: 27.5em;
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  background-color: rgba(var(--v-theme-surface-variant), 0.18);
-  position: relative;
-  direction: rtl;
-  unicode-bidi: isolate;
-  text-align: justify;
-  line-height: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  min-width: var(--preview-line-width);
-  width: var(--preview-line-width);
-  padding: 12px 14px 10px;
-  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
-  font-size: clamp(1rem, 2.1vw, 1.55rem);
-}
-
-.preview-column {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  direction: rtl;
-  min-width: 18ch;
-}
-
-.preview-column:nth-child(2) {
-  margin-right: 5em;
-  width: 12em;
-}
-
-.tikkun-preview-fragment {
-  width: 100%;
-  white-space: nowrap;
-}
-
-.tikkun-preview-fragment.mod-setuma {
-  width: auto;
-}
-
-.tikkun-preview-fragment::after {
-  content: '';
-  width: 100%;
-  display: inline-block;
-}
-
-.tikkun-preview-line :deep(.ktiv-kri) {
-  background-color: rgba(var(--v-theme-primary), 0.1);
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-  border-radius: 8px;
-  padding: 0.1rem;
-}
-
-.preview-open-btn {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.preview-open-btn :deep(.v-btn__content) {
-  white-space: normal;
-  line-height: 1.15;
-  text-align: center;
-}
-
 .target-ref-toggle {
   width: 100%;
 }
@@ -1420,26 +1035,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 600px) {
-  .tikkun-preview-line-shell {
-    width: 100%;
-  }
-
-  .tikkun-preview-line {
-    font-size: 0.83rem;
-    --preview-line-width: 100%;
-    min-width: 100%;
-    width: 100%;
-  }
-
-  .preview-column {
-    min-width: 0;
-  }
-
-  .preview-column:nth-child(2) {
-    margin-right: 1.4em;
-    width: 8.6em;
-  }
-
   .location-header {
     flex-direction: column;
   }
