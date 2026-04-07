@@ -396,7 +396,16 @@
                   <td>{{ option.candidate.reference.verse ?? '-' }}</td>
                   <td>{{ option.page }}</td>
                   <td class="dicta-choice-page-title">{{ getOptionPageTitle(option) }}</td>
-                  <td>
+                  <td class="dicta-choice-actions">
+                    <v-btn
+                      icon="mdi-book-open-page-variant-outline"
+                      size="x-small"
+                      variant="text"
+                      color="primary"
+                      :title="$t('preview.openPage')"
+                      :aria-label="$t('preview.openPage')"
+                      @click="openDictaChoicePreview(option.page)"
+                    />
                     <v-btn
                       size="small"
                       color="primary"
@@ -444,11 +453,20 @@
                       </template>
                     </div>
                   </v-card-text>
-                  <v-card-actions class="pt-0 px-3 pb-2">
+                  <v-card-actions class="pt-0 px-3 pb-2 dicta-choice-card-actions">
+                    <v-btn
+                      icon="mdi-book-open-page-variant-outline"
+                      size="small"
+                      variant="text"
+                      color="primary"
+                      :title="$t('preview.openPage')"
+                      :aria-label="$t('preview.openPage')"
+                      @click="openDictaChoicePreview(option.page)"
+                    />
                     <v-btn
                       size="small"
                       color="primary"
-                      block
+                      class="flex-grow-1"
                       variant="tonal"
                       @click="onDictaChoiceSelect(option)"
                     >
@@ -462,6 +480,14 @@
         </v-card>
       </div>
     </transition>
+
+    <PagePreviewDialog
+      :model-value="isDictaChoicePreviewOpen"
+      :page="dictaPreviewPage"
+      :preview-columns="dictaPreviewColumns"
+      :tikkun-url="dictaPreviewTikkunUrl"
+      @update:model-value="onDictaChoicePreviewModelValueChange"
+    />
 
     <VOnboardingWrapper
       ref="onboardingWrapper"
@@ -559,7 +585,14 @@ import LocationSelector from '@/components/LocationSelector.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
-import { computeRoll, getPageNumber, getApproximatePages, getPageTitleKeys } from '@/composables/utils';
+import PagePreviewDialog from '@/components/PagePreviewDialog.vue';
+import {
+  computeRoll,
+  getPageNumber,
+  getApproximatePages,
+  getPageStartRef,
+  getPageTitleKeys,
+} from '@/composables/utils';
 import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
 import { findReadingTargetByKey } from '@/composables/readingTargets';
 import {
@@ -575,8 +608,11 @@ import {
   openTutorialNavDrawer,
 } from '@/composables/tutorialUi';
 import realDb from '@/data/real_db.json';
+import pageFirstLinesData from '@/data/page_first_lines.json';
+import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
+import { toRefUrl } from '@/composables/tikkunLinks';
 import type { ManualData, RealDb, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
@@ -680,6 +716,7 @@ const dictaChoiceOptions = ref<DictaPageOption[]>([]);
 const dictaChoiceResolver = ref<((option: DictaPageOption | null) => void) | null>(null);
 const dictaCaptureKey = ref(0);
 const dictaAnalyzeJobId = ref(0);
+const dictaPreviewPage = ref<number | null>(null);
 const dictaOptionsBySide = ref<Record<'from' | 'to', DictaPageOption[]>>({
   from: [],
   to: [],
@@ -778,6 +815,16 @@ const hasCachedOptionsForActiveSide = computed(
 );
 const photoUiDirection = computed<'rtl' | 'ltr'>(() => (isRtl.value ? 'rtl' : 'ltr'));
 const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
+const isDictaChoicePreviewOpen = computed(() => dictaPreviewPage.value !== null);
+const dictaPreviewColumns = computed(() => {
+  if (dictaPreviewPage.value == null) return [];
+  return toPreviewColumns((pageFirstLinesData as unknown[])[dictaPreviewPage.value - 1]);
+});
+const dictaPreviewTikkunUrl = computed(() => {
+  if (dictaPreviewPage.value == null) return null;
+  const pageStartRef = getPageStartRef(db, dictaPreviewPage.value);
+  return pageStartRef ? toRefUrl(pageStartRef) : null;
+});
 const isPhoneCameraMode = computed(() => {
   if (typeof navigator === 'undefined') return false;
   const userAgent = navigator.userAgent.toLowerCase();
@@ -1032,6 +1079,7 @@ const onDictaCameraError = (message: string): void => {
 };
 
 const resolveDictaChoice = (choice: DictaPageOption | null): void => {
+  dictaPreviewPage.value = null;
   dictaChoiceOpen.value = false;
   dictaChoiceOptions.value = [];
   if (dictaChoiceResolver.value) {
@@ -1052,6 +1100,16 @@ const onDictaChoiceCancel = (): void => {
 const onDictaChoiceRetake = (): void => {
   resolveDictaChoice(null);
   openDictaCaptureForSide(activeSide.value);
+};
+
+const openDictaChoicePreview = (page: number): void => {
+  dictaPreviewPage.value = page;
+};
+
+const onDictaChoicePreviewModelValueChange = (value: boolean): void => {
+  if (!value) {
+    dictaPreviewPage.value = null;
+  }
 };
 
 const onDictaOverlayKeydown = (event: KeyboardEvent): void => {
@@ -2542,8 +2600,22 @@ onUnmounted(() => {
   overflow-wrap: anywhere;
 }
 
+.dicta-choice-actions {
+  white-space: nowrap;
+}
+
+.dicta-choice-actions :deep(.v-btn + .v-btn) {
+  margin-inline-start: 4px;
+}
+
 .dicta-choice-card {
   height: 100%;
+}
+
+.dicta-choice-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .home-onboarding {
