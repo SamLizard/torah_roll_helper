@@ -82,10 +82,10 @@
       "newPhoto": "Nouvelle photo",
       "backToOptions": "Retour aux options",
       "instructions": {
-        "1": "Placez le texte pour que la largeur de la ligne reste dans le cadre blanc",
-        "2": "Utilisez les lignes jaunes pour aligner l'image",
-        "3": "Capturez au moins quatre lignes de texte",
-        "4": "Privilégiez les lignes complètes. Une ligne complète occupe presque toute la largeur de la colonne, sans grands espaces vides au milieu. Assurez-vous qu'au moins la première ligne capturée soit complète."
+        "1": "Faites tenir la ligne dans le cadre blanc.",
+        "2": "Alignez le texte sur les lignes jaunes.",
+        "3": "Prenez au moins quatre lignes de texte.",
+        "4": "Prenez des lignes pleines, sans grands espaces."
       },
       "chooseTitle": "Choisir le résultat",
       "chooseSubtitle": "Plusieurs correspondances ont été trouvées. Choisissez la page correcte.",

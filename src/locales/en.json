@@ -82,10 +82,10 @@
       "newPhoto": "New photo",
       "backToOptions": "Back to options",
       "instructions": {
-        "1": "Place the text so the line width stays inside the white frame",
-        "2": "Use the yellow lines to align the image",
-        "3": "Capture at least four lines of text",
-        "4": "Prefer full lines. A full line has text across most of its width, without large blank spaces in the middle. Please make sure at least the first line you capture is a full line."
+        "1": "Fit the line width inside the white frame.",
+        "2": "Align the text using the yellow lines.",
+        "3": "Capture at least four lines of text.",
+        "4": "Ensure the first line is full (no large blanks)."
       },
       "chooseTitle": "Choose Result",
       "chooseSubtitle": "Multiple matches were found. Select the correct page.",
