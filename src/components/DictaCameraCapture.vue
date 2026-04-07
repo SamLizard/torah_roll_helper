@@ -75,6 +75,9 @@
           <p class="dcc-mobile-error-hint">
             {{ isHttpsError ? t('home.dicta.cameraHttpsHint') : mobileError }}
           </p>
+          <p v-if="!isHttpsError" class="dcc-mobile-error-hint">
+            {{ t('home.dicta.cameraPermissionHint') }}
+          </p>
           <div class="dcc-mobile-error-actions">
             <v-btn
               v-if="!isHttpsError"
@@ -128,6 +131,7 @@
           <li>{{ t('home.dicta.instructions.1') }}</li>
           <li>{{ t('home.dicta.instructions.2') }}</li>
           <li>{{ t('home.dicta.instructions.3') }}</li>
+          <li>{{ t('home.dicta.instructions.4') }}</li>
         </ul>
 
         <!-- Portrait shutter -->
@@ -157,6 +161,7 @@
       <p class="dcc-desktop-error-title">{{ t('home.dicta.cameraUnavailable') }}</p>
       <p v-if="isHttpsError" class="dcc-desktop-error-hint">{{ t('home.dicta.cameraHttpsHint') }}</p>
       <p v-else class="dcc-desktop-error-hint">{{ desktopError }}</p>
+      <p v-if="!isHttpsError" class="dcc-desktop-error-hint">{{ t('home.dicta.cameraPermissionHint') }}</p>
       <div class="dcc-desktop-error-actions">
         <v-btn
           v-if="!isHttpsError"
@@ -212,6 +217,7 @@
           <li>{{ t('home.dicta.instructions.1') }}</li>
           <li>{{ t('home.dicta.instructions.2') }}</li>
           <li>{{ t('home.dicta.instructions.3') }}</li>
+          <li>{{ t('home.dicta.instructions.4') }}</li>
         </ul>
       </div>
 

@@ -23,6 +23,7 @@
               {{ $t('home.actions.choose') }}
             </v-btn>
             <v-btn
+              v-if="allowPhoto"
               size="small"
               variant="tonal"
               color="primary"
@@ -223,6 +224,7 @@ const props = defineProps({
   selectedRef: { type: Object as () => ManualData | null, default: null },
   targetKey: { type: String as () => string | null, default: null },
   balanceCalendarCardHeight: { type: Boolean, default: false },
+  allowPhoto: { type: Boolean, default: true },
 });
 
 const emit = defineEmits<{

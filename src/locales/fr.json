@@ -66,13 +66,14 @@
       "loadingOcr": "Lecture de l'image avec OCR Dicta...",
       "loadingSearch": "Recherche des sources Dicta...",
       "noResultTitle": "Aucune source trouvée",
-      "noResultSubtitle": "Essayez une nouvelle photo ou un autre texte",
+      "noResultSubtitle": "Réessayez en suivant bien les consignes, ou prenez en photo une autre partie de la page.",
       "idleTitle": "Prenez une photo avec Dicta",
       "idleSubtitle": "Utilisez le cadre pour bien aligner le texte avant la capture.",
       "errorTitle": "Le scan Dicta n'a pas pu être terminé",
       "unexpectedError": "Erreur Dicta inattendue.",
       "cameraUnavailable": "L'API caméra n'est pas disponible dans ce contexte navigateur.",
       "cameraHttpsHint": "L'autorisation de la caméra n'est pas disponible sur localhost. Ouvrez l'application en HTTPS au lieu de localhost.",
+      "cameraPermissionHint": "Il se peut que votre appareil bloque l'accès à la caméra avant même que le navigateur ne le demande. Ouvrez les réglages de votre appareil, trouvez l'application de votre navigateur et autorisez l'accès à la caméra. Si le site a été bloqué dans le navigateur, réactivez-le dans les paramètres du site.",
       "captureFailed": "Impossible de capturer l'image.",
       "capture": "Capturer",
       "chooseFile": "Choisir un fichier",
@@ -82,7 +83,8 @@
       "instructions": {
         "1": "Placez le texte pour que la largeur de la ligne reste dans le cadre blanc",
         "2": "Utilisez les lignes jaunes pour aligner l'image",
-        "3": "Capturez au moins quatre lignes de texte"
+        "3": "Capturez au moins quatre lignes de texte",
+        "4": "Privilégiez les lignes complètes. Une ligne complète occupe presque toute la largeur de la colonne, sans grands espaces vides au milieu. Assurez-vous qu'au moins la première ligne capturée soit complète."
       },
       "chooseTitle": "Choisir le résultat",
       "chooseSubtitle": "Plusieurs correspondances ont été trouvées. Choisissez la page correcte.",
