@@ -69,7 +69,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, type CSSProperties } from 'vue';
 
 const BASE_PREVIEW_FONT_PX = 24;
-const PETUCHA_DESKTOP_BOX_WIDTH_PX = 31 * 16;
+const DESKTOP_PAGE_BOX_WIDTH_PX = 31 * 16;
 const FIT_SAFETY_MARGIN_PX = 10;
 const PREVIEW_DIMENSION_EPSILON_PX = 0.5;
 const MIN_PREVIEW_FONT_SCALE = 0.32;
@@ -79,9 +79,11 @@ const props = withDefaults(defineProps<{
   active?: boolean;
   columns: string[][];
   isPetucha?: boolean;
+  usesRegularBoxWidth?: boolean;
 }>(), {
   active: false,
   isPetucha: false,
+  usesRegularBoxWidth: false,
 });
 
 const previewFitAreaRef = ref<HTMLElement | null>(null);
@@ -184,15 +186,17 @@ const getTargetPreviewBoxWidth = ({
   availableWidth,
   naturalBoxWidth,
   isPetucha,
+  usesRegularBoxWidth,
 }: {
   availableWidth: number;
   naturalBoxWidth: number;
   isPetucha: boolean;
+  usesRegularBoxWidth: boolean;
 }) =>
   Math.min(
     availableWidth,
-    isPetucha
-      ? Math.max(PETUCHA_DESKTOP_BOX_WIDTH_PX, naturalBoxWidth)
+    isPetucha || usesRegularBoxWidth
+      ? Math.max(DESKTOP_PAGE_BOX_WIDTH_PX, naturalBoxWidth)
       : naturalBoxWidth,
   );
 
@@ -238,6 +242,7 @@ const updatePreviewFit = async ({
     availableWidth,
     naturalBoxWidth,
     isPetucha: props.isPetucha,
+    usesRegularBoxWidth: props.usesRegularBoxWidth,
   });
 
   previewBoxWidthPx.value = targetBoxWidth;
@@ -363,7 +368,7 @@ watch(
 );
 
 watch(
-  () => [props.columns, props.isPetucha],
+  () => [props.columns, props.isPetucha, props.usesRegularBoxWidth],
   async () => {
     if (!props.active) return;
 

@@ -79,6 +79,7 @@
           :active="modelValue"
           :columns="pagePreviewColumns"
           :is-petucha="isPetucha"
+          :uses-regular-box-width="usesRegularBoxWidth"
         />
         <div v-else class="text-body-2 text-medium-emphasis">
           {{ $t('preview.lineUnavailable') }}
@@ -204,6 +205,9 @@ const isPetucha = computed(() =>
   props.previewColumns.some((column) =>
     column.some((fragment) => fragment.includes('#(פ)'))
   )
+);
+const usesRegularBoxWidth = computed(() =>
+  props.previewColumns.some((column) => column.length > 1)
 );
 const openTikkunLabel = computed(() =>
   smAndDown.value ? t('preview.openTikkunShort') : t('preview.openTikkun')
