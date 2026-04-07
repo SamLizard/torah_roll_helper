@@ -133,12 +133,34 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+                <v-btn
+                  class="mt-4"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-text-search"
+                  data-tutorial="dicta-first-line-fallback"
+                  @click="onOpenFirstLineSearchFromDicta"
+                >
+                  {{ $t('home.dicta.tryFirstWords') }}
+                </v-btn>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+                <v-btn
+                  class="mt-4"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-text-search"
+                  data-tutorial="dicta-first-line-fallback"
+                  @click="onOpenFirstLineSearchFromDicta"
+                >
+                  {{ $t('home.dicta.tryFirstWords') }}
+                </v-btn>
               </div>
 
               <div
@@ -223,12 +245,34 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
+                <v-btn
+                  class="mt-4"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-text-search"
+                  data-tutorial="dicta-first-line-fallback"
+                  @click="onOpenFirstLineSearchFromDicta"
+                >
+                  {{ $t('home.dicta.tryFirstWords') }}
+                </v-btn>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
+                <v-btn
+                  class="mt-4"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-text-search"
+                  data-tutorial="dicta-first-line-fallback"
+                  @click="onOpenFirstLineSearchFromDicta"
+                >
+                  {{ $t('home.dicta.tryFirstWords') }}
+                </v-btn>
               </div>
             </div>
           </v-card-text>
@@ -515,7 +559,6 @@ import LocationSelector from '@/components/LocationSelector.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
-import type { ManualData } from '@/components/ManualEntryDialog.vue';
 import { computeRoll, getPageNumber, getApproximatePages, getPageTitleKeys } from '@/composables/utils';
 import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
 import { findReadingTargetByKey } from '@/composables/readingTargets';
@@ -534,7 +577,7 @@ import {
 import realDb from '@/data/real_db.json';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
-import type { RealDb, RollInstructions, TorahRef } from '@/types';
+import type { ManualData, RealDb, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
   key: string;
@@ -551,6 +594,7 @@ interface TutorialStepEntity extends StepEntity {
 }
 
 type TutorialKind = 'quick' | 'full';
+type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial';
 
 interface TutorialSnapshot {
   fromPage: number | null;
@@ -617,6 +661,8 @@ const pendingTutorialNavigation = ref<'about' | null>(null);
 interface LocationSelectorExposed {
   openManualDialog: () => void;
   closeManualDialog: () => void;
+  openFirstLineSearchDialog: (source?: FirstLineSearchOpenSource) => void;
+  closeFirstLineSearchDialog: () => void;
   openPagePreview: () => void;
   closePagePreview: () => void;
 }
@@ -1058,6 +1104,23 @@ const openDictaFor = (side: 'from' | 'to') => {
   openDictaCaptureForSide(side);
 };
 
+const openFirstLineSearchForSide = async (
+  side: 'from' | 'to',
+  source: FirstLineSearchOpenSource
+): Promise<void> => {
+  const selectorRef = getLocationSelectorRef(side);
+  if (!selectorRef) return;
+
+  selectorRef.openFirstLineSearchDialog(source);
+  await nextTick();
+};
+
+const onOpenFirstLineSearchFromDicta = async (): Promise<void> => {
+  closeDictaDialog();
+  await nextTick();
+  await openFirstLineSearchForSide(activeSide.value, 'camera-fallback');
+};
+
 const openTargets = (side: 'from' | 'to') => {
   activeSide.value = side;
   targetsOpen.value = true;
@@ -1340,6 +1403,19 @@ const closeManualDialog = async (): Promise<void> => {
   await waitForTutorialElementToDisappear('[data-tutorial="manual-dialog"]');
 };
 
+const openFirstLineSearchForTutorial = async (side: 'from' | 'to'): Promise<void> => {
+  await openFirstLineSearchForSide(side, 'tutorial');
+  await waitForTutorialElement('[data-tutorial="first-line-search-dialog"]');
+  await wait(120);
+};
+
+const closeFirstLineSearchDialogForTutorial = async (): Promise<void> => {
+  fromLocationSelectorRef.value?.closeFirstLineSearchDialog();
+  toLocationSelectorRef.value?.closeFirstLineSearchDialog();
+  await nextTick();
+  await waitForTutorialElementToDisappear('[data-tutorial="first-line-search-dialog"]');
+};
+
 const openPreviewFor = async (side: 'from' | 'to'): Promise<void> => {
   const selectorRef = getLocationSelectorRef(side);
 
@@ -1458,6 +1534,7 @@ const closeTutorialOverlays = async (
   await closeTargetsForTutorial();
   await closeDictaForTutorial();
   await closeManualDialog();
+  await closeFirstLineSearchDialogForTutorial();
   await closePreviewDialog();
   await closeSettingsDialog();
 
@@ -1856,7 +1933,6 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     afterStep: async (stepOptions) => {
       if (stepOptions?.isForward) {
         await closeManualDialog();
-        await applyTutorialCalendarDemoState();
       }
 
       if (stepOptions?.isBackward) {
@@ -1865,13 +1941,33 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     },
   }),
   createTutorialStep({
-    id: 'full-to',
+    id: 'full-first-line-search',
     stepNumber: 10,
-    selector: '[data-tutorial="to-selector"]',
+    selector: '[data-tutorial="first-line-search-dialog"]',
     titleKey: 'onboarding.full.step10.title',
     descriptionKey: 'onboarding.full.step10.description',
     beforeStep: async () => {
-      await closeManualDialog();
+      await openFirstLineSearchForTutorial('from');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeFirstLineSearchDialogForTutorial();
+        await applyTutorialCalendarDemoState();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeFirstLineSearchDialogForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-to',
+    stepNumber: 11,
+    selector: '[data-tutorial="to-selector"]',
+    titleKey: 'onboarding.full.step11.title',
+    descriptionKey: 'onboarding.full.step11.description',
+    beforeStep: async () => {
+      await closeFirstLineSearchDialogForTutorial();
     },
     afterStep: async (stepOptions) => {
       if (stepOptions?.isForward) {
@@ -1879,17 +1975,17 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       }
 
       if (stepOptions?.isBackward) {
-        await openManualDialogFor('from');
+        await openFirstLineSearchForTutorial('from');
       }
     },
   }),
   createTutorialStep({
     id: 'full-reference-point',
-    stepNumber: 11,
+    stepNumber: 12,
     selector: '[data-tutorial="to-target-ref"]',
     fallbackSelector: '[data-tutorial="to-page-preview-trigger"]',
-    titleKey: 'onboarding.full.step11.title',
-    descriptionKey: 'onboarding.full.step11.description',
+    titleKey: 'onboarding.full.step12.title',
+    descriptionKey: 'onboarding.full.step12.description',
     beforeStep: async () => {
       await applyLongTutorialResultDemoState();
     },
@@ -1901,19 +1997,8 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-result',
-    stepNumber: 12,
-    selector: '[data-tutorial="roll-result"]',
-    titleKey: 'onboarding.full.step12.title',
-    descriptionKey: 'onboarding.full.step12.description',
-    beforeStep: async () => {
-      await applyLongTutorialResultDemoState();
-    },
-  }),
-  createTutorialStep({
-    id: 'full-remaining-after-book',
     stepNumber: 13,
-    selector: '[data-tutorial="result-book-remaining"]',
-    fallbackSelector: '[data-tutorial="roll-result"]',
+    selector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step13.title',
     descriptionKey: 'onboarding.full.step13.description',
     beforeStep: async () => {
@@ -1921,11 +2006,22 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     },
   }),
   createTutorialStep({
-    id: 'full-preview-trigger',
+    id: 'full-remaining-after-book',
     stepNumber: 14,
-    selector: '[data-tutorial="to-page-preview-trigger"]',
+    selector: '[data-tutorial="result-book-remaining"]',
+    fallbackSelector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step14.title',
     descriptionKey: 'onboarding.full.step14.description',
+    beforeStep: async () => {
+      await applyLongTutorialResultDemoState();
+    },
+  }),
+  createTutorialStep({
+    id: 'full-preview-trigger',
+    stepNumber: 15,
+    selector: '[data-tutorial="to-page-preview-trigger"]',
+    titleKey: 'onboarding.full.step15.title',
+    descriptionKey: 'onboarding.full.step15.description',
     beforeStep: async () => {
       await closePreviewDialog();
     },
@@ -1941,10 +2037,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-preview',
-    stepNumber: 15,
+    stepNumber: 16,
     selector: '[data-tutorial="page-preview-dialog"]',
-    titleKey: 'onboarding.full.step15.title',
-    descriptionKey: 'onboarding.full.step15.description',
+    titleKey: 'onboarding.full.step16.title',
+    descriptionKey: 'onboarding.full.step16.description',
     beforeStep: async () => {
       await openPreviewFor('to');
     },
@@ -1960,10 +2056,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-settings-button',
-    stepNumber: 16,
+    stepNumber: 17,
     selector: '[data-tutorial="settings-button"]',
-    titleKey: 'onboarding.full.step16.title',
-    descriptionKey: 'onboarding.full.step16.description',
+    titleKey: 'onboarding.full.step17.title',
+    descriptionKey: 'onboarding.full.step17.description',
     beforeStep: async () => {
       await closeSettingsDialog();
     },
@@ -1979,10 +2075,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-settings',
-    stepNumber: 17,
+    stepNumber: 18,
     selector: '[data-tutorial="settings-dialog"]',
-    titleKey: 'onboarding.full.step17.title',
-    descriptionKey: 'onboarding.full.step17.description',
+    titleKey: 'onboarding.full.step18.title',
+    descriptionKey: 'onboarding.full.step18.description',
     beforeStep: async () => {
       await openSettingsDialog();
     },
@@ -1998,11 +2094,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-navigation',
-    stepNumber: 18,
+    stepNumber: 19,
     selector: smAndDown.value ? '[data-tutorial="menu-button"]' : '[data-tutorial="top-nav-links"]',
     fallbackSelector: '[data-tutorial="menu-button"]',
-    titleKey: 'onboarding.full.step18.title',
-    descriptionKey: 'onboarding.full.step18.description',
+    titleKey: 'onboarding.full.step19.title',
+    descriptionKey: 'onboarding.full.step19.description',
     beforeStep: async () => {
       await closeSettingsDialog();
       await closeNavDrawer();
@@ -2020,10 +2116,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-about',
-    stepNumber: 19,
+    stepNumber: 20,
     selector: '[data-tutorial="about-nav"]',
-    titleKey: 'onboarding.full.step19.title',
-    descriptionKey: 'onboarding.full.step19.description',
+    titleKey: 'onboarding.full.step20.title',
+    descriptionKey: 'onboarding.full.step20.description',
     beforeStep: async () => {
       await openNavDrawerIfNeeded();
       await waitForTutorialElement('[data-tutorial="about-nav"]');

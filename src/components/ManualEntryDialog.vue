@@ -80,6 +80,19 @@
             min="1"
             :max="maxPage"
           ></v-text-field>
+
+          <div class="text-center mt-2">
+            <v-btn
+              variant="text"
+              color="primary"
+              size="small"
+              prepend-icon="mdi-text-search"
+              data-tutorial="manual-first-line-search"
+              @click="openFirstLineSearch"
+            >
+              {{ $t('manual.search_by_first_words') }}
+            </v-btn>
+          </div>
         </v-form>
       </v-card-text>
 
@@ -104,15 +117,9 @@ import { useI18n } from 'vue-i18n';
 import { getPageNumber } from '@/composables/utils';
 import { useManualEntryRules } from '@/composables/rules';
 import realDb from '@/data/real_db.json';
-import type { RealDb } from '@/types';
+import type { ManualData, RealDb } from '@/types';
 import { useOptionsStore } from '@/stores/options';
 import Swal from 'sweetalert2';
-
-export interface ManualData {
-  book: number;
-  chapter: number | null;
-  verse: number | null;
-}
 
 const props = defineProps<{
   modelValue: boolean;
@@ -124,6 +131,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
   (e: 'save', data: ManualData, page: number): void;
   (e: 'draft', data: ManualData): void;
+  (e: 'open-first-line-search'): void;
 }>();
 
 const { t } = useI18n();
@@ -356,6 +364,10 @@ const restoreInitial = () => {
     suppressRefWatch = false;
     suppressPageWatch = false;
   });
+};
+
+const openFirstLineSearch = () => {
+  emit('open-first-line-search');
 };
 
 const close = () => {

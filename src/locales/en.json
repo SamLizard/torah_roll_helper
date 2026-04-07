@@ -67,6 +67,7 @@
       "loadingSearch": "Searching Dicta sources...",
       "noResultTitle": "No source found",
       "noResultSubtitle": "Try again following the instructions, or take a picture of a different part of the page.",
+      "tryFirstWords": "Type the first words instead",
       "idleTitle": "Take a photo with Dicta",
       "idleSubtitle": "Use the frame lines to align text before capture.",
       "errorTitle": "Could not complete Dicta scan",
@@ -114,7 +115,7 @@
     "title": "How To Use",
     "subtitle": "Follow these quick steps to get clear rolling instructions.",
     "steps": {
-      "step1": "Identify the current location of the Torah scroll (the parasha it is currently open on) using the camera or manual input.",
+      "step1": "Identify the current location of the Torah scroll (the parasha it is currently open on) using the camera, exact manual input, or the page's first words.",
       "step2": "Select your target reading from the upcoming list or the full index.",
       "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
     },
@@ -124,7 +125,7 @@
       "step1": "Allow camera access when prompted by your browser.",
       "step2": "Place the Torah text inside the frame in good, even lighting.",
       "step3": "Hold steady for a moment so detection can lock correctly.",
-      "step4": "If detection fails, use manual input to set the current location."
+      "step4": "If detection fails, use the page's first words or manual input to set the current location."
     },
     "tutorials": {
       "title": "Interactive screen tours",
@@ -162,7 +163,7 @@
       },
       "step3": {
         "title": "Set the current scroll location",
-        "description": "This is the FROM side. Use 'Choose manually' for all readings, 'Camera' to identify the open column from the Klaf, or 'Input' if you know the exact reference. The cards below show last month's readings for quick access."
+        "description": "This is the FROM side. Use 'Choose manually' for all readings, 'Camera' to identify the open column from the Klaf, or 'Input' for an exact reference, page number, or the page's first words. The cards below show last month's readings for quick access."
       },
       "step4": {
         "title": "Choose your destination",
@@ -200,53 +201,57 @@
       },
       "step7": {
         "title": "Camera results",
-        "description": "After taking a photo, the app scans the text and suggests the most likely Amudim for your current location."
+        "description": "After taking a photo, the app scans the text and suggests the most likely Amudim for your current location. If the photo misses, the same screen now offers a direct fallback to typing the page's first words."
       },
       "step8": {
         "title": "Manual input",
-        "description": "Click 'Input' when you already know the exact Perek/Pasuk or the specific page number in the Tikkun Korim."
+        "description": "Click 'Input' when you already know the exact Perek/Pasuk, the specific page number in the Tikkun Korim, or when you want to search from the line that opens the page."
       },
       "step9": {
         "title": "Exact location dialog",
-        "description": "Here you can set the Sefer, Perek, and Pasuk, or jump straight to a page number."
+        "description": "Here you can set the Sefer, Perek, and Pasuk, jump straight to a page number, or switch to searching from the line that opens the page."
       },
       "step10": {
+        "title": "Search by first words",
+        "description": "Start typing the first words that appear at the top of the page. Each result shows the line that opens that page. If needed, open the built-in Hebrew keyboard or switch to match anywhere inside that line."
+      },
+      "step11": {
         "title": "The TO card",
         "description": "This is where you set your destination. The calendar strip displays the upcoming month. In most cases, you will simply select the next reading from here."
       },
-      "step11": {
+      "step12": {
         "title": "Reference point",
         "description": "Choose your exact stopping point. You can target the start of the Parasha, the end of a weekday reading (Sheni/Hamishi/Mincha), or the end of the full Shabbat reading."
       },
-      "step12": {
+      "step13": {
         "title": "The result card",
         "description": "Once FROM and TO are set, this card gives you the final answer: how many Amudim to roll, which direction, and the reference pages."
       },
-      "step13": {
+      "step14": {
         "title": "Crossing into a new Chumash",
         "description": "If your roll crosses into a new book (e.g., from Exodus to Leviticus), this note tells you how many pages are left to roll after reaching target book."
       },
-      "step14": {
+      "step15": {
         "title": "Page preview",
         "description": "Click the page number or the small book icon to see a preview of the selected column."
       },
-      "step15": {
+      "step16": {
         "title": "Verify with the Tikkun",
         "description": "The preview shows the first line of the column (with an option to toggle Nikud) and includes a button to open a full digital Tikkun layout to verify your spot."
       },
-      "step16": {
+      "step17": {
         "title": "Settings",
         "description": "Click the cog icon to open your preferences."
       },
-      "step17": {
+      "step18": {
         "title": "Community customs",
         "description": "Use settings to toggle between Israel and Diaspora (Gola) modes, select your Nusach, and choose the scroll layout (e.g., 245 columns). These options affect which readings appear and how the roll is calculated."
       },
-      "step18": {
+      "step19": {
         "title": "Navigation",
         "description": "Use the navigation bar to access other tools. On mobile, tap the menu icon to open the sidebar."
       },
-      "step19": {
+      "step20": {
         "title": "About & Contact",
         "description": "When you finish this tour, the 'About' page will open so you can see project details, view data credits, or report an issue on GitHub."
       }
@@ -318,12 +323,34 @@
     "verse": "Verse",
     "use_page": "I already have the page",
     "page": "Page",
+    "search_by_first_words": "Search by first words instead",
     "required": "Required",
     "must_be_positive": "Must be positive",
     "max_chapter": "Max chapter is",
     "max_verse": "Max verse is",
     "max_page": "Max page is",
     "page_not_found": "Page not found for the selected reference."
+  },
+  "firstLineSearch": {
+    "title": "Search by First Words",
+    "description": "Type the first words that appear at the top of the page. Each result shows the line that opens that page.",
+    "placeholder": "Example: וידבר",
+    "emptyState": "Find the page from its opening words",
+    "emptyStateHint": "Type the beginning of the line that starts the page.",
+    "keepTyping": "Type a bit more to narrow the results.",
+    "resultsFound": "{count} matching pages",
+    "noMatches": "No matching opening lines found",
+    "noMatchesHint": "Try fewer words, or switch to searching anywhere in the opening line.",
+    "preview": "Preview",
+    "usePage": "Use this page",
+    "searchAnywhere": "Search anywhere in the opening line",
+    "showKeyboard": "Show Hebrew keyboard",
+    "hideKeyboard": "Hide Hebrew keyboard",
+    "keyboardTitle": "Hebrew keyboard",
+    "openingLineLabel": "Line that starts the page",
+    "space": "Space",
+    "backspace": "Backspace",
+    "clearSearch": "Clear"
   },
   "type": {
     "parasha": "Parashot",

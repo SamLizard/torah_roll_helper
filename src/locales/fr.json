@@ -67,6 +67,7 @@
       "loadingSearch": "Recherche des sources Dicta...",
       "noResultTitle": "Aucune source trouvée",
       "noResultSubtitle": "Réessayez en suivant bien les consignes, ou prenez en photo une autre partie de la page.",
+      "tryFirstWords": "Taper les premiers mots",
       "idleTitle": "Prenez une photo avec Dicta",
       "idleSubtitle": "Utilisez le cadre pour bien aligner le texte avant la capture.",
       "errorTitle": "Le scan Dicta n'a pas pu être terminé",
@@ -114,7 +115,7 @@
     "title": "Mode d'emploi",
     "subtitle": "Suivez ces étapes courtes pour obtenir des instructions de roulement claires.",
     "steps": {
-      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo ou saisie manuelle.",
+      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo, saisie exacte, ou avec les premiers mots de la page.",
       "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
       "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
     },
@@ -124,7 +125,7 @@
       "step1": "Autorisez l'accès à la caméra lorsque le navigateur le demande.",
       "step2": "Placez le texte de la Torah dans le cadre avec un éclairage homogène.",
       "step3": "Restez immobile un instant pour laisser la détection se stabiliser.",
-      "step4": "En cas d'échec, utilisez la saisie manuelle pour définir la position actuelle."
+      "step4": "En cas d'échec, utilisez les premiers mots de la page ou la saisie manuelle pour définir la position actuelle."
     },
     "tutorials": {
       "title": "Visites guidées interactives",
@@ -162,7 +163,7 @@
       },
       "step3": {
         "title": "Définir l'emplacement actuel",
-        "description": "C'est le point de DÉPART (DE). Utilisez 'Choisir manuellement' pour toutes les lectures, l'appareil photo pour identifier la page depuis le parchemin (Klaf), ou 'Saisie' si vous connaissez la référence exacte. Les cartes ci-dessous affichent les lectures du mois dernier pour un accès rapide."
+        "description": "C'est le point de DÉPART (DE). Utilisez 'Choisir manuellement' pour toutes les lectures, l'appareil photo pour identifier la page depuis le parchemin (Klaf), ou 'Saisie' pour une référence exacte, un numéro de page, ou les premiers mots de la page. Les cartes ci-dessous affichent les lectures du mois dernier pour un accès rapide."
       },
       "step4": {
         "title": "Choisir la destination",
@@ -200,53 +201,57 @@
       },
       "step7": {
         "title": "Résultats de l'analyse",
-        "description": "Après avoir pris une photo, l'application analyse le texte et suggère les Amoudim les plus probables pour votre emplacement actuel."
+        "description": "Après avoir pris une photo, l'application analyse le texte et suggère les Amoudim les plus probables pour votre emplacement actuel. Si la photo échoue, ce même écran propose maintenant un accès direct pour taper les premiers mots de la page."
       },
       "step8": {
         "title": "Saisie manuelle",
-        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts, ou le numéro de page spécifique dans le Tikkoun Korim."
+        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts, le numéro de page spécifique dans le Tikkoun Korim, ou si vous voulez chercher à partir de la ligne qui ouvre la page."
       },
       "step9": {
         "title": "Fenêtre de saisie exacte",
-        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, ou aller directement à un numéro de page."
+        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, aller directement à un numéro de page, ou basculer vers la recherche à partir de la ligne qui ouvre la page."
       },
       "step10": {
+        "title": "Recherche par premiers mots",
+        "description": "Commencez à taper les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page. Si besoin, ouvrez le clavier hébreu intégré ou passez à la recherche n'importe où dans cette ligne."
+      },
+      "step11": {
         "title": "La zone ARRIVÉE (À)",
         "description": "C'est ici que vous définissez votre destination. La bande calendaire affiche le mois à venir. Dans la plupart des cas, vous sélectionnerez simplement la prochaine lecture d'ici."
       },
-      "step11": {
+      "step12": {
         "title": "Point de repère",
         "description": "Précisez votre point d'arrêt exact. Vous pouvez cibler le début de la Paracha, la fin d'une lecture de semaine (Chéni/Hamichi/Min'ha), ou la fin de la lecture complète du Chabbat."
       },
-      "step12": {
+      "step13": {
         "title": "La carte de résultat",
         "description": "Une fois DE et À définis, cette carte vous donne la réponse finale : combien d'Amoudim rouler, dans quelle direction, et les pages de référence."
       },
-      "step13": {
+      "step14": {
         "title": "Changement de Houmach",
         "description": "S'il faut passer à un nouveau livre (ex: de Chémot à Vayikra), cette note vous indique combien de pages il reste à rouler une fois le livre cible atteint."
       },
-      "step14": {
+      "step15": {
         "title": "Aperçu de la page",
         "description": "Cliquez sur le numéro de page ou sur la petite icône de livre pour voir un aperçu de la colonne sélectionnée."
       },
-      "step15": {
+      "step16": {
         "title": "Vérification avec le Tikkoun",
         "description": "L'aperçu montre la première ligne de la colonne (avec la possibilité d'afficher ou masquer le Nikoud) et inclut un bouton pour ouvrir un affichage complet du Tikkoun afin de vérifier votre position."
       },
-      "step16": {
+      "step17": {
         "title": "Paramètres",
         "description": "Cliquez sur l'icône de roue dentée pour ouvrir vos préférences."
       },
-      "step17": {
+      "step18": {
         "title": "Coutumes communautaires",
         "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Noussah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé."
       },
-      "step18": {
+      "step19": {
         "title": "Navigation",
         "description": "Utilisez la barre de navigation pour accéder aux autres outils. Sur mobile, touchez l'icône de menu pour ouvrir le panneau latéral."
       },
-      "step19": {
+      "step20": {
         "title": "À propos et Contact",
         "description": "Lorsque vous terminez cette visite, la page 'À propos' s'ouvrira pour que vous puissiez voir les détails du projet, les crédits des données, ou signaler un problème sur GitHub."
       }
@@ -318,12 +323,34 @@
     "verse": "Verset",
     "use_page": "J'ai déjà la page",
     "page": "Page",
+    "search_by_first_words": "Chercher par premiers mots",
     "required": "Requis",
     "must_be_positive": "Doit être positif",
     "max_chapter": "Le chapitre max est",
     "max_verse": "Le verset max est",
     "max_page": "La page max est",
     "page_not_found": "Page introuvable pour la référence sélectionnée."
+  },
+  "firstLineSearch": {
+    "title": "Recherche par premiers mots",
+    "description": "Tapez les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page.",
+    "placeholder": "Exemple : וידבר",
+    "emptyState": "Retrouver la page à partir de ses premiers mots",
+    "emptyStateHint": "Tapez le début de la ligne qui ouvre la page.",
+    "keepTyping": "Tapez encore un peu pour réduire les résultats.",
+    "resultsFound": "{count} pages correspondantes",
+    "noMatches": "Aucune ligne d'ouverture correspondante",
+    "noMatchesHint": "Essayez avec moins de mots, ou activez la recherche n'importe où dans la ligne d'ouverture.",
+    "preview": "Aperçu",
+    "usePage": "Utiliser cette page",
+    "searchAnywhere": "Chercher n'importe où dans la ligne d'ouverture",
+    "showKeyboard": "Afficher le clavier hébreu",
+    "hideKeyboard": "Masquer le clavier hébreu",
+    "keyboardTitle": "Clavier hébreu",
+    "openingLineLabel": "Ligne qui commence la page",
+    "space": "Espace",
+    "backspace": "Retour",
+    "clearSearch": "Effacer"
   },
   "type": {
     "parasha": "Parachot",

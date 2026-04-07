@@ -1,6 +1,5 @@
-import type { RealDb, RollInstructions } from '../types';
+import type { ManualData, RealDb, RollInstructions, Verse } from '../types';
 import pageTitlesData from '@/data/page_titles_keys.json';
-import type { ManualData } from '@/components/ManualEntryDialog.vue';
 import { matchesTargetSpecific, readingTargets } from './readingTargets';
 import type { ReadingTarget } from './readingTargets';
 
@@ -8,6 +7,7 @@ const pageTitles = pageTitlesData as string[][];
 const readingTargetsByKey = new Map<string, ReadingTarget>(
   readingTargets.map((target) => [target.key, target])
 );
+const pageStartRefsByPage = new WeakMap<RealDb, Verse[]>();
 
 const isVisiblePageTitleKey = (key: string, isInGola: boolean): boolean => {
   const target = readingTargetsByKey.get(key);
@@ -90,6 +90,28 @@ const getApproximatePages = (
   return pages;
 };
 
+const getFlatPageStartRefs = (realDb: RealDb): Verse[] => {
+  const cachedPageStartRefs = pageStartRefsByPage.get(realDb);
+  if (cachedPageStartRefs) return cachedPageStartRefs;
+
+  const flatPageStartRefs = realDb.flatMap((bookEntries, bookIndex) =>
+    bookEntries.map(([chapter, verse]) => ({
+      book: bookIndex + 1,
+      chapter,
+      verse,
+    }))
+  );
+
+  pageStartRefsByPage.set(realDb, flatPageStartRefs);
+  return flatPageStartRefs;
+};
+
+const getPageStartRef = (realDb: RealDb, pageNumber: number | null): Verse | null => {
+  if (pageNumber == null) return null;
+  if (pageNumber < 1) return null;
+  return getFlatPageStartRefs(realDb)[pageNumber - 1] ?? null;
+};
+
 const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
   const pages = Math.abs(toPage - fromPage);
   const rollDirection = toPage > fromPage ? 'forward' : 'backward';
@@ -97,10 +119,10 @@ const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
   return { pages, rollDirection };
 };
 
-const getPageTitleKeys = (pageNumber: number, ref: ManualData, isInGola: boolean): string[] => {
+const getPageTitleKeys = (pageNumber: number, ref: ManualData | null, isInGola: boolean): string[] => {
   const readingMatches: string[] = [];
 
-  if (ref.chapter !== null && ref.verse !== null) {
+  if (ref && ref.chapter != null && ref.verse != null) {
     for (const target of readingTargets) {
       if (
         target.ref.book === ref.book &&
@@ -127,5 +149,6 @@ export {
   computeRoll,
   getApproximatePages,
   getPageNumber,
+  getPageStartRef,
   getPageTitleKeys,
 };

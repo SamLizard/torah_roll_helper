@@ -167,6 +167,12 @@
       :initial-page="page"
       @save="onManualSave"
       @draft="onManualDraft"
+      @open-first-line-search="onOpenFirstLineSearchFromManual"
+    />
+
+    <FirstLineSearchDialog
+      v-model="isFirstLineSearchOpen"
+      @save="onFirstLineSearchSave"
     />
   </v-card>
 </template>
@@ -175,10 +181,12 @@
 import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
-import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
+import ManualEntryDialog from './ManualEntryDialog.vue';
+import FirstLineSearchDialog from './FirstLineSearchDialog.vue';
 import PagePreviewDialog from './PagePreviewDialog.vue';
 import ReadingOptionCard from './ReadingOptionCard.vue';
-import { computeRoll, getPageTitleKeys } from '@/composables/utils';
+import { toPreviewColumns } from '@/composables/firstLineSearch';
+import { computeRoll, getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import pageFirstLinesData from '@/data/page_first_lines.json';
@@ -197,7 +205,7 @@ import {
   type ReadingTarget,
 } from '@/composables/readingTargets';
 import { useRtl } from 'vuetify';
-import type { RealDb, TorahRef, Verse } from '@/types';
+import type { ManualData, RealDb, TorahRef, Verse } from '@/types';
 import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
 
 type TargetItem = ReadingTarget;
@@ -217,6 +225,8 @@ interface TargetRefOption {
   labelKey: string;
   ref: TorahRef;
 }
+
+type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial';
 
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
@@ -240,6 +250,7 @@ const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
+const isFirstLineSearchOpen = ref(false);
 const isPagePreviewOpen = ref(false);
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
@@ -319,6 +330,21 @@ const closeManualInput = () => {
   isManualOpen.value = false;
 };
 
+const openFirstLineSearchDialog = (source: FirstLineSearchOpenSource = 'manual') => {
+  trackAction('first-line-search-open', source);
+  isFirstLineSearchOpen.value = true;
+};
+
+const closeFirstLineSearchDialog = () => {
+  isFirstLineSearchOpen.value = false;
+};
+
+const onOpenFirstLineSearchFromManual = async () => {
+  closeManualInput();
+  await nextTick();
+  openFirstLineSearchDialog('manual');
+};
+
 const getCalendarDayOffset = (dateIso: string): number | null => {
   const pickedDate = new Date(`${dateIso}T12:00:00`);
   if (Number.isNaN(pickedDate.getTime())) return null;
@@ -334,46 +360,6 @@ const toDayOffsetLabel = (offset: number) => {
   if (offset === 0) return 'today';
   if (offset > 0) return `next-${offset}`;
   return `ago-${Math.abs(offset)}`;
-};
-
-const getPageStartRef = (page: number | null): Verse | null => {
-  if (page == null) return null;
-
-  for (let bookIndex = 0; bookIndex < db.length; bookIndex += 1) {
-    const bookEntries = db[bookIndex];
-    const match = bookEntries.find((entry) => entry[2] === page);
-    if (!match) continue;
-
-    return {
-      book: bookIndex + 1,
-      chapter: match[0],
-      verse: match[1],
-    };
-  }
-
-  return null;
-};
-
-const toPreviewColumns = (entry: unknown): string[][] => {
-  if (typeof entry === 'string') return [[entry]];
-  if (!Array.isArray(entry)) return [];
-  if (entry.length === 0) return [];
-
-  if (entry.every((item) => typeof item === 'string')) {
-    return [entry as string[]];
-  }
-
-  if (entry.every((item) => Array.isArray(item))) {
-    return (entry as unknown[])
-      .map((column) =>
-        Array.isArray(column)
-          ? column.filter((fragment): fragment is string => typeof fragment === 'string')
-          : []
-      )
-      .filter((column) => column.length > 0);
-  }
-
-  return [];
 };
 
 const pagePreviewRawColumns = computed<string[][]>(() => {
@@ -585,7 +571,7 @@ const tikkunUrl = computed(() => {
     return toRefUrl(matchedTarget.value.ref);
   }
 
-  const pageStartRef = getPageStartRef(props.page);
+  const pageStartRef = getPageStartRef(db, props.page);
   if (!pageStartRef) return null;
 
   return toRefUrl(pageStartRef);
@@ -809,12 +795,16 @@ const resolvedPageTitle = computed(() => {
   return '';
 });
 
-const onManualSave = (data: ManualData, page: number) => {
+const applyResolvedSelection = (
+  data: ManualData,
+  page: number,
+  source: 'manual' | 'first-line-search'
+) => {
   const matchedManualTarget = visibleTargets.value.find((target) =>
     getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
   );
 
-  trackAction('manual-save', matchedManualTarget ? 'target' : 'custom');
+  trackAction(source === 'manual' ? 'manual-save' : 'first-line-search-save', matchedManualTarget ? 'target' : 'custom');
 
   if (matchedManualTarget) {
     const defaultMode = getDefaultTargetRefMode(matchedManualTarget, props.side);
@@ -828,6 +818,14 @@ const onManualSave = (data: ManualData, page: number) => {
 
   currentRef.value = data;
   emit('manual-set', page, data, null);
+};
+
+const onManualSave = (data: ManualData, page: number) => {
+  applyResolvedSelection(data, page, 'manual');
+};
+
+const onFirstLineSearchSave = (data: ManualData, page: number) => {
+  applyResolvedSelection(data, page, 'first-line-search');
 };
 
 const onManualDraft = (data: ManualData) => {
@@ -863,6 +861,8 @@ const onOpenTikkun = () => {
 defineExpose({
   openManualDialog: onOpenManualInput,
   closeManualDialog: closeManualInput,
+  openFirstLineSearchDialog,
+  closeFirstLineSearchDialog,
   openPagePreview,
   closePagePreview,
 });
