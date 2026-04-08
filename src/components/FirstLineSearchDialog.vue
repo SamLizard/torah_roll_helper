@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 33: Try to use (an option to use) the tesseract library. Pay attention to put a small height so the user can take only the first row. So the user will be able to base the text to write with the detected text (and remove the errors). -->
   <v-dialog v-model="dialog" max-width="760" scrollable>
     <v-card class="rounded-xl pa-4 first-line-search-card" data-tutorial="first-line-search-dialog">
       <v-card-title class="first-line-search-title">
@@ -270,6 +271,12 @@ import PagePreviewDialog from './PagePreviewDialog.vue';
 import realDb from '@/data/real_db.json';
 import pageFirstLinesData from '@/data/page_first_lines.json';
 import {
+  trackFirstLineSearchOutcome,
+  trackFromToAction,
+  type FirstLineSearchMode,
+  type FirstLineSearchSource,
+} from '@/composables/analytics';
+import {
   findPreparedPagesByLineStart,
   findPreparedPagesContainingTextInLine,
   normalizeForTypedInput,
@@ -297,8 +304,15 @@ const HEBREW_KEYBOARD_ROWS = [
   ['ך', 'ם', 'ן', 'ף', 'ץ'],
 ] as const;
 
+const createFirstResultLettersByMode = (): Record<FirstLineSearchMode, number | null> => ({
+  'line-start': null,
+  'inside-line': null,
+});
+
 const props = defineProps<{
   modelValue: boolean;
+  side: 'from' | 'to';
+  source: FirstLineSearchSource;
 }>();
 
 const emit = defineEmits<{
@@ -317,6 +331,10 @@ const searchQuery = ref('');
 const includeMatches = ref(false);
 const showKeyboard = ref(false);
 const previewPage = ref<number | null>(null);
+const firstResultLettersByMode = ref<Record<FirstLineSearchMode, number | null>>(
+  createFirstResultLettersByMode()
+);
+const hasTrackedSessionOutcome = ref(false);
 
 const keyboardRows = HEBREW_KEYBOARD_ROWS;
 const isKeyboardLockingNativeInput = computed(() => smAndDown.value && showKeyboard.value);
@@ -549,6 +567,24 @@ const toggleKeyboard = async () => {
   }
 };
 
+const getSearchMode = (): FirstLineSearchMode => {
+  return includeMatches.value ? 'inside-line' : 'line-start';
+};
+
+const trackCurrentSessionOutcome = (status: 'success' | 'no-result') => {
+  if (hasTrackedSessionOutcome.value) return;
+
+  trackFirstLineSearchOutcome({
+    side: props.side,
+    source: props.source,
+    status,
+    mode: getSearchMode(),
+    lettersCount: normalizedQuery.value.length,
+    firstResultLettersCount: firstResultLettersByMode.value[getSearchMode()],
+  });
+  hasTrackedSessionOutcome.value = true;
+};
+
 watch(
   () => props.modelValue,
   async (isOpen) => {
@@ -556,20 +592,47 @@ watch(
       searchQuery.value = '';
       includeMatches.value = false;
       showKeyboard.value = false;
+      firstResultLettersByMode.value = createFirstResultLettersByMode();
+      hasTrackedSessionOutcome.value = false;
       await focusSearchField();
       return;
+    }
+
+    if (isQueryReady.value && searchResults.value.length === 0) {
+      trackCurrentSessionOutcome('no-result');
     }
 
     previewPage.value = null;
   },
 );
 
+watch(
+  [() => props.modelValue, normalizedQuery, searchResults],
+  ([isOpen, queryValue, results]) => {
+    const searchMode = getSearchMode();
+    if (!isOpen) return;
+    if (firstResultLettersByMode.value[searchMode] != null) return;
+    if (queryValue.length === 0 || results.length === 0) return;
+
+    firstResultLettersByMode.value = {
+      ...firstResultLettersByMode.value,
+      [searchMode]: queryValue.length,
+    };
+  },
+);
+
 const selectPage = (pageNumber: number) => {
+  trackCurrentSessionOutcome('success');
   emit('save', toManualData(pageNumber), pageNumber);
   dialog.value = false;
 };
 
 const openPreview = (pageNumber: number) => {
+  trackFromToAction({
+    side: props.side,
+    action: 'preview-open',
+    value: 'first-line-search',
+  });
   previewPage.value = pageNumber;
 };
 

@@ -172,6 +172,8 @@
 
     <FirstLineSearchDialog
       v-model="isFirstLineSearchOpen"
+      :side="side"
+      :source="firstLineSearchSource"
       @save="onFirstLineSearchSave"
     />
   </v-card>
@@ -252,6 +254,7 @@ const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
 const isFirstLineSearchOpen = ref(false);
 const isPagePreviewOpen = ref(false);
+const firstLineSearchSource = ref<FirstLineSearchOpenSource>('manual');
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
@@ -331,6 +334,7 @@ const closeManualInput = () => {
 };
 
 const openFirstLineSearchDialog = (source: FirstLineSearchOpenSource = 'manual') => {
+  firstLineSearchSource.value = source;
   trackAction('first-line-search-open', source);
   isFirstLineSearchOpen.value = true;
 };
@@ -845,7 +849,7 @@ const onClear = () => {
 
 const openPagePreview = () => {
   if (props.page == null) return;
-  trackAction('preview-open');
+  trackAction('preview-open', 'location-card');
   isPagePreviewOpen.value = true;
 };
 

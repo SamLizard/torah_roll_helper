@@ -596,6 +596,11 @@ import {
 import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
 import { findReadingTargetByKey } from '@/composables/readingTargets';
 import {
+  trackPhotoAttemptOutcome,
+  trackPhotoMultiResultRetake,
+  trackPhotoMultiResultSelection,
+  trackPhotoSuccess,
+  trackFromToAction,
   trackRollResultDisplayed,
   trackTutorialEvent,
 } from '@/composables/analytics';
@@ -657,6 +662,11 @@ interface DictaPageOption {
   rank: 'high' | 'medium' | 'low';
   matchCount: number;
   sourceCount: number;
+}
+
+interface DictaMetricsSession {
+  attemptCount: number;
+  multiResultRetakeCount: number;
 }
 
 const options = useOptionsStore();
@@ -721,6 +731,10 @@ const dictaOptionsBySide = ref<Record<'from' | 'to', DictaPageOption[]>>({
   from: [],
   to: [],
 });
+const dictaMetricsBySide = ref<Record<'from' | 'to', DictaMetricsSession | null>>({
+  from: null,
+  to: null,
+});
 
 const allowGolaInTargets = computed(() => {
   return true;
@@ -782,10 +796,10 @@ const resetDictaSession = () => {
   dictaCandidates.value = [];
 };
 
-const applyDictaReference = (reference: DictaReference, page: number): void => {
+const applyDictaReference = (reference: DictaReference, page: number): boolean => {
   const resolvedPage = getPageNumber(db, reference.book, reference.chapter, reference.verse ?? 1);
   const finalPage = page > 0 ? page : resolvedPage;
-  if (finalPage <= 0) return;
+  if (finalPage <= 0) return false;
 
   const data: ManualData = {
     book: reference.book,
@@ -798,6 +812,34 @@ const applyDictaReference = (reference: DictaReference, page: number): void => {
   } else {
     onSetToPage(finalPage, data, null);
   }
+
+  return true;
+};
+
+const createDictaMetricsSession = (): DictaMetricsSession => ({
+  attemptCount: 0,
+  multiResultRetakeCount: 0,
+});
+
+const startDictaMetricsSession = (side: 'from' | 'to') => {
+  dictaMetricsBySide.value[side] = createDictaMetricsSession();
+};
+
+const ensureDictaMetricsSession = (side: 'from' | 'to'): DictaMetricsSession => {
+  const existingSession = dictaMetricsBySide.value[side];
+  if (existingSession) return existingSession;
+
+  const nextSession = createDictaMetricsSession();
+  dictaMetricsBySide.value[side] = nextSession;
+  return nextSession;
+};
+
+const getDictaMetricsSession = (side: 'from' | 'to') => {
+  return dictaMetricsBySide.value[side];
+};
+
+const clearDictaMetricsSession = (side: 'from' | 'to') => {
+  dictaMetricsBySide.value[side] = null;
 };
 
 const getBookLabel = (book: number): string => {
@@ -1012,6 +1054,9 @@ const wait = async (ms: number): Promise<void> => {
 
 const processDictaFile = async (file: File): Promise<void> => {
   const jobId = ++dictaAnalyzeJobId.value;
+  const side = activeSide.value;
+  const metricsSession = ensureDictaMetricsSession(side);
+  metricsSession.attemptCount += 1;
 
   try {
     if (!isCurrentAnalyzeJob(jobId)) return;
@@ -1022,6 +1067,7 @@ const processDictaFile = async (file: File): Promise<void> => {
     if (!isCurrentAnalyzeJob(jobId)) return;
 
     if (!analysis.ocrText) {
+      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
       dictaFlowState.value = 'no-result';
       return;
     }
@@ -1030,6 +1076,7 @@ const processDictaFile = async (file: File): Promise<void> => {
     dictaRawResults.value = analysis.parallels;
 
     if (analysis.parallels.length === 0) {
+      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
       dictaFlowState.value = 'no-result';
       return;
     }
@@ -1039,11 +1086,22 @@ const processDictaFile = async (file: File): Promise<void> => {
     const pageOptions = buildDictaPageOptions(candidates);
 
     if (pageOptions.length === 0) {
+      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
       dictaFlowState.value = 'no-result';
       return;
     }
 
-    dictaOptionsBySide.value[activeSide.value] = pageOptions;
+    dictaOptionsBySide.value[side] = pageOptions;
+
+    if (pageOptions.length === 1) {
+      trackPhotoAttemptOutcome({ side, outcome: 'single-result' });
+    } else {
+      trackPhotoAttemptOutcome({
+        side,
+        outcome: 'multiple-results',
+        multipleResultCount: pageOptions.length,
+      });
+    }
 
     if (pageOptions.length === 1) {
       dictaFlowState.value = 'success';
@@ -1061,9 +1119,33 @@ const processDictaFile = async (file: File): Promise<void> => {
       return;
     }
 
-    applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+    const applied = applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+    if (!applied) return;
+
+    const metricsSessionAfterSelection = getDictaMetricsSession(side);
+    if (!metricsSessionAfterSelection) return;
+
+    if (pageOptions.length > 1) {
+      const selectedPosition = pageOptions.findIndex((option) => option.key === selectedOption.key);
+      if (selectedPosition >= 0) {
+        trackPhotoMultiResultSelection({
+          side,
+          position: selectedPosition,
+          totalOptions: pageOptions.length,
+        });
+      }
+    }
+
+    trackPhotoSuccess({
+      side,
+      successType: pageOptions.length === 1 ? 'single-result' : 'multiple-results',
+      triesBeforeSuccess: metricsSessionAfterSelection.attemptCount,
+      multiResultRetakesBeforeSuccess: metricsSessionAfterSelection.multiResultRetakeCount,
+    });
+    clearDictaMetricsSession(side);
   } catch (error) {
     if (!isCurrentAnalyzeJob(jobId)) return;
+    trackPhotoAttemptOutcome({ side, outcome: 'error' });
     dictaFlowState.value = 'error';
     dictaErrorMessage.value = error instanceof Error ? error.message : t('home.dicta.unexpectedError');
   }
@@ -1098,11 +1180,24 @@ const onDictaChoiceCancel = (): void => {
 };
 
 const onDictaChoiceRetake = (): void => {
+  const metricsSession = getDictaMetricsSession(activeSide.value);
+  if (metricsSession) {
+    metricsSession.multiResultRetakeCount += 1;
+    trackPhotoMultiResultRetake(activeSide.value);
+  } else {
+    startDictaMetricsSession(activeSide.value);
+  }
+
   resolveDictaChoice(null);
   openDictaCaptureForSide(activeSide.value);
 };
 
 const openDictaChoicePreview = (page: number): void => {
+  trackFromToAction({
+    side: activeSide.value,
+    action: 'preview-open',
+    value: 'photo-multi-result',
+  });
   dictaPreviewPage.value = page;
 };
 
@@ -1132,12 +1227,40 @@ const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
 
   void pickDictaPageOption(cachedOptions).then((selectedOption) => {
     if (!selectedOption) return;
-    applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+
+    const applied = applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
+    if (!applied) return;
+
+    const metricsSession = getDictaMetricsSession(side);
+    if (!metricsSession) return;
+
+    const selectedPosition = cachedOptions.findIndex((option) => option.key === selectedOption.key);
+    if (selectedPosition >= 0) {
+      trackPhotoMultiResultSelection({
+        side,
+        position: selectedPosition,
+        totalOptions: cachedOptions.length,
+      });
+    }
+
+    trackPhotoSuccess({
+      side,
+      successType: 'multiple-results',
+      triesBeforeSuccess: metricsSession.attemptCount,
+      multiResultRetakesBeforeSuccess: metricsSession.multiResultRetakeCount,
+    });
+    clearDictaMetricsSession(side);
   });
 };
 
-const openDictaCaptureForSide = (side: 'from' | 'to'): void => {
+const openDictaCaptureForSide = (
+  side: 'from' | 'to',
+  options: { resetMetricsSession?: boolean } = {}
+): void => {
   activeSide.value = side;
+  if (options.resetMetricsSession) {
+    startDictaMetricsSession(side);
+  }
   dictaAnalyzeJobId.value += 1;
   resetDictaSession();
   dictaCaptureKey.value += 1;
@@ -1159,7 +1282,7 @@ const openDictaFor = (side: 'from' | 'to') => {
     openCachedOptionsForSide(side);
     return;
   }
-  openDictaCaptureForSide(side);
+  openDictaCaptureForSide(side, { resetMetricsSession: true });
 };
 
 const openFirstLineSearchForSide = async (
