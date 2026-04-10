@@ -19,9 +19,11 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@types/lodash": "^4.14.202",
+    "fuzzball": "^2.2.3",
     "lodash": "^4.17.21",
     "pinia": "^3.0.4",
     "sweetalert2": "^11.26.17",
+    "tesseract.js": "^7.0.0",
     "v-onboarding": "^2.12.2",
     "vue": "^3.5.27",
     "vue-i18n": "^11.2.8",

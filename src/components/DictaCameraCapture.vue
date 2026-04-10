@@ -128,10 +128,9 @@
 
         <!-- Instructions in the bottom dark band -->
         <ul class="dcc-instructions" :dir="isRtl ? 'rtl' : 'ltr'">
-          <li>{{ t('home.dicta.instructions.1') }}</li>
-          <li>{{ t('home.dicta.instructions.2') }}</li>
-          <li>{{ t('home.dicta.instructions.3') }}</li>
-          <li>{{ t('home.dicta.instructions.4') }}</li>
+          <li v-for="instruction in cameraInstructions" :key="instruction">
+            {{ instruction }}
+          </li>
         </ul>
 
         <!-- Portrait shutter -->
@@ -185,7 +184,7 @@
 
     <template v-else>
       <!-- Preview box with fixed aspect ratio — never collapses -->
-      <div class="dcc-desktop-preview" ref="videoHolder">
+      <div class="dcc-desktop-preview" ref="videoHolder" :style="desktopPreviewStyle">
 
         <video ref="videoEl" class="dcc-video-desktop" playsinline muted></video>
 
@@ -214,10 +213,9 @@
 
         <!-- Instructions in the bottom dark band -->
         <ul class="dcc-instructions" :dir="isRtl ? 'rtl' : 'ltr'">
-          <li>{{ t('home.dicta.instructions.1') }}</li>
-          <li>{{ t('home.dicta.instructions.2') }}</li>
-          <li>{{ t('home.dicta.instructions.3') }}</li>
-          <li>{{ t('home.dicta.instructions.4') }}</li>
+          <li v-for="instruction in cameraInstructions" :key="instruction">
+            {{ instruction }}
+          </li>
         </ul>
       </div>
 
@@ -269,6 +267,8 @@ const props = defineProps({
   hideFileButton: { type: Boolean, default: false },
   suppressErrors: { type: Boolean, default: false },
   mobileMode:     { type: Boolean, default: false },
+  instructions:   { type: Array as () => string[], default: () => [] },
+  captureHeightRatio: { type: Number, default: 0.3 },
 });
 
 const emit = defineEmits<{
@@ -284,7 +284,6 @@ const { isRtl } = useRtl();
 // Constants  (from Dicta's Camera.vue)
 // ─────────────────────────────────────────────────────────────────────────────
 const X_PERCENT  = 0.8;
-const Y_PERCENT  = 0.3;
 const PIXEL_WIDTH = 1500 / X_PERCENT; // 1875
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -327,8 +326,33 @@ let pendingBlob: Blob | null = null;
 // CSS variable for mobile (same formula as Dicta's Camera.vue boundStyle)
 // ─────────────────────────────────────────────────────────────────────────────
 const mobileStyle = computed(() => ({
-  '--y-percentage': `calc((100% - 0.3 * ${previewWidth.value}px) / 2)`,
+  '--y-percentage': `calc((100% - ${captureHeightRatio.value} * ${previewWidth.value}px) / 2)`,
 }));
+
+const captureHeightRatio = computed(() => {
+  return Math.min(0.45, Math.max(0.12, props.captureHeightRatio));
+});
+
+const desktopPreviewStyle = computed(() => {
+  const maskPercentage = ((0.75 - captureHeightRatio.value) / 1.5) * 100;
+
+  return {
+    '--y-percentage': `${Math.min(45, Math.max(12, maskPercentage))}%`,
+  };
+});
+
+const cameraInstructions = computed(() => {
+  if (props.instructions.length > 0) {
+    return props.instructions;
+  }
+
+  return [
+    t('home.dicta.instructions.1'),
+    t('home.dicta.instructions.2'),
+    t('home.dicta.instructions.3'),
+    t('home.dicta.instructions.4'),
+  ];
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Camera selection — direct port of Dicta's Camera.vue selectCamera()
@@ -509,7 +533,7 @@ async function emitPhoto(blob: Blob): Promise<void> {
     const img = await createImageBitmap(blob);
     const FRAME = 10;
     const sliceWidth  = PIXEL_WIDTH * X_PERCENT;  // 1500
-    const sliceHeight = PIXEL_WIDTH * Y_PERCENT;  // 562.5
+    const sliceHeight = PIXEL_WIDTH * captureHeightRatio.value;
 
     if (!canvas) canvas = document.createElement('canvas');
     canvas.width  = sliceWidth  + 2 * FRAME;
@@ -520,7 +544,7 @@ async function emitPhoto(blob: Blob): Promise<void> {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const sourceSliceHeight = img.width * Y_PERCENT;
+    const sourceSliceHeight = img.width * captureHeightRatio.value;
     ctx.drawImage(
       img,
       img.width * ((1 - X_PERCENT) / 2),

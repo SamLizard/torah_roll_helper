@@ -1,6 +1,11 @@
 <template>
-  <!-- TODO 33: Try to use (an option to use) the tesseract library. Pay attention to put a small height so the user can take only the first row. So the user will be able to base the text to write with the detected text (and remove the errors). -->
-  <v-dialog v-model="dialog" max-width="760" scrollable>
+  <!-- DONE 33: Try to use (an option to use) the tesseract library. Pay attention to put a small height so the user can take only the first row. So the user will be able to base the text to write with the detected text (and remove the errors). -->
+  <v-dialog
+    v-if="!shouldHideDialogForPhoneCamera"
+    v-model="dialog"
+    max-width="760"
+    scrollable
+  >
     <v-card class="rounded-xl pa-4 first-line-search-card" data-tutorial="first-line-search-dialog">
       <v-card-title class="first-line-search-title">
         <div class="first-line-search-title__text text-h6 font-weight-bold">
@@ -42,7 +47,21 @@
           autofocus
           data-tutorial="first-line-search-input"
           @click:clear="onInputClear"
-        />
+        >
+          <template #append-inner>
+            <v-btn
+              icon
+              variant="text"
+              size="small"
+              :loading="isOcrProcessing"
+              :disabled="isOcrProcessing || isOcrCameraOpen"
+              :title="$t('firstLineSearch.ocrAction')"
+              @click.stop="openOcrCamera"
+            >
+              <v-icon>mdi-camera</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
 
         <div class="first-line-search-controls">
           <v-switch
@@ -63,7 +82,126 @@
           >
             {{ showKeyboard ? $t('firstLineSearch.hideKeyboard') : $t('firstLineSearch.showKeyboard') }}
           </v-btn>
+
+          <v-btn
+            v-if="canRestoreOcrResults"
+            size="small"
+            variant="text"
+            color="primary"
+            prepend-icon="mdi-restore"
+            @click="restoreOcrResults"
+          >
+            {{ $t('firstLineSearch.restoreOcrResults') }}
+          </v-btn>
         </div>
+
+        <v-alert
+          v-if="ocrErrorMessage"
+          type="error"
+          variant="tonal"
+          density="comfortable"
+          class="mb-4"
+        >
+          {{ ocrErrorMessage }}
+        </v-alert>
+
+        <v-sheet
+          v-if="isOcrProcessing || isShowingOcrAnalysis"
+          rounded="xl"
+          border
+          class="first-line-search-ocr mb-4"
+        >
+          <div class="first-line-search-ocr__header">
+            <div>
+              <div class="text-subtitle-2 font-weight-medium">
+                {{ $t('firstLineSearch.ocrPanelTitle') }}
+              </div>
+              <div class="text-body-2 text-medium-emphasis">
+                {{ $t('firstLineSearch.ocrPanelHint') }}
+              </div>
+            </div>
+
+            <v-chip
+              v-if="ocrResult?.ocrConfidence != null"
+              size="small"
+              variant="tonal"
+            >
+              {{ $t('firstLineSearch.ocrConfidence', { value: ocrResult.ocrConfidence }) }}
+            </v-chip>
+          </div>
+
+          <div v-if="isOcrProcessing" class="first-line-search-ocr__progress">
+            <div class="text-body-2">
+              {{ $t('firstLineSearch.ocrProcessing') }}
+            </div>
+            <v-progress-linear
+              :model-value="ocrProgressPercent"
+              color="primary"
+              rounded
+              height="8"
+            />
+          </div>
+
+          <template v-else-if="ocrResult && isShowingOcrAnalysis">
+            <div
+              class="first-line-search-ocr__grid"
+              :class="{ 'first-line-search-ocr__grid--single': !shouldShowCorrectedOcrText }"
+            >
+              <div class="first-line-search-ocr__field">
+                <div class="text-caption text-medium-emphasis">
+                  {{ $t('firstLineSearch.ocrRawText') }}
+                </div>
+                <div class="first-line-search-ocr__text" dir="rtl" lang="he">
+                  {{ ocrRawPreview }}
+                </div>
+              </div>
+
+              <div v-if="shouldShowCorrectedOcrText" class="first-line-search-ocr__field">
+                <div class="text-caption text-medium-emphasis">
+                  {{ $t('firstLineSearch.ocrEditableText') }}
+                </div>
+                <div class="first-line-search-ocr__text" dir="rtl" lang="he">
+                  {{ searchQuery || $t('firstLineSearch.ocrNoText') }}
+                </div>
+              </div>
+            </div>
+
+            <v-alert
+              v-if="isOcrResultLowQuality"
+              type="warning"
+              variant="tonal"
+              density="comfortable"
+              class="mt-3"
+            >
+              {{ $t('firstLineSearch.ocrLowQuality') }}
+            </v-alert>
+
+            <div v-if="assistantSummary" class="first-line-search-ocr__summary">
+              <div class="text-caption text-medium-emphasis">
+                {{ $t('firstLineSearch.ocrBestMatch') }}
+              </div>
+
+              <div class="first-line-search-ocr__summary-main">
+                <div class="text-body-1 font-weight-medium">
+                  {{ assistantSummary.displayText }}
+                </div>
+
+                <div class="d-flex align-center ga-2 flex-wrap">
+                  <v-chip size="small" color="primary" variant="tonal">
+                    {{ $t('page') }} {{ assistantSummary.pageNumber }}
+                  </v-chip>
+                  <v-chip
+                    size="small"
+                    :color="getConfidenceChipColor(assistantSummary)"
+                    variant="tonal"
+                  >
+                    {{ getConfidenceChipLabel(assistantSummary) }}
+                  </v-chip>
+                </div>
+              </div>
+            </div>
+          </template>
+        </v-sheet>
 
         <div v-if="showKeyboard" class="first-line-search-keyboard">
           <div class="text-caption text-medium-emphasis mb-2">
@@ -134,23 +272,36 @@
           <div class="text-body-2">{{ $t('firstLineSearch.keepTyping') }}</div>
         </div>
 
-        <template v-else-if="searchResults.length > 0">
+        <template v-else-if="displayedSearchResults.length > 0">
           <div class="text-caption text-medium-emphasis mb-3">
-            {{ $t('firstLineSearch.resultsFound', { count: searchResults.length }) }}
+            {{
+              shouldUseAssistantResults
+                ? $t('firstLineSearch.ocrSuggestionsFound', { count: displayedSearchResults.length })
+                : $t('firstLineSearch.resultsFound', { count: displayedSearchResults.length })
+            }}
           </div>
 
           <div v-if="shouldUseCompactResults" class="d-flex flex-column ga-2">
             <v-sheet
-              v-for="result in searchResults"
+              v-for="result in displayedSearchResults"
               :key="result.pageNumber"
               rounded="lg"
               border
               class="first-line-search-compact"
+              :class="{ 'first-line-search-compact--best': shouldUseAssistantResults && result.pageNumber === assistantSummary?.pageNumber }"
             >
               <div class="first-line-search-compact__top">
                 <div class="d-flex align-center ga-2 min-w-0">
                   <v-chip color="primary" variant="tonal" size="x-small">
                     {{ result.pageNumber }}
+                  </v-chip>
+                  <v-chip
+                    v-if="shouldUseAssistantResults && result.displayConfidence != null"
+                    size="x-small"
+                    :color="getConfidenceChipColor(result)"
+                    variant="tonal"
+                  >
+                    {{ result.displayConfidence }}%
                   </v-chip>
                 </div>
 
@@ -189,19 +340,34 @@
 
           <div v-else class="d-flex flex-column ga-3">
             <v-card
-              v-for="result in searchResults"
+              v-for="result in displayedSearchResults"
               :key="result.pageNumber"
               variant="outlined"
               class="first-line-search-result"
+              :class="{ 'first-line-search-result--best': shouldUseAssistantResults && result.pageNumber === assistantSummary?.pageNumber }"
             >
               <v-card-text class="pb-2">
                 <div class="d-flex align-center justify-space-between ga-3 mb-3">
                   <div class="text-caption text-medium-emphasis">
-                    {{ $t('firstLineSearch.openingLineLabel') }}
+                    {{
+                      shouldUseAssistantResults
+                        ? $t('firstLineSearch.ocrMatchLabel')
+                        : $t('firstLineSearch.openingLineLabel')
+                    }}
                   </div>
-                  <v-chip color="primary" variant="tonal" size="small">
-                    {{ $t('page') }} {{ result.pageNumber }}
-                  </v-chip>
+                  <div class="d-flex align-center ga-2 flex-wrap justify-end">
+                    <v-chip color="primary" variant="tonal" size="small">
+                      {{ $t('page') }} {{ result.pageNumber }}
+                    </v-chip>
+                    <v-chip
+                      v-if="shouldUseAssistantResults && result.displayConfidence != null"
+                      size="small"
+                      :color="getConfidenceChipColor(result)"
+                      variant="tonal"
+                    >
+                      {{ getConfidenceChipLabel(result) }}
+                    </v-chip>
+                  </div>
                 </div>
 
                 <div class="first-line-search-result__text" dir="rtl" lang="he">
@@ -239,7 +405,10 @@
           </div>
         </template>
 
-        <div v-else class="first-line-search-state text-medium-emphasis">
+        <div
+          v-else-if="!shouldUseAssistantResults"
+          class="first-line-search-state text-medium-emphasis"
+        >
           <v-icon size="42" class="mb-2 opacity-60">mdi-text-search</v-icon>
           <div class="text-subtitle-2 font-weight-medium">{{ $t('firstLineSearch.noMatches') }}</div>
           <div class="text-body-2 mt-1">{{ $t('firstLineSearch.noMatchesHint') }}</div>
@@ -261,12 +430,69 @@
       @update:model-value="onPreviewDialogModelValueChange"
     />
   </v-dialog>
+
+  <Teleport to="body">
+    <transition name="dialog-bottom-transition">
+      <section
+        v-if="isPhoneOcrCameraMode && isOcrCameraOpen"
+        class="first-line-search-camera-overlay"
+      >
+        <DictaCameraCapture
+          :busy="false"
+          :auto-fallback="true"
+          :hide-file-button="true"
+          :suppress-errors="true"
+          :mobile-mode="true"
+          :instructions="ocrCameraInstructions"
+          :capture-height-ratio="0.18"
+          @captured="onOcrCaptured"
+          @error="onOcrCameraError"
+          @close="closeOcrCamera"
+        />
+      </section>
+    </transition>
+  </Teleport>
+
+  <v-dialog
+    v-if="!isPhoneOcrCameraMode && isOcrCameraOpen"
+    :model-value="isOcrCameraOpen"
+    max-width="960"
+    @update:model-value="onOcrCameraDialogModelValueChange"
+  >
+    <v-card class="rounded-xl pa-4">
+      <v-card-title class="first-line-search-title">
+        <div class="first-line-search-title__text text-h6 font-weight-bold">
+          {{ $t('firstLineSearch.ocrCameraTitle') }}
+        </div>
+
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          :title="$t('actions.close')"
+          @click="closeOcrCamera"
+        />
+      </v-card-title>
+
+      <v-card-text class="pt-2">
+        <DictaCameraCapture
+          :busy="false"
+          :instructions="ocrCameraInstructions"
+          :capture-height-ratio="0.18"
+          @captured="onOcrCaptured"
+          @error="onOcrCameraError"
+          @close="closeOcrCamera"
+        />
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
+import DictaCameraCapture from './DictaCameraCapture.vue';
 import PagePreviewDialog from './PagePreviewDialog.vue';
 import realDb from '@/data/real_db.json';
 import pageFirstLinesData from '@/data/page_first_lines.json';
@@ -284,13 +510,22 @@ import {
   type PageFirstLine,
   type PreparedPageFirstLine,
 } from '@/composables/firstLineSearch';
+import {
+  analyzeFirstLineText,
+  recognizeFirstLineFromImage,
+  type FirstLineOcrResult,
+  type OcrProgressPayload,
+} from '@/composables/firstLineOcr';
 import { getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { toRefUrl } from '@/composables/tikkunLinks';
 import { useOptionsStore } from '@/stores/options';
 import type { ManualData, RealDb } from '@/types';
 
-interface SearchResultItem extends PreparedPageFirstLine {
+interface SearchDisplayItem extends PreparedPageFirstLine {
   pageTitle: string;
+  score: number | null;
+  displayConfidence: number | null;
+  scoreGap: number | null;
 }
 
 type SearchFieldRef = {
@@ -325,6 +560,8 @@ const { smAndDown } = useDisplay();
 const optionsStore = useOptionsStore();
 const db = realDb as RealDb;
 const preparedPages = preparePageFirstLines(pageFirstLinesData as PageFirstLine[]);
+const MINIMUM_ASSISTANT_WORD_COVERAGE = 0.25;
+const MINIMUM_ASSISTANT_RESULT_SCORE = 70;
 
 const searchFieldRef = ref<SearchFieldRef>(null);
 const searchQuery = ref('');
@@ -335,9 +572,24 @@ const firstResultLettersByMode = ref<Record<FirstLineSearchMode, number | null>>
   createFirstResultLettersByMode()
 );
 const hasTrackedSessionOutcome = ref(false);
+const ocrResult = ref<FirstLineOcrResult | null>(null);
+const isOcrProcessing = ref(false);
+const ocrProgressPercent = ref(0);
+const ocrErrorMessage = ref('');
+const isOcrCameraOpen = ref(false);
+const ocrSuggestedQuery = ref('');
 
 const keyboardRows = HEBREW_KEYBOARD_ROWS;
 const isKeyboardLockingNativeInput = computed(() => smAndDown.value && showKeyboard.value);
+const preparedPagesByNumber = new Map(preparedPages.map((page) => [page.pageNumber, page]));
+const isPhoneOcrCameraMode = computed(() => smAndDown.value);
+const shouldHideDialogForPhoneCamera = computed(() => isPhoneOcrCameraMode.value && isOcrCameraOpen.value);
+const ocrCameraInstructions = computed(() => ([
+  t('firstLineSearch.ocrCameraInstruction1'),
+  t('firstLineSearch.ocrCameraInstruction2'),
+  t('firstLineSearch.ocrCameraInstruction3'),
+  t('firstLineSearch.ocrCameraInstruction4'),
+]));
 
 const dialog = computed({
   get: () => props.modelValue,
@@ -380,6 +632,7 @@ const getTitleForPage = (pageNumber: number): string => {
 };
 
 const matchedPages = computed(() => {
+  if (shouldUseAssistantResults.value) return [];
   if (!isQueryReady.value) return [];
 
   if (includeMatches.value) {
@@ -389,17 +642,144 @@ const matchedPages = computed(() => {
   return findPreparedPagesByLineStart(searchQuery.value, preparedPages);
 });
 
-const searchResults = computed<SearchResultItem[]>(() => {
+const searchResults = computed<SearchDisplayItem[]>(() => {
   return matchedPages.value.map((page) => ({
     ...page,
     pageTitle: getTitleForPage(page.pageNumber),
+    score: null,
+    displayConfidence: null,
+    scoreGap: null,
   }));
+});
+
+const isShowingOcrAnalysis = computed(() => {
+  if (!ocrResult.value) return false;
+
+  const normalizedOcrQuery = normalizeForTypedInput(ocrSuggestedQuery.value);
+  if (normalizedOcrQuery.length === 0) return false;
+
+  return normalizedOcrQuery === normalizedQuery.value;
+});
+
+const shouldUseAssistantResults = computed(() => isShowingOcrAnalysis.value);
+const canRestoreOcrResults = computed(() => {
+  if (!ocrResult.value) return false;
+  if (normalizeForTypedInput(ocrSuggestedQuery.value).length === 0) return false;
+  return !isShowingOcrAnalysis.value;
+});
+
+const getAssistantCandidatePages = (text: string): PreparedPageFirstLine[] => {
+  const normalizedText = normalizeForTypedInput(text);
+  if (normalizedText.length === 0) return [];
+
+  const words = normalizedText.split(' ');
+  let narrowestMatches: PreparedPageFirstLine[] = [];
+
+  for (let wordCount = words.length; wordCount >= 1; wordCount -= 1) {
+    const prefix = words.slice(0, wordCount).join(' ');
+    const matches = findPreparedPagesByLineStart(prefix, preparedPages);
+    if (matches.length === 0) continue;
+
+    if (narrowestMatches.length === 0 || matches.length < narrowestMatches.length) {
+      narrowestMatches = matches;
+    }
+
+    if (matches.length <= 5) {
+      return matches;
+    }
+  }
+
+  return narrowestMatches;
+};
+
+const assistantCandidatePages = computed(() => {
+  if (!shouldUseAssistantResults.value) return [];
+  return getAssistantCandidatePages(searchQuery.value);
+});
+
+const assistantAnalysis = computed(() => {
+  if (!shouldUseAssistantResults.value) return null;
+  if (normalizedQuery.value.length === 0) return null;
+  return analyzeFirstLineText(searchQuery.value, {
+    candidatePages: assistantCandidatePages.value.length > 0 ? assistantCandidatePages.value : undefined,
+  });
+});
+
+const getMatchedWordStats = (candidate: PreparedPageFirstLine, query: string) => {
+  const queryWords = new Set(normalizeForTypedInput(query).split(' ').filter((word) => word.length > 0));
+  const matchedWords = candidate.words.filter((word) => queryWords.has(word)).length;
+  const coverage = candidate.words.length > 0 ? matchedWords / candidate.words.length : 0;
+
+  return {
+    matchedWords,
+    coverage,
+  };
+};
+
+const assistantResults = computed<SearchDisplayItem[]>(() => {
+  if (!assistantAnalysis.value) return [];
+
+  const mappedResults = assistantAnalysis.value.rankedMatches.reduce<SearchDisplayItem[]>((results, match) => {
+    const page = preparedPagesByNumber.get(match.pageNumber);
+    if (!page) return results;
+
+    results.push({
+      ...page,
+      pageTitle: getTitleForPage(match.pageNumber),
+      score: match.score,
+      displayConfidence: match.displayConfidence,
+      scoreGap: match.scoreGap,
+    });
+
+    return results;
+  }, []);
+
+  if (assistantAnalysis.value.reliability === 'confirmed') {
+    return mappedResults.slice(0, 1);
+  }
+
+  return mappedResults.filter((result, index) => {
+    if (index === 0) return true;
+
+    const { matchedWords, coverage } = getMatchedWordStats(result, searchQuery.value);
+    const minimumMatchedWords = Math.min(2, result.words.length);
+
+    return (
+      (result.score ?? 0) >= MINIMUM_ASSISTANT_RESULT_SCORE
+      && matchedWords >= minimumMatchedWords
+      && coverage >= MINIMUM_ASSISTANT_WORD_COVERAGE
+    );
+  });
+});
+
+const displayedSearchResults = computed<SearchDisplayItem[]>(() => {
+  return shouldUseAssistantResults.value ? assistantResults.value : searchResults.value;
+});
+
+const assistantSummary = computed(() => {
+  if (!assistantAnalysis.value?.bestMatch) return null;
+  return assistantResults.value.find((result) => result.pageNumber === assistantAnalysis.value?.bestMatch?.pageNumber) ?? null;
+});
+
+const ocrRawPreview = computed(() => {
+  const rawText = ocrResult.value?.inputText.replace(/\s+/g, ' ').trim();
+  return rawText?.length ? rawText : t('firstLineSearch.ocrNoText');
+});
+
+const shouldShowCorrectedOcrText = computed(() => {
+  if (!ocrResult.value) return false;
+  return normalizeForTypedInput(ocrResult.value.inputText) !== normalizeForTypedInput(ocrResult.value.correctedText);
+});
+
+const isOcrResultLowQuality = computed(() => {
+  if (!ocrResult.value) return false;
+  return ocrResult.value.reliability === 'unreliable' || ocrResult.value.lowConfidenceWordCount >= 2;
 });
 
 const shouldUseCompactResults = computed(() => {
   if (!smAndDown.value) return false;
   const threshold = includeMatches.value ? 5 : 7;
-  return searchResults.value.length > threshold;
+  return displayedSearchResults.value.length > threshold;
 });
 
 const isPreviewOpen = computed(() => previewPage.value !== null);
@@ -509,6 +889,81 @@ const onInputClear = () => {
   void clearSearch();
 };
 
+const resetOcrState = () => {
+  ocrResult.value = null;
+  isOcrProcessing.value = false;
+  ocrProgressPercent.value = 0;
+  ocrErrorMessage.value = '';
+  isOcrCameraOpen.value = false;
+  ocrSuggestedQuery.value = '';
+};
+
+const openOcrCamera = () => {
+  ocrErrorMessage.value = '';
+  isOcrCameraOpen.value = true;
+};
+
+const closeOcrCamera = () => {
+  isOcrCameraOpen.value = false;
+};
+
+const onOcrProgress = (payload: OcrProgressPayload) => {
+  ocrProgressPercent.value = clampProgress(payload.progress * 100);
+};
+
+const clampProgress = (value: number): number => {
+  return Math.max(0, Math.min(100, Math.round(value)));
+};
+
+const runOcrFromFile = async (selectedFile: File) => {
+  isOcrProcessing.value = true;
+  ocrProgressPercent.value = 0;
+  ocrErrorMessage.value = '';
+  isOcrCameraOpen.value = false;
+
+  try {
+    const result = await recognizeFirstLineFromImage(selectedFile, {
+      onProgress: onOcrProgress,
+    });
+
+    ocrResult.value = result;
+    ocrSuggestedQuery.value = result.correctedText;
+    searchQuery.value = result.correctedText;
+    ocrProgressPercent.value = 100;
+    await focusSearchField();
+
+    if (result.correctedText.length === 0) {
+      ocrErrorMessage.value = t('firstLineSearch.ocrNoTextDetected');
+    }
+  } catch (error) {
+    resetOcrState();
+    ocrErrorMessage.value = error instanceof Error
+      ? error.message
+      : t('firstLineSearch.ocrUnexpectedError');
+  } finally {
+    isOcrProcessing.value = false;
+  }
+};
+
+const onOcrCaptured = (file: File) => {
+  void runOcrFromFile(file);
+};
+
+const onOcrCameraError = (message: string) => {
+  ocrErrorMessage.value = message;
+};
+
+const onOcrCameraDialogModelValueChange = (value: boolean) => {
+  if (!value) {
+    closeOcrCamera();
+  }
+};
+
+const restoreOcrResults = async () => {
+  searchQuery.value = ocrSuggestedQuery.value;
+  await focusSearchField();
+};
+
 const blurPressedButton = (event: Event) => {
   const currentTarget = event.currentTarget;
   if (!(currentTarget instanceof HTMLElement)) return;
@@ -594,9 +1049,12 @@ watch(
       showKeyboard.value = false;
       firstResultLettersByMode.value = createFirstResultLettersByMode();
       hasTrackedSessionOutcome.value = false;
+      resetOcrState();
       await focusSearchField();
       return;
     }
+
+    closeOcrCamera();
 
     if (isQueryReady.value && searchResults.value.length === 0) {
       trackCurrentSessionOutcome('no-result');
@@ -651,9 +1109,49 @@ const getKeyboardRowStyle = (row: readonly string[]) => ({
     ? `repeat(${Math.min(row.length, 5)}, minmax(0, 1fr))`
     : `repeat(${row.length}, minmax(0, 1fr))`,
 });
+
+const getConfidenceChipColor = (result: SearchDisplayItem) => {
+  if ((result.score ?? 0) >= 95 && (result.scoreGap ?? 0) >= 5) return 'success';
+  if ((result.score ?? 0) >= 85) return 'primary';
+  return 'warning';
+};
+
+const getConfidenceChipLabel = (result: SearchDisplayItem) => {
+  if ((result.score ?? 0) >= 95 && (result.scoreGap ?? 0) >= 5) {
+    return t('firstLineSearch.ocrConfirmed');
+  }
+
+  if ((result.score ?? 0) >= 85) {
+    return t('firstLineSearch.ocrLikely', {
+      value: result.displayConfidence ?? result.score ?? 0,
+    });
+  }
+
+  return t('firstLineSearch.ocrUnreliable', {
+    value: result.displayConfidence ?? result.score ?? 0,
+  });
+};
 </script>
 
 <style scoped>
+.first-line-search-camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgb(var(--v-theme-surface));
+  overflow: hidden;
+}
+
+.dialog-bottom-transition-enter-active,
+.dialog-bottom-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+.dialog-bottom-transition-enter-from,
+.dialog-bottom-transition-leave-to {
+  transform: translateY(100%);
+}
+
 .first-line-search-card {
   overflow: hidden;
 }
@@ -681,6 +1179,54 @@ const getKeyboardRowStyle = (row: readonly string[]) => ({
   flex-wrap: wrap;
   margin-top: 8px;
   margin-bottom: 16px;
+}
+
+.first-line-search-ocr {
+  padding: 16px;
+  background: rgba(var(--v-theme-surface-variant), 0.08);
+}
+
+.first-line-search-ocr__header,
+.first-line-search-ocr__summary-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.first-line-search-ocr__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.first-line-search-ocr__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.first-line-search-ocr__grid--single {
+  grid-template-columns: 1fr;
+}
+
+.first-line-search-ocr__field {
+  min-width: 0;
+}
+
+.first-line-search-ocr__text {
+  margin-top: 4px;
+  padding: 12px;
+  min-height: 68px;
+  border-radius: 12px;
+  background: rgba(var(--v-theme-surface), 0.92);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.first-line-search-ocr__summary {
+  margin-top: 16px;
 }
 
 .first-line-search-keyboard {
@@ -726,6 +1272,12 @@ const getKeyboardRowStyle = (row: readonly string[]) => ({
   overflow-wrap: anywhere;
 }
 
+.first-line-search-result--best,
+.first-line-search-compact--best {
+  border-color: rgba(var(--v-theme-primary), 0.55);
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-primary), 0.2);
+}
+
 .first-line-search-result__title,
 .first-line-search-compact__title {
   line-height: 1.5;
@@ -756,6 +1308,15 @@ const getKeyboardRowStyle = (row: readonly string[]) => ({
 }
 
 @media (max-width: 600px) {
+  .first-line-search-ocr__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .first-line-search-ocr__header,
+  .first-line-search-ocr__summary-main {
+    flex-direction: column;
+  }
+
   .first-line-search-keyboard__actions {
     grid-template-columns: 1fr;
   }
