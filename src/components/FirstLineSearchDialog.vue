@@ -444,7 +444,7 @@
           :suppress-errors="true"
           :mobile-mode="true"
           :instructions="ocrCameraInstructions"
-          :capture-height-ratio="0.18"
+          :capture-height-ratio="0.12"
           @captured="onOcrCaptured"
           @error="onOcrCameraError"
           @close="closeOcrCamera"
@@ -478,7 +478,7 @@
         <DictaCameraCapture
           :busy="false"
           :instructions="ocrCameraInstructions"
-          :capture-height-ratio="0.18"
+          :capture-height-ratio="0.12"
           @captured="onOcrCaptured"
           @error="onOcrCameraError"
           @close="closeOcrCamera"
