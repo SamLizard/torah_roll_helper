@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO 33: When they are multiple readins at the same date, they are displayed in alphabetical order. We will prefer to display them in the order that they will be read. So regular chaharit reading is first, then second sefer, then maftir and mincha at the end.-->
   <v-card
     class="h-100 d-flex flex-column"
     variant="outlined"
