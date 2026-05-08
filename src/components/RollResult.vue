@@ -27,13 +27,7 @@
       <div class="mt-4 text-body-2" data-tutorial="result-path">
         {{ $t('result.from') }}: {{ fromPage ?? '—' }} &nbsp;
         <span :class="direction === 'forward' ? 'text-primary' : direction === 'backward' ? 'text-secondary' : ''">
-          {{
-            direction === 'forward'
-              ? ($vuetify.locale.isRtl ? '←' : '→')
-              : direction === 'backward'
-                ? ($vuetify.locale.isRtl ? '→' : '←')
-                : ($vuetify.locale.isRtl ? '←' : '→')
-          }}
+          {{ ($vuetify.locale.isRtl ? '←' : '→') }}
         </span>
         &nbsp; {{ $t('result.to') }}: {{ toPage ?? '—' }}
       </div>
