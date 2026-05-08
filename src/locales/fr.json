@@ -2,6 +2,26 @@
   "language": "Français",
   "dir": "ltr",
   "title": "Assistant de Roulement de la Torah",
+  "seo": {
+    "siteName": "Torah Roll Helper",
+    "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
+    "fallbackDescription": "Assistant gratuit de roulement de la Torah pour aider les Gabbaim et Ba'alei Kriah a calculer rapidement le sens et le nombre de colonnes a rouler entre deux lectures. Aussi connu sous les noms Torah Roll Helper et עוזר גלילת התורה.",
+    "keywords": "Torah roll helper,Torah roll assistant,assistant de roulement de la Torah,עוזר גלילת התורה,assistant Torah,Sefer Torah,Gabbai,Ba'al Koreh,גלילת התורה",
+    "routes": {
+      "home": {
+        "title": "Assistant de roulement de la Torah | Outil gratuit",
+        "description": "Outil gratuit pour aider les Gabbaim et Ba'alei Kriah a calculer le nombre de colonnes a rouler et le sens de la glila entre deux lectures."
+      },
+      "about": {
+        "title": "A propos | Torah Roll Helper",
+        "description": "Decouvrez le projet Torah Roll Helper, ses sources de donnees pour les lectures de la Torah et la facon de contacter ou aider au projet."
+      },
+      "howTo": {
+        "title": "Mode d'emploi | Torah Roll Helper",
+        "description": "Apprenez a utiliser Torah Roll Helper pour identifier la position actuelle du Sefer Torah, choisir la prochaine lecture et obtenir des instructions claires."
+      }
+    }
+  },
   "routes": {
     "home": "Accueil",
     "about": "À propos",
@@ -46,13 +66,15 @@
       "loadingOcr": "Lecture de l'image avec OCR Dicta...",
       "loadingSearch": "Recherche des sources Dicta...",
       "noResultTitle": "Aucune source trouvée",
-      "noResultSubtitle": "Essayez une nouvelle photo ou un autre texte",
+      "noResultSubtitle": "Réessayez en suivant bien les consignes, ou prenez en photo une autre partie de la page.",
+      "tryFirstWords": "Taper les premiers mots",
       "idleTitle": "Prenez une photo avec Dicta",
       "idleSubtitle": "Utilisez le cadre pour bien aligner le texte avant la capture.",
       "errorTitle": "Le scan Dicta n'a pas pu être terminé",
       "unexpectedError": "Erreur Dicta inattendue.",
       "cameraUnavailable": "L'API caméra n'est pas disponible dans ce contexte navigateur.",
       "cameraHttpsHint": "L'autorisation de la caméra n'est pas disponible sur localhost. Ouvrez l'application en HTTPS au lieu de localhost.",
+      "cameraPermissionHint": "Il se peut que votre appareil bloque l'accès à la caméra avant même que le navigateur ne le demande. Ouvrez les réglages de votre appareil, trouvez l'application de votre navigateur et autorisez l'accès à la caméra. Si le site a été bloqué dans le navigateur, réactivez-le dans les paramètres du site.",
       "captureFailed": "Impossible de capturer l'image.",
       "capture": "Capturer",
       "chooseFile": "Choisir un fichier",
@@ -60,9 +82,10 @@
       "newPhoto": "Nouvelle photo",
       "backToOptions": "Retour aux options",
       "instructions": {
-        "1": "Placez le texte pour que la largeur de la ligne reste dans le cadre blanc",
-        "2": "Utilisez les lignes jaunes pour aligner l'image",
-        "3": "Capturez au moins quatre lignes de texte"
+        "1": "Faites tenir la ligne dans le cadre blanc.",
+        "2": "Alignez le texte sur les lignes jaunes.",
+        "3": "Prenez au moins quatre lignes de texte.",
+        "4": "Prenez des lignes pleines, sans grands espaces."
       },
       "chooseTitle": "Choisir le résultat",
       "chooseSubtitle": "Plusieurs correspondances ont été trouvées. Choisissez la page correcte.",
@@ -92,7 +115,7 @@
     "title": "Mode d'emploi",
     "subtitle": "Suivez ces étapes courtes pour obtenir des instructions de roulement claires.",
     "steps": {
-      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo ou saisie manuelle.",
+      "step1": "Indiquez l'emplacement actuel du Sefer Torah (la paracha où il est ouvert) par photo, saisie exacte, ou avec les premiers mots de la page.",
       "step2": "Choisissez la lecture cible dans la liste des parachiot à venir.",
       "step3": "L'application détermine le sens de roulement (Avant/Arrière) et le nombre de colonnes à parcourir."
     },
@@ -102,7 +125,136 @@
       "step1": "Autorisez l'accès à la caméra lorsque le navigateur le demande.",
       "step2": "Placez le texte de la Torah dans le cadre avec un éclairage homogène.",
       "step3": "Restez immobile un instant pour laisser la détection se stabiliser.",
-      "step4": "En cas d'échec, utilisez la saisie manuelle pour définir la position actuelle."
+      "step4": "En cas d'échec, utilisez les premiers mots de la page ou la saisie manuelle pour définir la position actuelle."
+    },
+    "tutorials": {
+      "title": "Visites guidées interactives",
+      "subtitle": "Ces visites vous guident à travers l'interface de l'application. Utilisez la visite courte pour l'essentiel, ou la visite complète pour découvrir tous les outils.",
+      "quick": "Lancer la visite courte",
+      "full": "Lancer la visite complète"
+    }
+  },
+  "tutorialPrompt": {
+    "title": "Première visite ?",
+    "text": "Des visites guidées sont disponibles dans la page 'Mode d'emploi'. Vous pouvez aussi lancer une visite rapide dès maintenant pour apprendre les bases.",
+    "openQuick": "Lancer la visite courte"
+  },
+  "onboarding": {
+    "labels": {
+      "quick": "Visite courte",
+      "full": "Visite complète"
+    },
+    "progress": "Étape {current} sur {total}",
+    "actions": {
+      "exit": "Quitter",
+      "back": "Retour",
+      "next": "Suivant",
+      "finish": "Terminer",
+      "openAbout": "Ouvrir À propos"
+    },
+    "quick": {
+      "step1": {
+        "title": "Choix de la langue",
+        "description": "Cliquez ou touchez ici pour changer la langue de l'application. La visite se met en pause pour vous laisser ouvrir le menu."
+      },
+      "step2": {
+        "title": "Sélectionnez votre langue",
+        "description": "Choisissez la langue souhaitée. Le texte du tutoriel se mettra à jour immédiatement. Si la langue actuelle vous convient, touchez Suivant."
+      },
+      "step3": {
+        "title": "Définir l'emplacement actuel",
+        "description": "C'est le point de DÉPART (DE). Utilisez 'Choisir manuellement' pour toutes les lectures, l'appareil photo pour identifier la page depuis le parchemin (Klaf), ou 'Saisie' pour une référence exacte, un numéro de page, ou les premiers mots de la page. Les cartes ci-dessous affichent les lectures du mois dernier pour un accès rapide."
+      },
+      "step4": {
+        "title": "Choisir la destination",
+        "description": "C'est le point d'ARRIVÉE (À). Cette bande calendaire affiche les lectures à venir. La plupart du temps, il suffit de cliquer sur la prochaine Paracha ici. Nous avons sélectionné un exemple pour vous."
+      },
+      "step5": {
+        "title": "Instructions de roulement",
+        "description": "Cette carte affiche votre résultat : le nombre d'Amoudim (colonnes) à déplacer, le sens de roulement, et les pages DE et À exactes utilisées pour le calcul."
+      }
+    },
+    "full": {
+      "step1": {
+        "title": "Choix de la langue",
+        "description": "Cliquez ou touchez ici pour changer la langue de l'application. La visite se met en pause pour vous laisser ouvrir le menu."
+      },
+      "step2": {
+        "title": "Sélectionnez votre langue",
+        "description": "Choisissez la langue souhaitée. Le texte du tutoriel se mettra à jour immédiatement. Si la langue actuelle vous convient, touchez Suivant."
+      },
+      "step3": {
+        "title": "La zone DÉPART (DE)",
+        "description": "Utilisez cette section pour définir où le Sefer Torah est actuellement ouvert. Les boutons du haut offrent trois méthodes pour trouver une lecture, tandis que les cartes en bas affichent les lectures du mois dernier pour une sélection rapide."
+      },
+      "step4": {
+        "title": "L'index complet des lectures",
+        "description": "Cliquez sur 'Choisir manuellement' lorsque vous devez trouver une Paracha spécifique, un Yom Tov, Roch 'Hodech, un jeûne ou un Maftir spécial."
+      },
+      "step5": {
+        "title": "La fenêtre de recherche",
+        "description": "Utilisez la barre de recherche en haut, ou parcourez les catégories ci-dessous pour trouver la Kria exacte dont vous avez besoin."
+      },
+      "step6": {
+        "title": "Reconnaissance par photo",
+        "description": "Cliquez sur l'icône d'appareil photo si le Sefer Torah est ouvert et que vous souhaitez que l'application identifie votre emplacement directement à partir du texte sur le parchemin."
+      },
+      "step7": {
+        "title": "Résultats de l'analyse",
+        "description": "Après avoir pris une photo, l'application analyse le texte et suggère les Amoudim les plus probables pour votre emplacement actuel. Si la photo échoue, ce même écran propose maintenant un accès direct pour taper les premiers mots de la page."
+      },
+      "step8": {
+        "title": "Saisie manuelle",
+        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts, le numéro de page spécifique dans le Tikkoun Korim, ou si vous voulez chercher à partir de la ligne qui ouvre la page."
+      },
+      "step9": {
+        "title": "Fenêtre de saisie exacte",
+        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, aller directement à un numéro de page, ou basculer vers la recherche à partir de la ligne qui ouvre la page."
+      },
+      "step10": {
+        "title": "Recherche par premiers mots",
+        "description": "Commencez à taper les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page. Si besoin, ouvrez le clavier hébreu intégré ou passez à la recherche n'importe où dans cette ligne."
+      },
+      "step11": {
+        "title": "La zone ARRIVÉE (À)",
+        "description": "C'est ici que vous définissez votre destination. La bande calendaire affiche le mois à venir. Dans la plupart des cas, vous sélectionnerez simplement la prochaine lecture d'ici."
+      },
+      "step12": {
+        "title": "Point de repère",
+        "description": "Précisez votre point d'arrêt exact. Vous pouvez cibler le début de la Paracha, la fin d'une lecture de semaine (Chéni/Hamichi/Min'ha), ou la fin de la lecture complète du Chabbat."
+      },
+      "step13": {
+        "title": "La carte de résultat",
+        "description": "Une fois DE et À définis, cette carte vous donne la réponse finale : combien d'Amoudim rouler, dans quelle direction, et les pages de référence."
+      },
+      "step14": {
+        "title": "Changement de Houmach",
+        "description": "S'il faut passer à un nouveau livre (ex: de Chémot à Vayikra), cette note vous indique combien de pages il reste à rouler une fois le livre cible atteint."
+      },
+      "step15": {
+        "title": "Aperçu de la page",
+        "description": "Cliquez sur le numéro de page ou sur la petite icône de livre pour voir un aperçu de la colonne sélectionnée."
+      },
+      "step16": {
+        "title": "Vérification avec le Tikkoun",
+        "description": "L'aperçu montre la première ligne de la colonne (avec la possibilité d'afficher ou masquer le Nikoud) et inclut un bouton pour ouvrir un affichage complet du Tikkoun afin de vérifier votre position."
+      },
+      "step17": {
+        "title": "Paramètres",
+        "description": "Cliquez sur l'icône de roue dentée pour ouvrir vos préférences."
+      },
+      "step18": {
+        "title": "Coutumes communautaires",
+        "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Noussah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé."
+      },
+      "step19": {
+        "title": "Navigation",
+        "description": "Utilisez la barre de navigation pour accéder aux autres outils. Sur mobile, touchez l'icône de menu pour ouvrir le panneau latéral."
+      },
+      "step20": {
+        "title": "À propos et Contact",
+        "description": "Lorsque vous terminez cette visite, la page 'À propos' s'ouvrira pour que vous puissiez voir les détails du projet, les crédits des données, ou signaler un problème sur GitHub."
+      }
     }
   },
   "settings": {
@@ -171,12 +323,57 @@
     "verse": "Verset",
     "use_page": "J'ai déjà la page",
     "page": "Page",
+    "search_by_first_words": "Chercher par premiers mots",
     "required": "Requis",
     "must_be_positive": "Doit être positif",
     "max_chapter": "Le chapitre max est",
     "max_verse": "Le verset max est",
     "max_page": "La page max est",
     "page_not_found": "Page introuvable pour la référence sélectionnée."
+  },
+  "firstLineSearch": {
+    "title": "Recherche par premiers mots",
+    "description": "Tapez les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page.",
+    "placeholder": "Exemple : וידבר",
+    "ocrAction": "Scanner avec l'appareil photo",
+    "ocrCameraTitle": "Scanner la première ligne",
+    "ocrCameraInstruction1": "Cadrez uniquement la première ligne dans le cadre blanc.",
+    "ocrCameraInstruction2": "Alignez la ligne sur les repères jaunes.",
+    "ocrCameraInstruction3": "Gardez des lettres grandes, nettes et bien éclairées.",
+    "ocrCameraInstruction4": "Évitez les lignes supplémentaires au-dessus ou au-dessous du cadre.",
+    "ocrPanelTitle": "Assistant OCR",
+    "ocrPanelHint": "Prenez une photo serrée de la première ligne. Le texte corrigé est inséré dans le champ ci-dessus afin que vous puissiez l'ajuster.",
+    "ocrProcessing": "Lecture locale de l'image...",
+    "ocrConfidence": "OCR {value}%",
+    "ocrRawText": "Texte OCR brut",
+    "ocrEditableText": "Texte corrigé dans le champ de recherche",
+    "ocrNoText": "Aucun texte hébreu exploitable pour le moment.",
+    "ocrNoTextDetected": "Aucun texte hébreu exploitable n'a été détecté dans cette photo.",
+    "ocrUnexpectedError": "Impossible d'exécuter l'OCR sur cette image. Essayez une autre photo.",
+    "ocrLowQuality": "Ce résultat OCR semble faible. Essayez une photo plus serrée de la première ligne, ou corrigez le texte ci-dessus.",
+    "ocrBestMatch": "Meilleure correspondance",
+    "restoreOcrResults": "Retour aux résultats OCR",
+    "ocrSuggestionsFound": "{count} suggestions OCR",
+    "ocrMatchLabel": "Ligne d'ouverture suggérée",
+    "ocrConfirmed": "Correspondance 100 %",
+    "ocrLikely": "Correspondance probable ({value} %)",
+    "ocrUnreliable": "Faible confiance ({value} %)",
+    "emptyState": "Retrouver la page à partir de ses premiers mots",
+    "emptyStateHint": "Tapez le début de la ligne qui ouvre la page.",
+    "keepTyping": "Tapez encore un peu pour réduire les résultats.",
+    "resultsFound": "{count} pages correspondantes",
+    "noMatches": "Aucune ligne d'ouverture correspondante",
+    "noMatchesHint": "Essayez avec moins de mots, ou activez la recherche n'importe où dans la ligne d'ouverture.",
+    "preview": "Aperçu",
+    "usePage": "Utiliser cette page",
+    "searchAnywhere": "Chercher n'importe où dans la ligne d'ouverture",
+    "showKeyboard": "Afficher le clavier hébreu",
+    "hideKeyboard": "Masquer le clavier hébreu",
+    "keyboardTitle": "Clavier hébreu",
+    "openingLineLabel": "Ligne qui commence la page",
+    "space": "Espace",
+    "backspace": "Retour",
+    "clearSearch": "Effacer"
   },
   "type": {
     "parasha": "Parachot",

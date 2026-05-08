@@ -1,17 +1,37 @@
 <template>
-  <v-card class="h-100 d-flex flex-column" variant="outlined" style="border-radius: 16px;">
+  <!-- TODO 33: When they are multiple readins at the same date, they are displayed in alphabetical order. We will prefer to display them in the order that they will be read. So regular chaharit reading is first, then second sefer, then maftir and mincha at the end.-->
+  <v-card
+    class="h-100 d-flex flex-column"
+    variant="outlined"
+    style="border-radius: 16px;"
+    :data-tutorial="`${side}-selector`"
+  >
     <v-card-item class="location-card-item">
       <div class="location-header">
         <div class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <div class="location-actions-shell">
+        <div class="location-actions-shell" :data-tutorial="`${side}-actions`">
           <div class="location-actions">
-            <v-btn size="small" variant="text" prepend-icon="mdi-format-list-bulleted" @click="onChooseManual">
+            <v-btn
+              size="small"
+              variant="text"
+              prepend-icon="mdi-format-list-bulleted"
+              :data-tutorial="`${side}-choose-manual`"
+              @click="onChooseManual"
+            >
               {{ $t('home.actions.choose') }}
-            </v-btn>          
-            <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-camera" @click="onOpenDicta">
+            </v-btn>
+            <v-btn
+              v-if="allowPhoto"
+              size="small"
+              variant="tonal"
+              color="primary"
+              prepend-icon="mdi-camera"
+              :data-tutorial="`${side}-photo`"
+              @click="onOpenDicta"
+            >
               {{ $t('home.actions.photo') }}
             </v-btn>
             <v-btn 
@@ -19,6 +39,7 @@
               variant="tonal" 
               color="secondary" 
               prepend-icon="mdi-pencil" 
+              :data-tutorial="`${side}-input`"
               @click="onOpenManualInput"
             >
               {{ $t('home.actions.input') }}
@@ -30,40 +51,50 @@
 
     <v-divider />
 
-    <v-card-text v-if="calendarEntries.length > 0" class="pt-3 pb-2">
-      <div ref="calendarSlideShellRef" class="mt-4" style="display: grid; min-width: 0;">
-        <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
-          <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
-          <span>{{ $t(`home.calendar.${side}`) }}</span>
-        </div>
+    <v-card-text v-if="calendarEntries.length > 0" class="pa-0">
+      <div class="location-calendar-frame" :data-tutorial="`${side}-calendar`">
+        <div class="location-calendar-section">
+          <div ref="calendarSlideShellRef" class="location-calendar-slide-shell">
+            <div class="d-flex align-center text-caption text-medium-emphasis mb-2">
+              <v-icon size="14" class="me-1">mdi-calendar-month-outline</v-icon>
+              <span>{{ $t(`home.calendar.${side}`) }}</span>
+            </div>
 
-        <v-slide-group show-arrows class="calendar-slide-group">
-          <v-slide-group-item
-            v-for="entry in calendarEntries"
-            :key="`${side}-${entry.key}-${entry.dateIso}`"
-          >
-            <ReadingOptionCard
-              :reading-key="entry.target.key"
-              :reading-label="entry.readingLabel"
-              :page="entry.target.ref.page"
-              :active="isSelectedCalendarEntry(entry)"
-              :specific-badge="getTargetBadgeKind(entry.target)"
-              :highlight-next-parasha="isNextParasha(entry)"
-              :show-next-parasha-badge="false"
-              :date-label="entry.dateLabel"
-              :show-date-icon="true"
-              :roll-preview="getCalendarRollPreview(entry)"
-              :compact-calendar="true"
-              @click="selectCalendarEntry(entry)"
-            />
-          </v-slide-group-item>
-        </v-slide-group>
+            <v-slide-group show-arrows class="calendar-slide-group">
+              <v-slide-group-item
+                v-for="entry in calendarEntries"
+                :key="`${side}-${entry.key}-${entry.dateIso}`"
+              >
+                <ReadingOptionCard
+                  :reading-key="entry.target.key"
+                  :reading-label="entry.readingLabel"
+                  :page="entry.target.ref.page"
+                  :active="isSelectedCalendarEntry(entry)"
+                  :specific-badge="getTargetBadgeKind(entry.target)"
+                  :highlight-next-parasha="isNextParasha(entry)"
+                  :show-next-parasha-badge="false"
+                  :date-label="entry.dateLabel"
+                  :show-date-icon="true"
+                  :roll-preview="getCalendarRollPreview(entry)"
+                  :compact-calendar="true"
+                  :balance-calendar-card-height="balanceCalendarCardHeight"
+                  @calendar-compact-change="(compact) => onCalendarCardCompactChange(toCalendarEntryStateKey(entry), compact)"
+                  @click="selectCalendarEntry(entry)"
+                />
+              </v-slide-group-item>
+            </v-slide-group>
+          </div>
+        </div>
       </div>
     </v-card-text>
 
     <v-card-text class="flex-grow-1 d-flex align-center justify-center">
       <div v-if="page !== null" class="text-center w-100">
-        <div class="location-page-number-shell mb-2" :class="{ 'mod-rtl': isRtl }">
+        <div
+          class="location-page-number-shell mb-2"
+          :class="{ 'mod-rtl': isRtl }"
+          :data-tutorial="`${side}-page-preview-trigger`"
+        >
           <button
             type="button"
             class="location-page-number location-page-number-btn font-weight-black text-primary"
@@ -87,7 +118,7 @@
           {{ resolvedPageTitle }}
         </div>
 
-        <div v-if="targetRefOptions.length > 1" class="mt-2">
+        <div v-if="targetRefOptions.length > 1" class="mt-2" :data-tutorial="`${side}-target-ref`">
           <div class="text-caption text-medium-emphasis mb-2">
             {{ $t('home.targetRef.title') }}
           </div>
@@ -116,123 +147,13 @@
           {{ $t('home.actions.clear') }}
         </v-btn>
 
-        <v-dialog
+        <PagePreviewDialog
           v-model="isPagePreviewOpen"
-          max-width="920"
-        >
-          <v-card class="rounded-xl preview-dialog-card">
-            <v-card-title class="preview-dialog-title">
-              <span class="text-subtitle-1 font-weight-bold">
-                {{ $t('preview.pageTitle', { page }) }}
-              </span>
-              <v-btn
-                icon="mdi-close"
-                variant="text"
-                size="small"
-                @click="isPagePreviewOpen = false"
-              />
-            </v-card-title>
-
-            <v-card-text>
-              <div class="preview-top-row mb-2">
-                <div class="text-caption text-medium-emphasis">
-                  {{ $t('preview.firstLine') }}
-                </div>
-
-                <v-tooltip v-if="!smAndDown" :text="$t('preview.shiftTip')">
-                  <template #activator="{ props: tooltipProps }">
-                    <button
-                      v-bind="tooltipProps"
-                      type="button"
-                      class="preview-annotations-toggle"
-                      :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                      :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                      @click="togglePreviewNikud"
-                    >
-                      <div class="preview-toggle">
-                        <div class="preview-shadowed-circle">
-                          <input
-                            type="checkbox"
-                            :checked="effectivePreviewWithNikud"
-                            tabindex="-1"
-                            aria-hidden="true"
-                          >
-                          <span class="preview-toggle-state mod-off">א</span>
-                          <span class="preview-toggle-state mod-on">אֶ֨</span>
-                        </div>
-                      </div>
-                    </button>
-                  </template>
-                </v-tooltip>
-                <button
-                  v-else
-                  type="button"
-                  class="preview-annotations-toggle"
-                  :title="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                  :aria-label="effectivePreviewWithNikud ? $t('preview.withNikud') : $t('preview.withoutNikud')"
-                  @click="togglePreviewNikud"
-                >
-                  <div class="preview-toggle">
-                    <div class="preview-shadowed-circle">
-                      <input
-                        type="checkbox"
-                        :checked="effectivePreviewWithNikud"
-                        tabindex="-1"
-                        aria-hidden="true"
-                      >
-                      <span class="preview-toggle-state mod-off">א</span>
-                      <span class="preview-toggle-state mod-on">אֶ֨</span>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <div v-if="hasPagePreview" class="tikkun-preview-line-shell">
-                <div
-                  class="tikkun-preview-line"
-                  dir="rtl"
-                  lang="he"
-                >
-                  <div
-                    v-for="(column, columnIndex) in pagePreviewColumns"
-                    :key="`${page}-${columnIndex}`"
-                    class="preview-column"
-                  >
-                    <span
-                      v-for="(fragment, fragmentIndex) in column"
-                      :key="`${page}-${columnIndex}-${fragmentIndex}`"
-                      class="tikkun-preview-fragment"
-                      :class="{ 'mod-setuma': column.length > 1 }"
-                      v-html="fragment"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-body-2 text-medium-emphasis">
-                {{ $t('preview.lineUnavailable') }}
-              </div>
-            </v-card-text>
-
-            <v-card-actions class="justify-space-between">
-              <v-btn variant="text" @click="isPagePreviewOpen = false">
-                {{ $t('actions.close') }}
-              </v-btn>
-              <v-btn
-                color="primary"
-                variant="tonal"
-                prepend-icon="mdi-open-in-new"
-                :href="tikkunUrl ?? undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                :disabled="!tikkunUrl"
-                class="preview-open-btn"
-                @click="onOpenTikkun"
-              >
-                {{ openTikkunLabel }}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+          :page="page"
+          :preview-columns="pagePreviewRawColumns"
+          :tikkun-url="tikkunUrl"
+          @open-tikkun="onOpenTikkun"
+        />
       </div>
 
       <div v-else class="text-center text-medium-emphasis py-6">
@@ -247,6 +168,14 @@
       :initial-page="page"
       @save="onManualSave"
       @draft="onManualDraft"
+      @open-first-line-search="onOpenFirstLineSearchFromManual"
+    />
+
+    <FirstLineSearchDialog
+      v-model="isFirstLineSearchOpen"
+      :side="side"
+      :source="firstLineSearchSource"
+      @save="onFirstLineSearchSave"
     />
   </v-card>
 </template>
@@ -255,9 +184,12 @@
 import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
-import ManualEntryDialog, { type ManualData } from './ManualEntryDialog.vue';
+import ManualEntryDialog from './ManualEntryDialog.vue';
+import FirstLineSearchDialog from './FirstLineSearchDialog.vue';
+import PagePreviewDialog from './PagePreviewDialog.vue';
 import ReadingOptionCard from './ReadingOptionCard.vue';
-import { computeRoll, getPageTitleKeys } from '@/composables/utils';
+import { toPreviewColumns } from '@/composables/firstLineSearch';
+import { computeRoll, getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import pageFirstLinesData from '@/data/page_first_lines.json';
@@ -275,8 +207,8 @@ import {
   readingTargets,
   type ReadingTarget,
 } from '@/composables/readingTargets';
-import { useDisplay, useRtl } from 'vuetify';
-import type { RealDb, TorahRef, Verse } from '@/types';
+import { useRtl } from 'vuetify';
+import type { ManualData, RealDb, TorahRef, Verse } from '@/types';
 import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
 
 type TargetItem = ReadingTarget;
@@ -297,34 +229,38 @@ interface TargetRefOption {
   ref: TorahRef;
 }
 
+type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial';
+
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
   page: { type: Number as () => number | null, default: null },
   selectedRef: { type: Object as () => ManualData | null, default: null },
   targetKey: { type: String as () => string | null, default: null },
+  balanceCalendarCardHeight: { type: Boolean, default: false },
+  allowPhoto: { type: Boolean, default: true },
 });
 
 const emit = defineEmits<{
   (e: 'open-dicta'): void;
   (e: 'choose-manual'): void;
   (e: 'manual-set', page: number | null, data?: ManualData, targetKey?: string | null): void;
+  (e: 'calendar-requires-expanded-height-change', requiresExpandedHeight: boolean): void;
 }>();
 
 const { t, locale } = useI18n();
 const { isRtl } = useRtl();
-const { smAndDown } = useDisplay();
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const isManualOpen = ref(false);
+const isFirstLineSearchOpen = ref(false);
 const isPagePreviewOpen = ref(false);
-const previewWithNikud = ref(true);
-const isShiftPressed = ref(false);
+const firstLineSearchSource = ref<FirstLineSearchOpenSource>('manual');
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
+const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
 
-const NUN_HAFUCHA = '׆';
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const PERSISTED_TARGET_SEPARATOR = ' | ';
 
@@ -375,57 +311,6 @@ const toManualData = (torahRef: TorahRef): ManualData => ({
   verse: torahRef.verse,
 });
 
-const ketiv = (text: string) =>
-  text
-    .replace('#(פ)', '')
-    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
-    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
-    .split(' ')
-    .map((maqafSeparatedWord) =>
-      maqafSeparatedWord
-        .split('־')
-        .map((word) => {
-          const parts = word.split('#');
-
-          if (parts.length <= 1) {
-            return parts[0];
-          }
-
-          return parts.slice(1);
-        })
-        .join('־')
-    )
-    .join(' ')
-    .replace(/\[/g, '{')
-    .replace(/\]/g, '}');
-
-const kri = (text: string) =>
-  text
-    .replace('#(פ)', '')
-    .replace(`(${NUN_HAFUCHA})#`, `${NUN_HAFUCHA} `)
-    .replace(`#(${NUN_HAFUCHA})`, ` ${NUN_HAFUCHA}`)
-    .replace(/־/g, ' ')
-    .replace(/#\[.+?\]/g, ' ')
-    .replace(new RegExp(`[^א-ת\\s${NUN_HAFUCHA}]`, 'g'), '')
-    .replace(/\s{2,}/g, ' ');
-
-const textFilter = ({ text, annotated }: { text: string; annotated: boolean }) =>
-  annotated ? ketiv(text) : kri(text);
-
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const ktivKriAnnotation = (text: string) =>
-  escapeHtml(text)
-    .replace(/[{]/g, '<span class="ktiv-kri">')
-    .replace(/[}]/g, '</span>')
-    .trim();
-
 const trackAction = (action: string, value?: string | number | null) => {
   trackFromToAction({ side: props.side, action, value });
 };
@@ -445,6 +330,26 @@ const onOpenManualInput = () => {
   isManualOpen.value = true;
 };
 
+const closeManualInput = () => {
+  isManualOpen.value = false;
+};
+
+const openFirstLineSearchDialog = (source: FirstLineSearchOpenSource = 'manual') => {
+  firstLineSearchSource.value = source;
+  trackAction('first-line-search-open', source);
+  isFirstLineSearchOpen.value = true;
+};
+
+const closeFirstLineSearchDialog = () => {
+  isFirstLineSearchOpen.value = false;
+};
+
+const onOpenFirstLineSearchFromManual = async () => {
+  closeManualInput();
+  await nextTick();
+  openFirstLineSearchDialog('manual');
+};
+
 const getCalendarDayOffset = (dateIso: string): number | null => {
   const pickedDate = new Date(`${dateIso}T12:00:00`);
   if (Number.isNaN(pickedDate.getTime())) return null;
@@ -462,68 +367,10 @@ const toDayOffsetLabel = (offset: number) => {
   return `ago-${Math.abs(offset)}`;
 };
 
-const getPageStartRef = (page: number | null): Verse | null => {
-  if (page == null) return null;
-
-  for (let bookIndex = 0; bookIndex < db.length; bookIndex += 1) {
-    const bookEntries = db[bookIndex];
-    const match = bookEntries.find((entry) => entry[2] === page);
-    if (!match) continue;
-
-    return {
-      book: bookIndex + 1,
-      chapter: match[0],
-      verse: match[1],
-    };
-  }
-
-  return null;
-};
-
-const toPreviewColumns = (entry: unknown): string[][] => {
-  if (typeof entry === 'string') return [[entry]];
-  if (!Array.isArray(entry)) return [];
-  if (entry.length === 0) return [];
-
-  if (entry.every((item) => typeof item === 'string')) {
-    return [entry as string[]];
-  }
-
-  if (entry.every((item) => Array.isArray(item))) {
-    return (entry as unknown[])
-      .map((column) =>
-        Array.isArray(column)
-          ? column.filter((fragment): fragment is string => typeof fragment === 'string')
-          : []
-      )
-      .filter((column) => column.length > 0);
-  }
-
-  return [];
-};
-
 const pagePreviewRawColumns = computed<string[][]>(() => {
   if (props.page == null) return [];
   return toPreviewColumns(pageFirstLines[props.page - 1]);
 });
-
-const pagePreviewColumns = computed(() =>
-  pagePreviewRawColumns.value.map((column) =>
-    column.map((fragment) =>
-      ktivKriAnnotation(
-        textFilter({ text: fragment, annotated: effectivePreviewWithNikud.value })
-      )
-    )
-  )
-);
-
-const hasPagePreview = computed(() => pagePreviewColumns.value.length > 0);
-const effectivePreviewWithNikud = computed(() =>
-  isShiftPressed.value ? !previewWithNikud.value : previewWithNikud.value
-);
-const openTikkunLabel = computed(() =>
-  smAndDown.value ? t('preview.openTikkunShort') : t('preview.openTikkun')
-);
 
 const hasCurrentRef = computed(() =>
   currentRef.value.chapter != null && currentRef.value.verse != null
@@ -729,7 +576,7 @@ const tikkunUrl = computed(() => {
     return toRefUrl(matchedTarget.value.ref);
   }
 
-  const pageStartRef = getPageStartRef(props.page);
+  const pageStartRef = getPageStartRef(db, props.page);
   if (!pageStartRef) return null;
 
   return toRefUrl(pageStartRef);
@@ -752,6 +599,35 @@ const getCalendarRollPreview = (entry: CalendarEntry) => {
     color: isForward ? 'primary' : 'secondary',
     text: t('preview.cols', { count: roll.pages }),
   };
+};
+
+const toCalendarEntryStateKey = (entry: CalendarEntry) => `${entry.key}-${entry.dateIso}`;
+
+const emitCalendarRequiresExpandedHeight = () => {
+  const requiresExpandedHeight = Object.values(compactCalendarCardStates.value).some(Boolean);
+  emit('calendar-requires-expanded-height-change', requiresExpandedHeight);
+};
+
+const syncCompactCalendarCardStates = () => {
+  const nextState: Record<string, boolean> = {};
+
+  for (const entry of calendarEntries.value) {
+    const entryKey = toCalendarEntryStateKey(entry);
+    nextState[entryKey] = compactCalendarCardStates.value[entryKey] ?? false;
+  }
+
+  compactCalendarCardStates.value = nextState;
+  emitCalendarRequiresExpandedHeight();
+};
+
+const onCalendarCardCompactChange = (entryKey: string, compact: boolean) => {
+  if (compactCalendarCardStates.value[entryKey] === compact) return;
+
+  compactCalendarCardStates.value = {
+    ...compactCalendarCardStates.value,
+    [entryKey]: compact,
+  };
+  emitCalendarRequiresExpandedHeight();
 };
 
 const selectCalendarEntry = (entry: CalendarEntry) => {
@@ -846,9 +722,10 @@ const setupCalendarMouseDrag = () => {
 };
 
 watch(
-  () => calendarEntries.value.length,
+  () => calendarEntries.value.map((entry) => toCalendarEntryStateKey(entry)).join('|'),
   () => {
     void nextTick(() => {
+      syncCompactCalendarCardStates();
       setupCalendarMouseDrag();
     });
   },
@@ -879,18 +756,6 @@ watch(() => props.page, (newPage) => {
     isPagePreviewOpen.value = false;
   }
 });
-
-const onPreviewKeydown = (event: KeyboardEvent) => {
-  if (!isPagePreviewOpen.value) return;
-  if (event.key !== 'Shift') return;
-  isShiftPressed.value = true;
-};
-
-const onPreviewKeyup = (event: KeyboardEvent) => {
-  if (!isPagePreviewOpen.value) return;
-  if (event.key !== 'Shift') return;
-  isShiftPressed.value = false;
-};
 
 const computedPageTitle = computed(() => {
   if (props.page === null) return [] as string[];
@@ -935,12 +800,16 @@ const resolvedPageTitle = computed(() => {
   return '';
 });
 
-const onManualSave = (data: ManualData, page: number) => {
+const applyResolvedSelection = (
+  data: ManualData,
+  page: number,
+  source: 'manual' | 'first-line-search'
+) => {
   const matchedManualTarget = visibleTargets.value.find((target) =>
     getTargetRefOptions(target).some((option) => isSameTorahRef(option.ref, page, data))
   );
 
-  trackAction('manual-save', matchedManualTarget ? 'target' : 'custom');
+  trackAction(source === 'manual' ? 'manual-save' : 'first-line-search-save', matchedManualTarget ? 'target' : 'custom');
 
   if (matchedManualTarget) {
     const defaultMode = getDefaultTargetRefMode(matchedManualTarget, props.side);
@@ -954,6 +823,14 @@ const onManualSave = (data: ManualData, page: number) => {
 
   currentRef.value = data;
   emit('manual-set', page, data, null);
+};
+
+const onManualSave = (data: ManualData, page: number) => {
+  applyResolvedSelection(data, page, 'manual');
+};
+
+const onFirstLineSearchSave = (data: ManualData, page: number) => {
+  applyResolvedSelection(data, page, 'first-line-search');
 };
 
 const onManualDraft = (data: ManualData) => {
@@ -971,14 +848,14 @@ const onClear = () => {
   clear();
 };
 
-const togglePreviewNikud = () => {
-  previewWithNikud.value = !previewWithNikud.value;
-};
-
 const openPagePreview = () => {
   if (props.page == null) return;
-  trackAction('preview-open');
+  trackAction('preview-open', 'location-card');
   isPagePreviewOpen.value = true;
+};
+
+const closePagePreview = () => {
+  isPagePreviewOpen.value = false;
 };
 
 const onOpenTikkun = () => {
@@ -986,22 +863,18 @@ const onOpenTikkun = () => {
   trackAction('preview-open-tikkun');
 };
 
-watch(isPagePreviewOpen, (isOpen) => {
-  if (isOpen) {
-    window.addEventListener('keydown', onPreviewKeydown);
-    window.addEventListener('keyup', onPreviewKeyup);
-    return;
-  }
-
-  window.removeEventListener('keydown', onPreviewKeydown);
-  window.removeEventListener('keyup', onPreviewKeyup);
-  isShiftPressed.value = false;
+defineExpose({
+  openManualDialog: onOpenManualInput,
+  closeManualDialog: closeManualInput,
+  openFirstLineSearchDialog,
+  closeFirstLineSearchDialog,
+  openPagePreview,
+  closePagePreview,
 });
 
 onUnmounted(() => {
+  emit('calendar-requires-expanded-height-change', false);
   teardownCalendarMouseDrag?.();
-  window.removeEventListener('keydown', onPreviewKeydown);
-  window.removeEventListener('keyup', onPreviewKeyup);
 });
 </script>
 
@@ -1108,6 +981,16 @@ onUnmounted(() => {
   margin-inline: -4px;
 }
 
+.location-calendar-slide-shell {
+  display: grid;
+  min-width: 0;
+  padding-top: 16px;
+}
+
+.location-calendar-section {
+  padding: 12px 16px 8px;
+}
+
 .calendar-slide-group :deep(.v-slide-group__content) {
   padding-top: 4px;
 }
@@ -1121,175 +1004,6 @@ onUnmounted(() => {
     cursor: grabbing;
     user-select: none;
   }
-}
-
-.preview-dialog-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.preview-dialog-card {
-  max-height: min(66vh, 520px);
-  overflow: hidden;
-}
-
-.preview-dialog-card :deep(.v-card-text) {
-  overflow-y: auto;
-}
-
-.preview-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.preview-annotations-toggle {
-  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 9999px;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.preview-toggle {
-  --annotations-toggle-active-color: white;
-  --annotations-toggle-inactive-color: hsla(0, 0%, 100%, 0.6);
-  text-align: middle;
-  display: flex;
-  align-items: center;
-  direction: ltr;
-  unicode-bidi: isolate;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.preview-toggle [type='checkbox'] {
-  display: none;
-}
-
-.preview-toggle-state {
-  color: var(--annotations-toggle-inactive-color);
-  transition: all 0.1s;
-  position: relative;
-  right: 3px;
-}
-
-.preview-toggle-state.mod-off {
-  display: inline-block;
-  margin-right: 0.25em;
-}
-
-.preview-toggle [type='checkbox']:checked ~ .preview-toggle-state.mod-on,
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
-  transform: scale(1.5);
-  color: var(--annotations-toggle-active-color);
-}
-
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-on,
-.preview-toggle [type='checkbox']:not(:checked) ~ .preview-toggle-state.mod-off {
-  right: -3px;
-}
-
-.preview-shadowed-circle {
-  padding: 0.72em;
-  height: 2.95em;
-  width: 2.95em;
-  display: flex;
-  direction: ltr;
-  unicode-bidi: isolate;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  background: black;
-  color: white;
-  transition: 0.15s transform;
-}
-
-.preview-shadowed-circle:hover {
-  transform: scale(1.08);
-}
-
-.tikkun-preview-line-shell {
-  width: min(100%, 44rem);
-  margin-inline: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 4px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.tikkun-preview-line {
-  --preview-line-width: 27.5em;
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  background-color: rgba(var(--v-theme-surface-variant), 0.18);
-  position: relative;
-  direction: rtl;
-  unicode-bidi: isolate;
-  text-align: justify;
-  line-height: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  min-width: var(--preview-line-width);
-  width: var(--preview-line-width);
-  padding: 12px 14px 10px;
-  font-family: 'Noto Serif Hebrew', 'Times New Roman', serif;
-  font-size: clamp(1rem, 2.1vw, 1.55rem);
-}
-
-.preview-column {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  direction: rtl;
-  min-width: 18ch;
-}
-
-.preview-column:nth-child(2) {
-  margin-right: 5em;
-  width: 12em;
-}
-
-.tikkun-preview-fragment {
-  width: 100%;
-  white-space: nowrap;
-}
-
-.tikkun-preview-fragment.mod-setuma {
-  width: auto;
-}
-
-.tikkun-preview-fragment::after {
-  content: '';
-  width: 100%;
-  display: inline-block;
-}
-
-.tikkun-preview-line :deep(.ktiv-kri) {
-  background-color: rgba(var(--v-theme-primary), 0.1);
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-  border-radius: 8px;
-  padding: 0.1rem;
-}
-
-.preview-open-btn {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.preview-open-btn :deep(.v-btn__content) {
-  white-space: normal;
-  line-height: 1.15;
-  text-align: center;
 }
 
 .target-ref-toggle {
@@ -1328,26 +1042,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 600px) {
-  .tikkun-preview-line-shell {
-    width: 100%;
-  }
-
-  .tikkun-preview-line {
-    font-size: 0.83rem;
-    --preview-line-width: 100%;
-    min-width: 100%;
-    width: 100%;
-  }
-
-  .preview-column {
-    min-width: 0;
-  }
-
-  .preview-column:nth-child(2) {
-    margin-right: 1.4em;
-    width: 8.6em;
-  }
-
   .location-header {
     flex-direction: column;
   }
@@ -1403,7 +1097,8 @@ onUnmounted(() => {
   }
 
   .calendar-slide-group :deep(.reading-option-card--calendar) {
-    min-width: 154px;
+    min-width: 162px;
+    max-width: 186px;
   }
 }
 </style>

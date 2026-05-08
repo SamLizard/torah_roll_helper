@@ -1,5 +1,13 @@
 type LocationSide = 'from' | 'to';
 type RollDirection = 'forward' | 'backward';
+type TutorialKind = 'quick' | 'full';
+type TutorialEventAction = 'open' | 'close' | 'advanced-details';
+type TutorialPromptAction = 'shown' | 'opened-quick-tutorial';
+type FirstLineSearchSource = 'manual' | 'camera-fallback' | 'tutorial';
+type FirstLineSearchStatus = 'success' | 'no-result';
+type FirstLineSearchMode = 'line-start' | 'inside-line';
+type PhotoAttemptOutcome = 'single-result' | 'multiple-results' | 'no-result' | 'error';
+type PhotoSuccessType = 'single-result' | 'multiple-results';
 
 interface GoatCounterCountPayload {
   path: string;
@@ -16,6 +24,44 @@ interface TrackFromToActionInput {
 interface TrackRollResultDisplayedInput {
   direction: RollDirection;
   pages: number;
+}
+
+interface TrackTutorialEventInput {
+  tutorial: TutorialKind;
+  action: TutorialEventAction;
+  progressPercent?: number;
+  step?: number;
+  totalSteps?: number;
+  durationSeconds?: number;
+  source?: string | null;
+}
+
+interface TrackFirstLineSearchOutcomeInput {
+  side: LocationSide;
+  source: FirstLineSearchSource;
+  status: FirstLineSearchStatus;
+  mode: FirstLineSearchMode;
+  lettersCount: number;
+  firstResultLettersCount?: number | null;
+}
+
+interface TrackPhotoAttemptOutcomeInput {
+  side: LocationSide;
+  outcome: PhotoAttemptOutcome;
+  multipleResultCount?: number | null;
+}
+
+interface TrackPhotoSuccessInput {
+  side: LocationSide;
+  successType: PhotoSuccessType;
+  triesBeforeSuccess: number;
+  multiResultRetakesBeforeSuccess: number;
+}
+
+interface TrackPhotoMultiResultSelectionInput {
+  side: LocationSide;
+  position: number;
+  totalOptions: number;
 }
 
 interface GoatCounterApi {
@@ -41,6 +87,8 @@ const toSlug = (value: string) =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+const normalizeMetricCount = (value: number) => Math.max(0, Math.round(value));
 
 const getGoatCounterWindow = () => window as GoatCounterWindow;
 
@@ -161,6 +209,152 @@ const trackRollResultDisplayed = ({ direction, pages }: TrackRollResultDisplayed
   });
 };
 
+const trackTutorialEvent = ({
+  tutorial,
+  action,
+  progressPercent,
+  step,
+  totalSteps,
+  durationSeconds,
+  source,
+}: TrackTutorialEventInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const normalizedProgress = progressPercent == null ? null : Math.max(0, Math.min(100, Math.round(progressPercent)));
+  const normalizedDurationSeconds =
+    durationSeconds == null ? null : Math.max(0, Math.round(durationSeconds));
+
+  const pathSegments = [
+    EVENT_PATH_PREFIX,
+    'tutorial',
+    tutorial,
+    action,
+    normalizedProgress == null ? '' : `progress-${normalizedProgress}`,
+    source ? `source-${toSlug(source)}` : '',
+  ].filter((segment) => segment.length > 0);
+
+  const titleSegments = [
+    'tutorial',
+    tutorial,
+    action,
+    step == null || totalSteps == null ? '' : `step:${step}/${totalSteps}`,
+    normalizedProgress == null ? '' : `progress:${normalizedProgress}`,
+    normalizedDurationSeconds == null ? '' : `duration:${normalizedDurationSeconds}`,
+    source ? `source:${source}` : '',
+  ].filter((segment) => segment.length > 0);
+
+  trackGoatCounterEvent({
+    path: pathSegments.join('/'),
+    title: titleSegments.join(':'),
+    event: true,
+  });
+};
+
+const trackTutorialPromptEvent = (action: TutorialPromptAction) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const path = `${EVENT_PATH_PREFIX}/tutorial-prompt/${toSlug(action)}`;
+  const title = `tutorial-prompt:${action}`;
+
+  trackGoatCounterEvent({
+    path,
+    title,
+    event: true,
+  });
+};
+
+const trackFirstLineSearchOutcome = ({
+  side,
+  source,
+  status,
+  mode,
+  lettersCount,
+  firstResultLettersCount,
+}: TrackFirstLineSearchOutcomeInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const normalizedLettersCount = normalizeMetricCount(lettersCount);
+  const normalizedFirstResultLettersCount =
+    firstResultLettersCount == null ? null : normalizeMetricCount(firstResultLettersCount);
+  const actionBase = `first-line-search-${status}-${source}-${mode}`;
+
+  trackFromToAction({ side, action: actionBase });
+  trackFromToAction({
+    side,
+    action: `${actionBase}-letters`,
+    value: normalizedLettersCount,
+  });
+
+  if (normalizedFirstResultLettersCount != null) {
+    trackFromToAction({
+      side,
+      action: `${actionBase}-first-result-letters`,
+      value: normalizedFirstResultLettersCount,
+    });
+  }
+};
+
+const trackPhotoAttemptOutcome = ({
+  side,
+  outcome,
+  multipleResultCount,
+}: TrackPhotoAttemptOutcomeInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  trackFromToAction({ side, action: `photo-attempt-${outcome}` });
+
+  if (outcome === 'multiple-results' && multipleResultCount != null) {
+    trackFromToAction({
+      side,
+      action: 'photo-attempt-multiple-results-count',
+      value: normalizeMetricCount(multipleResultCount),
+    });
+  }
+};
+
+const trackPhotoSuccess = ({
+  side,
+  successType,
+  triesBeforeSuccess,
+  multiResultRetakesBeforeSuccess,
+}: TrackPhotoSuccessInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  trackFromToAction({
+    side,
+    action: `photo-success-${successType}-tries`,
+    value: normalizeMetricCount(triesBeforeSuccess),
+  });
+  trackFromToAction({
+    side,
+    action: 'photo-success-multi-result-retakes',
+    value: normalizeMetricCount(multiResultRetakesBeforeSuccess),
+  });
+};
+
+const trackPhotoMultiResultSelection = ({
+  side,
+  position,
+  totalOptions,
+}: TrackPhotoMultiResultSelectionInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const normalizedPosition = normalizeMetricCount(position) + 1;
+  const normalizedTotalOptions = Math.max(normalizedPosition, normalizeMetricCount(totalOptions));
+
+  trackFromToAction({
+    side,
+    action: 'photo-multiple-results-choice-position',
+    value: `${normalizedPosition}-of-${normalizedTotalOptions}`,
+  });
+};
+
+const trackPhotoMultiResultRetake = (side: LocationSide) => {
+  if (!isAnalyticsEnabled()) return;
+
+  trackFromToAction({ side, action: 'photo-multiple-results-retake' });
+};
+
 const trackPageView = (routePath: string, routeName?: string) => {
   if (!isAnalyticsEnabled()) return;
 
@@ -176,9 +370,21 @@ const trackPageView = (routePath: string, routeName?: string) => {
 
 export {
   bootstrapAnalytics,
+  trackFirstLineSearchOutcome,
   trackFromToAction,
   trackGolaChoice,
   trackLanguageChange,
+  trackPhotoAttemptOutcome,
+  trackPhotoMultiResultRetake,
+  trackPhotoMultiResultSelection,
+  trackPhotoSuccess,
   trackRollResultDisplayed,
   trackPageView,
+  trackTutorialEvent,
+  trackTutorialPromptEvent,
+};
+
+export type {
+  FirstLineSearchMode,
+  FirstLineSearchSource,
 };

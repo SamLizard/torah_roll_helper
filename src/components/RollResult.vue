@@ -4,8 +4,12 @@
     <div class="text-subtitle-1 mb-2">{{ $t('result.title') }}</div>
 
     <div v-if="pages !== null" class="text-center">
-      <div class="big-number">{{ pages }}</div>
-      <div v-if="remainingAfterBook !== null" class="text-caption mt-1 text-medium-emphasis">
+      <div class="big-number" data-tutorial="result-pages">{{ pages }}</div>
+      <div
+        v-if="remainingAfterBook !== null"
+        class="text-caption mt-1 text-medium-emphasis"
+        data-tutorial="result-book-remaining"
+      >
         {{
           $t('result.remainingAfterBook', {
             count: remainingAfterBook.count,
@@ -16,10 +20,11 @@
       <div
         class="text-h6 mt-2"
         :class="direction === 'forward' ? 'text-primary' : direction === 'backward' ? 'text-secondary' : ''"
+        data-tutorial="result-direction"
       >
         {{ $t(`result.direction.${direction}`) }}
       </div>
-      <div class="mt-4 text-body-2">
+      <div class="mt-4 text-body-2" data-tutorial="result-path">
         {{ $t('result.from') }}: {{ fromPage ?? '—' }} &nbsp;
         <span :class="direction === 'forward' ? 'text-primary' : direction === 'backward' ? 'text-secondary' : ''">
           {{

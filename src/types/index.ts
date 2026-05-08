@@ -7,6 +7,12 @@ interface TorahRef {
 
 type Verse = Omit<TorahRef, 'page'>;
 
+interface ManualData {
+  book: number;
+  chapter: number | null;
+  verse: number | null;
+}
+
 interface PageEntry {
   page: number;
   firstVerse: Verse;
@@ -22,6 +28,7 @@ interface RollInstructions {
 }
 
 export {
+  type ManualData,
   type TorahRef,
   type Verse,
   type PageEntry,

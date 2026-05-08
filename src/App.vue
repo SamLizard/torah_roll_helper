@@ -1,6 +1,8 @@
 <template>
   <!-- TODO 29: Use localStorage, or make PWA (progressive web app) so the user settings are remembered more long term. -->
   <!-- TODO 30: Add a part to explain how to put on apple screen (like an application). -->
+  <!-- TODO 31: Add a sort of cache (local storage?) that will store the user's preferences (language + settings). When reloading the page, the app will use these preferences and if it is not like the default settings, show a popup that closes by itself to tell that the setting is set to x. If only language, don't show the popup (he will see it by himself). -->
+  <!-- TODO 32: Add some reload button / key on the date that will refetch the calendar data? -->
   <v-app>
     <nav-bar />
     <v-main>
@@ -11,19 +13,159 @@
 
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue';
+import Swal from 'sweetalert2';
 
-import { onMounted, watch } from 'vue';
-import { useRtl } from 'vuetify';
-import { bootstrapAnalytics } from '@/composables/analytics';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import { useDisplay, useRtl } from 'vuetify';
+import {
+  bootstrapAnalytics,
+  trackTutorialPromptEvent,
+} from '@/composables/analytics';
+import {
+  initializeTutorialState,
+  markTutorialPromptSeen,
+} from '@/composables/tutorials';
 
 const { isRtl } = useRtl();
+const { smAndDown } = useDisplay();
+const { locale, t } = useI18n();
+const router = useRouter();
+const route = useRoute();
+const canonicalUrl = 'https://samlizard.github.io/torah_roll_helper/';
+
+let tutorialPromptTimeoutId: number | null = null;
+
+const tutorialPromptPosition = computed(() => {
+  if (smAndDown.value) {
+    return 'top';
+  }
+
+  return isRtl.value ? 'top-start' : 'top-end';
+});
+
+const getTranslatedText = (key: string): string => {
+  const translatedValue = t(key);
+
+  return typeof translatedValue === 'string' ? translatedValue : '';
+};
+
+const updateMetaContent = (id: string, value: string): void => {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.setAttribute('content', value);
+  }
+};
+
+const updateLinkHref = (id: string, value: string): void => {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.setAttribute('href', value);
+  }
+};
+
+const updateSeo = (): void => {
+  const routeTitleKey = typeof route.meta.titleKey === 'string' ? route.meta.titleKey : 'seo.fallbackTitle';
+  const routeDescriptionKey = typeof route.meta.descriptionKey === 'string'
+    ? route.meta.descriptionKey
+    : 'seo.fallbackDescription';
+  const title = getTranslatedText(routeTitleKey) || getTranslatedText('seo.fallbackTitle');
+  const description = getTranslatedText(routeDescriptionKey) || getTranslatedText('seo.fallbackDescription');
+  const direction = getTranslatedText('dir') || 'ltr';
+
+  document.title = title;
+  document.documentElement.lang = locale.value || 'en';
+  document.documentElement.dir = direction;
+
+  updateMetaContent('app-description', description);
+  updateMetaContent('app-keywords', getTranslatedText('seo.keywords'));
+  updateMetaContent('app-og-title', title);
+  updateMetaContent('app-og-description', description);
+  updateMetaContent('app-og-url', canonicalUrl);
+  updateMetaContent('app-twitter-title', title);
+  updateMetaContent('app-twitter-description', description);
+  updateLinkHref('app-canonical', canonicalUrl);
+};
 
 watch(isRtl, (newRtl) => {
   document.documentElement.style.setProperty('--swal-direction', newRtl ? 'rtl' : 'ltr');
-});
+}, { immediate: true });
+
+watch(
+  [() => route.fullPath, () => locale.value],
+  () => {
+    updateSeo();
+  },
+  { immediate: true },
+);
+
+const openQuickTutorialFromToast = async () => {
+  trackTutorialPromptEvent('opened-quick-tutorial');
+
+  await router.push({
+    name: 'home',
+    query: {
+      tutorial: 'quick',
+      source: 'welcome-toast',
+    },
+  });
+};
+
+const showTutorialPrompt = async () => {
+  markTutorialPromptSeen();
+  trackTutorialPromptEvent('shown');
+
+  const result = await Swal.fire({
+    toast: true,
+    position: tutorialPromptPosition.value,
+    icon: 'info',
+    title: t('tutorialPrompt.title'),
+    text: t('tutorialPrompt.text'),
+    showConfirmButton: true,
+    confirmButtonText: t('tutorialPrompt.openQuick'),
+    showCloseButton: true,
+    timer: 9000,
+    timerProgressBar: true,
+    customClass: {
+      popup: 'tutorial-toast',
+    },
+  });
+
+  if (result.isConfirmed) {
+    await openQuickTutorialFromToast();
+  }
+};
 
 onMounted(() => {
   bootstrapAnalytics();
+
+  const tutorialInitialization = initializeTutorialState();
+
+  if (
+    !tutorialInitialization.isFirstVisit ||
+    tutorialInitialization.state.hasSeenHowToPage ||
+    tutorialInitialization.state.hasStartedTutorial ||
+    route.name === 'howTo'
+  ) {
+    return;
+  }
+
+  tutorialPromptTimeoutId = window.setTimeout(() => {
+    if (route.name === 'howTo') {
+      return;
+    }
+
+    void showTutorialPrompt();
+  }, 1300);
+});
+
+onBeforeUnmount(() => {
+  if (tutorialPromptTimeoutId != null) {
+    window.clearTimeout(tutorialPromptTimeoutId);
+  }
 });
 </script>
 
@@ -49,6 +191,10 @@ nav a.router-link-exact-active {
 
 .swal2-modal {
   font-family: "roboto", sans-serif;
+}
+
+.tutorial-toast {
+  width: min(420px, calc(100vw - 24px));
 }
 
 .component {
