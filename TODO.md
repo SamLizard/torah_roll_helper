@@ -229,3 +229,56 @@ firstLineSearch.ocrUnreliable → EN: "Uncertain"        FR: "Incertain"        
 Remove the `{value}%` from all three — do not show percentages to the end user.
 
 4. Keep the "Restore OCR results" button (`canRestoreOcrResults`) as the only escape hatch for users who want to see or re-apply the OCR text. Its current label is fine.
+
+## Task 9 — No-results hint in first-line search
+**File:** `src/components/FirstLineSearchDialog.vue`, locale files
+
+When the user has typed enough letters but gets no results (`isQueryReady` is true, `displayedSearchResults` is empty, not in OCR assistant mode), the current message is a generic "No matching opening lines found" with a generic hint. Enrich this to explain possible reasons and offer a direct action.
+
+Show two additional elements below the existing "no matches" message:
+
+**1 — Scroll layout note (if results are truly zero):**
+A small secondary line suggesting the scroll layout might not match:
+```
+firstLineSearch.noMatchesLayout:
+  EN: "Make sure the scroll layout in Settings matches your Sefer Torah."
+  FR: "Vérifiez que la mise en page dans les paramètres correspond à votre Sefer Torah."
+  HE: "ודאו שפריסת הספר בהגדרות תואמת את ספר התורה שלכם."
+```
+Style with `text-caption text-medium-emphasis`. Only show this when `includeMatches` is false (i.e. the user is searching from the start, which is more strict).
+
+**2 — Direct toggle action:**
+When `includeMatches` is false, add a small `v-btn` with `variant="text"` and `size="small"` that directly sets `includeMatches = true` when clicked, with label:
+```
+firstLineSearch.noMatchesTryAnywhere:
+  EN: "Search anywhere in the line instead"
+  FR: "Chercher n'importe où dans la ligne"
+  HE: "חפשו בכל מקום בשורה"
+```
+This saves the user from having to scroll back up to find and understand the toggle. Once clicked, results (if any) appear immediately. Do not show this button when `includeMatches` is already true.
+
+---
+
+## Task 10 — Retry camera button prominent in Dicta overlay
+**File:** `src/views/HomeView.vue`, locale files
+
+In the Dicta overlay, when the result is `no-result` or `error`, the user currently has two recovery paths:
+- "Type the first words instead" — shown prominently in the **center** of the overlay content
+- "New photo" — shown only as a small button in the **toolbar at the top** of the overlay
+
+This asymmetry means the retry option is easy to miss while the first-line fallback is obvious. Add the retry camera button alongside "Type the first words instead" in the center content area so both options are equally visible.
+
+In both the desktop overlay and the mobile overlay, inside the `dictaFlowState === 'no-result'` and `dictaFlowState === 'error'` blocks, add a second `v-btn` next to the existing "Type first words" button:
+
+```html
+<v-btn
+  size="small"
+  variant="tonal"
+  prepend-icon="mdi-camera-retake"
+  @click="onDictaRetake"
+>
+  {{ $t('home.dicta.newPhoto') }}
+</v-btn>
+```
+
+Place both buttons in a `d-flex gap-2 justify-center flex-wrap` container so they sit side by side (or wrap on very narrow screens). The existing "New photo" button in the toolbar can remain as-is — having it in both places is intentional, since users may look in either location.
