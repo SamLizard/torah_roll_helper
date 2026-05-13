@@ -309,6 +309,7 @@
   "preview": {
     "cols": "{count} עמ׳",
     "openPage": "תצוגה מקדימה לעמוד",
+    "openPageShort": "תצוגה מקדימה",
     "pageTitle": "תצוגה מקדימה לעמוד {page}",
     "firstLine": "שורה ראשונה",
     "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",

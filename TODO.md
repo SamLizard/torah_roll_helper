@@ -52,7 +52,7 @@ Style with `text-body-2 text-medium-emphasis mt-1`. Place directly below the exi
 
 ---
 
-## Task 4 — Preview button hint
+## ~~Task 4 — Preview button hint~~ ✅ DONE
 **File:** `src/components/LocationSelector.vue`, locale files
 
 Add a short text label that appears after the preview icon button inline in the same row as the page number. See Task 7f for the exact layout — this hint text is part of that layout change, not a separate element.

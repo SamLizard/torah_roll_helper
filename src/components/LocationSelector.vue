@@ -94,25 +94,28 @@
       <div v-if="page !== null" class="text-center w-100">
         <div
           class="location-page-number-shell mb-2"
-          :class="{ 'mod-rtl': isRtl }"
           :data-tutorial="`${side}-page-preview-trigger`"
         >
           <button
             type="button"
             class="location-page-number location-page-number-btn font-weight-black text-primary"
+            :class="{ 'mod-rtl': isRtl }"
             @click="openPagePreview"
           >
             {{ page }}
+            <span class="location-page-preview-group">
+              <v-btn
+                icon="mdi-book-open-page-variant-outline"
+                size="small"
+                variant="text"
+                color="primary"
+                class="location-page-preview-btn"
+                :aria-label="$t('preview.openPage')"
+                @click.stop="openPagePreview"
+              />
+              <span class="location-page-preview-hint text-caption text-medium-emphasis">{{ $t('preview.openPageShort') }}</span>
+            </span>
           </button>
-          <v-btn
-            icon="mdi-book-open-page-variant-outline"
-            size="small"
-            variant="text"
-            color="primary"
-            class="location-page-preview-btn"
-            :aria-label="$t('preview.openPage')"
-            @click="openPagePreview"
-          />
         </div>
         <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
@@ -929,6 +932,7 @@ onUnmounted(() => {
 }
 
 .location-page-number-btn {
+  position: relative;
   background: none;
   border: none;
   margin: 0;
@@ -948,20 +952,27 @@ onUnmounted(() => {
 }
 
 .location-page-number-shell {
-  position: relative;
-  display: flex;
+  text-align: center;
+}
+
+.location-page-preview-group {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: fit-content;
-  margin-inline: auto;
-  padding-inline: 40px;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.location-page-number-btn.mod-rtl .location-page-preview-group {
+  left: auto;
+  right: 100%;
+  flex-direction: row-reverse;
 }
 
 .location-page-preview-btn {
-  position: absolute;
-  top: 50%;
-  inset-inline-end: 4px;
-  transform: translateY(-50%);
   width: 34px;
   height: 34px;
   min-width: 34px;
@@ -970,9 +981,8 @@ onUnmounted(() => {
   padding: 0;
 }
 
-.location-page-number-shell.mod-rtl .location-page-preview-btn {
-  inset-inline-end: auto;
-  inset-inline-start: 4px;
+.location-page-preview-hint {
+  white-space: nowrap;
 }
 
 .location-page-preview-btn :deep(.v-btn__overlay),

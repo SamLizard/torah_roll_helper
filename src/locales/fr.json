@@ -309,6 +309,7 @@
   "preview": {
     "cols": "{count} col.",
     "openPage": "Aperçu de la page",
+    "openPageShort": "Aperçu",
     "pageTitle": "Aperçu de la page {page}",
     "firstLine": "Première ligne",
     "lineUnavailable": "La première ligne n'est pas disponible pour cette page.",
