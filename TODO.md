@@ -17,7 +17,7 @@ home.actions.input:
 
 ---
 
-## Task 2 — Show result without scrolling
+## ~~Task 2 — Show result without scrolling~~ ✅ DONE
 **File:** `src/views/HomeView.vue`
 
 On mobile the full result card is below both location cards and requires scrolling. Replace the current plain down-arrow row (`d-flex d-md-none`) with a new compact component that sits between the two cards.

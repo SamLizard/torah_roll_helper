@@ -26,8 +26,11 @@
         mdi-arrow-{{ $vuetify.locale.isRtl ? 'left' : 'right' }}
       </v-icon>
 
-      <v-col cols="12" class="d-flex d-md-none align-center justify-center py-0">
-        <v-icon size="36">mdi-arrow-down</v-icon>
+      <v-col cols="12" class="d-md-none py-0">
+        <MobileCompactResult
+          :pages="roll?.pages ?? null"
+          :direction="roll?.rollDirection ?? null"
+        />
       </v-col>
 
       <v-col cols="12" md="6" class="px-md-5">
@@ -582,6 +585,7 @@ import {
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import LocationSelector from '@/components/LocationSelector.vue';
+import MobileCompactResult from '@/components/MobileCompactResult.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
