@@ -1,4 +1,4 @@
-## Task 1 — Rename action buttons
+## ~~Task 1 — Rename action buttons~~ ✅ DONE
 **Files:** `src/locales/en.json`, `src/locales/fr.json`, `src/locales/he.json`
 
 Update the `home.actions` keys as follows. The `choose` button opens the full reading list (TargetOptionsGrid). The `input` button opens the manual entry dialog which contains ref/page/first-line search — so both buttons now use the word "choose" to make their purpose parallel.
@@ -31,7 +31,7 @@ The full `RollResult` card below is unchanged. The new component is mobile-only 
 
 ---
 
-## Task 3 — Empty state helper text
+## ~~Task 3 — Empty state helper text~~ ✅ DONE
 **Files:** `src/components/LocationSelector.vue`, locale files
 
 When no page is selected, add a short second line below "No page selected", specific to each card side:

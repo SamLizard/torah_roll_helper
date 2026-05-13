@@ -161,6 +161,7 @@
       <div v-else class="text-center text-medium-emphasis py-6">
         <v-icon size="48" class="mb-2 opacity-50">mdi-book-open-page-variant-outline</v-icon>
         <div>{{ $t('home.noSelection') }}</div>
+        <div class="text-body-2 text-medium-emphasis mt-1">{{ $t(`home.${side}.emptyHint`) }}</div>
       </div>
     </v-card-text>
     

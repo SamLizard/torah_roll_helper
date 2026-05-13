@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "נקודת התחלה",
-      "subtitle": "מיקום נוכחי"
+      "subtitle": "מיקום נוכחי",
+      "emptyHint": "היכן ספר התורה פתוח כעת?"
     },
     "to": {
       "title": "יעד",
-      "subtitle": "קריאת יעד"
+      "subtitle": "קריאת יעד",
+      "emptyHint": "בחר את הקריאה הבאה"
     },
     "calendar": {
       "from": "קריאות אחרונות",
@@ -104,9 +106,9 @@
     },
     "actions": {
       "photo": "צלם",
-      "choose": "בחר ידנית",
+      "choose": "בחר קריאה",
       "clear": "נקה",
-      "input": "הקלדה"
+      "input": "בחר לפי ייחוס"
     },
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"

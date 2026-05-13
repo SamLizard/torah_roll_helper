@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "FROM",
-      "subtitle": "Current location"
+      "subtitle": "Current location",
+      "emptyHint": "Where is the Torah scroll currently open?"
     },
     "to": {
       "title": "TO",
-      "subtitle": "Target reading"
+      "subtitle": "Target reading",
+      "emptyHint": "Choose the upcoming reading"
     },
     "calendar": {
       "from": "Recent readings",
@@ -104,9 +106,9 @@
     },
     "actions": {
       "photo": "Take photo",
-      "choose": "Choose manually",
+      "choose": "Choose reading",
       "clear": "Clear",
-      "input": "Input"
+      "input": "Choose by ref."
     },
     "selected": "Selected",
     "noSelection": "No page selected"

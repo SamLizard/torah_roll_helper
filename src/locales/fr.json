@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "DE",
-      "subtitle": "Emplacement actuel"
+      "subtitle": "Emplacement actuel",
+      "emptyHint": "Où le Sefer Torah est-il actuellement ouvert ?"
     },
     "to": {
       "title": "À",
-      "subtitle": "Lecture cible"
+      "subtitle": "Lecture cible",
+      "emptyHint": "Choisissez la prochaine lecture"
     },
     "calendar": {
       "from": "Lectures récentes",
@@ -104,9 +106,9 @@
     },
     "actions": {
       "photo": "Photo",
-      "choose": "Choisir manuellement",
+      "choose": "Choisir une lecture",
       "clear": "Effacer",
-      "input": "Saisie"
+      "input": "Choisir par réf."
     },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
