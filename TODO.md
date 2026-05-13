@@ -94,7 +94,7 @@ home.golaBanner.dismiss: (reuse actions.close)
 
 ---
 
-## Task 6 — Result card improvements
+## ~~Task 6 — Result card improvements~~ ✅ DONE
 **File:** `src/components/RollResult.vue`, locale files
 
 **6a — Clearer direction labels:**

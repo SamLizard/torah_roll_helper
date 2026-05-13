@@ -7,15 +7,16 @@
       <div class="big-number" data-tutorial="result-pages">{{ pages }}</div>
       <div
         v-if="remainingAfterBook !== null"
-        class="text-caption mt-1 text-medium-emphasis"
+        class="d-flex align-center justify-center gap-1 mt-2 text-body-2"
         data-tutorial="result-book-remaining"
       >
-        {{
+        <v-icon size="16" class="me-1">mdi-book-open-page-variant-outline</v-icon>
+        <span>{{
           $t('result.remainingAfterBook', {
             count: remainingAfterBook.count,
             book: $t(`group.${remainingAfterBook.bookKey}`)
           })
-        }}
+        }}</span>
       </div>
       <div
         class="text-h6 mt-2"

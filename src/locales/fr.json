@@ -302,8 +302,8 @@
     "to": "À",
     "remainingAfterBook": "{count} pages restantes après {book}",
     "direction": {
-      "forward": "Vers l'avant",
-      "backward": "Vers l'arrière"
+      "forward": "Vers l'avant (vers Devarim)",
+      "backward": "Vers l'arrière (vers Bereshit)"
     }
   },
   "page": "Page",

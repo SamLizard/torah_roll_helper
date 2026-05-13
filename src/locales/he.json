@@ -302,8 +302,8 @@
     "to": "ל־",
     "remainingAfterBook": "נותרו {count} עמודים לגלול אחרי {book}",
     "direction": {
-      "forward": "לגלול קדימה",
-      "backward": "לגלול לאחור"
+      "forward": "קדימה (לכיוון דברים)",
+      "backward": "אחורה (לכיוון בראשית)"
     }
   },
   "page": "עמוד",
