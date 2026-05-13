@@ -230,7 +230,7 @@ Remove the `{value}%` from all three — do not show percentages to the end user
 
 4. Keep the "Restore OCR results" button (`canRestoreOcrResults`) as the only escape hatch for users who want to see or re-apply the OCR text. Its current label is fine.
 
-## Task 9 — No-results hint in first-line search
+## ~~Task 9 — No-results hint in first-line search~~ ✅ DONE
 **File:** `src/components/FirstLineSearchDialog.vue`, locale files
 
 When the user has typed enough letters but gets no results (`isQueryReady` is true, `displayedSearchResults` is empty, not in OCR assistant mode), the current message is a generic "No matching opening lines found" with a generic hint. Enrich this to explain possible reasons and offer a direct action.

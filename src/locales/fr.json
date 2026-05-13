@@ -372,6 +372,8 @@
     "searchFromStart": "La ligne commence par ces mots",
     "noMatches": "Aucune ligne d'ouverture correspondante",
     "noMatchesHint": "Essayez avec moins de mots, ou activez la recherche n'importe où dans la ligne d'ouverture.",
+    "noMatchesLayout": "Vérifiez que la mise en page dans les paramètres correspond à votre Sefer Torah.",
+    "noMatchesTryAnywhere": "Chercher n'importe où dans la ligne",
     "preview": "Aperçu",
     "usePage": "Utiliser cette page",
     "searchAnywhere": "Chercher n'importe où dans la ligne d'ouverture",

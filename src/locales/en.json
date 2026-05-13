@@ -372,6 +372,8 @@
     "searchFromStart": "Line starts with these words",
     "noMatches": "No matching opening lines found",
     "noMatchesHint": "Try fewer words, or switch to searching anywhere in the opening line.",
+    "noMatchesLayout": "Make sure the scroll layout in Settings matches your Sefer Torah.",
+    "noMatchesTryAnywhere": "Search anywhere in the line instead",
     "preview": "Preview",
     "usePage": "Use this page",
     "searchAnywhere": "Search anywhere in the opening line",

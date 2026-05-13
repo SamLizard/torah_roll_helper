@@ -390,6 +390,20 @@
           <v-icon size="42" class="mb-2 opacity-60">mdi-text-search</v-icon>
           <div class="text-subtitle-2 font-weight-medium">{{ $t('firstLineSearch.noMatches') }}</div>
           <div class="text-body-2 mt-1">{{ $t('firstLineSearch.noMatchesHint') }}</div>
+
+          <div class="text-caption text-medium-emphasis mt-3">
+            {{ $t('firstLineSearch.noMatchesLayout') }}
+          </div>
+
+          <v-btn
+            v-if="!includeMatches"
+            class="mt-3"
+            variant="text"
+            size="small"
+            @click="includeMatches = true"
+          >
+            {{ $t('firstLineSearch.noMatchesTryAnywhere') }}
+          </v-btn>
         </div>
       </v-card-text>
 
