@@ -104,6 +104,9 @@
         "pageTitle": "Titre de page"
       }
     },
+    "golaBanner": {
+      "text": "Les lectures sont configurées sur Israël. Êtes-vous en dehors d'Israël ?"
+    },
     "actions": {
       "photo": "Photo",
       "choose": "Choisir une lecture",

@@ -69,7 +69,7 @@ The label renders as a small `text-caption` span directly after the preview `v-b
 
 ---
 
-## Task 5 — Gola/Israel first-use notice
+## ~~Task 5 — Gola/Israel first-use notice~~ ✅ DONE
 **Files:** `src/views/HomeView.vue`, `src/stores/options.ts`, locale files
 
 A user opening the app for the first time is silently in Israel mode. If they are in the Diaspora, the readings shown in the calendar strip will be wrong some weeks. They have no indication of this unless they explore Settings.

@@ -104,6 +104,9 @@
         "pageTitle": "Page title"
       }
     },
+    "golaBanner": {
+      "text": "Readings are set to Israel. Are you outside Israel?"
+    },
     "actions": {
       "photo": "Take photo",
       "choose": "Choose reading",
