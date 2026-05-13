@@ -259,7 +259,7 @@ This saves the user from having to scroll back up to find and understand the tog
 
 ---
 
-## Task 10 — Retry camera button prominent in Dicta overlay
+## ~~Task 10 — Retry camera button prominent in Dicta overlay~~ ✅ DONE
 **File:** `src/views/HomeView.vue`, locale files
 
 In the Dicta overlay, when the result is `no-result` or `error`, the user currently has two recovery paths:

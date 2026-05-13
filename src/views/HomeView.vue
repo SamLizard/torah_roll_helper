@@ -138,34 +138,52 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div
@@ -250,34 +268,52 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
             </div>
           </v-card-text>
@@ -2690,6 +2726,7 @@ onUnmounted(() => {
 .dicta-state-headline {
   width: 100%;
   text-align: center;
+  padding-inline: 16px;
 }
 
 .dicta-state-headline--compact {
