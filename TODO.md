@@ -178,7 +178,7 @@ The `mod-rtl` class already handles mirroring for the preview button; apply the 
 
 ---
 
-## Task 8 — First line search improvements
+## ~~Task 8 — First line search improvements~~ ✅ DONE
 **Files:** `src/components/FirstLineSearchDialog.vue`, locale files
 
 **8a — Scroll layout note:**

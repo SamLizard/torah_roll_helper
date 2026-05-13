@@ -22,8 +22,12 @@
       </v-card-title>
 
       <v-card-text class="pt-2">
-        <div class="text-body-2 text-medium-emphasis mb-4">
+        <div class="text-body-2 text-medium-emphasis mb-2">
           {{ $t('firstLineSearch.description') }}
+        </div>
+
+        <div class="text-caption text-medium-emphasis mb-4">
+          {{ $t('firstLineSearch.layoutNote', { layout: $t(`settings.torahTypeOptions.${optionsStore.torahType}`) }) }}
         </div>
 
         <v-text-field
@@ -70,7 +74,7 @@
             density="compact"
             hide-details
             inset
-            :label="$t('firstLineSearch.searchAnywhere')"
+            :label="includeMatches ? $t('firstLineSearch.searchAnywhere') : $t('firstLineSearch.searchFromStart')"
           />
 
           <v-btn
@@ -144,37 +148,11 @@
 
           <template v-else-if="ocrResult && isShowingOcrAnalysis">
             <div
-              class="first-line-search-ocr__grid"
-              :class="{ 'first-line-search-ocr__grid--single': !shouldShowCorrectedOcrText }"
-            >
-              <div class="first-line-search-ocr__field">
-                <div class="text-caption text-medium-emphasis">
-                  {{ $t('firstLineSearch.ocrRawText') }}
-                </div>
-                <div class="first-line-search-ocr__text" dir="rtl" lang="he">
-                  {{ ocrRawPreview }}
-                </div>
-              </div>
-
-              <div v-if="shouldShowCorrectedOcrText" class="first-line-search-ocr__field">
-                <div class="text-caption text-medium-emphasis">
-                  {{ $t('firstLineSearch.ocrEditableText') }}
-                </div>
-                <div class="first-line-search-ocr__text" dir="rtl" lang="he">
-                  {{ searchQuery || $t('firstLineSearch.ocrNoText') }}
-                </div>
-              </div>
-            </div>
-
-            <v-alert
               v-if="isOcrResultLowQuality"
-              type="warning"
-              variant="tonal"
-              density="comfortable"
-              class="mt-3"
+              class="text-body-2 text-medium-emphasis mt-3"
             >
               {{ $t('firstLineSearch.ocrLowQuality') }}
-            </v-alert>
+            </div>
 
             <div v-if="assistantSummary" class="first-line-search-ocr__summary">
               <div class="text-caption text-medium-emphasis">
@@ -301,7 +279,7 @@
                     :color="getConfidenceChipColor(result)"
                     variant="tonal"
                   >
-                    {{ result.displayConfidence }}%
+                    {{ getConfidenceChipLabel(result) }}
                   </v-chip>
                 </div>
 
@@ -1122,14 +1100,10 @@ const getConfidenceChipLabel = (result: SearchDisplayItem) => {
   }
 
   if ((result.score ?? 0) >= 85) {
-    return t('firstLineSearch.ocrLikely', {
-      value: result.displayConfidence ?? result.score ?? 0,
-    });
+    return t('firstLineSearch.ocrLikely');
   }
 
-  return t('firstLineSearch.ocrUnreliable', {
-    value: result.displayConfidence ?? result.score ?? 0,
-  });
+  return t('firstLineSearch.ocrUnreliable');
 };
 </script>
 
