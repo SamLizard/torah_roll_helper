@@ -3,12 +3,12 @@
    Pay attention that hebcal is already giving them in the correct order.
   -->
   <v-card
-    class="h-100 d-flex flex-column"
+    class="d-flex flex-column location-card"
     variant="outlined"
     style="border-radius: 16px;"
     :data-tutorial="`${side}-selector`"
   >
-    <v-card-item class="location-card-item">
+    <v-card-item class="location-card-item pa-2">
       <div class="location-header">
         <div class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
@@ -90,10 +90,24 @@
       </div>
     </v-card-text>
 
-    <v-card-text class="flex-grow-1 d-flex align-center justify-center">
+    <v-card-text class="flex-grow-1-md d-flex align-center justify-center location-body-section">
+      <v-btn
+        v-if="page !== null"
+        icon="mdi-close"
+        size="small"
+        variant="text"
+        color="error"
+        class="location-clear-btn"
+        :aria-label="$t('home.actions.clear')"
+        @click="onClear"
+      >
+        <v-icon>mdi-close</v-icon>
+        <v-tooltip activator="parent" location="bottom" class="d-none d-md-block">{{ $t('home.actions.clear') }}</v-tooltip>
+      </v-btn>
+
       <div v-if="page !== null" class="text-center w-100">
         <div
-          class="location-page-number-shell mb-2"
+          class="location-page-number-shell mb-1"
           :data-tutorial="`${side}-page-preview-trigger`"
         >
           <button
@@ -102,6 +116,9 @@
             :class="{ 'mod-rtl': isRtl }"
             @click="openPagePreview"
           >
+            <span class="location-page-label-group">
+              <span class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</span>
+            </span>
             {{ page }}
             <span class="location-page-preview-group">
               <v-btn
@@ -117,9 +134,8 @@
             </span>
           </button>
         </div>
-        <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
-        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
+        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-1 text-primary">
           {{ resolvedPageTitle }}
         </div>
 
@@ -148,10 +164,6 @@
           </v-btn-toggle>
         </div>
 
-        <v-btn class="mt-4" size="small" color="error" variant="text" @click="onClear">
-          {{ $t('home.actions.clear') }}
-        </v-btn>
-
         <PagePreviewDialog
           v-model="isPagePreviewOpen"
           :page="page"
@@ -161,7 +173,7 @@
         />
       </div>
 
-      <div v-else class="text-center text-medium-emphasis py-6">
+      <div v-else class="text-center text-medium-emphasis py-2">
         <v-icon size="48" class="mb-2 opacity-50">mdi-book-open-page-variant-outline</v-icon>
         <div>{{ $t('home.noSelection') }}</div>
         <div class="text-body-2 text-medium-emphasis mt-1">{{ $t(`home.${side}.emptyHint`) }}</div>
@@ -952,7 +964,53 @@ onUnmounted(() => {
 }
 
 .location-page-number-shell {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.location-page-label-group {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding-inline-end: 6px;
+}
+
+.location-page-number-btn.mod-rtl .location-page-label-group {
+  right: auto;
+  left: 100%;
+  padding-inline-end: 0;
+  padding-inline-start: 6px;
+}
+
+.location-clear-btn {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+  z-index: 1;
+}
+
+.location-body-section {
+  position: relative;
+}
+
+.flex-grow-1-md {
+  flex-grow: 0;
+}
+
+@media (min-width: 960px) {
+  .flex-grow-1-md {
+    flex-grow: 1;
+  }
+
+  .location-card {
+    height: 100%;
+  }
 }
 
 .location-page-preview-group {
@@ -997,11 +1055,10 @@ onUnmounted(() => {
 .location-calendar-slide-shell {
   display: grid;
   min-width: 0;
-  padding-top: 16px;
 }
 
 .location-calendar-section {
-  padding: 12px 16px 8px;
+  padding: 4px 12px 4px;
 }
 
 .calendar-slide-group :deep(.v-slide-group__content) {

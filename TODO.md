@@ -129,7 +129,7 @@ This uses the same icon as the page preview so users already have a visual assoc
 
 ---
 
-## Task 7 — Reduce card height
+## ~~Task 7 — Reduce card height~~ ✅ DONE
 **File:** `src/components/LocationSelector.vue`
 
 Apply all changes to `LocationSelector.vue` and its scoped styles.
