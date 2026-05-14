@@ -4,10 +4,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue';
 import vuetify, {transformAssetUrls} from 'vite-plugin-vuetify'
 import vueI18n from '@intlify/unplugin-vue-i18n/vite';
+import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+const config = defineConfig({
   server: {
     port: 8081,
   },
@@ -23,6 +24,47 @@ export default defineConfig({
         path.resolve(__dirname, './src/locales/**'),
       ],
     }),
+    VitePWA({
+      registerType: 'prompt',
+      manifest: {
+        name: 'Torah Roll Helper',
+        short_name: 'Torah Roll',
+        description: "Free Torah scroll rolling assistant for Gabbaim and Ba'alei Kriah",
+        theme_color: '#1976D2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/torah_roll_helper/',
+        start_url: '/torah_roll_helper/',
+        categories: ['utilities', 'education'],
+        icons: [
+          {
+            src: 'icon/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'icon/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: 'icon/pwa-maskable-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icon/pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2,json}'],
+      },
+    }),
   ],
   base: '/torah_roll_helper/', 
   resolve: {
@@ -31,3 +73,5 @@ export default defineConfig({
     }
   },
 })
+
+export default config

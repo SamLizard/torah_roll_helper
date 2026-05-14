@@ -64,7 +64,7 @@ The key point: **all icons (favicon, PWA manifest, apple-touch-icon) must come f
 
 ---
 
-## 3. Configure `vite-plugin-pwa` in `vite.config.ts`
+## 3. DONE — Configure `vite-plugin-pwa` in `vite.config.ts`
 
 ```ts
 import { VitePWA } from 'vite-plugin-pwa'
@@ -145,9 +145,13 @@ export default defineConfig({
 - The calendar is generated locally from `@hebcal/hdate` and `@hebcal/leyning`; there are no runtime `hebcal.com` calls to cache.
 - Do not add `runtimeCaching` for Dicta. OCR/parallels should remain live-network features, and the app should show a clear offline message when they are unavailable.
 
+Current project status:
+- DONE: `VitePWA()` is configured in `vite.config.ts` with `registerType: 'prompt'`, manifest metadata, GitHub Pages `scope`/`start_url`, PWA icons, maskable icons, and Workbox static asset patterns including fonts.
+- TODO: Manifest screenshots are intentionally not configured yet because `public/screenshots/mobile.png` and `public/screenshots/desktop.png` do not exist. Track this under the advanced Rich Install UI task.
+
 ---
 
-## 4. Add meta tags to `index.html`
+## 4. DONE — Add meta tags to `index.html`
 
 Add these inside `<head>`:
 
@@ -169,6 +173,11 @@ Notes:
 - `apple-mobile-web-app-capable` — Tells Safari the app can run in standalone mode (no browser chrome).
 - `apple-mobile-web-app-status-bar-style` — Use `"default"` for a normal status bar, or `"black-translucent"` for a full-bleed look.
 - The app currently only has a light theme. If you add a dark theme later, make sure the dark `theme-color` matches your Vuetify dark theme's `background` color.
+
+Current project status:
+- DONE: `index.html` already had the dynamic `theme-color` tags and Apple standalone meta tags.
+- DONE: The Apple touch icon now uses one canonical, unconditional bright-mode icon: `/torah_roll_helper/icon/apple-touch-icon-180x180.png`.
+- DONE: Favicon links already exist for light and dark system preferences.
 
 ---
 
@@ -506,7 +515,7 @@ Android Chrome supports a "Rich Install UI" that mimics the Google Play Store ex
 
 1. Take screenshots of the app (mobile + desktop)
 2. Place them in `public/screenshots/` (e.g. `mobile.png` at 390×844, `desktop.png` at 1280×720)
-3. Add the `screenshots` array to the manifest (already included in step 3 config above)
+3. Add the `screenshots` array to the manifest after the files exist
 4. Add `categories: ['utilities', 'education']` to the manifest (already included above)
 
 The combination of `description` + `screenshots` + `categories` triggers the rich UI instead of the basic install banner.
@@ -650,12 +659,12 @@ This is optional and only useful if the app has multiple entry points.
 - [x] Generate maskable icon variants (with safe-zone padding)
 - [x] Generate `apple-touch-icon-180x180.png`
 - [x] Replace `favicon.ico` with one generated from the same source image (so tab icon = home screen icon)
-- [ ] Add `VitePWA()` plugin to `vite.config.ts` with manifest config
-- [ ] Add PWA meta tags to `index.html` (theme-color with light/dark, apple-touch-icon, apple-mobile-web-app-*)
+- [x] Add `VitePWA()` plugin to `vite.config.ts` with manifest config
+- [x] Add PWA meta tags to `index.html` (theme-color with light/dark, apple-touch-icon, apple-mobile-web-app-*)
 - [ ] Add TypeScript type reference for `vite-plugin-pwa/vue`
 - [ ] Create `ReloadPrompt.vue` component for update notifications
 - [ ] Add `<ReloadPrompt />` to `App.vue` and import it
-- [ ] Keep external API calls out of Workbox runtime caching unless a future feature explicitly needs cached API responses
+- [x] Keep external API calls out of Workbox runtime caching unless a future feature explicitly needs cached API responses
 - [ ] Test with Lighthouse PWA audit
 - [ ] Test on real Android device (Chrome)
 - [ ] Test on real iOS device (Safari)
