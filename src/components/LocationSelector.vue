@@ -14,38 +14,34 @@
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <v-btn
-          ref="firstBtnEl"
-          size="small"
-          variant="text"
-          prepend-icon="mdi-format-list-bulleted"
-          class="location-action-first"
-          :data-tutorial="`${side}-choose-manual`"
-          @click="onChooseManual"
-        >
-          {{ $t('home.actions.choose') }}
-        </v-btn>
-        <div ref="restEl" class="location-actions-rest">
+        <div v-if="topButtons.length" class="location-actions-top">
           <v-btn
-            v-if="allowPhoto"
+            v-for="btn in topButtons"
+            :key="btn.key"
+            :ref="(el) => setBtnRef(btn.key, el)"
             size="small"
-            variant="tonal"
-            color="primary"
-            prepend-icon="mdi-camera"
-            :data-tutorial="`${side}-photo`"
-            @click="onOpenDicta"
+            :variant="btn.variant"
+            :color="btn.color"
+            :prepend-icon="btn.icon"
+            :data-tutorial="btn.tutorial"
+            @click="btn.action"
           >
-            {{ $t('home.actions.photo') }}
+            {{ btn.label }}
           </v-btn>
-          <v-btn 
-            size="small" 
-            variant="tonal" 
-            color="secondary" 
-            prepend-icon="mdi-pencil" 
-            :data-tutorial="`${side}-input`"
-            @click="onOpenManualInput"
+        </div>
+        <div v-if="restButtons.length" class="location-actions-rest">
+          <v-btn
+            v-for="btn in restButtons"
+            :key="btn.key"
+            :ref="(el) => setBtnRef(btn.key, el)"
+            size="small"
+            :variant="btn.variant"
+            :color="btn.color"
+            :prepend-icon="btn.icon"
+            :data-tutorial="btn.tutorial"
+            @click="btn.action"
           >
-            {{ $t('home.actions.input') }}
+            {{ btn.label }}
           </v-btn>
         </div>
       </div>
@@ -247,7 +243,7 @@ interface TargetRefOption {
   ref: TorahRef;
 }
 
-type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial';
+type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial' | 'card';
 
 const props = defineProps({
   side: { type: String as () => 'from' | 'to', required: true },
@@ -283,38 +279,134 @@ const db = realDb as RealDb;
 type HeaderLayoutMode = 'inline' | 'split' | 'stack';
 const headerEl = ref<HTMLElement | null>(null);
 const textEl = ref<HTMLElement | null>(null);
-const firstBtnEl = ref<any>(null);
-const restEl = ref<HTMLElement | null>(null);
 const headerLayoutMode = ref<HeaderLayoutMode>('inline');
+const firstRowButtonCount = ref(0);
 let headerRo: ResizeObserver | null = null;
 
-function getFirstBtnDom(): HTMLElement | null {
-  if (!firstBtnEl.value) return null;
-  // v-btn ref returns a component instance; get its root element
-  return firstBtnEl.value.$el ?? firstBtnEl.value;
+interface ActionButton {
+  key: string;
+  variant: 'text' | 'flat' | 'outlined' | 'plain' | 'elevated' | 'tonal';
+  color: string | undefined;
+  icon: string;
+  label: string;
+  tutorial: string;
+  action: () => void;
 }
+
+const btnRefs: Record<string, any> = {};
+
+function setBtnRef(key: string, el: any) {
+  btnRefs[key] = el;
+}
+
+function getBtnDom(key: string): HTMLElement | null {
+  const btnRef = btnRefs[key];
+  if (!btnRef) return null;
+  // v-btn ref returns a component instance; get its root element
+  return btnRef.$el ?? btnRef;
+}
+
+const actionButtons = computed<ActionButton[]>(() => {
+  const list: ActionButton[] = [
+    {
+      key: 'manual',
+      variant: 'text',
+      color: undefined,
+      icon: 'mdi-format-list-bulleted',
+      label: t('home.actions.choose'),
+      tutorial: `${props.side}-choose-manual`,
+      action: onChooseManual,
+    },
+  ];
+
+  if (props.side === 'from') {
+    list.push({
+      key: 'firstLine',
+      variant: 'tonal',
+      color: 'primary',
+      icon: 'mdi-text-search',
+      label: t('home.actions.firstLine'),
+      tutorial: `${props.side}-first-line`,
+      action: () => openFirstLineSearchDialog('card'),
+    });
+  }
+
+  if (props.allowPhoto) {
+    list.push({
+      key: 'photo',
+      variant: 'tonal',
+      color: 'primary',
+      icon: 'mdi-camera',
+      label: t('home.actions.photo'),
+      tutorial: `${props.side}-photo`,
+      action: onOpenDicta,
+    });
+  }
+
+  list.push({
+    key: 'input',
+    variant: 'tonal',
+    color: 'secondary',
+    icon: 'mdi-pencil',
+    label: t('home.actions.input'),
+    tutorial: `${props.side}-input`,
+    action: onOpenManualInput,
+  });
+
+  return list;
+});
+
+const topButtons = computed(() => actionButtons.value.slice(0, firstRowButtonCount.value));
+const restButtons = computed(() => actionButtons.value.slice(firstRowButtonCount.value));
 
 function updateHeaderLayout() {
   const header = headerEl.value;
   const text = textEl.value;
-  const first = getFirstBtnDom();
-  const rest = restEl.value;
-  if (!header || !text || !first || !rest) return;
+  if (!header || !text) return;
+
+  const buttons = actionButtons.value
+    .map((btn) => getBtnDom(btn.key))
+    .filter((b): b is HTMLElement => !!b);
+
+  if (!buttons.length) return;
+
+  // Temporarily force nowrap to measure intrinsic widths accurately
+  const prevWrap = header.style.flexWrap;
+  header.style.flexWrap = 'nowrap';
 
   const gap = 8;
   const available = header.clientWidth;
+  const textWidth = Math.ceil(text.getBoundingClientRect().width);
+  const buttonWidths = buttons.map((b) => Math.ceil(b.getBoundingClientRect().width));
 
-  const textWidth = Math.ceil(text.scrollWidth);
-  const firstWidth = Math.ceil(first.getBoundingClientRect().width);
-  const restWidth = Math.ceil(rest.scrollWidth);
+  // Restore original wrap
+  header.style.flexWrap = prevWrap;
 
-  const allButtonsFitOnOneLine = textWidth + firstWidth + restWidth + gap * 2 <= available;
-  const firstButtonFitsWithTitle = textWidth + firstWidth + gap <= available;
+  // Count how many buttons fit next to the title
+  let used = 0;
+  let count = 0;
+
+  for (const w of buttonWidths) {
+    const extra = count === 0 ? w : w + gap;
+    const neededOnLine = textWidth + gap + used + extra;
+
+    if (neededOnLine <= available) {
+      used += extra;
+      count++;
+    } else {
+      break;
+    }
+  }
+
+  firstRowButtonCount.value = count;
+
+  const allButtonsFit = count === buttonWidths.length;
+  const noneFit = count === 0;
 
   const nextMode: HeaderLayoutMode =
-    allButtonsFitOnOneLine ? 'inline' :
-    firstButtonFitsWithTitle ? 'split' :
-    'stack';
+    allButtonsFit ? 'inline' :
+    noneFit ? 'stack' :
+    'split';
 
   if (nextMode !== headerLayoutMode.value) headerLayoutMode.value = nextMode;
 }
@@ -935,9 +1027,7 @@ onMounted(async () => {
   updateHeaderLayout();
 
   headerRo = new ResizeObserver(() => updateHeaderLayout());
-  [headerEl.value, textEl.value, getFirstBtnDom(), restEl.value].forEach((el) => {
-    if (el) headerRo?.observe(el);
-  });
+  if (headerEl.value) headerRo.observe(headerEl.value);
 });
 
 onBeforeUnmount(() => {
@@ -983,16 +1073,21 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.location-action-first,
-.location-actions-rest :deep(.v-btn) {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
+.location-actions-top,
 .location-actions-rest {
   display: flex;
   gap: 8px;
   flex-wrap: nowrap;
+}
+
+.location-actions-top {
+  margin-inline-start: auto;
+}
+
+.location-actions-top :deep(.v-btn),
+.location-actions-rest :deep(.v-btn) {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 /* inline = title + all buttons on one line */
@@ -1004,7 +1099,7 @@ onUnmounted(() => {
   margin-inline-end: auto;
 }
 
-/* split = title + first button on line 1, rest on line 2, aligned end */
+/* split = title + some buttons on line 1, rest on line 2, aligned end */
 .location-header.is-split {
   flex-wrap: wrap;
 }
@@ -1016,6 +1111,7 @@ onUnmounted(() => {
 .location-header.is-split .location-actions-rest {
   flex-basis: 100%;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 /* stack = title on line 1, everything else below, aligned start */
@@ -1028,9 +1124,11 @@ onUnmounted(() => {
   margin-inline-end: 0;
 }
 
+.location-header.is-stack .location-actions-top,
 .location-header.is-stack .location-actions-rest {
   flex-basis: 100%;
   justify-content: flex-start;
+  margin-inline-start: 0;
   flex-wrap: wrap;
 }
 

@@ -111,7 +111,8 @@
       "photo": "Photo",
       "choose": "Choisir une lecture",
       "clear": "Effacer",
-      "input": "Choisir par réf."
+      "input": "Choisir par réf.",
+      "firstLine": "Première ligne"
     },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
@@ -201,62 +202,66 @@
         "description": "Utilisez la barre de recherche en haut, ou parcourez les catégories ci-dessous pour trouver la Kria exacte dont vous avez besoin."
       },
       "step6": {
+        "title": "Recherche par première ligne",
+        "description": "Cliquez sur 'Première ligne' pour identifier votre page actuelle en tapant les premiers mots qui apparaissent en haut de la colonne."
+      },
+      "step7": {
+        "title": "Recherche par premiers mots",
+        "description": "Commencez à taper les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page. Si besoin, ouvrez le clavier hébreu intégré, utilisez l'appareil photo pour scanner la première ligne, ou passez à la recherche n'importe où dans cette ligne."
+      },
+      "step8": {
         "title": "Reconnaissance par photo",
         "description": "Cliquez sur l'icône d'appareil photo si le Sefer Torah est ouvert et que vous souhaitez que l'application identifie votre emplacement directement à partir du texte sur le parchemin."
       },
-      "step7": {
+      "step9": {
         "title": "Résultats de l'analyse",
         "description": "Après avoir pris une photo, l'application analyse le texte et suggère les Amoudim les plus probables pour votre emplacement actuel. Si la photo échoue, ce même écran propose maintenant un accès direct pour taper les premiers mots de la page."
       },
-      "step8": {
-        "title": "Saisie manuelle",
-        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts, le numéro de page spécifique dans le Tikkoun Korim, ou si vous voulez chercher à partir de la ligne qui ouvre la page."
-      },
-      "step9": {
-        "title": "Fenêtre de saisie exacte",
-        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, aller directement à un numéro de page, ou basculer vers la recherche à partir de la ligne qui ouvre la page."
-      },
       "step10": {
-        "title": "Recherche par premiers mots",
-        "description": "Commencez à taper les premiers mots qui apparaissent en haut de la page. Chaque résultat affiche la ligne qui ouvre cette page. Si besoin, ouvrez le clavier hébreu intégré ou passez à la recherche n'importe où dans cette ligne."
+        "title": "Saisie manuelle",
+        "description": "Cliquez sur 'Saisie' si vous connaissez déjà le Perek et le Passouk exacts ou le numéro de page spécifique dans le Tikkoun Korim."
       },
       "step11": {
+        "title": "Fenêtre de saisie exacte",
+        "description": "Ici, vous pouvez définir le Sefer, le Perek et le Passouk, ou aller directement à un numéro de page."
+      },
+      "step12": {
         "title": "La zone ARRIVÉE (À)",
         "description": "C'est ici que vous définissez votre destination. La bande calendaire affiche le mois à venir. Dans la plupart des cas, vous sélectionnerez simplement la prochaine lecture d'ici."
       },
-      "step12": {
+      "step13": {
         "title": "Point de repère",
         "description": "Précisez votre point d'arrêt exact. Vous pouvez cibler le début de la Paracha, la fin d'une lecture de semaine (Chéni/Hamichi/Min'ha), ou la fin de la lecture complète du Chabbat."
       },
-      "step13": {
+      "step14": {
         "title": "La carte de résultat",
         "description": "Une fois DE et À définis, cette carte vous donne la réponse finale : combien d'Amoudim rouler, dans quelle direction, et les pages de référence."
       },
-      "step14": {
+      "step15": {
         "title": "Changement de Houmach",
         "description": "S'il faut passer à un nouveau livre (ex: de Chémot à Vayikra), cette note vous indique combien de pages il reste à rouler une fois le livre cible atteint."
       },
-      "step15": {
+      "step16": {
         "title": "Aperçu de la page",
         "description": "Cliquez sur le numéro de page ou sur la petite icône de livre pour voir un aperçu de la colonne sélectionnée."
       },
-      "step16": {
+      "step17": {
         "title": "Vérification avec le Tikkoun",
         "description": "L'aperçu montre la première ligne de la colonne (avec la possibilité d'afficher ou masquer le Nikoud) et inclut un bouton pour ouvrir un affichage complet du Tikkoun afin de vérifier votre position."
       },
-      "step17": {
+      "step18": {
         "title": "Paramètres",
         "description": "Cliquez sur l'icône de roue dentée pour ouvrir vos préférences."
       },
-      "step18": {
+      "step19": {
         "title": "Coutumes communautaires",
         "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Noussah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé."
       },
-      "step19": {
+      "step20": {
         "title": "Navigation",
         "description": "Utilisez la barre de navigation pour accéder aux autres outils. Sur mobile, touchez l'icône de menu pour ouvrir le panneau latéral."
       },
-      "step20": {
+      "step21": {
         "title": "À propos et Contact",
         "description": "Lorsque vous terminez cette visite, la page 'À propos' s'ouvrira pour que vous puissiez voir les détails du projet, les crédits des données, ou signaler un problème sur GitHub."
       }
