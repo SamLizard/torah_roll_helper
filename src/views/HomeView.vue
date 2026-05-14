@@ -32,6 +32,7 @@
         <MobileCompactResult
           :pages="roll?.pages ?? null"
           :direction="roll?.rollDirection ?? null"
+          :remaining-after-book-label="remainingAfterBookLabel"
         />
       </v-col>
 
@@ -57,6 +58,7 @@
       <v-col cols="12" md="8">
         <div data-tutorial="roll-result">
           <RollResult
+            ref="rollResultRef"
             :pages="roll?.pages ?? null"
             :direction="roll?.rollDirection ?? null"
             :from-page="options.fromPage"
@@ -813,6 +815,14 @@ watch(
   },
   { immediate: true }
 );
+
+const rollResultRef = ref<InstanceType<typeof RollResult> | null>(null);
+
+const remainingAfterBookLabel = computed(() => {
+  const data = rollResultRef.value?.remainingAfterBook;
+  if (!data) return null;
+  return t('result.remainingAfterBook', { count: data.count, book: t(`group.${data.bookKey}`) });
+});
 
 const toManualData = (torahRef: TorahRef): ManualData => ({
   book: torahRef.book,

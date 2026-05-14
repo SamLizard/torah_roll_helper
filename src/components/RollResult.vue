@@ -71,6 +71,8 @@ const remainingAfterBook = computed<{ count: number; bookKey: BookLabelKey } | n
     bookKey
   };
 });
+
+defineExpose({ remainingAfterBook });
 </script>
 
 <style scoped>
