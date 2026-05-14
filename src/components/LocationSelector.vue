@@ -3,50 +3,50 @@
    Pay attention that hebcal is already giving them in the correct order.
   -->
   <v-card
-    class="h-100 d-flex flex-column"
+    class="d-flex flex-column location-card"
     variant="outlined"
     style="border-radius: 16px;"
     :data-tutorial="`${side}-selector`"
   >
-    <v-card-item class="location-card-item">
-      <div class="location-header">
-        <div class="location-text">
+    <v-card-item class="location-card-item pa-2">
+      <div ref="headerEl" class="location-header" :class="`is-${headerLayoutMode}`" :data-tutorial="`${side}-actions`">
+        <div ref="textEl" class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <div class="location-actions-shell" :data-tutorial="`${side}-actions`">
-          <div class="location-actions">
-            <v-btn
-              size="small"
-              variant="text"
-              prepend-icon="mdi-format-list-bulleted"
-              :data-tutorial="`${side}-choose-manual`"
-              @click="onChooseManual"
-            >
-              {{ $t('home.actions.choose') }}
-            </v-btn>
-            <v-btn
-              v-if="allowPhoto"
-              size="small"
-              variant="tonal"
-              color="primary"
-              prepend-icon="mdi-camera"
-              :data-tutorial="`${side}-photo`"
-              @click="onOpenDicta"
-            >
-              {{ $t('home.actions.photo') }}
-            </v-btn>
-            <v-btn 
-              size="small" 
-              variant="tonal" 
-              color="secondary" 
-              prepend-icon="mdi-pencil" 
-              :data-tutorial="`${side}-input`"
-              @click="onOpenManualInput"
-            >
-              {{ $t('home.actions.input') }}
-            </v-btn>
-          </div>
+        <v-btn
+          ref="firstBtnEl"
+          size="small"
+          variant="text"
+          prepend-icon="mdi-format-list-bulleted"
+          class="location-action-first"
+          :data-tutorial="`${side}-choose-manual`"
+          @click="onChooseManual"
+        >
+          {{ $t('home.actions.choose') }}
+        </v-btn>
+        <div ref="restEl" class="location-actions-rest">
+          <v-btn
+            v-if="allowPhoto"
+            size="small"
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-camera"
+            :data-tutorial="`${side}-photo`"
+            @click="onOpenDicta"
+          >
+            {{ $t('home.actions.photo') }}
+          </v-btn>
+          <v-btn 
+            size="small" 
+            variant="tonal" 
+            color="secondary" 
+            prepend-icon="mdi-pencil" 
+            :data-tutorial="`${side}-input`"
+            @click="onOpenManualInput"
+          >
+            {{ $t('home.actions.input') }}
+          </v-btn>
         </div>
       </div>
     </v-card-item>
@@ -90,33 +90,52 @@
       </div>
     </v-card-text>
 
-    <v-card-text class="flex-grow-1 d-flex align-center justify-center">
+    <v-card-text class="flex-grow-1-md d-flex align-center justify-center location-body-section">
+      <v-btn
+        v-if="page !== null"
+        icon="mdi-close"
+        size="small"
+        variant="text"
+        color="error"
+        class="location-clear-btn"
+        :aria-label="$t('home.actions.clear')"
+        @click="onClear"
+      >
+        <v-icon>mdi-close</v-icon>
+        <v-tooltip activator="parent" location="bottom" class="d-none d-md-block">{{ $t('home.actions.clear') }}</v-tooltip>
+      </v-btn>
+
       <div v-if="page !== null" class="text-center w-100">
         <div
-          class="location-page-number-shell mb-2"
-          :class="{ 'mod-rtl': isRtl }"
+          class="location-page-number-shell mb-1"
           :data-tutorial="`${side}-page-preview-trigger`"
         >
           <button
             type="button"
             class="location-page-number location-page-number-btn font-weight-black text-primary"
+            :class="{ 'mod-rtl': isRtl }"
             @click="openPagePreview"
           >
+            <span class="location-page-label-group">
+              <span class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</span>
+            </span>
             {{ page }}
+            <span class="location-page-preview-group">
+              <v-btn
+                icon="mdi-book-open-page-variant-outline"
+                size="small"
+                variant="text"
+                color="primary"
+                class="location-page-preview-btn"
+                :aria-label="$t('preview.openPage')"
+                @click.stop="openPagePreview"
+              />
+              <span class="location-page-preview-hint text-caption text-medium-emphasis">{{ $t('preview.openPageShort') }}</span>
+            </span>
           </button>
-          <v-btn
-            icon="mdi-book-open-page-variant-outline"
-            size="small"
-            variant="text"
-            color="primary"
-            class="location-page-preview-btn"
-            :aria-label="$t('preview.openPage')"
-            @click="openPagePreview"
-          />
         </div>
-        <div class="text-caption text-medium-emphasis text-uppercase">{{ $t('page') }}</div>
         
-        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-2 text-primary">
+        <div v-if="resolvedPageTitle" class="text-subtitle-1 font-weight-medium mt-1 text-primary">
           {{ resolvedPageTitle }}
         </div>
 
@@ -145,10 +164,6 @@
           </v-btn-toggle>
         </div>
 
-        <v-btn class="mt-4" size="small" color="error" variant="text" @click="onClear">
-          {{ $t('home.actions.clear') }}
-        </v-btn>
-
         <PagePreviewDialog
           v-model="isPagePreviewOpen"
           :page="page"
@@ -158,9 +173,10 @@
         />
       </div>
 
-      <div v-else class="text-center text-medium-emphasis py-6">
+      <div v-else class="text-center text-medium-emphasis py-2">
         <v-icon size="48" class="mb-2 opacity-50">mdi-book-open-page-variant-outline</v-icon>
         <div>{{ $t('home.noSelection') }}</div>
+        <div class="text-body-2 text-medium-emphasis mt-1">{{ $t(`home.${side}.emptyHint`) }}</div>
       </div>
     </v-card-text>
     
@@ -183,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog from './ManualEntryDialog.vue';
@@ -262,6 +278,46 @@ const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
+
+// --- Header layout measurement (Task 11) ---
+type HeaderLayoutMode = 'inline' | 'split' | 'stack';
+const headerEl = ref<HTMLElement | null>(null);
+const textEl = ref<HTMLElement | null>(null);
+const firstBtnEl = ref<any>(null);
+const restEl = ref<HTMLElement | null>(null);
+const headerLayoutMode = ref<HeaderLayoutMode>('inline');
+let headerRo: ResizeObserver | null = null;
+
+function getFirstBtnDom(): HTMLElement | null {
+  if (!firstBtnEl.value) return null;
+  // v-btn ref returns a component instance; get its root element
+  return firstBtnEl.value.$el ?? firstBtnEl.value;
+}
+
+function updateHeaderLayout() {
+  const header = headerEl.value;
+  const text = textEl.value;
+  const first = getFirstBtnDom();
+  const rest = restEl.value;
+  if (!header || !text || !first || !rest) return;
+
+  const gap = 8;
+  const available = header.clientWidth;
+
+  const textWidth = Math.ceil(text.scrollWidth);
+  const firstWidth = Math.ceil(first.getBoundingClientRect().width);
+  const restWidth = Math.ceil(rest.scrollWidth);
+
+  const allButtonsFitOnOneLine = textWidth + firstWidth + restWidth + gap * 2 <= available;
+  const firstButtonFitsWithTitle = textWidth + firstWidth + gap <= available;
+
+  const nextMode: HeaderLayoutMode =
+    allButtonsFitOnOneLine ? 'inline' :
+    firstButtonFitsWithTitle ? 'split' :
+    'stack';
+
+  if (nextMode !== headerLayoutMode.value) headerLayoutMode.value = nextMode;
+}
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const PERSISTED_TARGET_SEPARATOR = ' | ';
@@ -874,6 +930,21 @@ defineExpose({
   closePagePreview,
 });
 
+onMounted(async () => {
+  await nextTick();
+  updateHeaderLayout();
+
+  headerRo = new ResizeObserver(() => updateHeaderLayout());
+  [headerEl.value, textEl.value, getFirstBtnDom(), restEl.value].forEach((el) => {
+    if (el) headerRo?.observe(el);
+  });
+});
+
+onBeforeUnmount(() => {
+  headerRo?.disconnect();
+  headerRo = null;
+});
+
 onUnmounted(() => {
   emit('calendar-requires-expanded-height-change', false);
   teardownCalendarMouseDrag?.();
@@ -890,35 +961,77 @@ onUnmounted(() => {
 }
 
 .location-subtitle {
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .location-header {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .location-text {
-  min-width: 0;
-  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: max-content;
 }
 
-.location-actions {
+.location-title,
+.location-subtitle {
+  white-space: nowrap;
+}
+
+.location-action-first,
+.location-actions-rest :deep(.v-btn) {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.location-actions-rest {
   display: flex;
   gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* inline = title + all buttons on one line */
+.location-header.is-inline {
+  flex-wrap: nowrap;
+}
+
+.location-header.is-inline .location-text {
+  margin-inline-end: auto;
+}
+
+/* split = title + first button on line 1, rest on line 2, aligned end */
+.location-header.is-split {
   flex-wrap: wrap;
+}
+
+.location-header.is-split .location-text {
+  margin-inline-end: auto;
+}
+
+.location-header.is-split .location-actions-rest {
+  flex-basis: 100%;
   justify-content: flex-end;
 }
 
-.location-actions-shell {
-  min-width: 0;
-  flex: 0 1 420px;
+/* stack = title on line 1, everything else below, aligned start */
+.location-header.is-stack {
+  flex-wrap: wrap;
 }
 
-.location-actions :deep(.v-btn) {
-  white-space: nowrap;
+.location-header.is-stack .location-text {
+  flex-basis: 100%;
+  margin-inline-end: 0;
+}
+
+.location-header.is-stack .location-actions-rest {
+  flex-basis: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .location-page-number {
@@ -928,6 +1041,7 @@ onUnmounted(() => {
 }
 
 .location-page-number-btn {
+  position: relative;
   background: none;
   border: none;
   margin: 0;
@@ -947,20 +1061,73 @@ onUnmounted(() => {
 }
 
 .location-page-number-shell {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: fit-content;
-  margin-inline: auto;
-  padding-inline: 40px;
+  position: relative;
+}
+
+.location-page-label-group {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding-inline-end: 6px;
+}
+
+.location-page-number-btn.mod-rtl .location-page-label-group {
+  right: auto;
+  left: 100%;
+  padding-inline-end: 0;
+  padding-inline-start: 6px;
+}
+
+.location-clear-btn {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+  z-index: 1;
+}
+
+.location-body-section {
+  position: relative;
+}
+
+.flex-grow-1-md {
+  flex-grow: 0;
+}
+
+@media (min-width: 960px) {
+  .flex-grow-1-md {
+    flex-grow: 1;
+  }
+
+  .location-card {
+    height: 100%;
+  }
+}
+
+.location-page-preview-group {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.location-page-number-btn.mod-rtl .location-page-preview-group {
+  left: auto;
+  right: 100%;
+  flex-direction: row-reverse;
 }
 
 .location-page-preview-btn {
-  position: absolute;
-  top: 50%;
-  inset-inline-end: 4px;
-  transform: translateY(-50%);
   width: 34px;
   height: 34px;
   min-width: 34px;
@@ -969,9 +1136,8 @@ onUnmounted(() => {
   padding: 0;
 }
 
-.location-page-number-shell.mod-rtl .location-page-preview-btn {
-  inset-inline-end: auto;
-  inset-inline-start: 4px;
+.location-page-preview-hint {
+  white-space: nowrap;
 }
 
 .location-page-preview-btn :deep(.v-btn__overlay),
@@ -986,11 +1152,10 @@ onUnmounted(() => {
 .location-calendar-slide-shell {
   display: grid;
   min-width: 0;
-  padding-top: 16px;
 }
 
 .location-calendar-section {
-  padding: 12px 16px 8px;
+  padding: 4px 12px 4px;
 }
 
 .calendar-slide-group :deep(.v-slide-group__content) {
@@ -1028,76 +1193,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-@media (max-width: 900px) {
-  .location-text {
-    flex-basis: 100%;
-  }
-
-  .location-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .location-actions-shell {
-    width: 100%;
-  }
-}
-
 @media (max-width: 600px) {
-  .location-header {
-    flex-direction: column;
-  }
-
-  .location-text {
-    flex: 0 0 auto;
-  }
-
-  .location-actions-shell {
-    flex: 0 0 auto;
-    width: 100%;
-    position: relative;
-  }
-
-  .location-actions-shell::before,
-  .location-actions-shell::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 2px;
-    width: 14px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .location-actions-shell::before {
-    left: 0;
-    background: linear-gradient(
-      to right,
-      rgba(var(--v-theme-surface), 1),
-      rgba(var(--v-theme-surface), 0)
-    );
-  }
-
-  .location-actions-shell::after {
-    right: 0;
-    background: linear-gradient(
-      to left,
-      rgba(var(--v-theme-surface), 1),
-      rgba(var(--v-theme-surface), 0)
-    );
-  }
-
-  .location-actions {
-    width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-    padding-inline: 6px;
-    scroll-padding-inline: 6px;
-    scrollbar-width: thin;
-  }
-
   .calendar-slide-group :deep(.reading-option-card--calendar) {
     min-width: 162px;
     max-width: 186px;

@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "FROM",
-      "subtitle": "Current location"
+      "subtitle": "Current location",
+      "emptyHint": "Where is the Torah scroll currently open?"
     },
     "to": {
       "title": "TO",
-      "subtitle": "Target reading"
+      "subtitle": "Target reading",
+      "emptyHint": "Choose the upcoming reading"
     },
     "calendar": {
       "from": "Recent readings",
@@ -102,11 +104,14 @@
         "pageTitle": "Page title"
       }
     },
+    "golaBanner": {
+      "text": "Readings are set to Israel. Are you outside Israel?"
+    },
     "actions": {
       "photo": "Take photo",
-      "choose": "Choose manually",
+      "choose": "Choose reading",
       "clear": "Clear",
-      "input": "Input"
+      "input": "Choose by ref."
     },
     "selected": "Selected",
     "noSelection": "No page selected"
@@ -297,8 +302,8 @@
     "to": "To",
     "remainingAfterBook": "{count} pages remaining after {book}",
     "direction": {
-      "forward": "Forward",
-      "backward": "Backward"
+      "forward": "Forward (toward Devarim)",
+      "backward": "Backward (toward Bereshit)"
     }
   },
   "page": "Page",
@@ -307,6 +312,7 @@
   "preview": {
     "cols": "{count} cols",
     "openPage": "Preview page",
+    "openPageShort": "Preview",
     "pageTitle": "Page {page} preview",
     "firstLine": "First line",
     "lineUnavailable": "First line is unavailable for this page.",
@@ -350,20 +356,24 @@
     "ocrNoText": "No usable Hebrew text yet.",
     "ocrNoTextDetected": "No usable Hebrew text was detected in that photo.",
     "ocrUnexpectedError": "Could not run OCR on this image. Try another photo.",
-    "ocrLowQuality": "This OCR result looks weak. Try a tighter photo of the first line, or edit the text above.",
+    "ocrLowQuality": "The photo wasn't clear enough. Try a tighter shot of the first line, or type the words manually.",
     "ocrBestMatch": "Best match",
     "restoreOcrResults": "Back to OCR results",
     "ocrSuggestionsFound": "{count} OCR suggestions",
     "ocrMatchLabel": "Suggested opening line",
-    "ocrConfirmed": "100% match",
-    "ocrLikely": "Likely match ({value}%)",
-    "ocrUnreliable": "Low confidence ({value}%)",
+    "ocrConfirmed": "Strong match",
+    "ocrLikely": "Possible match",
+    "ocrUnreliable": "Uncertain",
     "emptyState": "Find the page from its opening words",
     "emptyStateHint": "Type the beginning of the line that starts the page.",
     "keepTyping": "Type a bit more to narrow the results.",
     "resultsFound": "{count} matching pages",
+    "layoutNote": "Works with the scroll layout set in Settings (currently: {layout})",
+    "searchFromStart": "Line starts with these words",
     "noMatches": "No matching opening lines found",
     "noMatchesHint": "Try fewer words, or switch to searching anywhere in the opening line.",
+    "noMatchesLayout": "Make sure the scroll layout in Settings matches your Sefer Torah.",
+    "noMatchesTryAnywhere": "Search anywhere in the line instead",
     "preview": "Preview",
     "usePage": "Use this page",
     "searchAnywhere": "Search anywhere in the opening line",

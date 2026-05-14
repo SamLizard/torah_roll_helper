@@ -1,5 +1,7 @@
 <template>
   <v-container fluid class="pa-4">
+    <GolaBanner />
+
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
         <LocationSelector
@@ -26,8 +28,11 @@
         mdi-arrow-{{ $vuetify.locale.isRtl ? 'left' : 'right' }}
       </v-icon>
 
-      <v-col cols="12" class="d-flex d-md-none align-center justify-center py-0">
-        <v-icon size="36">mdi-arrow-down</v-icon>
+      <v-col cols="12" class="d-md-none py-0">
+        <MobileCompactResult
+          :pages="roll?.pages ?? null"
+          :direction="roll?.rollDirection ?? null"
+        />
       </v-col>
 
       <v-col cols="12" md="6" class="px-md-5">
@@ -133,34 +138,52 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div
@@ -245,34 +268,52 @@
                 <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
                 <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
                 <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
 
               <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
                 <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
                 <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
                 <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <v-btn
-                  class="mt-4"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-text-search"
-                  data-tutorial="dicta-first-line-fallback"
-                  @click="onOpenFirstLineSearchFromDicta"
-                >
-                  {{ $t('home.dicta.tryFirstWords') }}
-                </v-btn>
+                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
+                  <v-btn
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-text-search"
+                    data-tutorial="dicta-first-line-fallback"
+                    @click="onOpenFirstLineSearchFromDicta"
+                  >
+                    {{ $t('home.dicta.tryFirstWords') }}
+                  </v-btn>
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-camera-retake"
+                    @click="onDictaRetake"
+                  >
+                    {{ $t('home.dicta.newPhoto') }}
+                  </v-btn>
+                </div>
               </div>
             </div>
           </v-card-text>
@@ -582,6 +623,8 @@ import {
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import LocationSelector from '@/components/LocationSelector.vue';
+import MobileCompactResult from '@/components/MobileCompactResult.vue';
+import GolaBanner from '@/components/GolaBanner.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
@@ -2683,6 +2726,7 @@ onUnmounted(() => {
 .dicta-state-headline {
   width: 100%;
   text-align: center;
+  padding-inline: 16px;
 }
 
 .dicta-state-headline--compact {
