@@ -299,6 +299,10 @@
       "update": "Mettre à jour",
       "dismiss": "Ignorer",
       "close": "Fermer"
+    },
+    "installPrompt": {
+      "install": "Installer l'application",
+      "subtitle": "Ajouter Torah Roll Helper à l'écran d'accueil"
     }
   },
   "actions": {

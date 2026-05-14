@@ -299,6 +299,10 @@
       "update": "Update",
       "dismiss": "Dismiss",
       "close": "Close"
+    },
+    "installPrompt": {
+      "install": "Install app",
+      "subtitle": "Add Torah Roll Helper to your home screen"
     }
   },
   "actions": {

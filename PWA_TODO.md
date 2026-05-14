@@ -313,16 +313,27 @@ When you push a new version to GitHub Pages, iOS Safari can be extremely stubbor
 
 ---
 
-## 8. Android-specific considerations
+## 8. DONE — Android-specific considerations
 
 ### 8a. Install prompt
 Android Chrome fires the `beforeinstallprompt` event. You can intercept it to show a custom "Install app" button. This is optional — Chrome also shows its own mini-infobar.
 
+Current project status:
+- DONE: `src/composables/installPrompt.ts` captures Android Chrome's `beforeinstallprompt` event and exposes `canInstall` plus `installApp()`.
+- DONE: `src/components/NavBar.vue` shows a localized install action in the desktop top bar and in the mobile drawer only when the browser reports that the app is installable.
+- DONE: The install action is hidden when the app is already running in standalone mode.
+
 ### 8b. Maskable icons
 Android uses adaptive icons. Without a maskable icon, your icon may appear with an ugly white background circle. Make sure to provide `purpose: "maskable"` icons with safe-zone padding.
 
+Current project status:
+- DONE: Maskable 192px and 512px icons exist and are declared in the Vite PWA manifest.
+
 ### 8c. TWA (Trusted Web Activity)
 Not needed for a simple PWA. Only relevant if you want to publish on the Play Store.
+
+Current project status:
+- DONE: No TWA setup is needed for the current GitHub Pages PWA.
 
 ---
 
@@ -691,8 +702,8 @@ This is optional and only useful if the app has multiple entry points.
 
 ### Advanced (native feel, do after core works)
 - [ ] Take app screenshots and add to manifest for Rich Install UI
-- [ ] Add custom "Install App" button (Android `beforeinstallprompt`)
-- [ ] Detect standalone mode to hide install prompts
+- [x] Add custom "Install App" button (Android `beforeinstallprompt`)
+- [x] Detect standalone mode to hide install prompts
 - [ ] Add periodic SW update checks (hourly)
 - [ ] Add offline-aware UI feedback (disable OCR button, show chip)
 - [x] Generate iOS splash screens for all device sizes

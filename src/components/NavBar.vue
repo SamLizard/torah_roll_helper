@@ -32,6 +32,16 @@
               {{ $t('settings.subtitle') }}
             </v-list-item-subtitle>
           </v-list-item>
+          <v-list-item
+            v-if="canInstall"
+            prepend-icon="mdi-cellphone-arrow-down"
+            :title="$t('pwa.installPrompt.install')"
+            @click="install"
+          >
+            <v-list-item-subtitle class="text-caption">
+              {{ $t('pwa.installPrompt.subtitle') }}
+            </v-list-item-subtitle>
+          </v-list-item>
         </v-list>
         
         <div class="pa-4 pt-0">
@@ -81,6 +91,14 @@
         :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'"
       />
       <v-btn
+        v-if="canInstall"
+        icon="mdi-cellphone-arrow-down"
+        variant="text"
+        class="ms-1 d-none d-md-inline-flex"
+        :aria-label="$t('pwa.installPrompt.install')"
+        @click="install"
+      />
+      <v-btn
         icon="mdi-cog"
         variant="text"
         class="ms-1"
@@ -103,6 +121,7 @@ import {
   setTutorialLanguageMenuControls,
   setTutorialNavDrawerControls,
 } from '@/composables/tutorialUi';
+import { useInstallPrompt } from '@/composables/installPrompt';
 
 interface LanguageSelectionExposed {
   openMenu: () => void;
@@ -115,6 +134,7 @@ const drawer = ref(false);
 const settingsPopupOpen = ref(false);
 const topLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const drawerLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
+const { canInstall, initializeInstallPrompt, installApp } = useInstallPrompt();
 
 const navLinks = computed(() => {
   return router.getRoutes().filter(route => route.meta?.showInNav);
@@ -146,7 +166,14 @@ const openSettingsPopup = (): void => {
   drawer.value = false;
 };
 
+const install = async (): Promise<void> => {
+  drawer.value = false;
+  await installApp();
+};
+
 onMounted(() => {
+  initializeInstallPrompt();
+
   setTutorialLanguageMenuControls({
     open: () => {
       getTutorialLanguageSelection()?.openMenu();
