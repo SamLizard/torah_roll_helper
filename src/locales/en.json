@@ -111,7 +111,8 @@
       "photo": "Take photo",
       "choose": "Choose reading",
       "clear": "Clear",
-      "input": "Choose by ref."
+      "input": "Choose by ref.",
+      "firstLine": "First line"
     },
     "selected": "Selected",
     "noSelection": "No page selected"
@@ -201,62 +202,66 @@
         "description": "Use the search bar at the top, or expand the categories below to find the exact Kriah you need."
       },
       "step6": {
+        "title": "Search by first line",
+        "description": "Click 'First line' to identify your current page by typing the first words that appear at the top of the column."
+      },
+      "step7": {
+        "title": "Search by first words",
+        "description": "Start typing the first words that appear at the top of the page. Each result shows the line that opens that page. If needed, open the built-in Hebrew keyboard, use the camera to scan the first line, or switch to match anywhere inside that line."
+      },
+      "step8": {
         "title": "Page recognition (Camera)",
         "description": "Click the camera icon when the Sefer Torah is open and you want the app to identify your location directly from the text on the Klaf."
       },
-      "step7": {
+      "step9": {
         "title": "Camera results",
         "description": "After taking a photo, the app scans the text and suggests the most likely Amudim for your current location. If the photo misses, the same screen now offers a direct fallback to typing the page's first words."
       },
-      "step8": {
-        "title": "Manual input",
-        "description": "Click 'Input' when you already know the exact Perek/Pasuk, the specific page number in the Tikkun Korim, or when you want to search from the line that opens the page."
-      },
-      "step9": {
-        "title": "Exact location dialog",
-        "description": "Here you can set the Sefer, Perek, and Pasuk, jump straight to a page number, or switch to searching from the line that opens the page."
-      },
       "step10": {
-        "title": "Search by first words",
-        "description": "Start typing the first words that appear at the top of the page. Each result shows the line that opens that page. If needed, open the built-in Hebrew keyboard or switch to match anywhere inside that line."
+        "title": "Manual input",
+        "description": "Click 'Input' when you already know the exact Perek/Pasuk or the specific page number in the Tikkun Korim."
       },
       "step11": {
+        "title": "Exact location dialog",
+        "description": "Here you can set the Sefer, Perek, and Pasuk, or jump straight to a page number."
+      },
+      "step12": {
         "title": "The TO card",
         "description": "This is where you set your destination. The calendar strip displays the upcoming month. In most cases, you will simply select the next reading from here."
       },
-      "step12": {
+      "step13": {
         "title": "Reference point",
         "description": "Choose your exact stopping point. You can target the start of the Parasha, the end of a weekday reading (Sheni/Hamishi/Mincha), or the end of the full Shabbat reading."
       },
-      "step13": {
+      "step14": {
         "title": "The result card",
         "description": "Once FROM and TO are set, this card gives you the final answer: how many Amudim to roll, which direction, and the reference pages."
       },
-      "step14": {
+      "step15": {
         "title": "Crossing into a new Chumash",
         "description": "If your roll crosses into a new book (e.g., from Exodus to Leviticus), this note tells you how many pages are left to roll after reaching target book."
       },
-      "step15": {
+      "step16": {
         "title": "Page preview",
         "description": "Click the page number or the small book icon to see a preview of the selected column."
       },
-      "step16": {
+      "step17": {
         "title": "Verify with the Tikkun",
         "description": "The preview shows the first line of the column (with an option to toggle Nikud) and includes a button to open a full digital Tikkun layout to verify your spot."
       },
-      "step17": {
+      "step18": {
         "title": "Settings",
         "description": "Click the cog icon to open your preferences."
       },
-      "step18": {
+      "step19": {
         "title": "Community customs",
         "description": "Use settings to toggle between Israel and Diaspora (Gola) modes, select your Nusach, and choose the scroll layout (e.g., 245 columns). These options affect which readings appear and how the roll is calculated."
       },
-      "step19": {
+      "step20": {
         "title": "Navigation",
         "description": "Use the navigation bar to access other tools. On mobile, tap the menu icon to open the sidebar."
       },
-      "step20": {
+      "step21": {
         "title": "About & Contact",
         "description": "When you finish this tour, the 'About' page will open so you can see project details, view data credits, or report an issue on GitHub."
       }
