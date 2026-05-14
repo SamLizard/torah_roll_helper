@@ -181,7 +181,7 @@ Current project status:
 
 ---
 
-## 5. Add TypeScript types
+## 5. DONE — Add TypeScript types
 
 In `env.d.ts` (or `tsconfig.json`), add the type reference so `virtual:pwa-register/vue` resolves:
 
@@ -200,9 +200,12 @@ Or in `tsconfig.json`:
 
 Prefer the triple-slash reference in `env.d.ts`/`src/vite-env.d.ts` when possible because it is additive. If you edit `tsconfig.json`, keep the existing `vite/client` entry; replacing it will break Vite's type resolution.
 
+Current project status:
+- DONE: `env.d.ts` includes `/// <reference types="vite-plugin-pwa/vue" />`.
+
 ---
 
-## 6. Create a "Reload Prompt" component (recommended)
+## 6. DONE — Create a "Reload Prompt" component (recommended)
 
 Since `registerType` is set to `'prompt'` (step 3), the service worker will NOT auto-update. Instead, it waits for the user to confirm. This is the recommended approach because:
 - iOS Safari is notoriously stubborn about holding onto old cached versions
@@ -235,17 +238,17 @@ const close = () => {
 
 <template>
   <v-snackbar v-model="showOfflineReady" :timeout="3000" color="success">
-    App ready to work offline.
+    {{ $t('pwa.reloadPrompt.offlineReady') }}
     <template #actions>
-      <v-btn variant="text" @click="close">Close</v-btn>
+      <v-btn variant="text" @click="close">{{ $t('pwa.reloadPrompt.close') }}</v-btn>
     </template>
   </v-snackbar>
 
   <v-snackbar v-model="needRefresh" :timeout="-1" color="primary">
-    New version available.
+    {{ $t('pwa.reloadPrompt.needRefresh') }}
     <template #actions>
-      <v-btn variant="text" @click="updateServiceWorker(true)">Update</v-btn>
-      <v-btn variant="text" @click="close">Dismiss</v-btn>
+      <v-btn variant="text" @click="updateServiceWorker(true)">{{ $t('pwa.reloadPrompt.update') }}</v-btn>
+      <v-btn variant="text" @click="close">{{ $t('pwa.reloadPrompt.dismiss') }}</v-btn>
     </template>
   </v-snackbar>
 </template>
@@ -271,6 +274,10 @@ import ReloadPrompt from './components/ReloadPrompt.vue'
 ```
 
 In the real `App.vue`, place `<ReloadPrompt />` just before `</v-app>` so it sits at the app shell level without interfering with route content.
+
+Current project status:
+- DONE: `src/components/ReloadPrompt.vue` shows an offline-ready snackbar and a persistent update-available snackbar using localized text from `src/locales/*.json`.
+- DONE: `src/App.vue` imports `ReloadPrompt` and renders `<ReloadPrompt />` at the app shell level just before `</v-app>`.
 
 ---
 
@@ -661,9 +668,9 @@ This is optional and only useful if the app has multiple entry points.
 - [x] Replace `favicon.ico` with one generated from the same source image (so tab icon = home screen icon)
 - [x] Add `VitePWA()` plugin to `vite.config.ts` with manifest config
 - [x] Add PWA meta tags to `index.html` (theme-color with light/dark, apple-touch-icon, apple-mobile-web-app-*)
-- [ ] Add TypeScript type reference for `vite-plugin-pwa/vue`
-- [ ] Create `ReloadPrompt.vue` component for update notifications
-- [ ] Add `<ReloadPrompt />` to `App.vue` and import it
+- [x] Add TypeScript type reference for `vite-plugin-pwa/vue`
+- [x] Create `ReloadPrompt.vue` component for update notifications
+- [x] Add `<ReloadPrompt />` to `App.vue` and import it
 - [x] Keep external API calls out of Workbox runtime caching unless a future feature explicitly needs cached API responses
 - [ ] Test with Lighthouse PWA audit
 - [ ] Test on real Android device (Chrome)

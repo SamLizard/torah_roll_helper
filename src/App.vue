@@ -8,11 +8,13 @@
     <v-main>
       <router-view />
     </v-main>
+    <ReloadPrompt />
   </v-app>
 </template>
 
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue';
+import ReloadPrompt from './components/ReloadPrompt.vue';
 import Swal from 'sweetalert2';
 
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue';

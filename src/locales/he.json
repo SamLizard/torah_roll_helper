@@ -292,6 +292,15 @@
     "golaBadge": "גולה",
     "israelBadge": "ישראל"
   },
+  "pwa": {
+    "reloadPrompt": {
+      "offlineReady": "האפליקציה מוכנה לעבודה במצב לא מקוון.",
+      "needRefresh": "גרסה חדשה זמינה.",
+      "update": "עדכן",
+      "dismiss": "התעלם",
+      "close": "סגור"
+    }
+  },
   "actions": {
     "close": "סגור",
     "search": "חיפוש...",

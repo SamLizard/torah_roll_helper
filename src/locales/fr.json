@@ -292,6 +292,15 @@
     "golaBadge": "Gola",
     "israelBadge": "Israël"
   },
+  "pwa": {
+    "reloadPrompt": {
+      "offlineReady": "L'application est prête à fonctionner hors ligne.",
+      "needRefresh": "Une nouvelle version est disponible.",
+      "update": "Mettre à jour",
+      "dismiss": "Ignorer",
+      "close": "Fermer"
+    }
+  },
   "actions": {
     "close": "Fermer",
     "search": "Rechercher...",
