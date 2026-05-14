@@ -32,6 +32,7 @@
         <MobileCompactResult
           :pages="roll?.pages ?? null"
           :direction="roll?.rollDirection ?? null"
+          :remaining-after-book-label="remainingAfterBookLabel"
         />
       </v-col>
 
@@ -57,6 +58,7 @@
       <v-col cols="12" md="8">
         <div data-tutorial="roll-result">
           <RollResult
+            ref="rollResultRef"
             :pages="roll?.pages ?? null"
             :direction="roll?.rollDirection ?? null"
             :from-page="options.fromPage"
@@ -678,7 +680,7 @@ interface TutorialStepEntity extends StepEntity {
 }
 
 type TutorialKind = 'quick' | 'full';
-type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial';
+type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial' | 'card';
 
 interface TutorialSnapshot {
   fromPage: number | null;
@@ -813,6 +815,14 @@ watch(
   },
   { immediate: true }
 );
+
+const rollResultRef = ref<InstanceType<typeof RollResult> | null>(null);
+
+const remainingAfterBookLabel = computed(() => {
+  const data = rollResultRef.value?.remainingAfterBook;
+  if (!data) return null;
+  return t('result.remainingAfterBook', { count: data.count, book: t(`group.${data.bookKey}`) });
+});
 
 const toManualData = (torahRef: TorahRef): ManualData => ({
   book: torahRef.book,
@@ -1871,7 +1881,7 @@ const applyLongTutorialResultDemoState = async (): Promise<void> => {
     selectTutorialTargetKey('from', 'vayakhel') ||
     selectTutorialTargetKey('from', 'shemot');
   const hasToSelection =
-    selectTutorialTargetKey('to', 'bamidbar') ||
+    selectTutorialTargetKey('to', 'nasso') ||
     selectTutorialTargetKey('to', 'tazria') ||
     selectTutorialTargetKey('to', 'vayikra');
 
@@ -2089,11 +2099,49 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     },
   }),
   createTutorialStep({
-    id: 'full-camera-button',
+    id: 'full-first-line-button',
     stepNumber: 6,
-    selector: '[data-tutorial="from-photo"]',
+    selector: '[data-tutorial="from-first-line"]',
     titleKey: 'onboarding.full.step6.title',
     descriptionKey: 'onboarding.full.step6.description',
+    beforeStep: async () => {
+      await closeTutorialOverlays();
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await openFirstLineSearchForTutorial('from');
+      }
+
+      if (stepOptions?.isBackward) {
+        await openTargetsForTutorial('from');
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-first-line-search',
+    stepNumber: 7,
+    selector: '[data-tutorial="first-line-search-dialog"]',
+    titleKey: 'onboarding.full.step7.title',
+    descriptionKey: 'onboarding.full.step7.description',
+    beforeStep: async () => {
+      await openFirstLineSearchForTutorial('from');
+    },
+    afterStep: async (stepOptions) => {
+      if (stepOptions?.isForward) {
+        await closeFirstLineSearchDialogForTutorial();
+      }
+
+      if (stepOptions?.isBackward) {
+        await closeFirstLineSearchDialogForTutorial();
+      }
+    },
+  }),
+  createTutorialStep({
+    id: 'full-camera-button',
+    stepNumber: 8,
+    selector: '[data-tutorial="from-photo"]',
+    titleKey: 'onboarding.full.step8.title',
+    descriptionKey: 'onboarding.full.step8.description',
     beforeStep: async () => {
       await closeTutorialOverlays();
     },
@@ -2103,16 +2151,16 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       }
 
       if (stepOptions?.isBackward) {
-        await openTargetsForTutorial('from');
+        await openFirstLineSearchForTutorial('from');
       }
     },
   }),
   createTutorialStep({
     id: 'full-camera',
-    stepNumber: 7,
+    stepNumber: 9,
     selector: '[data-tutorial="dicta-dialog"]',
-    titleKey: 'onboarding.full.step7.title',
-    descriptionKey: 'onboarding.full.step7.description',
+    titleKey: 'onboarding.full.step9.title',
+    descriptionKey: 'onboarding.full.step9.description',
     beforeStep: async () => {
       await openDictaForTutorial('from');
     },
@@ -2128,10 +2176,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-input-button',
-    stepNumber: 8,
+    stepNumber: 10,
     selector: '[data-tutorial="from-input"]',
-    titleKey: 'onboarding.full.step8.title',
-    descriptionKey: 'onboarding.full.step8.description',
+    titleKey: 'onboarding.full.step10.title',
+    descriptionKey: 'onboarding.full.step10.description',
     beforeStep: async () => {
       await closeTutorialOverlays();
     },
@@ -2147,16 +2195,17 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-manual',
-    stepNumber: 9,
+    stepNumber: 11,
     selector: '[data-tutorial="manual-dialog"]',
-    titleKey: 'onboarding.full.step9.title',
-    descriptionKey: 'onboarding.full.step9.description',
+    titleKey: 'onboarding.full.step11.title',
+    descriptionKey: 'onboarding.full.step11.description',
     beforeStep: async () => {
       await openManualDialogFor('from');
     },
     afterStep: async (stepOptions) => {
       if (stepOptions?.isForward) {
         await closeManualDialog();
+        await applyTutorialCalendarDemoState();
       }
 
       if (stepOptions?.isBackward) {
@@ -2165,33 +2214,13 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     },
   }),
   createTutorialStep({
-    id: 'full-first-line-search',
-    stepNumber: 10,
-    selector: '[data-tutorial="first-line-search-dialog"]',
-    titleKey: 'onboarding.full.step10.title',
-    descriptionKey: 'onboarding.full.step10.description',
-    beforeStep: async () => {
-      await openFirstLineSearchForTutorial('from');
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closeFirstLineSearchDialogForTutorial();
-        await applyTutorialCalendarDemoState();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeFirstLineSearchDialogForTutorial();
-      }
-    },
-  }),
-  createTutorialStep({
     id: 'full-to',
-    stepNumber: 11,
+    stepNumber: 12,
     selector: '[data-tutorial="to-selector"]',
-    titleKey: 'onboarding.full.step11.title',
-    descriptionKey: 'onboarding.full.step11.description',
+    titleKey: 'onboarding.full.step12.title',
+    descriptionKey: 'onboarding.full.step12.description',
     beforeStep: async () => {
-      await closeFirstLineSearchDialogForTutorial();
+      await closeManualDialog();
     },
     afterStep: async (stepOptions) => {
       if (stepOptions?.isForward) {
@@ -2199,17 +2228,17 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       }
 
       if (stepOptions?.isBackward) {
-        await openFirstLineSearchForTutorial('from');
+        await openManualDialogFor('from');
       }
     },
   }),
   createTutorialStep({
     id: 'full-reference-point',
-    stepNumber: 12,
+    stepNumber: 13,
     selector: '[data-tutorial="to-target-ref"]',
     fallbackSelector: '[data-tutorial="to-page-preview-trigger"]',
-    titleKey: 'onboarding.full.step12.title',
-    descriptionKey: 'onboarding.full.step12.description',
+    titleKey: 'onboarding.full.step13.title',
+    descriptionKey: 'onboarding.full.step13.description',
     beforeStep: async () => {
       await applyLongTutorialResultDemoState();
     },
@@ -2221,19 +2250,8 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-result',
-    stepNumber: 13,
-    selector: '[data-tutorial="roll-result"]',
-    titleKey: 'onboarding.full.step13.title',
-    descriptionKey: 'onboarding.full.step13.description',
-    beforeStep: async () => {
-      await applyLongTutorialResultDemoState();
-    },
-  }),
-  createTutorialStep({
-    id: 'full-remaining-after-book',
     stepNumber: 14,
-    selector: '[data-tutorial="result-book-remaining"]',
-    fallbackSelector: '[data-tutorial="roll-result"]',
+    selector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step14.title',
     descriptionKey: 'onboarding.full.step14.description',
     beforeStep: async () => {
@@ -2241,11 +2259,22 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     },
   }),
   createTutorialStep({
-    id: 'full-preview-trigger',
+    id: 'full-remaining-after-book',
     stepNumber: 15,
-    selector: '[data-tutorial="to-page-preview-trigger"]',
+    selector: '[data-tutorial="result-book-remaining"]',
+    fallbackSelector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step15.title',
     descriptionKey: 'onboarding.full.step15.description',
+    beforeStep: async () => {
+      await applyLongTutorialResultDemoState();
+    },
+  }),
+  createTutorialStep({
+    id: 'full-preview-trigger',
+    stepNumber: 16,
+    selector: '[data-tutorial="to-page-preview-trigger"]',
+    titleKey: 'onboarding.full.step16.title',
+    descriptionKey: 'onboarding.full.step16.description',
     beforeStep: async () => {
       await closePreviewDialog();
     },
@@ -2261,10 +2290,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-preview',
-    stepNumber: 16,
+    stepNumber: 17,
     selector: '[data-tutorial="page-preview-dialog"]',
-    titleKey: 'onboarding.full.step16.title',
-    descriptionKey: 'onboarding.full.step16.description',
+    titleKey: 'onboarding.full.step17.title',
+    descriptionKey: 'onboarding.full.step17.description',
     beforeStep: async () => {
       await openPreviewFor('to');
     },
@@ -2280,10 +2309,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-settings-button',
-    stepNumber: 17,
+    stepNumber: 18,
     selector: '[data-tutorial="settings-button"]',
-    titleKey: 'onboarding.full.step17.title',
-    descriptionKey: 'onboarding.full.step17.description',
+    titleKey: 'onboarding.full.step18.title',
+    descriptionKey: 'onboarding.full.step18.description',
     beforeStep: async () => {
       await closeSettingsDialog();
     },
@@ -2299,10 +2328,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-settings',
-    stepNumber: 18,
+    stepNumber: 19,
     selector: '[data-tutorial="settings-dialog"]',
-    titleKey: 'onboarding.full.step18.title',
-    descriptionKey: 'onboarding.full.step18.description',
+    titleKey: 'onboarding.full.step19.title',
+    descriptionKey: 'onboarding.full.step19.description',
     beforeStep: async () => {
       await openSettingsDialog();
     },
@@ -2318,11 +2347,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-navigation',
-    stepNumber: 19,
+    stepNumber: 20,
     selector: smAndDown.value ? '[data-tutorial="menu-button"]' : '[data-tutorial="top-nav-links"]',
     fallbackSelector: '[data-tutorial="menu-button"]',
-    titleKey: 'onboarding.full.step19.title',
-    descriptionKey: 'onboarding.full.step19.description',
+    titleKey: 'onboarding.full.step20.title',
+    descriptionKey: 'onboarding.full.step20.description',
     beforeStep: async () => {
       await closeSettingsDialog();
       await closeNavDrawer();
@@ -2340,10 +2369,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
   }),
   createTutorialStep({
     id: 'full-about',
-    stepNumber: 20,
+    stepNumber: 21,
     selector: '[data-tutorial="about-nav"]',
-    titleKey: 'onboarding.full.step20.title',
-    descriptionKey: 'onboarding.full.step20.description',
+    titleKey: 'onboarding.full.step21.title',
+    descriptionKey: 'onboarding.full.step21.description',
     beforeStep: async () => {
       await openNavDrawerIfNeeded();
       await waitForTutorialElement('[data-tutorial="about-nav"]');
