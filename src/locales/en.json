@@ -303,6 +303,25 @@
     "installPrompt": {
       "install": "Install app",
       "subtitle": "Add Torah Roll Helper to your home screen"
+    },
+    "installGuide": {
+      "open": "Add to Home Screen",
+      "title": "Add to Home Screen",
+      "subtitle": "Install Torah Roll Helper so it opens like an app and keeps working after the first load.",
+      "ios": {
+        "title": "iPhone and iPad",
+        "step1": "Open this site in Safari.",
+        "step2": "Tap the Share button.",
+        "step3": "Choose Add to Home Screen.",
+        "step4": "Tap Add."
+      },
+      "android": {
+        "title": "Android",
+        "step1": "Open this site in Chrome.",
+        "step2": "Tap the three-dot menu.",
+        "step3": "Choose Install app or Add to Home Screen.",
+        "step4": "Confirm the installation."
+      }
     }
   },
   "actions": {

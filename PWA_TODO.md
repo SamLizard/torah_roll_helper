@@ -337,7 +337,7 @@ Current project status:
 
 ---
 
-## 9. "Add to Home Screen" instructions for users (TODO 30)
+## 9. DONE — "Add to Home Screen" instructions for users (TODO 30)
 
 Create an in-app guide (dialog or page) explaining how to install:
 
@@ -357,6 +357,13 @@ Consider showing this guide:
 - As a dismissible banner on first visit (similar to the Gola banner pattern)
 - Or as a button in the Settings dialog
 - Only show on mobile (use `navigator.standalone` or `window.matchMedia('(display-mode: standalone)')` to hide it if already installed)
+
+Current project status:
+- DONE: `src/components/SettingsDialog.vue` shows a mobile-only "Add to Home Screen" guide entry.
+- DONE: `src/components/InstallGuideDialog.vue` owns the guide dialog UI and Android install action.
+- DONE: The guide is hidden when the app is already running in standalone/home-screen mode.
+- DONE: The guide includes localized iOS and Android instructions from `src/locales/*.json`.
+- DONE: Android users who have an available browser install prompt also see an install button inside the guide.
 
 ---
 
@@ -698,7 +705,7 @@ This is optional and only useful if the app has multiple entry points.
 ### Complementary (high value, partially independent of PWA)
 - [ ] Persist user settings via `pinia-plugin-persistedstate` (language, gola, torahType)
 - [ ] Wire persisted language to vue-i18n on first frame
-- [ ] Add "Add to Home Screen" instructions UI for iOS/Android users
+- [x] Add "Add to Home Screen" instructions UI for iOS/Android users
 
 ### Advanced (native feel, do after core works)
 - [ ] Take app screenshots and add to manifest for Rich Install UI

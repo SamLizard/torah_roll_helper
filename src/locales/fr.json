@@ -303,6 +303,25 @@
     "installPrompt": {
       "install": "Installer l'application",
       "subtitle": "Ajouter Torah Roll Helper à l'écran d'accueil"
+    },
+    "installGuide": {
+      "open": "Ajouter à l'écran d'accueil",
+      "title": "Ajouter à l'écran d'accueil",
+      "subtitle": "Installez Torah Roll Helper pour l'ouvrir comme une application et continuer à l'utiliser après le premier chargement.",
+      "ios": {
+        "title": "iPhone et iPad",
+        "step1": "Ouvrez ce site dans Safari.",
+        "step2": "Touchez le bouton Partage.",
+        "step3": "Choisissez Ajouter à l'écran d'accueil.",
+        "step4": "Touchez Ajouter."
+      },
+      "android": {
+        "title": "Android",
+        "step1": "Ouvrez ce site dans Chrome.",
+        "step2": "Touchez le menu à trois points.",
+        "step3": "Choisissez Installer l'application ou Ajouter à l'écran d'accueil.",
+        "step4": "Confirmez l'installation."
+      }
     }
   },
   "actions": {
