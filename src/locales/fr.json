@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "DE",
-      "subtitle": "Emplacement actuel"
+      "subtitle": "Emplacement actuel",
+      "emptyHint": "Où le Sefer Torah est-il actuellement ouvert ?"
     },
     "to": {
       "title": "À",
-      "subtitle": "Lecture cible"
+      "subtitle": "Lecture cible",
+      "emptyHint": "Choisissez la prochaine lecture"
     },
     "calendar": {
       "from": "Lectures récentes",
@@ -102,11 +104,14 @@
         "pageTitle": "Titre de page"
       }
     },
+    "golaBanner": {
+      "text": "Les lectures sont configurées sur Israël. Êtes-vous en dehors d'Israël ?"
+    },
     "actions": {
       "photo": "Photo",
-      "choose": "Choisir manuellement",
+      "choose": "Choisir une lecture",
       "clear": "Effacer",
-      "input": "Saisie"
+      "input": "Choisir par réf."
     },
     "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
@@ -297,8 +302,8 @@
     "to": "À",
     "remainingAfterBook": "{count} pages restantes après {book}",
     "direction": {
-      "forward": "Vers l'avant",
-      "backward": "Vers l'arrière"
+      "forward": "Vers l'avant (vers Devarim)",
+      "backward": "Vers l'arrière (vers Bereshit)"
     }
   },
   "page": "Page",
@@ -307,6 +312,7 @@
   "preview": {
     "cols": "{count} col.",
     "openPage": "Aperçu de la page",
+    "openPageShort": "Aperçu",
     "pageTitle": "Aperçu de la page {page}",
     "firstLine": "Première ligne",
     "lineUnavailable": "La première ligne n'est pas disponible pour cette page.",
@@ -350,20 +356,24 @@
     "ocrNoText": "Aucun texte hébreu exploitable pour le moment.",
     "ocrNoTextDetected": "Aucun texte hébreu exploitable n'a été détecté dans cette photo.",
     "ocrUnexpectedError": "Impossible d'exécuter l'OCR sur cette image. Essayez une autre photo.",
-    "ocrLowQuality": "Ce résultat OCR semble faible. Essayez une photo plus serrée de la première ligne, ou corrigez le texte ci-dessus.",
+    "ocrLowQuality": "La photo n'était pas assez nette. Prenez une photo plus serrée de la première ligne, ou saisissez les mots manuellement.",
     "ocrBestMatch": "Meilleure correspondance",
     "restoreOcrResults": "Retour aux résultats OCR",
     "ocrSuggestionsFound": "{count} suggestions OCR",
     "ocrMatchLabel": "Ligne d'ouverture suggérée",
-    "ocrConfirmed": "Correspondance 100 %",
-    "ocrLikely": "Correspondance probable ({value} %)",
-    "ocrUnreliable": "Faible confiance ({value} %)",
+    "ocrConfirmed": "Correspondance sûre",
+    "ocrLikely": "Correspondance probable",
+    "ocrUnreliable": "Incertain",
     "emptyState": "Retrouver la page à partir de ses premiers mots",
     "emptyStateHint": "Tapez le début de la ligne qui ouvre la page.",
     "keepTyping": "Tapez encore un peu pour réduire les résultats.",
     "resultsFound": "{count} pages correspondantes",
+    "layoutNote": "Fonctionne avec la mise en page des paramètres (actuellement : {layout})",
+    "searchFromStart": "La ligne commence par ces mots",
     "noMatches": "Aucune ligne d'ouverture correspondante",
     "noMatchesHint": "Essayez avec moins de mots, ou activez la recherche n'importe où dans la ligne d'ouverture.",
+    "noMatchesLayout": "Vérifiez que la mise en page dans les paramètres correspond à votre Sefer Torah.",
+    "noMatchesTryAnywhere": "Chercher n'importe où dans la ligne",
     "preview": "Aperçu",
     "usePage": "Utiliser cette page",
     "searchAnywhere": "Chercher n'importe où dans la ligne d'ouverture",

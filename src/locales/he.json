@@ -45,11 +45,13 @@
   "home": {
     "from": {
       "title": "נקודת התחלה",
-      "subtitle": "מיקום נוכחי"
+      "subtitle": "מיקום נוכחי",
+      "emptyHint": "היכן ספר התורה פתוח כעת?"
     },
     "to": {
       "title": "יעד",
-      "subtitle": "קריאת יעד"
+      "subtitle": "קריאת יעד",
+      "emptyHint": "בחר את הקריאה הבאה"
     },
     "calendar": {
       "from": "קריאות אחרונות",
@@ -102,11 +104,14 @@
         "pageTitle": "כותרת עמוד"
       }
     },
+    "golaBanner": {
+      "text": "הקריאות מוגדרות לישראל. האם אתם בחוץ לארץ?"
+    },
     "actions": {
       "photo": "צלם",
-      "choose": "בחר ידנית",
+      "choose": "בחר קריאה",
       "clear": "נקה",
-      "input": "הקלדה"
+      "input": "בחר לפי ייחוס"
     },
     "selected": "נבחר",
     "noSelection": "לא נבחרה עמודה"
@@ -297,8 +302,8 @@
     "to": "ל־",
     "remainingAfterBook": "נותרו {count} עמודים לגלול אחרי {book}",
     "direction": {
-      "forward": "לגלול קדימה",
-      "backward": "לגלול לאחור"
+      "forward": "קדימה (לכיוון דברים)",
+      "backward": "אחורה (לכיוון בראשית)"
     }
   },
   "page": "עמוד",
@@ -307,6 +312,7 @@
   "preview": {
     "cols": "{count} עמ׳",
     "openPage": "תצוגה מקדימה לעמוד",
+    "openPageShort": "תצוגה מקדימה",
     "pageTitle": "תצוגה מקדימה לעמוד {page}",
     "firstLine": "שורה ראשונה",
     "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",
@@ -350,20 +356,24 @@
     "ocrNoText": "עדיין לא זוהה טקסט עברי שמיש.",
     "ocrNoTextDetected": "לא זוהה בתמונה טקסט עברי שמיש.",
     "ocrUnexpectedError": "לא ניתן היה להריץ OCR על התמונה הזו. נסו צילום אחר.",
-    "ocrLowQuality": "תוצאת ה-OCR נראית חלשה. נסו צילום תקריב יותר של השורה הראשונה, או ערכו את הטקסט למעלה.",
+    "ocrLowQuality": "התמונה לא הייתה מספיק ברורה. נסו צילום קרוב יותר של השורה הראשונה, או הקלידו את המילים ידנית.",
     "ocrBestMatch": "ההתאמה הטובה ביותר",
     "restoreOcrResults": "חזרה לתוצאות ה-OCR",
     "ocrSuggestionsFound": "{count} הצעות OCR",
     "ocrMatchLabel": "שורת פתיחה מוצעת",
-    "ocrConfirmed": "התאמה של 100%",
-    "ocrLikely": "התאמה סבירה ({value}%)",
-    "ocrUnreliable": "אמינות נמוכה ({value}%)",
+    "ocrConfirmed": "התאמה ברורה",
+    "ocrLikely": "התאמה אפשרית",
+    "ocrUnreliable": "לא ודאי",
     "emptyState": "מצאו את העמוד לפי המילים הפותחות שלו",
     "emptyStateHint": "הקלידו את תחילת השורה שפותחת את העמוד.",
     "keepTyping": "המשיכו להקליד עוד קצת כדי לצמצם את התוצאות.",
     "resultsFound": "{count} עמודים מתאימים",
+    "layoutNote": "עובד עם פריסת הספר בהגדרות (כרגע: {layout})",
+    "searchFromStart": "השורה מתחילה במילים אלו",
     "noMatches": "לא נמצאו שורות פתיחה מתאימות",
     "noMatchesHint": "נסו פחות מילים, או הפעילו חיפוש בכל מקום בתוך שורת הפתיחה.",
+    "noMatchesLayout": "ודאו שפריסת הספר בהגדרות תואמת את ספר התורה שלכם.",
+    "noMatchesTryAnywhere": "חפשו בכל מקום בשורה",
     "preview": "תצוגה מקדימה",
     "usePage": "בחרו בעמוד הזה",
     "searchAnywhere": "חפשו בכל מקום בתוך שורת הפתיחה",
