@@ -35,6 +35,7 @@
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackLanguageChange } from '@/composables/analytics';
+import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys';
 import { setLanguageMenuOpen } from '@/composables/tutorialUi';
 
 const i18n = useI18n();
@@ -56,6 +57,7 @@ const onLocaleChanged = (nextLocale: string | null) => {
 
   const previousLocale = i18n.locale.value;
   i18n.locale.value = nextLocale;
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
   trackLanguageChange(previousLocale, nextLocale);
 };
 

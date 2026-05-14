@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
+import { OPTIONS_STORAGE_KEY } from '@/composables/storageKeys';
 
 const NUSACH_OPTIONS = ['sefaradic'] as const;
 type NusachOption = (typeof NUSACH_OPTIONS)[number];
@@ -63,6 +64,11 @@ const useOptionsStore = defineStore('options', () => {
     toPage,
     changeToPage
   };
+}, {
+  persist: {
+    key: OPTIONS_STORAGE_KEY,
+    pick: ['isInGola', 'nusach', 'torahType'],
+  },
 });
 
 export { useOptionsStore, NUSACH_OPTIONS, TORAH_TYPE_OPTIONS, getTorahPageCount };

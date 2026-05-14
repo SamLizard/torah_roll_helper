@@ -367,14 +367,14 @@ Current project status:
 
 ---
 
-## 10. Persist user preferences with localStorage (TODO 29 + 31)
+## 10. DONE — Persist user preferences with localStorage (TODO 29 + 31)
 
 This is partially independent of PWA but complements it. The app already uses localStorage for tutorial state (`src/composables/tutorials.ts`). Extend this pattern to persist:
 
-- [ ] Language preference
-- [ ] Gola/Israel setting
-- [ ] Torah scroll layout (torahType)
-- [ ] Any other settings from the options store
+- [x] Language preference
+- [x] Gola/Israel setting
+- [x] Torah scroll layout (torahType)
+- [x] Any other durable settings from the options store (`nusach`)
 
 **Recommended approach — `pinia-plugin-persistedstate`:**
 
@@ -485,6 +485,15 @@ Without the `LanguageSelection.vue` change, Pinia and `vue-i18n` will drift out 
 Wire any future Vuetify theme preference the same way, so the correct language/theme renders on the very first frame (including offline).
 
 On app load, if settings differ from defaults, optionally show a brief toast (auto-dismiss) informing the user which non-default settings are active. If only language differs, skip the toast (the user will see it by themselves).
+
+Current project status:
+- DONE: `pinia-plugin-persistedstate` is wired in `src/main.ts`.
+- DONE: `src/stores/options.ts` persists only durable options: `isInGola`, `nusach`, and `torahType`.
+- DONE: `fromPage` and `toPage` are intentionally not persisted, so the current scroll selection resets each session.
+- DONE: `src/composables/storageKeys.ts` centralizes the localStorage keys.
+- DONE: `src/plugins/i18n.ts` initializes language from localStorage before mount.
+- DONE: `src/components/LanguageSelection.vue` saves language changes to localStorage.
+- DONE: `src/App.vue` shows a short localized toast only when non-default settings were restored; language-only restores stay quiet.
 
 ---
 
@@ -703,8 +712,8 @@ This is optional and only useful if the app has multiple entry points.
 - [ ] Verify app works offline after first load
 
 ### Complementary (high value, partially independent of PWA)
-- [ ] Persist user settings via `pinia-plugin-persistedstate` (language, gola, torahType)
-- [ ] Wire persisted language to vue-i18n on first frame
+- [x] Persist user settings via `pinia-plugin-persistedstate` (language, gola, torahType)
+- [x] Wire persisted language to vue-i18n on first frame
 - [x] Add "Add to Home Screen" instructions UI for iOS/Android users
 
 ### Advanced (native feel, do after core works)

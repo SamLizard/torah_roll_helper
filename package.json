@@ -24,6 +24,7 @@
     "fuzzball": "^2.2.3",
     "lodash": "^4.17.21",
     "pinia": "^3.0.4",
+    "pinia-plugin-persistedstate": "^4.7.1",
     "sweetalert2": "^11.26.17",
     "tesseract.js": "^7.0.0",
     "v-onboarding": "^2.12.2",

@@ -283,6 +283,12 @@
     },
     "torahTypeOptions": {
       "klaf_245": "רמ״ה (245 pages)"
+    },
+    "restoredPreferences": {
+      "title": "Paramètres enregistrés restaurés",
+      "gola": "Mode Diaspora",
+      "nusach": "Rite : {value}",
+      "torahType": "Mise en page : {value}"
     }
   },
   "targets": {
