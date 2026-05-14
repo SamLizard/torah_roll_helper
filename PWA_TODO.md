@@ -9,7 +9,7 @@ Related TODOs from `src/App.vue`:
 
 ---
 
-## 1. Install `vite-plugin-pwa`
+## 1. DONE — Install `vite-plugin-pwa`
 
 ```bash
 npm install -D vite-plugin-pwa
@@ -19,7 +19,7 @@ This is the standard zero-config PWA plugin for Vite. It generates the web manif
 
 ---
 
-## 2. Generate icon assets from existing images
+## 2. DONE — Generate icon assets from existing images
 
 You have two source images in `public/icon/`:
 - `bright_mode.png` — for light theme / standard display
@@ -29,7 +29,6 @@ You have two source images in `public/icon/`:
 
 | Size | Purpose | Filename |
 |------|---------|----------|
-| 64×64 | Favicon | `public/icon/favicon-64.png` |
 | 192×192 | Android home screen, manifest | `public/icon/pwa-192x192.png` |
 | 512×512 | Android splash screen, manifest | `public/icon/pwa-512x512.png` |
 | 180×180 | Apple touch icon (iOS) | `public/icon/apple-touch-icon-180x180.png` |
@@ -76,7 +75,6 @@ export default defineConfig({
     // ... existing plugins (vue, vuetify, vueI18n)
     VitePWA({
       registerType: 'prompt',  // Use 'prompt' to show the ReloadPrompt component (see step 6)
-      includeAssets: ['favicon.ico', 'icon/apple-touch-icon-180x180.png'],
       manifest: {
         name: 'Torah Roll Helper',
         short_name: 'Torah Roll',
@@ -129,21 +127,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,json}'],
-        runtimeCaching: [
-          {
-            // Cache the Hebrew calendar API calls if any
-            urlPattern: /^https:\/\/www\.hebcal\.com\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'hebcal-api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 // 24 hours
-              }
-            }
-          }
-        ]
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2,json}']
       }
     })
   ]
@@ -152,10 +136,14 @@ export default defineConfig({
 
 **Important notes:**
 - The `scope` and `start_url` must match the `base` in your Vite config (`/torah_roll_helper/`) since you deploy to GitHub Pages.
+- `woff2` must be included in `globPatterns` because `@mdi/font` icons and the `ShlomosemiStam` Tikkun preview font use `.woff2` files. Without it, icons and Hebrew preview text can break offline.
+- `includeAssets` is not needed for the current favicon/apple-touch-icon because those static `public/` files are already covered by `globPatterns`. Add `includeAssets` later only for assets Workbox cannot discover automatically.
 - `registerType` is set to `'prompt'` — this is intentional. It pairs with the `ReloadPrompt.vue` component in step 6. If you set `'autoUpdate'` instead, the prompt component will never trigger (the SW updates silently). Choose one strategy:
   - `'prompt'` + ReloadPrompt component = user clicks "Update" to get new version
   - `'autoUpdate'` + no prompt component = silent background updates
 - The `screenshots` array enables Android Chrome's "Rich Install UI" (Play Store-like carousel). You need to take actual screenshots of the app and place them in `public/screenshots/`. Adjust sizes to match your actual screenshots.
+- The calendar is generated locally from `@hebcal/hdate` and `@hebcal/leyning`; there are no runtime `hebcal.com` calls to cache.
+- Do not add `runtimeCaching` for Dicta. OCR/parallels should remain live-network features, and the app should show a clear offline message when they are unavailable.
 
 ---
 
@@ -196,10 +184,12 @@ Or in `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-    "types": ["vite-plugin-pwa/vue"]
+    "types": ["vite/client", "vite-plugin-pwa/vue"]
   }
 }
 ```
+
+Prefer the triple-slash reference in `env.d.ts`/`src/vite-env.d.ts` when possible because it is additive. If you edit `tsconfig.json`, keep the existing `vite/client` entry; replacing it will break Vite's type resolution.
 
 ---
 
@@ -214,17 +204,34 @@ Create `src/components/ReloadPrompt.vue`:
 
 ```vue
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW()
 
-function close() {
+const showOfflineReady = computed({
+  get: () => offlineReady.value && !needRefresh.value,
+  set: (value: boolean) => {
+    if (!value) {
+      offlineReady.value = false
+    }
+  }
+})
+
+const close = () => {
   offlineReady.value = false
   needRefresh.value = false
 }
 </script>
 
 <template>
+  <v-snackbar v-model="showOfflineReady" :timeout="3000" color="success">
+    App ready to work offline.
+    <template #actions>
+      <v-btn variant="text" @click="close">Close</v-btn>
+    </template>
+  </v-snackbar>
+
   <v-snackbar v-model="needRefresh" :timeout="-1" color="primary">
     New version available.
     <template #actions>
@@ -236,6 +243,25 @@ function close() {
 ```
 
 Include this component in `App.vue`. Make the update banner highly visible — especially for iOS home-screen users who have no other way to trigger a refresh of cached assets.
+
+```vue
+<template>
+  <v-app>
+    <nav-bar />
+    <v-main>
+      <router-view />
+    </v-main>
+    <ReloadPrompt />
+  </v-app>
+</template>
+
+<script setup lang="ts">
+import NavBar from './components/NavBar.vue'
+import ReloadPrompt from './components/ReloadPrompt.vue'
+</script>
+```
+
+In the real `App.vue`, place `<ReloadPrompt />` just before `</v-app>` so it sits at the app shell level without interfering with route content.
 
 ---
 
@@ -334,13 +360,89 @@ const useOptionsStore = defineStore('options', () => {
 })
 ```
 
+Important product decision: `persist: true` persists the entire options store, including `fromPage` and `toPage`. That means the scroll will reopen at the last selected position on the next app load. If that is intentional, keep `persist: true`. If only long-term settings should persist and the current scroll position should reset each session, use `pick`:
+
+```ts
+// src/stores/options.ts
+const useOptionsStore = defineStore('options', () => {
+  // ... existing refs
+}, {
+  persist: {
+    pick: ['isInGola', 'nusach', 'torahType']
+    // fromPage and toPage are NOT persisted
+  }
+})
+```
+
 **Alternative — `@vueuse/core`'s `useStorage`:**
 
 If you prefer a composable-level approach (without a Pinia plugin), `useStorage` from `@vueuse/core` creates a reactive ref that auto-syncs to localStorage. Useful for one-off values outside of stores.
 
 **Wiring persisted preferences to i18n and Vuetify:**
 
-Wire the persisted language preference directly into the `vue-i18n` locale instance on app startup, so the correct language renders on the very first frame (including offline). Same for any future Vuetify theme preference.
+Language currently lives entirely on the `vue-i18n` instance. `src/components/LanguageSelection.vue` mutates `i18n.locale.value` directly when the user changes language.
+
+Recommended path for the current code: persist the locale directly in localStorage and initialize `vue-i18n` from that value before `app.mount('#app')`. This avoids a Pinia refactor.
+
+Before wiring this, extract the localStorage key to a shared constant so `i18n.ts` and `LanguageSelection.vue` cannot drift:
+
+```ts
+// src/composables/storageKeys.ts
+const LANGUAGE_STORAGE_KEY = 'torah-roll-helper:language'
+
+export { LANGUAGE_STORAGE_KEY }
+```
+
+```ts
+// src/plugins/i18n.ts
+import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys'
+
+const storedLocale = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+
+const i18n = createI18n({
+  legacy: false,
+  locale: storedLocale || import.meta.env.VITE_APP_I18N_LOCALE || 'en',
+  fallbackLocale: import.meta.env.VITE_APP_I18N_FALLBACK_LOCALE || 'en',
+  messages
+})
+```
+
+```ts
+// src/components/LanguageSelection.vue
+import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys'
+
+const onLocaleChanged = (nextLocale: string | null) => {
+  if (!nextLocale || nextLocale === i18n.locale.value) return
+
+  const previousLocale = i18n.locale.value
+  i18n.locale.value = nextLocale
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale)
+  trackLanguageChange(previousLocale, nextLocale)
+}
+```
+
+If you prefer to add `language` to the Pinia options store instead, treat it as a two-part refactor:
+- Add a `language` ref and `changeLanguage` action to `useOptionsStore`.
+- Update `LanguageSelection.vue` to call `changeLanguage(nextLocale)` instead of mutating `i18n.locale.value` directly.
+
+Then wire the store into `vue-i18n` on app startup after Pinia is installed and before mounting:
+
+```ts
+// src/main.ts
+import { useOptionsStore } from '@/stores/options'
+
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+app.use(pinia)
+
+const optionsStore = useOptionsStore()
+i18n.global.locale.value = optionsStore.language
+```
+
+Without the `LanguageSelection.vue` change, Pinia and `vue-i18n` will drift out of sync as soon as the user changes language.
+
+Wire any future Vuetify theme preference the same way, so the correct language/theme renders on the very first frame (including offline).
 
 On app load, if settings differ from defaults, optionally show a brief toast (auto-dismiss) informing the user which non-default settings are active. If only language differs, skip the toast (the user will see it by themselves).
 
@@ -356,8 +458,7 @@ With `vite-plugin-pwa` and Workbox, the app's static assets (JS, CSS, HTML, font
 - Rolling calculations (pure client-side logic)
 
 **What does NOT work offline:**
-- Hebrew calendar API calls (if fetching from hebcal.com) — use `NetworkFirst` caching strategy
-- Dicta OCR API — requires network, show a clear offline message
+- Dicta OCR/parallels search — requires network, show a clear offline message
 - Tikkun.io preview links — external site, cannot cache
 
 ---
@@ -376,6 +477,8 @@ The service worker only activates in production builds. Use Chrome DevTools → 
 
 ### Lighthouse audit
 Run a Lighthouse PWA audit in Chrome DevTools to verify all requirements are met. Target a score of 100 on the PWA category.
+
+Do not rely on `http://localhost` for the final PWA score. Some PWA checks require a production build and secure context behavior. Use `npm run build` + `npm run preview`, then test `http://127.0.0.1:PORT` locally, or deploy to a staging URL over HTTPS.
 
 ### Device testing
 - **Android**: Test in Chrome, check install prompt appears, verify icon and splash
@@ -416,6 +519,13 @@ On Android, you can intercept the browser's install prompt and show your own cus
 // src/composables/installPrompt.ts
 import { ref } from 'vue'
 
+declare global {
+  interface BeforeInstallPromptEvent extends Event {
+    prompt(): Promise<void>
+    readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+  }
+}
+
 const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
 const canInstall = ref(false)
 
@@ -425,8 +535,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
   canInstall.value = true
 })
 
-export function useInstallPrompt() {
-  async function install() {
+const useInstallPrompt = () => {
+  const install = async () => {
     if (!deferredPrompt.value) return
     deferredPrompt.value.prompt()
     const { outcome } = await deferredPrompt.value.userChoice
@@ -438,6 +548,8 @@ export function useInstallPrompt() {
 
   return { canInstall, install }
 }
+
+export { useInstallPrompt }
 ```
 
 Then show an "Install" button in the NavBar or Settings when `canInstall` is true. This does NOT work on iOS — for iOS, show the manual instructions (step 9).
@@ -471,12 +583,12 @@ This ensures the "Update available" prompt appears even if the user never naviga
 
 ### 14e. Offline-aware UI feedback
 
-Show a subtle indicator when the app is offline so users know network-dependent features (Dicta OCR, calendar sync) won't work:
+Show a subtle indicator when the app is offline so users know network-dependent features (Dicta OCR/parallels) won't work:
 
 ```ts
 import { ref, onMounted, onUnmounted } from 'vue'
 
-export function useOnlineStatus() {
+const useOnlineStatus = () => {
   const isOnline = ref(navigator.onLine)
   const onOnline = () => { isOnline.value = true }
   const onOffline = () => { isOnline.value = false }
@@ -492,9 +604,13 @@ export function useOnlineStatus() {
 
   return { isOnline }
 }
+
+export { useOnlineStatus }
 ```
 
 Use this to disable or grey out the camera/OCR button and show a small chip like "Offline — core features available" in the NavBar.
+
+Note: `navigator.onLine` reflects network interface connectivity, not internet access. A device on WiFi with no internet will appear online. For this app that is acceptable because Dicta failures are already handled by the existing `dictaFlowState` error state.
 
 ### 14f. iOS splash screens (all device sizes)
 
@@ -529,16 +645,17 @@ This is optional and only useful if the app has multiple entry points.
 ## Summary checklist
 
 ### Core (must-have for a working PWA)
-- [ ] Install `vite-plugin-pwa` as dev dependency
-- [ ] Generate all required icon sizes from `public/icon/bright_mode.png`
-- [ ] Generate maskable icon variants (with safe-zone padding)
-- [ ] Generate `apple-touch-icon-180x180.png`
-- [ ] Replace `favicon.ico` with one generated from the same source image (so tab icon = home screen icon)
+- [x] Install `vite-plugin-pwa` as dev dependency
+- [x] Generate all required icon sizes from `public/icon/bright_mode.png`
+- [x] Generate maskable icon variants (with safe-zone padding)
+- [x] Generate `apple-touch-icon-180x180.png`
+- [x] Replace `favicon.ico` with one generated from the same source image (so tab icon = home screen icon)
 - [ ] Add `VitePWA()` plugin to `vite.config.ts` with manifest config
 - [ ] Add PWA meta tags to `index.html` (theme-color with light/dark, apple-touch-icon, apple-mobile-web-app-*)
 - [ ] Add TypeScript type reference for `vite-plugin-pwa/vue`
 - [ ] Create `ReloadPrompt.vue` component for update notifications
-- [ ] Configure Workbox runtime caching for external API calls
+- [ ] Add `<ReloadPrompt />` to `App.vue` and import it
+- [ ] Keep external API calls out of Workbox runtime caching unless a future feature explicitly needs cached API responses
 - [ ] Test with Lighthouse PWA audit
 - [ ] Test on real Android device (Chrome)
 - [ ] Test on real iOS device (Safari)
