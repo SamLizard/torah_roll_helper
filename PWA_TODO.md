@@ -281,7 +281,7 @@ Current project status:
 
 ---
 
-## 7. iOS-specific considerations
+## 7. DONE — iOS-specific considerations
 
 ### 7a. Splash screens (Launch images)
 iOS does not use the manifest `icons` for splash screens. It uses `<link rel="apple-touch-startup-image">` tags with specific media queries for each device size. This is optional but improves the experience.
@@ -291,6 +291,12 @@ Use [pwa-asset-generator](https://github.com/nicedoc/pwa-asset-generator) to aut
 ```bash
 npx pwa-asset-generator public/icon/bright_mode.png public/icon/splash --splash-only --type png
 ```
+
+Current project status:
+- DONE: iOS portrait startup images were generated in `public/icon/splash/` from `public/icon/pwa-512x512.png`.
+- DONE: `index.html` includes `apple-touch-startup-image` tags for common iPhone and iPad portrait viewport/device-pixel-ratio combinations.
+- TODO: Manual Add to Home Screen instructions for iOS users are still tracked separately in step 9 / TODO 30.
+- NOTE: The `bright_mode.png` source named above is not currently present in `public/icon/`, so the existing 512px PWA icon was used as the launch-image source.
 
 ### 7b. No install prompt on iOS
 Unlike Android (which shows a native install banner), iOS Safari requires users to manually tap **Share → Add to Home Screen**. Consider adding an in-app banner/tooltip explaining this (relates to TODO 30).
@@ -689,5 +695,5 @@ This is optional and only useful if the app has multiple entry points.
 - [ ] Detect standalone mode to hide install prompts
 - [ ] Add periodic SW update checks (hourly)
 - [ ] Add offline-aware UI feedback (disable OCR button, show chip)
-- [ ] Generate iOS splash screens for all device sizes
+- [x] Generate iOS splash screens for all device sizes
 - [ ] (Optional) Add manifest shortcuts for long-press actions
