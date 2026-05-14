@@ -282,3 +282,27 @@ In both the desktop overlay and the mobile overlay, inside the `dictaFlowState =
 ```
 
 Place both buttons in a `d-flex gap-2 justify-center flex-wrap` container so they sit side by side (or wrap on very narrow screens). The existing "New photo" button in the toolbar can remain as-is — having it in both places is intentional, since users may look in either location.
+
+## ~~Task 11 — Action buttons layout across screen sizes~~ ✅ DONE
+**File:** `src/components/LocationSelector.vue`
+
+The three action buttons ("Choose reading", "Take photo", "Choose by ref.") adapt to the available card width using a measured 3-mode layout (ResizeObserver).
+
+**Rules:**
+1. Title/subtitle ("FROM"/"TO" + "Current location"/"Target reading") must **never** shrink, wrap, or be hidden. If buttons don't fit, the buttons move — not the title.
+2. Buttons must **always** show their text labels — no icon-only mode.
+3. Each card decides its layout independently (FROM has 3 buttons, TO has 2).
+
+**The 3 layout modes (computed via ResizeObserver):**
+
+| Mode | Condition | Layout |
+|------|-----------|--------|
+| `inline` | All buttons fit next to title | `[Title/Sub] ——space—— [btn1] [btn2] [btn3]` — one line, buttons at end |
+| `split` | Only title + first button fit | Line 1: `[Title/Sub] ——space—— [btn1]` / Line 2: `[btn2] [btn3]` at end |
+| `stack` | Even first button doesn't fit | Line 1: `[Title/Sub]` / Line 2: `[btn1] [btn2] [btn3]` at start (wraps if needed) |
+
+**Implementation:**
+- The first button is a direct flex child of `.location-header` (separate from the other two which are in `.location-actions-rest`). This allows flex-wrap to break between them independently.
+- A `ResizeObserver` measures the intrinsic widths of the title, first button, and rest container. It temporarily forces `flex-wrap: nowrap` to get accurate measurements, then restores the wrap and applies the correct mode class (`is-inline`, `is-split`, `is-stack`).
+- CSS for each mode controls `flex-wrap`, `flex-basis`, `margin-inline-end: auto`, and `justify-content` to achieve the correct alignment.
+- No horizontal scroll, no fade gradients, no fixed breakpoints.

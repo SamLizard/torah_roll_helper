@@ -9,44 +9,44 @@
     :data-tutorial="`${side}-selector`"
   >
     <v-card-item class="location-card-item pa-2">
-      <div class="location-header">
-        <div class="location-text">
+      <div ref="headerEl" class="location-header" :class="`is-${headerLayoutMode}`" :data-tutorial="`${side}-actions`">
+        <div ref="textEl" class="location-text">
           <div class="text-h6 font-weight-bold">{{ $t(`home.${side}.title`) }}</div>
           <div class="text-caption location-subtitle">{{ $t(`home.${side}.subtitle`) }}</div>
         </div>
-        <div class="location-actions-shell" :data-tutorial="`${side}-actions`">
-          <div class="location-actions">
-            <v-btn
-              size="small"
-              variant="text"
-              prepend-icon="mdi-format-list-bulleted"
-              :data-tutorial="`${side}-choose-manual`"
-              @click="onChooseManual"
-            >
-              {{ $t('home.actions.choose') }}
-            </v-btn>
-            <v-btn
-              v-if="allowPhoto"
-              size="small"
-              variant="tonal"
-              color="primary"
-              prepend-icon="mdi-camera"
-              :data-tutorial="`${side}-photo`"
-              @click="onOpenDicta"
-            >
-              {{ $t('home.actions.photo') }}
-            </v-btn>
-            <v-btn 
-              size="small" 
-              variant="tonal" 
-              color="secondary" 
-              prepend-icon="mdi-pencil" 
-              :data-tutorial="`${side}-input`"
-              @click="onOpenManualInput"
-            >
-              {{ $t('home.actions.input') }}
-            </v-btn>
-          </div>
+        <v-btn
+          ref="firstBtnEl"
+          size="small"
+          variant="text"
+          prepend-icon="mdi-format-list-bulleted"
+          class="location-action-first"
+          :data-tutorial="`${side}-choose-manual`"
+          @click="onChooseManual"
+        >
+          {{ $t('home.actions.choose') }}
+        </v-btn>
+        <div ref="restEl" class="location-actions-rest">
+          <v-btn
+            v-if="allowPhoto"
+            size="small"
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-camera"
+            :data-tutorial="`${side}-photo`"
+            @click="onOpenDicta"
+          >
+            {{ $t('home.actions.photo') }}
+          </v-btn>
+          <v-btn 
+            size="small" 
+            variant="tonal" 
+            color="secondary" 
+            prepend-icon="mdi-pencil" 
+            :data-tutorial="`${side}-input`"
+            @click="onOpenManualInput"
+          >
+            {{ $t('home.actions.input') }}
+          </v-btn>
         </div>
       </div>
     </v-card-item>
@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import ManualEntryDialog from './ManualEntryDialog.vue';
@@ -278,6 +278,46 @@ const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
 const pageFirstLines = pageFirstLinesData as unknown[];
 const db = realDb as RealDb;
+
+// --- Header layout measurement (Task 11) ---
+type HeaderLayoutMode = 'inline' | 'split' | 'stack';
+const headerEl = ref<HTMLElement | null>(null);
+const textEl = ref<HTMLElement | null>(null);
+const firstBtnEl = ref<any>(null);
+const restEl = ref<HTMLElement | null>(null);
+const headerLayoutMode = ref<HeaderLayoutMode>('inline');
+let headerRo: ResizeObserver | null = null;
+
+function getFirstBtnDom(): HTMLElement | null {
+  if (!firstBtnEl.value) return null;
+  // v-btn ref returns a component instance; get its root element
+  return firstBtnEl.value.$el ?? firstBtnEl.value;
+}
+
+function updateHeaderLayout() {
+  const header = headerEl.value;
+  const text = textEl.value;
+  const first = getFirstBtnDom();
+  const rest = restEl.value;
+  if (!header || !text || !first || !rest) return;
+
+  const gap = 8;
+  const available = header.clientWidth;
+
+  const textWidth = Math.ceil(text.scrollWidth);
+  const firstWidth = Math.ceil(first.getBoundingClientRect().width);
+  const restWidth = Math.ceil(rest.scrollWidth);
+
+  const allButtonsFitOnOneLine = textWidth + firstWidth + restWidth + gap * 2 <= available;
+  const firstButtonFitsWithTitle = textWidth + firstWidth + gap <= available;
+
+  const nextMode: HeaderLayoutMode =
+    allButtonsFitOnOneLine ? 'inline' :
+    firstButtonFitsWithTitle ? 'split' :
+    'stack';
+
+  if (nextMode !== headerLayoutMode.value) headerLayoutMode.value = nextMode;
+}
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const PERSISTED_TARGET_SEPARATOR = ' | ';
@@ -890,6 +930,21 @@ defineExpose({
   closePagePreview,
 });
 
+onMounted(async () => {
+  await nextTick();
+  updateHeaderLayout();
+
+  headerRo = new ResizeObserver(() => updateHeaderLayout());
+  [headerEl.value, textEl.value, getFirstBtnDom(), restEl.value].forEach((el) => {
+    if (el) headerRo?.observe(el);
+  });
+});
+
+onBeforeUnmount(() => {
+  headerRo?.disconnect();
+  headerRo = null;
+});
+
 onUnmounted(() => {
   emit('calendar-requires-expanded-height-change', false);
   teardownCalendarMouseDrag?.();
@@ -906,35 +961,77 @@ onUnmounted(() => {
 }
 
 .location-subtitle {
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .location-header {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .location-text {
-  min-width: 0;
-  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: max-content;
 }
 
-.location-actions {
+.location-title,
+.location-subtitle {
+  white-space: nowrap;
+}
+
+.location-action-first,
+.location-actions-rest :deep(.v-btn) {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.location-actions-rest {
   display: flex;
   gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* inline = title + all buttons on one line */
+.location-header.is-inline {
+  flex-wrap: nowrap;
+}
+
+.location-header.is-inline .location-text {
+  margin-inline-end: auto;
+}
+
+/* split = title + first button on line 1, rest on line 2, aligned end */
+.location-header.is-split {
   flex-wrap: wrap;
+}
+
+.location-header.is-split .location-text {
+  margin-inline-end: auto;
+}
+
+.location-header.is-split .location-actions-rest {
+  flex-basis: 100%;
   justify-content: flex-end;
 }
 
-.location-actions-shell {
-  min-width: 0;
-  flex: 0 1 420px;
+/* stack = title on line 1, everything else below, aligned start */
+.location-header.is-stack {
+  flex-wrap: wrap;
 }
 
-.location-actions :deep(.v-btn) {
-  white-space: nowrap;
+.location-header.is-stack .location-text {
+  flex-basis: 100%;
+  margin-inline-end: 0;
+}
+
+.location-header.is-stack .location-actions-rest {
+  flex-basis: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .location-page-number {
@@ -1096,76 +1193,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-@media (max-width: 900px) {
-  .location-text {
-    flex-basis: 100%;
-  }
-
-  .location-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .location-actions-shell {
-    width: 100%;
-  }
-}
-
 @media (max-width: 600px) {
-  .location-header {
-    flex-direction: column;
-  }
-
-  .location-text {
-    flex: 0 0 auto;
-  }
-
-  .location-actions-shell {
-    flex: 0 0 auto;
-    width: 100%;
-    position: relative;
-  }
-
-  .location-actions-shell::before,
-  .location-actions-shell::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 2px;
-    width: 14px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .location-actions-shell::before {
-    left: 0;
-    background: linear-gradient(
-      to right,
-      rgba(var(--v-theme-surface), 1),
-      rgba(var(--v-theme-surface), 0)
-    );
-  }
-
-  .location-actions-shell::after {
-    right: 0;
-    background: linear-gradient(
-      to left,
-      rgba(var(--v-theme-surface), 1),
-      rgba(var(--v-theme-surface), 0)
-    );
-  }
-
-  .location-actions {
-    width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-    padding-inline: 6px;
-    scroll-padding-inline: 6px;
-    scrollbar-width: thin;
-  }
-
   .calendar-slide-group :deep(.reading-option-card--calendar) {
     min-width: 162px;
     max-width: 186px;
