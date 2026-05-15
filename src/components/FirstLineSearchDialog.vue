@@ -58,8 +58,8 @@
               variant="text"
               size="small"
               :loading="isOcrProcessing"
-              :disabled="isOcrProcessing || isOcrCameraOpen"
-              :title="$t('firstLineSearch.ocrAction')"
+              :disabled="isOcrCameraButtonDisabled"
+              :title="ocrCameraButtonTitle"
               @click.stop="openOcrCamera"
             >
               <v-icon>mdi-camera</v-icon>
@@ -508,6 +508,7 @@ import {
   type FirstLineOcrResult,
   type OcrProgressPayload,
 } from '@/composables/firstLineOcr';
+import { useOnlineStatus } from '@/composables/onlineStatus';
 import { getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { toRefUrl } from '@/composables/tikkunLinks';
 import { useOptionsStore } from '@/stores/options';
@@ -549,6 +550,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { smAndDown } = useDisplay();
+const { isOnline } = useOnlineStatus();
 const optionsStore = useOptionsStore();
 const db = realDb as RealDb;
 const preparedPages = preparePageFirstLines(pageFirstLinesData as PageFirstLine[]);
@@ -576,6 +578,10 @@ const isKeyboardLockingNativeInput = computed(() => smAndDown.value && showKeybo
 const preparedPagesByNumber = new Map(preparedPages.map((page) => [page.pageNumber, page]));
 const isPhoneOcrCameraMode = computed(() => smAndDown.value);
 const shouldHideDialogForPhoneCamera = computed(() => isPhoneOcrCameraMode.value && isOcrCameraOpen.value);
+const isOcrCameraButtonDisabled = computed(() => isOcrProcessing.value || isOcrCameraOpen.value || !isOnline.value);
+const ocrCameraButtonTitle = computed(() => (
+  isOnline.value ? t('firstLineSearch.ocrAction') : t('home.dicta.offlineUnavailable')
+));
 const ocrCameraInstructions = computed(() => ([
   t('firstLineSearch.ocrCameraInstruction1'),
   t('firstLineSearch.ocrCameraInstruction2'),
@@ -891,6 +897,8 @@ const resetOcrState = () => {
 };
 
 const openOcrCamera = () => {
+  if (!isOnline.value) return;
+
   ocrErrorMessage.value = '';
   isOcrCameraOpen.value = true;
 };
