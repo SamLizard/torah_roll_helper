@@ -24,12 +24,31 @@
       <div class="border-t">
         <v-list nav>
           <v-list-item
+            v-if="!isOnline"
+            prepend-icon="mdi-wifi-off"
+            :title="$t('pwa.offlineIndicator.title')"
+          >
+            <v-list-item-subtitle class="text-caption">
+              {{ $t('pwa.offlineIndicator.subtitle') }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item
             prepend-icon="mdi-cog"
             :title="$t('settings.label')"
             @click="openSettingsPopup"
           >
             <v-list-item-subtitle class="text-caption">
               {{ $t('settings.subtitle') }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item
+            v-if="canInstall"
+            prepend-icon="mdi-cellphone-arrow-down"
+            :title="$t('pwa.installPrompt.install')"
+            @click="install"
+          >
+            <v-list-item-subtitle class="text-caption">
+              {{ $t('pwa.installPrompt.subtitle') }}
             </v-list-item-subtitle>
           </v-list-item>
         </v-list>
@@ -76,9 +95,27 @@
     <v-spacer class="d-md-block d-none"></v-spacer>
 
     <div class="d-flex align-center flex-shrink-0 pe-2">
+      <v-chip
+        v-if="!isOnline"
+        class="me-1 d-none d-md-inline-flex"
+        color="warning"
+        prepend-icon="mdi-wifi-off"
+        size="small"
+        variant="tonal"
+      >
+        {{ $t('pwa.offlineIndicator.title') }}
+      </v-chip>
       <language-selection
         ref="topLanguageSelectionRef"
         :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'"
+      />
+      <v-btn
+        v-if="canInstall"
+        icon="mdi-cellphone-arrow-down"
+        variant="text"
+        class="ms-1 d-none d-md-inline-flex"
+        :aria-label="$t('pwa.installPrompt.install')"
+        @click="install"
       />
       <v-btn
         icon="mdi-cog"
@@ -103,6 +140,8 @@ import {
   setTutorialLanguageMenuControls,
   setTutorialNavDrawerControls,
 } from '@/composables/tutorialUi';
+import { useInstallPrompt } from '@/composables/installPrompt';
+import { useOnlineStatus } from '@/composables/onlineStatus';
 
 interface LanguageSelectionExposed {
   openMenu: () => void;
@@ -115,6 +154,8 @@ const drawer = ref(false);
 const settingsPopupOpen = ref(false);
 const topLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const drawerLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
+const { canInstall, initializeInstallPrompt, installApp } = useInstallPrompt();
+const { isOnline } = useOnlineStatus();
 
 const navLinks = computed(() => {
   return router.getRoutes().filter(route => route.meta?.showInNav);
@@ -146,7 +187,14 @@ const openSettingsPopup = (): void => {
   drawer.value = false;
 };
 
+const install = async (): Promise<void> => {
+  drawer.value = false;
+  await installApp();
+};
+
 onMounted(() => {
+  initializeInstallPrompt();
+
   setTutorialLanguageMenuControls({
     open: () => {
       getTutorialLanguageSelection()?.openMenu();

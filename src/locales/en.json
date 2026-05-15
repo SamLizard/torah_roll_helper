@@ -77,6 +77,7 @@
       "cameraUnavailable": "Camera API is not available in this browser context.",
       "cameraHttpsHint": "Camera authorization is not available on localhost. Open the app over HTTPS instead of localhost.",
       "cameraPermissionHint": "Your device might be blocking camera access before the browser can even ask. Open your device settings, find your browser app, and allow Camera access. If you already blocked this site inside the browser, re-enable it in the browser's site settings.",
+      "offlineUnavailable": "Dicta photo search requires an internet connection.",
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
       "chooseFile": "Choose file",
@@ -283,6 +284,13 @@
     },
     "torahTypeOptions": {
       "klaf_245": "רמ\"ה (245 pages)"
+    },
+    "savedSettingsBanner": {
+      "defaultText": "Settings are saved in this browser.",
+      "text": "Saved in this browser: {settings}.",
+      "gola": "Gola mode",
+      "nusach": "rite {value}",
+      "torahType": "scroll layout {value}"
     }
   },
   "targets": {
@@ -291,6 +299,42 @@
     "golaLabel": "Gola (Diaspora) mode",
     "golaBadge": "Gola",
     "israelBadge": "Israel"
+  },
+  "pwa": {
+    "reloadPrompt": {
+      "offlineReady": "App ready to work offline.",
+      "needRefresh": "New version available.",
+      "update": "Update",
+      "dismiss": "Dismiss",
+      "close": "Close"
+    },
+    "installPrompt": {
+      "install": "Install app",
+      "subtitle": "Add Torah Roll Helper to your home screen"
+    },
+    "installGuide": {
+      "open": "Add to Home Screen",
+      "title": "Add to Home Screen",
+      "subtitle": "Install Torah Roll Helper so it opens like an app and keeps working after the first load.",
+      "ios": {
+        "title": "iPhone and iPad",
+        "step1": "Open this site in Safari.",
+        "step2": "Tap the Share button.",
+        "step3": "Choose Add to Home Screen.",
+        "step4": "Tap Add."
+      },
+      "android": {
+        "title": "Android",
+        "step1": "Open this site in Chrome.",
+        "step2": "Tap the three-dot menu.",
+        "step3": "Choose Install app or Add to Home Screen.",
+        "step4": "Confirm the installation."
+      }
+    },
+    "offlineIndicator": {
+      "title": "Offline",
+      "subtitle": "Core features are available. Dicta photo search needs internet."
+    }
   },
   "actions": {
     "close": "Close",

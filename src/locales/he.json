@@ -77,6 +77,7 @@
       "cameraUnavailable": "ממשק המצלמה אינו זמין בהקשר הדפדפן הנוכחי.",
       "cameraHttpsHint": "אישור מצלמה אינו זמין ב-localhost. פתח את האפליקציה ב-HTTPS במקום localhost.",
       "cameraPermissionHint": "ייתכן שהמכשיר חוסם את הגישה למצלמה עוד לפני שהדפדפן מספיק לבקש. פתחו את הגדרות המכשיר, חפשו את אפליקציית הדפדפן, ואשרו גישה למצלמה. אם חסמתם את האתר בתוך הדפדפן, אפשרו שוב את המצלמה בהגדרות האתר בדפדפן.",
+      "offlineUnavailable": "חיפוש תמונה בדיקטה דורש חיבור לאינטרנט.",
       "captureFailed": "לא ניתן לצלם את התמונה.",
       "capture": "צלם",
       "chooseFile": "בחר קובץ",
@@ -283,6 +284,13 @@
     },
     "torahTypeOptions": {
       "klaf_245": "רמ״ה (245 עמודים)"
+    },
+    "savedSettingsBanner": {
+      "defaultText": "ההגדרות נשמרות בדפדפן הזה.",
+      "text": "נשמר בדפדפן הזה: {settings}.",
+      "gola": "מצב גולה",
+      "nusach": "נוסח {value}",
+      "torahType": "פריסת ספר {value}"
     }
   },
   "targets": {
@@ -291,6 +299,42 @@
     "golaLabel": "מצב גולה",
     "golaBadge": "גולה",
     "israelBadge": "ישראל"
+  },
+  "pwa": {
+    "reloadPrompt": {
+      "offlineReady": "האפליקציה מוכנה לעבודה במצב לא מקוון.",
+      "needRefresh": "גרסה חדשה זמינה.",
+      "update": "עדכן",
+      "dismiss": "התעלם",
+      "close": "סגור"
+    },
+    "installPrompt": {
+      "install": "התקן אפליקציה",
+      "subtitle": "הוסיפו את Torah Roll Helper למסך הבית"
+    },
+    "installGuide": {
+      "open": "הוסף למסך הבית",
+      "title": "הוספה למסך הבית",
+      "subtitle": "התקינו את Torah Roll Helper כדי לפתוח אותו כמו אפליקציה ולהמשיך להשתמש בו אחרי הטעינה הראשונה.",
+      "ios": {
+        "title": "iPhone ו-iPad",
+        "step1": "פתחו את האתר הזה ב-Safari.",
+        "step2": "לחצו על כפתור השיתוף.",
+        "step3": "בחרו הוסף למסך הבית.",
+        "step4": "לחצו הוסף."
+      },
+      "android": {
+        "title": "Android",
+        "step1": "פתחו את האתר הזה ב-Chrome.",
+        "step2": "לחצו על תפריט שלוש הנקודות.",
+        "step3": "בחרו התקן אפליקציה או הוסף למסך הבית.",
+        "step4": "אשרו את ההתקנה."
+      }
+    },
+    "offlineIndicator": {
+      "title": "לא מקוון",
+      "subtitle": "הפעולות המרכזיות זמינות. חיפוש תמונה בדיקטה דורש אינטרנט."
+    }
   },
   "actions": {
     "close": "סגור",

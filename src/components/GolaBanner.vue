@@ -46,19 +46,17 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { useOptionsStore } from '@/stores/options';
 import { trackGolaChoice } from '@/composables/analytics';
+import { useGolaNotice } from '@/composables/golaNotice';
 
-const STORAGE_KEY = 'trh:gola-notice-seen';
 const dismissDuration = 2500;
 
 const optionsStore = useOptionsStore();
+const { golaNoticeSeen, markGolaNoticeSeen } = useGolaNotice();
 
-const noticeSeen = ref(
-  typeof window !== 'undefined' && window.localStorage.getItem(STORAGE_KEY) === 'true',
-);
 const dismissTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 const isCountingDown = ref(false);
 
-const visible = computed(() => !noticeSeen.value);
+const visible = computed(() => !golaNoticeSeen.value);
 
 const golaSwitch = computed<boolean>({
   get: () => optionsStore.isInGola,
@@ -89,10 +87,7 @@ const cancelCountdown = () => {
 
 const dismiss = () => {
   cancelCountdown();
-  noticeSeen.value = true;
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(STORAGE_KEY, 'true');
-  }
+  markGolaNoticeSeen();
 };
 
 onUnmounted(() => {
