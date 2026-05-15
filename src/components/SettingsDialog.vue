@@ -76,6 +76,19 @@
             </template>
           </v-tooltip>
         </div>
+
+        <template v-if="showInstallGuideEntry">
+          <v-divider class="my-4" />
+          <v-btn
+            block
+            color="primary"
+            prepend-icon="mdi-cellphone-arrow-down"
+            variant="tonal"
+            @click="openInstallGuide"
+          >
+            {{ $t('pwa.installGuide.open') }}
+          </v-btn>
+        </template>
       </v-card-text>
 
       <v-card-actions>
@@ -86,12 +99,18 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <install-guide-dialog v-model="installGuideDialog" />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useDisplay } from 'vuetify';
 import { trackGolaChoice } from '@/composables/analytics';
+import { markGolaNoticeSeen } from '@/composables/golaNotice';
+import { useInstallPrompt } from '@/composables/installPrompt';
+import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
 import {
   NUSACH_OPTIONS,
   TORAH_TYPE_OPTIONS,
@@ -109,7 +128,13 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { smAndDown } = useDisplay();
+const {
+  initializeInstallPrompt,
+  isStandalone,
+} = useInstallPrompt();
 const optionsStore = useOptionsStore();
+const installGuideDialog = ref(false);
 
 const dialog = computed<boolean>({
   get: () => props.modelValue,
@@ -120,6 +145,7 @@ const isInGola = computed<boolean>({
   get: () => optionsStore.isInGola,
   set: (value) => {
     optionsStore.changeIsInGola(value);
+    markGolaNoticeSeen();
     trackGolaChoice(value);
   },
 });
@@ -148,9 +174,19 @@ const torahTypeOptions = computed(() => {
   }));
 });
 
+const showInstallGuideEntry = computed(() => smAndDown.value && !isStandalone.value);
+
 const close = (): void => {
   dialog.value = false;
 };
+
+const openInstallGuide = (): void => {
+  installGuideDialog.value = true;
+};
+
+onMounted(() => {
+  initializeInstallPrompt();
+});
 </script>
 
 <style scoped>
