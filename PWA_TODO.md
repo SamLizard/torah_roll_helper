@@ -161,7 +161,18 @@ Add these inside `<head>`:
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">
 
 <!-- PWA: iOS/Apple specific -->
-<link rel="apple-touch-icon" href="/torah_roll_helper/icon/apple-touch-icon-180x180.png">
+<link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="/torah_roll_helper/icon/apple-touch-icon-180x180.png">
+<script>
+  (() => {
+    const appleTouchIcon = document.getElementById('apple-touch-icon')
+    if (!appleTouchIcon || !window.matchMedia) return
+
+      appleTouchIcon.setAttribute(
+        'href',
+        `/torah_roll_helper/icon${window.matchMedia('(prefers-color-scheme: dark)').matches ? '/dark' : ''}/apple-touch-icon-180x180.png`
+      );
+  })()
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Torah Roll">
@@ -170,13 +181,14 @@ Add these inside `<head>`:
 Notes:
 - **Dynamic theme-color** — Two `<meta name="theme-color">` tags with `media` queries make the mobile browser status bar react to the user's system light/dark preference. Update `#121212` if you later add a Vuetify dark theme with a different background.
 - `apple-touch-icon` — Required for iOS to show your icon (not a generic screenshot) when added to home screen. Must be 180×180px.
+- iOS Safari does not reliably honor `media="(prefers-color-scheme: ...)"` on multiple `apple-touch-icon` links when adding to Home Screen. Use one `apple-touch-icon` link and set its `href` at page load from `window.matchMedia('(prefers-color-scheme: dark)')`.
 - `apple-mobile-web-app-capable` — Tells Safari the app can run in standalone mode (no browser chrome).
 - `apple-mobile-web-app-status-bar-style` — Use `"default"` for a normal status bar, or `"black-translucent"` for a full-bleed look.
 - The app currently only has a light theme. If you add a dark theme later, make sure the dark `theme-color` matches your Vuetify dark theme's `background` color.
 
 Current project status:
 - DONE: `index.html` already had the dynamic `theme-color` tags and Apple standalone meta tags.
-- DONE: The Apple touch icon now uses one canonical, unconditional bright-mode icon: `/torah_roll_helper/icon/apple-touch-icon-180x180.png`.
+- DONE: The Apple touch icon uses one dynamic link whose `href` is set to the bright or dark 180px icon at page load based on `prefers-color-scheme`.
 - DONE: Favicon links already exist for light and dark system preferences.
 
 ---
@@ -556,7 +568,7 @@ Current project status:
 Since the app deploys to `https://samlizard.github.io/torah_roll_helper/`:
 - The `base` in `vite.config.ts` is already `/torah_roll_helper/` ✅
 - The manifest `scope` and `start_url` must also be `/torah_roll_helper/`
-- The `apple-touch-icon` href must include the base path: `/torah_roll_helper/icon/apple-touch-icon-180x180.png`
+- The `apple-touch-icon` hrefs must include the base path: `/torah_roll_helper/icon/apple-touch-icon-180x180.png` and `/torah_roll_helper/icon/dark/apple-touch-icon-180x180.png`
 - `vite-plugin-pwa` automatically respects the Vite `base` config for manifest icon paths
 
 Current project status:

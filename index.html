@@ -9,8 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1976D2">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">
-    <link rel="apple-touch-icon" sizes="180x180" href="/torah_roll_helper/icon/dark/apple-touch-icon-180x180.png" media="(prefers-color-scheme: dark)">
-    <link rel="apple-touch-icon" sizes="180x180" href="/torah_roll_helper/icon/apple-touch-icon-180x180.png" media="(prefers-color-scheme: light)">
+    <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="/torah_roll_helper/icon/apple-touch-icon-180x180.png">
+    <script>
+      (() => {
+        const appleTouchIcon = document.getElementById('apple-touch-icon');
+        if (!appleTouchIcon || !window.matchMedia) return;
+
+        appleTouchIcon.setAttribute(
+          'href',
+          `/torah_roll_helper/icon${window.matchMedia('(prefers-color-scheme: dark)').matches ? '/dark' : ''}/apple-touch-icon-180x180.png`
+        );
+      })();
+    </script>
     <link rel="apple-touch-startup-image" href="/torah_roll_helper/icon/splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="/torah_roll_helper/icon/splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="/torah_roll_helper/icon/splash/apple-splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
