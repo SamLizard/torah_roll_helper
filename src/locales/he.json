@@ -288,6 +288,7 @@
     "savedSettingsBanner": {
       "defaultText": "ההגדרות נשמרות בדפדפן הזה.",
       "text": "נשמר בדפדפן הזה: {settings}.",
+      "dontShowAgain": "אל תציג שוב",
       "gola": "מצב גולה",
       "nusach": "נוסח {value}",
       "torahType": "פריסת ספר {value}"

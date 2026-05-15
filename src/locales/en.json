@@ -288,6 +288,7 @@
     "savedSettingsBanner": {
       "defaultText": "Settings are saved in this browser.",
       "text": "Saved in this browser: {settings}.",
+      "dontShowAgain": "Don't show again",
       "gola": "Gola mode",
       "nusach": "rite {value}",
       "torahType": "scroll layout {value}"

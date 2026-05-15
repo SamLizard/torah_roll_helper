@@ -32,6 +32,16 @@
         :model-value="100"
         :style="{ '--saved-settings-dismiss-duration': dismissDuration + 'ms' }"
       />
+
+      <template #append>
+        <v-btn
+          variant="text"
+          size="small"
+          @click="dismissPermanently"
+        >
+          {{ $t('settings.savedSettingsBanner.dontShowAgain') }}
+        </v-btn>
+      </template>
     </v-alert>
   </v-expand-transition>
 </template>
@@ -40,16 +50,23 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useInstallPrompt } from '@/composables/installPrompt';
-import { OPTIONS_STORAGE_KEY } from '@/composables/storageKeys';
+import {
+  OPTIONS_STORAGE_KEY,
+  SAVED_SETTINGS_NOTICE_STORAGE_KEY,
+} from '@/composables/storageKeys';
 import { useOptionsStore } from '@/stores/options';
 
 const dismissDuration = 5000;
 
 const { t } = useI18n();
 const optionsStore = useOptionsStore();
-const { initializeInstallPrompt, isStandalone } = useInstallPrompt();
+const { isStandalone } = useInstallPrompt();
 
 const noticeDismissed = ref(false);
+const noticeDismissedPermanently = ref(
+  typeof window !== 'undefined'
+    && window.localStorage.getItem(SAVED_SETTINGS_NOTICE_STORAGE_KEY) === 'true',
+);
 const hasSavedOptions = ref(false);
 const dismissTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
@@ -92,7 +109,10 @@ const bannerText = computed(() => {
 });
 
 const visible = computed(() => {
-  return !noticeDismissed.value && !isStandalone.value && hasSavedOptions.value;
+  return !noticeDismissed.value
+    && !noticeDismissedPermanently.value
+    && !isStandalone.value
+    && hasSavedOptions.value;
 });
 
 const cancelDismissTimer = () => {
@@ -114,8 +134,16 @@ const dismiss = () => {
   noticeDismissed.value = true;
 };
 
+const dismissPermanently = () => {
+  dismiss();
+  noticeDismissedPermanently.value = true;
+
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(SAVED_SETTINGS_NOTICE_STORAGE_KEY, 'true');
+  }
+};
+
 onMounted(() => {
-  initializeInstallPrompt();
   hasSavedOptions.value = typeof window !== 'undefined'
     && window.localStorage.getItem(OPTIONS_STORAGE_KEY) !== null;
 });
