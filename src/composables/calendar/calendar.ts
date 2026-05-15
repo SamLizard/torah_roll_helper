@@ -197,7 +197,7 @@ const collectRange = ({
       readingId: group.readingId,
       dates: Array.from(group.dates).sort(),
     }))
-    .sort(compareByFirstDateThenId)
+    .sort(compareByFirstDate)
 }
 
 const getTorahOccurrences = (
@@ -816,11 +816,10 @@ const isShabbatRoshChodeshAliyah = (aliyah: Aliyah | undefined) => {
   return aliyah?.k === 'Numbers' && aliyah.b === '28:9' && aliyah.e === '28:15'
 }
 
-const compareByFirstDateThenId = (a: MonthlyReadingEntry, b: MonthlyReadingEntry) => {
+const compareByFirstDate = (a: MonthlyReadingEntry, b: MonthlyReadingEntry) => {
   const ad = a.dates[0] ?? ''
   const bd = b.dates[0] ?? ''
-  if (ad !== bd) return ad.localeCompare(bd)
-  return a.readingId.localeCompare(b.readingId)
+  return ad.localeCompare(bd)
 }
 
 const addMonths = (date: Date, months: number) => {
