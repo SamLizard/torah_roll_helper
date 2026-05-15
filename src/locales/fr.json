@@ -288,6 +288,7 @@
     "savedSettingsBanner": {
       "defaultText": "Les paramètres sont enregistrés dans ce navigateur.",
       "text": "Enregistré dans ce navigateur : {settings}.",
+      "dontShowAgain": "Ne plus afficher",
       "gola": "mode Diaspora",
       "nusach": "rite {value}",
       "torahType": "mise en page {value}"
