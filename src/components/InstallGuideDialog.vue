@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useInstallPrompt } from '@/composables/installPrompt';
 
 const props = defineProps<{
@@ -77,7 +77,6 @@ const emit = defineEmits<{
 
 const {
   canInstall,
-  initializeInstallPrompt,
   installApp,
 } = useInstallPrompt();
 
@@ -94,10 +93,6 @@ const install = async (): Promise<void> => {
   await installApp();
   close();
 };
-
-onMounted(() => {
-  initializeInstallPrompt();
-});
 </script>
 
 <style scoped>

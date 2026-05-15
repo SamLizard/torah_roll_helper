@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { trackGolaChoice } from '@/composables/analytics';
@@ -130,7 +130,6 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { smAndDown } = useDisplay();
 const {
-  initializeInstallPrompt,
   isStandalone,
 } = useInstallPrompt();
 const optionsStore = useOptionsStore();
@@ -183,10 +182,6 @@ const close = (): void => {
 const openInstallGuide = (): void => {
   installGuideDialog.value = true;
 };
-
-onMounted(() => {
-  initializeInstallPrompt();
-});
 </script>
 
 <style scoped>
