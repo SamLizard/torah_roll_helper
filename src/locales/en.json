@@ -77,6 +77,7 @@
       "cameraUnavailable": "Camera API is not available in this browser context.",
       "cameraHttpsHint": "Camera authorization is not available on localhost. Open the app over HTTPS instead of localhost.",
       "cameraPermissionHint": "Your device might be blocking camera access before the browser can even ask. Open your device settings, find your browser app, and allow Camera access. If you already blocked this site inside the browser, re-enable it in the browser's site settings.",
+      "offlineUnavailable": "Dicta photo search requires an internet connection.",
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
       "chooseFile": "Choose file",
@@ -284,11 +285,12 @@
     "torahTypeOptions": {
       "klaf_245": "רמ\"ה (245 pages)"
     },
-    "restoredPreferences": {
-      "title": "Saved settings restored",
+    "savedSettingsBanner": {
+      "defaultText": "Settings are saved in this browser.",
+      "text": "Saved in this browser: {settings}.",
       "gola": "Gola mode",
-      "nusach": "Rite: {value}",
-      "torahType": "Scroll layout: {value}"
+      "nusach": "rite {value}",
+      "torahType": "scroll layout {value}"
     }
   },
   "targets": {
@@ -328,6 +330,10 @@
         "step3": "Choose Install app or Add to Home Screen.",
         "step4": "Confirm the installation."
       }
+    },
+    "offlineIndicator": {
+      "title": "Offline",
+      "subtitle": "Core features are available. Dicta photo search needs internet."
     }
   },
   "actions": {

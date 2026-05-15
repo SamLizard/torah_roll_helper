@@ -77,6 +77,7 @@
       "cameraUnavailable": "L'API caméra n'est pas disponible dans ce contexte navigateur.",
       "cameraHttpsHint": "L'autorisation de la caméra n'est pas disponible sur localhost. Ouvrez l'application en HTTPS au lieu de localhost.",
       "cameraPermissionHint": "Il se peut que votre appareil bloque l'accès à la caméra avant même que le navigateur ne le demande. Ouvrez les réglages de votre appareil, trouvez l'application de votre navigateur et autorisez l'accès à la caméra. Si le site a été bloqué dans le navigateur, réactivez-le dans les paramètres du site.",
+      "offlineUnavailable": "La recherche photo Dicta nécessite une connexion internet.",
       "captureFailed": "Impossible de capturer l'image.",
       "capture": "Capturer",
       "chooseFile": "Choisir un fichier",
@@ -284,11 +285,12 @@
     "torahTypeOptions": {
       "klaf_245": "רמ״ה (245 pages)"
     },
-    "restoredPreferences": {
-      "title": "Paramètres enregistrés restaurés",
-      "gola": "Mode Diaspora",
-      "nusach": "Rite : {value}",
-      "torahType": "Mise en page : {value}"
+    "savedSettingsBanner": {
+      "defaultText": "Les paramètres sont enregistrés dans ce navigateur.",
+      "text": "Enregistré dans ce navigateur : {settings}.",
+      "gola": "mode Diaspora",
+      "nusach": "rite {value}",
+      "torahType": "mise en page {value}"
     }
   },
   "targets": {
@@ -328,6 +330,10 @@
         "step3": "Choisissez Installer l'application ou Ajouter à l'écran d'accueil.",
         "step4": "Confirmez l'installation."
       }
+    },
+    "offlineIndicator": {
+      "title": "Hors ligne",
+      "subtitle": "Les fonctions principales restent disponibles. La recherche photo Dicta nécessite internet."
     }
   },
   "actions": {

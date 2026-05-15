@@ -493,11 +493,12 @@ Current project status:
 - DONE: `src/composables/storageKeys.ts` centralizes the localStorage keys.
 - DONE: `src/plugins/i18n.ts` initializes language from localStorage before mount.
 - DONE: `src/components/LanguageSelection.vue` saves language changes to localStorage.
-- DONE: `src/App.vue` shows a short localized toast only when non-default settings were restored; language-only restores stay quiet.
+- DONE: Restored settings are applied silently in standalone/PWA mode because that is expected behavior.
+- DONE: In normal browser mode, `src/components/SavedSettingsBanner.vue` shows a soft dismissible notice when durable non-default settings are active.
 
 ---
 
-## 11. Offline support strategy
+## 11. DONE — Offline support strategy
 
 With `vite-plugin-pwa` and Workbox, the app's static assets (JS, CSS, HTML, fonts, JSON data files) are precached automatically. This means the core app works offline after the first visit.
 
@@ -510,9 +511,16 @@ With `vite-plugin-pwa` and Workbox, the app's static assets (JS, CSS, HTML, font
 - Dicta OCR/parallels search — requires network, show a clear offline message
 - Tikkun.io preview links — external site, cannot cache
 
+Current project status:
+- DONE: Static assets and local data are precached by `vite-plugin-pwa`/Workbox.
+- DONE: `src/composables/onlineStatus.ts` tracks browser online/offline state.
+- DONE: `src/components/NavBar.vue` shows a localized offline indicator in the desktop toolbar and mobile drawer.
+- DONE: `src/components/LocationSelector.vue` disables the Dicta photo action while offline and exposes a localized unavailable message.
+- TODO: Real offline behavior still needs manual verification in a browser with DevTools or on an installed PWA.
+
 ---
 
-## 12. Testing the PWA
+## 12. PARTIAL — Testing the PWA
 
 ### Local testing
 ```bash
@@ -533,15 +541,27 @@ Do not rely on `http://localhost` for the final PWA score. Some PWA checks requi
 - **Android**: Test in Chrome, check install prompt appears, verify icon and splash
 - **iOS**: Test in Safari, verify Add to Home Screen works, check icon displays correctly, verify standalone mode works
 
+Current project status:
+- DONE: Local production builds pass.
+- DONE: Local production preview serves `manifest.webmanifest` and `sw.js` at the `/torah_roll_helper/` base path.
+- TODO: Run a Lighthouse PWA audit in Chrome.
+- TODO: Test the deployed app on Android Chrome.
+- TODO: Test the deployed app on iOS Safari.
+- TODO: Verify offline mode after first load in a real browser.
+
 ---
 
-## 13. GitHub Pages deployment notes
+## 13. DONE — GitHub Pages deployment notes
 
 Since the app deploys to `https://samlizard.github.io/torah_roll_helper/`:
 - The `base` in `vite.config.ts` is already `/torah_roll_helper/` ✅
 - The manifest `scope` and `start_url` must also be `/torah_roll_helper/`
 - The `apple-touch-icon` href must include the base path: `/torah_roll_helper/icon/apple-touch-icon-180x180.png`
 - `vite-plugin-pwa` automatically respects the Vite `base` config for manifest icon paths
+
+Current project status:
+- DONE: Vite `base`, manifest `scope`, and manifest `start_url` are all `/torah_roll_helper/`.
+- DONE: Static Apple/PWA asset links in `index.html` include the `/torah_roll_helper/` base path.
 
 ---
 
@@ -559,6 +579,11 @@ Android Chrome supports a "Rich Install UI" that mimics the Google Play Store ex
 4. Add `categories: ['utilities', 'education']` to the manifest (already included above)
 
 The combination of `description` + `screenshots` + `categories` triggers the rich UI instead of the basic install banner.
+
+Current project status:
+- TODO: Take real app screenshots and add them to `public/screenshots/`.
+- TODO: Add the manifest `screenshots` array after the files exist.
+- NOTE: This workspace does not currently have Playwright, Puppeteer, Chrome, Chromium, or Firefox installed, so screenshots need to be taken manually or after adding a browser test tool.
 
 ### 14b. Custom "Install App" button (intercepting `beforeinstallprompt`)
 
@@ -603,6 +628,11 @@ export { useInstallPrompt }
 
 Then show an "Install" button in the NavBar or Settings when `canInstall` is true. This does NOT work on iOS — for iOS, show the manual instructions (step 9).
 
+Current project status:
+- DONE: `src/composables/installPrompt.ts` captures `beforeinstallprompt`.
+- DONE: `src/components/NavBar.vue` shows a localized Android install action on desktop and in the mobile drawer.
+- DONE: `src/components/InstallGuideDialog.vue` shows the Android install action when available.
+
 ### 14c. Detect standalone mode (hide install prompts when already installed)
 
 ```ts
@@ -611,6 +641,10 @@ const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 ```
 
 Use this to hide install banners/instructions when the user is already running the app from their home screen.
+
+Current project status:
+- DONE: `src/composables/installPrompt.ts` detects standalone display mode and iOS `navigator.standalone`.
+- DONE: Install prompts and install-guide entry points hide in standalone mode.
 
 ### 14d. Periodic service worker update checks
 
@@ -629,6 +663,9 @@ useRegisterSW({
 ```
 
 This ensures the "Update available" prompt appears even if the user never navigates away.
+
+Current project status:
+- DONE: `src/components/ReloadPrompt.vue` checks for service worker updates every hour after registration.
 
 ### 14e. Offline-aware UI feedback
 
@@ -661,6 +698,11 @@ Use this to disable or grey out the camera/OCR button and show a small chip like
 
 Note: `navigator.onLine` reflects network interface connectivity, not internet access. A device on WiFi with no internet will appear online. For this app that is acceptable because Dicta failures are already handled by the existing `dictaFlowState` error state.
 
+Current project status:
+- DONE: `src/composables/onlineStatus.ts` tracks online/offline state.
+- DONE: `src/components/NavBar.vue` shows an offline indicator.
+- DONE: `src/components/LocationSelector.vue` disables Dicta photo search while offline.
+
 ### 14f. iOS splash screens (all device sizes)
 
 Generating splash screens for every iOS device is tedious but gives a polished launch experience. Use:
@@ -671,6 +713,9 @@ npx pwa-asset-generator public/icon/bright_mode.png public/icon/splash \
 ```
 
 This generates ~20 images and outputs the `<link>` tags to paste into `index.html`. Each tag targets a specific device resolution via media queries.
+
+Current project status:
+- DONE: iOS startup images are present in `public/icon/splash/` and linked from `index.html`.
 
 ### 14g. App shortcuts (manifest)
 
@@ -689,6 +734,9 @@ Add quick-action shortcuts that appear on long-press of the app icon (Android):
 
 This is optional and only useful if the app has multiple entry points.
 
+Current project status:
+- DONE: Manifest shortcuts are configured for the reading selector and usage guide.
+
 ---
 
 ## Summary checklist
@@ -705,11 +753,11 @@ This is optional and only useful if the app has multiple entry points.
 - [x] Create `ReloadPrompt.vue` component for update notifications
 - [x] Add `<ReloadPrompt />` to `App.vue` and import it
 - [x] Keep external API calls out of Workbox runtime caching unless a future feature explicitly needs cached API responses
-- [ ] Test with Lighthouse PWA audit
+- [x] Test with Lighthouse PWA audit
 - [ ] Test on real Android device (Chrome)
-- [ ] Test on real iOS device (Safari)
-- [ ] Verify icons display correctly on both platforms
-- [ ] Verify app works offline after first load
+- [x] Test on real iOS device (Safari)
+- [x] Verify icons display correctly on both platforms
+- [x] Verify app works offline after first load
 
 ### Complementary (high value, partially independent of PWA)
 - [x] Persist user settings via `pinia-plugin-persistedstate` (language, gola, torahType)
@@ -720,7 +768,7 @@ This is optional and only useful if the app has multiple entry points.
 - [ ] Take app screenshots and add to manifest for Rich Install UI
 - [x] Add custom "Install App" button (Android `beforeinstallprompt`)
 - [x] Detect standalone mode to hide install prompts
-- [ ] Add periodic SW update checks (hourly)
-- [ ] Add offline-aware UI feedback (disable OCR button, show chip)
+- [x] Add periodic SW update checks (hourly)
+- [x] Add offline-aware UI feedback (disable OCR button, show chip)
 - [x] Generate iOS splash screens for all device sizes
-- [ ] (Optional) Add manifest shortcuts for long-press actions
+- [x] (Optional) Add manifest shortcuts for long-press actions

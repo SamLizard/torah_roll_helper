@@ -29,14 +29,12 @@ import {
   initializeTutorialState,
   markTutorialPromptSeen,
 } from '@/composables/tutorials';
-import { useOptionsStore } from '@/stores/options';
 
 const { isRtl } = useRtl();
 const { smAndDown } = useDisplay();
 const { locale, t } = useI18n();
 const router = useRouter();
 const route = useRoute();
-const optionsStore = useOptionsStore();
 const canonicalUrl = 'https://samlizard.github.io/torah_roll_helper/';
 
 let tutorialPromptTimeoutId: number | null = null;
@@ -143,50 +141,8 @@ const showTutorialPrompt = async () => {
   }
 };
 
-const getRestoredPreferenceLabels = (): string[] => {
-  const labels: string[] = [];
-
-  if (optionsStore.isInGola) {
-    labels.push(t('settings.restoredPreferences.gola'));
-  }
-
-  if (optionsStore.nusach !== 'sefaradic') {
-    labels.push(t('settings.restoredPreferences.nusach', {
-      value: getTranslatedText(`settings.nusachOptions.${optionsStore.nusach}`),
-    }));
-  }
-
-  if (optionsStore.torahType !== 'klaf_245') {
-    labels.push(t('settings.restoredPreferences.torahType', {
-      value: getTranslatedText(`settings.torahTypeOptions.${optionsStore.torahType}`),
-    }));
-  }
-
-  return labels;
-};
-
-const showRestoredPreferencesToast = async (): Promise<void> => {
-  const labels = getRestoredPreferenceLabels();
-
-  if (!labels.length) {
-    return;
-  }
-
-  await Swal.fire({
-    toast: true,
-    position: tutorialPromptPosition.value,
-    icon: 'info',
-    title: t('settings.restoredPreferences.title'),
-    text: labels.join(' · '),
-    showConfirmButton: false,
-    timer: 3500,
-    timerProgressBar: true,
-  });
-};
-
 onMounted(() => {
   bootstrapAnalytics();
-  void showRestoredPreferencesToast();
 
   const tutorialInitialization = initializeTutorialState();
 

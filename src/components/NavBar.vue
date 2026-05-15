@@ -24,6 +24,15 @@
       <div class="border-t">
         <v-list nav>
           <v-list-item
+            v-if="!isOnline"
+            prepend-icon="mdi-wifi-off"
+            :title="$t('pwa.offlineIndicator.title')"
+          >
+            <v-list-item-subtitle class="text-caption">
+              {{ $t('pwa.offlineIndicator.subtitle') }}
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item
             prepend-icon="mdi-cog"
             :title="$t('settings.label')"
             @click="openSettingsPopup"
@@ -86,6 +95,16 @@
     <v-spacer class="d-md-block d-none"></v-spacer>
 
     <div class="d-flex align-center flex-shrink-0 pe-2">
+      <v-chip
+        v-if="!isOnline"
+        class="me-1 d-none d-md-inline-flex"
+        color="warning"
+        prepend-icon="mdi-wifi-off"
+        size="small"
+        variant="tonal"
+      >
+        {{ $t('pwa.offlineIndicator.title') }}
+      </v-chip>
       <language-selection
         ref="topLanguageSelectionRef"
         :class="$vuetify.locale.isRtl ? 'rtl' : 'ltr'"
@@ -122,6 +141,7 @@ import {
   setTutorialNavDrawerControls,
 } from '@/composables/tutorialUi';
 import { useInstallPrompt } from '@/composables/installPrompt';
+import { useOnlineStatus } from '@/composables/onlineStatus';
 
 interface LanguageSelectionExposed {
   openMenu: () => void;
@@ -135,6 +155,7 @@ const settingsPopupOpen = ref(false);
 const topLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const drawerLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const { canInstall, initializeInstallPrompt, installApp } = useInstallPrompt();
+const { isOnline } = useOnlineStatus();
 
 const navLinks = computed(() => {
   return router.getRoutes().filter(route => route.meta?.showInNav);

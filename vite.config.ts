@@ -60,6 +60,34 @@ const config = defineConfig({
             purpose: 'maskable',
           },
         ],
+        shortcuts: [
+          {
+            name: 'Choose reading',
+            short_name: 'Reading',
+            description: 'Open the Torah reading selector',
+            url: '/torah_roll_helper/#/home',
+            icons: [
+              {
+                src: 'icon/pwa-192x192.png',
+                sizes: '192x192',
+                type: 'image/png',
+              },
+            ],
+          },
+          {
+            name: 'How to use',
+            short_name: 'How to',
+            description: 'Open the usage guide',
+            url: '/torah_roll_helper/#/how-to',
+            icons: [
+              {
+                src: 'icon/pwa-192x192.png',
+                sizes: '192x192',
+                type: 'image/png',
+              },
+            ],
+          },
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2,json}'],

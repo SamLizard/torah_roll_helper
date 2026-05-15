@@ -22,8 +22,10 @@
             size="small"
             :variant="btn.variant"
             :color="btn.color"
+            :disabled="btn.disabled"
             :prepend-icon="btn.icon"
             :data-tutorial="btn.tutorial"
+            :title="btn.title"
             @click="btn.action"
           >
             {{ btn.label }}
@@ -37,8 +39,10 @@
             size="small"
             :variant="btn.variant"
             :color="btn.color"
+            :disabled="btn.disabled"
             :prepend-icon="btn.icon"
             :data-tutorial="btn.tutorial"
+            :title="btn.title"
             @click="btn.action"
           >
             {{ btn.label }}
@@ -206,6 +210,7 @@ import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { computeRoll, getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
+import { useOnlineStatus } from '@/composables/onlineStatus';
 import pageFirstLinesData from '@/data/page_first_lines.json';
 import realDb from '@/data/real_db.json';
 import { trackFromToAction } from '@/composables/analytics';
@@ -263,6 +268,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n();
 const { isRtl } = useRtl();
+const { isOnline } = useOnlineStatus();
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
@@ -290,6 +296,8 @@ interface ActionButton {
   icon: string;
   label: string;
   tutorial: string;
+  title?: string;
+  disabled?: boolean;
   action: () => void;
 }
 
@@ -339,6 +347,8 @@ const actionButtons = computed<ActionButton[]>(() => {
       icon: 'mdi-camera',
       label: t('home.actions.photo'),
       tutorial: `${props.side}-photo`,
+      title: isOnline.value ? undefined : t('home.dicta.offlineUnavailable'),
+      disabled: !isOnline.value,
       action: onOpenDicta,
     });
   }

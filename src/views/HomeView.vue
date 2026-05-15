@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="pa-4">
     <GolaBanner />
+    <SavedSettingsBanner />
 
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
@@ -627,6 +628,7 @@ import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import LocationSelector from '@/components/LocationSelector.vue';
 import MobileCompactResult from '@/components/MobileCompactResult.vue';
 import GolaBanner from '@/components/GolaBanner.vue';
+import SavedSettingsBanner from '@/components/SavedSettingsBanner.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';

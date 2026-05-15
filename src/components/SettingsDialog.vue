@@ -108,6 +108,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { trackGolaChoice } from '@/composables/analytics';
+import { markGolaNoticeSeen } from '@/composables/golaNotice';
 import { useInstallPrompt } from '@/composables/installPrompt';
 import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
 import {
@@ -144,6 +145,7 @@ const isInGola = computed<boolean>({
   get: () => optionsStore.isInGola,
   set: (value) => {
     optionsStore.changeIsInGola(value);
+    markGolaNoticeSeen();
     trackGolaChoice(value);
   },
 });

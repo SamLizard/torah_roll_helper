@@ -41,10 +41,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import { useRegisterSW } from 'virtual:pwa-register/vue';
 
-const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW();
+const serviceWorkerUpdateIntervalMs = 60 * 60 * 1000;
+let serviceWorkerUpdateIntervalId: number | null = null;
+
+const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
+  onRegistered(registration) {
+    if (!registration || serviceWorkerUpdateIntervalId !== null) {
+      return;
+    }
+
+    serviceWorkerUpdateIntervalId = window.setInterval(() => {
+      void registration.update();
+    }, serviceWorkerUpdateIntervalMs);
+  },
+});
 
 const showOfflineReady = computed({
   get: () => offlineReady.value && !needRefresh.value,
@@ -59,4 +72,10 @@ const close = () => {
   offlineReady.value = false;
   needRefresh.value = false;
 };
+
+onUnmounted(() => {
+  if (serviceWorkerUpdateIntervalId !== null) {
+    window.clearInterval(serviceWorkerUpdateIntervalId);
+  }
+});
 </script>
