@@ -449,11 +449,11 @@
     "chanukah": "Hanoucca",
     "pesach": "Pessah",
     "shavuot": "Chavouot",
-    "genesis": "Genèse",
-    "exodus": "Exode",
-    "leviticus": "Lévitique",
-    "numbers": "Nombres",
-    "deuteronomy": "Deutéronome",
+    "genesis": "Genèse (Béréchit)",
+    "exodus": "Exode (Chémot)",
+    "leviticus": "Lévitique (Vayikra)",
+    "numbers": "Nombres (Bamidbar)",
+    "deuteronomy": "Deutéronome (Devarim)",
     "four-readings": "Quatre Parachiot"
   },
   "readingTargets": {

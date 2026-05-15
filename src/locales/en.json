@@ -449,11 +449,11 @@
     "chanukah": "Chanukah",
     "pesach": "Pesach",
     "shavuot": "Shavuot",
-    "genesis": "Genesis",
-    "exodus": "Exodus",
-    "leviticus": "Leviticus",
-    "numbers": "Numbers",
-    "deuteronomy": "Deuteronomy",
+    "genesis": "Genesis (Bereshit)",
+    "exodus": "Exodus (Shemot)",
+    "leviticus": "Leviticus (Vayikra)",
+    "numbers": "Numbers (Bamidbar)",
+    "deuteronomy": "Deuteronomy (Devarim)",
     "four-readings": "Four Parashiot"
   },
   "readingTargets": {
