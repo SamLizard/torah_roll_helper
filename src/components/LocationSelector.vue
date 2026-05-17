@@ -380,7 +380,7 @@ function updateHeaderLayout() {
 
   if (!buttons.length) return;
 
-  // Temporarily force nowrap to measure intrinsic widths accurately
+  // Measure intrinsic widths
   const prevWrap = header.style.flexWrap;
   header.style.flexWrap = 'nowrap';
 
@@ -389,36 +389,75 @@ function updateHeaderLayout() {
   const textWidth = Math.ceil(text.getBoundingClientRect().width);
   const buttonWidths = buttons.map((b) => Math.ceil(b.getBoundingClientRect().width));
 
-  // Restore original wrap
   header.style.flexWrap = prevWrap;
 
-  // Count how many buttons fit next to the title
-  let used = 0;
-  let count = 0;
+  const countRows = (widths: number[]) => {
+    if (!widths.length) return 0;
 
-  for (const w of buttonWidths) {
-    const extra = count === 0 ? w : w + gap;
-    const neededOnLine = textWidth + gap + used + extra;
+    let rows = 1;
+    let used = 0;
 
-    if (neededOnLine <= available) {
-      used += extra;
-      count++;
-    } else {
-      break;
+    for (const w of widths) {
+      const nextUsed = used === 0 ? w : used + gap + w;
+
+      if (nextUsed <= available) {
+        used = nextUsed;
+      } else {
+        rows++;
+        used = w;
+      }
+    }
+
+    return rows;
+  };
+
+  // If everything fits on the title line, keep the inline layout
+  const allButtonsWidth = buttonWidths.reduce(
+    (sum, w, i) => sum + w + (i === 0 ? 0 : gap),
+    0,
+  );
+  const allButtonsFitOnTitleLine =
+    textWidth + (buttonWidths.length ? gap : 0) + allButtonsWidth <= available;
+
+  if (allButtonsFitOnTitleLine) {
+    firstRowButtonCount.value = buttonWidths.length;
+    headerLayoutMode.value = 'inline';
+    return;
+  }
+
+  // Otherwise, try every split and choose:
+  // 1) the fewest total rows
+  // 2) if tied, the split with fewer buttons on the title line
+  //    (meaning more buttons are pushed below)
+  let bestCount = 0;
+  let bestTotalRows = Number.POSITIVE_INFINITY;
+
+  for (let count = 0; count <= buttonWidths.length; count++) {
+    const topButtons = buttonWidths.slice(0, count);
+    const bottomButtons = buttonWidths.slice(count);
+
+    const topButtonsWidth = topButtons.reduce(
+      (sum, w, i) => sum + w + (i === 0 ? 0 : gap),
+      0,
+    );
+
+    const topLineWidth = textWidth + (topButtons.length ? gap : 0) + topButtonsWidth;
+    if (topLineWidth > available) continue;
+
+    const bottomRows = countRows(bottomButtons);
+    const totalRows = 1 + bottomRows; // title row + button rows below
+
+    if (
+      totalRows < bestTotalRows ||
+      (totalRows === bestTotalRows && count < bestCount)
+    ) {
+      bestTotalRows = totalRows;
+      bestCount = count;
     }
   }
 
-  firstRowButtonCount.value = count;
-
-  const allButtonsFit = count === buttonWidths.length;
-  const noneFit = count === 0;
-
-  const nextMode: HeaderLayoutMode =
-    allButtonsFit ? 'inline' :
-    noneFit ? 'stack' :
-    'split';
-
-  if (nextMode !== headerLayoutMode.value) headerLayoutMode.value = nextMode;
+  firstRowButtonCount.value = bestCount;
+  headerLayoutMode.value = bestCount === 0 ? 'stack' : 'split';
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
