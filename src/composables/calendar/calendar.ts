@@ -429,7 +429,7 @@ const resolveHolidayReadingIds = ({
 }) => {
   if (titleEn.startsWith('Yom Kippur (Mincha)')) return ['yom-kippur-mincha']
   if (FAST_DAY_MINCHA_TITLES.has(titleEn)) return ['taanit-tzibur']
-  if (titleEn.startsWith('Erev Simchat Torah')) return ['vezot_haberakhah']
+  // if (titleEn.startsWith('Erev Simchat Torah')) return ['vezot_haberakhah'] // TODO: check if ashkenazi are reading it at simchat torah night (hakafot). If yes, we should return them when ashkenazi will be an option. Maybe adapt in splitHolidayAliyot hasMain - "vezot_haberakhah"
 
   if (titleEn.startsWith('Chanukah Day ')) {
     return resolveChanukahReadingIds({
@@ -583,7 +583,6 @@ const splitHolidayAliyot = ({
   titleEn,
   readingId,
   aliyotMap,
-  isIsrael,
 }: {
   titleEn: string
   readingId: string
@@ -591,33 +590,23 @@ const splitHolidayAliyot = ({
   isIsrael: boolean
 }) => {
   const aliyot = getOrderedAliyot({ aliyotMap })
-  if (!aliyot.length) {
+  if (!aliyot.length
+    || readingId === "vezot_haberakhah"
+  ) {
     return {
       hasMain: false,
       hasMaftir: false,
     }
   }
 
-  if (titleEn.startsWith('Erev Simchat Torah')) {
+  if (titleEn.startsWith('Sukkot Chol ha Moed Day ')
+      || titleEn.startsWith('Sukkot Final Day')) {
     return {
-      hasMain: false,
+      hasMain: true,
       hasMaftir: false,
-    }
+    }      
   }
 
-  if (titleEn.startsWith('Sukkot Final Day')) {
-    return {
-      hasMain: (isIsrael ? aliyot.slice(2, 3) : aliyot.slice(1, 3)).length > 0,
-      hasMaftir: Boolean(aliyot[aliyot.length - 1]),
-    }
-  }
-
-  if (titleEn.startsWith('Sukkot Chol ha Moed Day ')) {
-    return {
-      hasMain: (isIsrael ? aliyot.slice(0, 1) : aliyot.slice(0, 2)).length > 0,
-      hasMaftir: Boolean(aliyot[aliyot.length - 1]),
-    }
-  }
 
   if (isPesachCholHamoedTitle(titleEn)) {
     return {
