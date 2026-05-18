@@ -182,10 +182,11 @@ Here are the most useful contribution areas right now.
 
 ### 3) Add a new scroll layout option
 
-1. Add a new layout id and page count in `TORAH_TYPE_OPTIONS` in `src/stores/options.ts`.
-2. Add translated labels for this id under `settings.torahTypeOptions` in all locale files in `src/locales/`.
-3. Provide an updated `src/data/real_db.json` for that layout (book/chapter/verse to page mapping).
-4. With that `real_db.json`, I can generate the rest of the derived data.
+1. Create a folder `src/data/<pageCount>/` with `real_db.json`, `page_first_lines.json`, `page_titles_keys.json`.
+2. Import the three files in `src/composables/torahData.ts` and add an entry to the `LAYOUT_DATA` registry.
+3. Add `{ id: 'klaf_<pageCount>', pageCount: <pageCount> }` to `TORAH_TYPE_OPTIONS` in `src/stores/options.ts`.
+4. Add a translation key `settings.torahTypeOptions.klaf_<pageCount>` in each locale file under `src/locales/`.
+5. Add a `"<pageCount>"` key to every `page` object in `src/data/target_pages.json`.
 
 ### 4) Add links to other online tikkun providers
 

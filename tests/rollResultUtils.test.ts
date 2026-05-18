@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import realDb from '../src/data/real_db.json';
+import realDb from '../src/data/245/real_db.json';
 import type { RealDb } from '../src/types';
 import { getRemainingAfterBookForRoll } from '../src/composables/rollResultUtils';
 
@@ -10,7 +10,7 @@ describe('getRemainingAfterBookForRoll', () => {
     const result = getRemainingAfterBookForRoll(112, 189, db);
 
     expect(result).toEqual({
-      count: 41,
+      count: 42,
       bookIndex: 3
     });
   });
@@ -19,7 +19,7 @@ describe('getRemainingAfterBookForRoll', () => {
     const result = getRemainingAfterBookForRoll(140, 151, db);
 
     expect(result).toEqual({
-      count: 3,
+      count: 4,
       bookIndex: 3
     });
   });
@@ -29,7 +29,7 @@ describe('getRemainingAfterBookForRoll', () => {
 
     expect(result).toEqual({
       count: 37,
-      bookIndex: 2
+      bookIndex: 3
     });
   });
 

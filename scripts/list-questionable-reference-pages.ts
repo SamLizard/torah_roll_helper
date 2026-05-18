@@ -27,7 +27,8 @@ interface QuestionableReferenceReportItem {
 
 const require = createRequire(import.meta.url)
 
-const realDb = require('../src/data/real_db.json') as RealDb
+const LAYOUT_KEY = '245'
+const realDb = require('../src/data/245/real_db.json') as RealDb
 const targetPages = require('../src/data/target_pages.json') as ReadingTargetForScript[]
 
 const referencePropertyNames: RefPropertyName[] = ['refEndPartial', 'refEnd']
@@ -87,7 +88,7 @@ const getPageStartRef = (realDbData: RealDb, pageNumber: number): TorahRef | nul
         book: bookIndex + 1,
         chapter,
         verse,
-        page,
+        page: { [LAYOUT_KEY]: page },
       }
     }
   }
@@ -136,14 +137,15 @@ const compareRefs = (left: TorahRef, right: TorahRef): number => {
 }
 
 const hasLaterStartOnSamePage = (reference: TorahRef): boolean => {
+  const refPage = reference.page[LAYOUT_KEY]
   return startingReferences.some(({ ref }) => (
-    ref.page === reference.page &&
+    ref.page[LAYOUT_KEY] === refPage &&
     compareRefs(ref, reference) > 0
   ))
 }
 
 const formatRef = (reference: TorahRef): string => {
-  return `${reference.book}-${reference.chapter}-${reference.verse} (page ${reference.page})`
+  return `${reference.book}-${reference.chapter}-${reference.verse} (page ${reference.page[LAYOUT_KEY]})`
 }
 
 const formatReason = (reason: QuestionableReferenceReportItem['reason']): string => {
@@ -153,9 +155,10 @@ const formatReason = (reason: QuestionableReferenceReportItem['reason']): string
 }
 
 const formatReportLine = (item: QuestionableReferenceReportItem): string => {
+  const refPage = item.ref.page[LAYOUT_KEY]
   const status = item.isAlreadyMarkedOnNextPage
-    ? `already marked on next page (${item.calculatedPage} -> ${item.ref.page})`
-    : `needs review (currently on page ${item.ref.page}, next page would be ${item.calculatedPage + 1})`
+    ? `already marked on next page (${item.calculatedPage} -> ${refPage})`
+    : `needs review (currently on page ${refPage}, next page would be ${item.calculatedPage + 1})`
 
   return [
     `- ${item.id} | ${item.specific} | ${item.propertyName}`,
@@ -176,7 +179,7 @@ const getQuestionableReferenceReport = (): QuestionableReferenceReportItem[] => 
       const calculatedPage = getPageNumber(realDb, reference.book, reference.chapter, reference.verse)
       const nextPageStart = getPageStartRef(realDb, calculatedPage + 1)
       const reason = getReason(reference, nextPageStart)
-      const isAlreadyMarkedOnNextPage = reference.page === calculatedPage + 1
+      const isAlreadyMarkedOnNextPage = reference.page[LAYOUT_KEY] === calculatedPage + 1
 
       if (!nextPageStart || !reason) return []
       if (!isAlreadyMarkedOnNextPage && hasLaterStartOnSamePage(reference)) return []
