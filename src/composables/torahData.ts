@@ -15,10 +15,13 @@ import type { RealDb } from '@/types';
 import type { PageFirstLine } from '@/composables/firstLineSearch';
 
 // --- Layout data imports ---
+import realDb226 from '@/data/226/real_db.json';
 import realDb245 from '@/data/245/real_db.json';
 import realDb248 from '@/data/248/real_db.json';
+import pageFirstLines226 from '@/data/226/page_first_lines.json';
 import pageFirstLines245 from '@/data/245/page_first_lines.json';
 import pageFirstLines248 from '@/data/248/page_first_lines.json';
+import pageTitlesKeys226 from '@/data/226/page_titles_keys.json';
 import pageTitlesKeys245 from '@/data/245/page_titles_keys.json';
 import pageTitlesKeys248 from '@/data/248/page_titles_keys.json';
 
@@ -30,6 +33,11 @@ interface LayoutData {
 }
 
 const LAYOUT_DATA: Record<string, LayoutData> = {
+  '226': {
+    realDb: realDb226 as RealDb,
+    pageFirstLines: pageFirstLines226 as PageFirstLine[],
+    pageTitlesKeys: pageTitlesKeys226 as string[][],
+  },
   '245': {
     realDb: realDb245 as RealDb,
     pageFirstLines: pageFirstLines245 as PageFirstLine[],

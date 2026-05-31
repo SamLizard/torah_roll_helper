@@ -31,6 +31,7 @@ const PARASHA_MARKERS_REGEX = /#\([פס]\)|\([פס]\)/gu;
 const HEBREW_MARKS_REGEX = /[\u0591-\u05BD\u05BF-\u05C7]/gu;
 const FORMAT_CHARS_REGEX = /[\u200C-\u200F\uFEFF]/gu;
 const NON_HEBREW_LETTERS_REGEX = /[^א-ת\s]/gu;
+const VAV_PAGE_START_THRESHOLD = 0.9;
 
 const toPreviewColumns = (entry: unknown): string[][] => {
   if (typeof entry === 'string') return [[entry]];
@@ -87,6 +88,24 @@ const preparePageFirstLines = (pageFirstLines: PageFirstLine[]): PreparedPageFir
 
 const getPreparedPageFirstLines = (pageFirstLines: PageFirstLine[]): PreparedPageFirstLine[] => {
   return preparePageFirstLines(pageFirstLines);
+};
+
+const hasMostlyVavPageStarts = (preparedPages: PreparedPageFirstLine[]): boolean => {
+  if (preparedPages.length === 0) return false;
+
+  const vavStartCount = preparedPages.filter((page) => page.normalizedText.startsWith('ו')).length;
+  return vavStartCount / preparedPages.length > VAV_PAGE_START_THRESHOLD;
+};
+
+const getMinimumLineStartQueryLength = (
+  normalizedQuery: string,
+  preparedPages: PreparedPageFirstLine[]
+): number => {
+  const firstLetter = normalizedQuery[0];
+  if (!firstLetter) return 2;
+  if (firstLetter === 'ו') return 2;
+
+  return hasMostlyVavPageStarts(preparedPages) ? 1 : 2;
 };
 
 const findPreparedPagesByLineStart = (
@@ -213,7 +232,9 @@ export {
   findPreparedPagesContainingTextInLine,
   flattenPageFirstLine,
   getMinimumUniqueStartingWordCount,
+  getMinimumLineStartQueryLength,
   getPreparedPageFirstLines,
+  hasMostlyVavPageStarts,
   normalizeForTypedInput,
   preparePageFirstLines,
   toPreviewColumns,

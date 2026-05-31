@@ -496,6 +496,7 @@ import {
 import {
   findPreparedPagesByLineStart,
   findPreparedPagesContainingTextInLine,
+  getMinimumLineStartQueryLength,
   normalizeForTypedInput,
   preparePageFirstLines,
   type PageFirstLine,
@@ -599,9 +600,7 @@ const hasQuery = computed(() => normalizedQuery.value.length > 0);
 const minimumQueryLength = computed(() => {
   if (includeMatches.value) return 3;
 
-  const firstLetter = normalizedQuery.value[0];
-  if (!firstLetter) return 2;
-  return firstLetter === 'ו' ? 2 : 1;
+  return getMinimumLineStartQueryLength(normalizedQuery.value, preparedPages.value);
 });
 const isQueryReady = computed(() => normalizedQuery.value.length >= minimumQueryLength.value);
 
