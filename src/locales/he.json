@@ -2,6 +2,23 @@
   "language": "עברית",
   "dir": "rtl",
   "title": "עוזר גלילת התורה",
+  "share": {
+    "label": "שיתוף",
+    "subtitle": "שלחו קישור לאפליקציה",
+    "title": "שיתוף עוזר גלילת התורה",
+    "languagePrompt": "בחרו את שפת הקישור וההודעה לשיתוף:",
+    "linkLabel": "קישור לשיתוף",
+    "nativeShare": "שיתוף…",
+    "copy": "העתקת קישור",
+    "whatsapp": "וואטסאפ",
+    "email": "אימייל",
+    "shareTitle": "עוזר גלילת התורה",
+    "shareText": "עוזר גלילת התורה — חישוב כיוון ומספר העמודים לגלילת ספר התורה בין הקריאות.",
+    "copied": "הקישור הועתק",
+    "copyFailed": "לא ניתן להעתיק את הקישור. סמנו אותו ידנית.",
+    "openFailed": "לא ניתן לפתוח את יעד השיתוף.",
+    "nativeFailed": "השיתוף נכשל. נסו אפשרות אחרת למטה."
+  },
   "seo": {
     "siteName": "Torah Roll Helper",
     "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",

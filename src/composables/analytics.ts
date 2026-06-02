@@ -8,6 +8,7 @@ type FirstLineSearchStatus = 'success' | 'no-result';
 type FirstLineSearchMode = 'line-start' | 'inside-line';
 type PhotoAttemptOutcome = 'single-result' | 'multiple-results' | 'no-result' | 'error';
 type PhotoSuccessType = 'single-result' | 'multiple-results';
+type ShareMethod = 'native' | 'copy-link' | 'whatsapp' | 'email';
 
 interface GoatCounterCountPayload {
   path: string;
@@ -368,6 +369,29 @@ const trackPageView = (routePath: string, routeName?: string) => {
   });
 };
 
+const trackShareOpened = () => {
+  if (!isAnalyticsEnabled()) return;
+
+  trackGoatCounterEvent({
+    path: `${EVENT_PATH_PREFIX}/share/opened`,
+    title: 'share:opened',
+    event: true,
+  });
+};
+
+const trackShareCompleted = (method: ShareMethod, shareLocale: string) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const path = `${EVENT_PATH_PREFIX}/share/completed/${toSlug(method)}/${toSlug(shareLocale)}`;
+  const title = `share-completed:${method}:${shareLocale}`;
+
+  trackGoatCounterEvent({
+    path,
+    title,
+    event: true,
+  });
+};
+
 export {
   bootstrapAnalytics,
   trackFirstLineSearchOutcome,
@@ -380,6 +404,8 @@ export {
   trackPhotoSuccess,
   trackRollResultDisplayed,
   trackPageView,
+  trackShareCompleted,
+  trackShareOpened,
   trackTutorialEvent,
   trackTutorialPromptEvent,
 };
@@ -387,4 +413,5 @@ export {
 export type {
   FirstLineSearchMode,
   FirstLineSearchSource,
+  ShareMethod,
 };

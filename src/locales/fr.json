@@ -2,6 +2,23 @@
   "language": "Français",
   "dir": "ltr",
   "title": "Assistant de Roulement de la Torah",
+  "share": {
+    "label": "Partager",
+    "subtitle": "Envoyer un lien vers cette application",
+    "title": "Partager Torah Roll Helper",
+    "languagePrompt": "Choisissez la langue du lien et du message partagés :",
+    "linkLabel": "Lien de partage",
+    "nativeShare": "Partager…",
+    "copy": "Copier le lien",
+    "whatsapp": "WhatsApp",
+    "email": "E-mail",
+    "shareTitle": "Torah Roll Helper",
+    "shareText": "Torah Roll Helper — calculez comment rouler le Sefer Torah entre les lectures.",
+    "copied": "Lien copié dans le presse-papiers",
+    "copyFailed": "Impossible de copier le lien. Sélectionnez-le manuellement.",
+    "openFailed": "Impossible d'ouvrir la cible de partage.",
+    "nativeFailed": "Le partage a échoué. Essayez une autre option ci-dessous."
+  },
   "seo": {
     "siteName": "Torah Roll Helper",
     "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
