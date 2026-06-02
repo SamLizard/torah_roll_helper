@@ -9,7 +9,7 @@
 
     <v-divider></v-divider>
 
-    <v-list nav active-color="primary">
+    <v-list nav color="primary">
       <v-list-item 
         v-for="route in navLinks" 
         :key="route.path" 
@@ -85,7 +85,7 @@
         :data-tutorial="getRouteTutorialAttr(route)"
         variant="text"
         class="mx-1"
-        active-color="primary"
+        color="primary"
       >
         <v-icon start v-if="getRouteIcon(route)">{{ getRouteIcon(route) }}</v-icon>
         {{ $t("routes." + route.name?.toString()) }}

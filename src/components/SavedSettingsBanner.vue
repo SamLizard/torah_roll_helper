@@ -4,7 +4,7 @@
       v-if="visible"
       type="info"
       variant="tonal"
-      class="mb-4"
+      class="saved-settings-banner mb-4"
     >
       <template #close>
         <v-btn
@@ -17,11 +17,22 @@
         />
       </template>
 
-      <div class="d-flex align-center flex-wrap ga-2">
-        <v-icon size="18">mdi-content-save-check-outline</v-icon>
-        <span class="text-body-2">
-          {{ bannerText }}
-        </span>
+      <div class="saved-settings-banner__body">
+        <div class="d-flex align-center flex-wrap ga-2">
+          <v-icon size="18">mdi-content-save-check-outline</v-icon>
+          <span class="text-body-2">
+            {{ bannerText }}
+          </span>
+        </div>
+
+        <v-btn
+          class="saved-settings-banner__dismiss-btn"
+          variant="text"
+          size="small"
+          @click="dismissPermanently"
+        >
+          {{ $t('settings.savedSettingsBanner.dontShowAgain') }}
+        </v-btn>
       </div>
 
       <v-progress-linear
@@ -32,16 +43,6 @@
         :model-value="100"
         :style="{ '--saved-settings-dismiss-duration': dismissDuration + 'ms' }"
       />
-
-      <template #append>
-        <v-btn
-          variant="text"
-          size="small"
-          @click="dismissPermanently"
-        >
-          {{ $t('settings.savedSettingsBanner.dontShowAgain') }}
-        </v-btn>
-      </template>
     </v-alert>
   </v-expand-transition>
 </template>
@@ -172,6 +173,29 @@ watch(
 </script>
 
 <style scoped>
+.saved-settings-banner__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-settings-banner__dismiss-btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .saved-settings-banner__body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .saved-settings-banner__dismiss-btn {
+    align-self: flex-end;
+  }
+}
+
 .saved-settings-banner__timer :deep(.v-progress-linear__determinate) {
   animation: saved-settings-shrink var(--saved-settings-dismiss-duration, 5000ms) linear forwards;
 }

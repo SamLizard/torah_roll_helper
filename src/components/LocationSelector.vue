@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO 33: When they are multiple readins at the same date, they are displayed in alphabetical order. We will prefer to display them in the order that they will be read. So regular chaharit reading is first, then second sefer, then maftir and mincha at the end.
+  <!-- DONE 33: When they are multiple readins at the same date, they are displayed in alphabetical order. We will prefer to display them in the order that they will be read. So regular chaharit reading is first, then second sefer, then maftir and mincha at the end.
    Pay attention that hebcal is already giving them in the correct order.
   -->
   <v-card
@@ -70,7 +70,7 @@
                 <ReadingOptionCard
                   :reading-key="entry.target.key"
                   :reading-label="entry.readingLabel"
-                  :page="entry.target.ref.page"
+                  :page="resolvePageForLayout(entry.target.ref.page, layoutKey)"
                   :active="isSelectedCalendarEntry(entry)"
                   :specific-badge="getTargetBadgeKind(entry.target)"
                   :highlight-next-parasha="isNextParasha(entry)"
@@ -208,11 +208,10 @@ import PagePreviewDialog from './PagePreviewDialog.vue';
 import ReadingOptionCard from './ReadingOptionCard.vue';
 import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { computeRoll, getPageStartRef, getPageTitleKeys } from '@/composables/utils';
-import { useOptionsStore } from '@/stores/options';
+import { useOptionsStore, getLayoutKey } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import { useOnlineStatus } from '@/composables/onlineStatus';
-import pageFirstLinesData from '@/data/page_first_lines.json';
-import realDb from '@/data/real_db.json';
+import { useTorahData, resolvePageForLayout } from '@/composables/torahData';
 import { trackFromToAction } from '@/composables/analytics';
 import {
   splitPairedParashaReadingId,
@@ -272,14 +271,13 @@ const { isOnline } = useOnlineStatus();
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
+const { layoutKey, realDb: torahRealDb, pageFirstLines: torahPageFirstLines, pageTitlesKeys: torahPageTitles } = useTorahData();
 const isManualOpen = ref(false);
 const isFirstLineSearchOpen = ref(false);
 const isPagePreviewOpen = ref(false);
 const firstLineSearchSource = ref<FirstLineSearchOpenSource>('manual');
 const calendarSlideShellRef = ref<HTMLElement | null>(null);
 const compactCalendarCardStates = ref<Record<string, boolean>>({});
-const pageFirstLines = pageFirstLinesData as unknown[];
-const db = realDb as RealDb;
 
 // --- Header layout measurement (Task 11) ---
 type HeaderLayoutMode = 'inline' | 'split' | 'stack';
@@ -380,7 +378,7 @@ function updateHeaderLayout() {
 
   if (!buttons.length) return;
 
-  // Temporarily force nowrap to measure intrinsic widths accurately
+  // Measure intrinsic widths
   const prevWrap = header.style.flexWrap;
   header.style.flexWrap = 'nowrap';
 
@@ -389,36 +387,75 @@ function updateHeaderLayout() {
   const textWidth = Math.ceil(text.getBoundingClientRect().width);
   const buttonWidths = buttons.map((b) => Math.ceil(b.getBoundingClientRect().width));
 
-  // Restore original wrap
   header.style.flexWrap = prevWrap;
 
-  // Count how many buttons fit next to the title
-  let used = 0;
-  let count = 0;
+  const countRows = (widths: number[]) => {
+    if (!widths.length) return 0;
 
-  for (const w of buttonWidths) {
-    const extra = count === 0 ? w : w + gap;
-    const neededOnLine = textWidth + gap + used + extra;
+    let rows = 1;
+    let used = 0;
 
-    if (neededOnLine <= available) {
-      used += extra;
-      count++;
-    } else {
-      break;
+    for (const w of widths) {
+      const nextUsed = used === 0 ? w : used + gap + w;
+
+      if (nextUsed <= available) {
+        used = nextUsed;
+      } else {
+        rows++;
+        used = w;
+      }
+    }
+
+    return rows;
+  };
+
+  // If everything fits on the title line, keep the inline layout
+  const allButtonsWidth = buttonWidths.reduce(
+    (sum, w, i) => sum + w + (i === 0 ? 0 : gap),
+    0,
+  );
+  const allButtonsFitOnTitleLine =
+    textWidth + (buttonWidths.length ? gap : 0) + allButtonsWidth <= available;
+
+  if (allButtonsFitOnTitleLine) {
+    firstRowButtonCount.value = buttonWidths.length;
+    headerLayoutMode.value = 'inline';
+    return;
+  }
+
+  // Otherwise, try every split and choose:
+  // 1) the fewest total rows
+  // 2) if tied, the split with fewer buttons on the title line
+  //    (meaning more buttons are pushed below)
+  let bestCount = 0;
+  let bestTotalRows = Number.POSITIVE_INFINITY;
+
+  for (let count = 0; count <= buttonWidths.length; count++) {
+    const topButtons = buttonWidths.slice(0, count);
+    const bottomButtons = buttonWidths.slice(count);
+
+    const topButtonsWidth = topButtons.reduce(
+      (sum, w, i) => sum + w + (i === 0 ? 0 : gap),
+      0,
+    );
+
+    const topLineWidth = textWidth + (topButtons.length ? gap : 0) + topButtonsWidth;
+    if (topLineWidth > available) continue;
+
+    const bottomRows = countRows(bottomButtons);
+    const totalRows = 1 + bottomRows; // title row + button rows below
+
+    if (
+      totalRows < bestTotalRows ||
+      (totalRows === bestTotalRows && count < bestCount)
+    ) {
+      bestTotalRows = totalRows;
+      bestCount = count;
     }
   }
 
-  firstRowButtonCount.value = count;
-
-  const allButtonsFit = count === buttonWidths.length;
-  const noneFit = count === 0;
-
-  const nextMode: HeaderLayoutMode =
-    allButtonsFit ? 'inline' :
-    noneFit ? 'stack' :
-    'split';
-
-  if (nextMode !== headerLayoutMode.value) headerLayoutMode.value = nextMode;
+  firstRowButtonCount.value = bestCount;
+  headerLayoutMode.value = bestCount === 0 ? 'stack' : 'split';
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -529,7 +566,7 @@ const toDayOffsetLabel = (offset: number) => {
 
 const pagePreviewRawColumns = computed<string[][]>(() => {
   if (props.page == null) return [];
-  return toPreviewColumns(pageFirstLines[props.page - 1]);
+  return toPreviewColumns(torahPageFirstLines.value[props.page - 1]);
 });
 
 const hasCurrentRef = computed(() =>
@@ -551,7 +588,7 @@ const isSameTorahRef = (
   page: number | null,
   refData: ManualData | null
 ) =>
-  page === torahRef.page &&
+  page === resolvePageForLayout(torahRef.page, layoutKey.value) &&
   refData?.chapter != null &&
   refData?.verse != null &&
   refData.book === torahRef.book &&
@@ -690,11 +727,11 @@ const isSelectedCalendarEntry = (entry: CalendarEntry) => {
 
     return (
       props.targetKey === entry.key &&
-      isSameTorahRef(entry.target.ref, explicitTarget.ref.page, toManualData(explicitTarget.ref))
+      isSameTorahRef(entry.target.ref, resolvePageForLayout(explicitTarget.ref.page, layoutKey.value), toManualData(explicitTarget.ref))
     );
   }
 
-  return props.page === entry.target.ref.page;
+  return props.page === resolvePageForLayout(entry.target.ref.page, layoutKey.value);
 };
 
 const matchedTarget = computed(() => {
@@ -736,7 +773,7 @@ const tikkunUrl = computed(() => {
     return toRefUrl(matchedTarget.value.ref);
   }
 
-  const pageStartRef = getPageStartRef(db, props.page);
+  const pageStartRef = getPageStartRef(torahRealDb.value, props.page);
   if (!pageStartRef) return null;
 
   return toRefUrl(pageStartRef);
@@ -744,9 +781,10 @@ const tikkunUrl = computed(() => {
 
 const getCalendarRollPreview = (entry: CalendarEntry) => {
   if (props.side !== 'to') return null;
-  if (options.fromPage === null || options.fromPage === entry.target.ref.page) return null;
+  const entryPage = resolvePageForLayout(entry.target.ref.page, layoutKey.value);
+  if (options.fromPage === null || options.fromPage === entryPage) return null;
 
-  const roll = computeRoll(options.fromPage, entry.target.ref.page);
+  const roll = computeRoll(options.fromPage, entryPage);
   if (!roll) return null;
 
   const isForward = roll.rollDirection === 'forward';
@@ -802,7 +840,7 @@ const selectCalendarEntry = (entry: CalendarEntry) => {
   const refData = toManualData(targetRef);
 
   currentRef.value = refData;
-  emit('manual-set', targetRef.page, refData, entry.target.key);
+  emit('manual-set', resolvePageForLayout(targetRef.page, layoutKey.value), refData, entry.target.key);
 };
 
 let teardownCalendarMouseDrag: (() => void) | null = null;
@@ -900,7 +938,7 @@ const onTargetRefModeChanged = (mode: TargetRefMode | null) => {
   const refData = toManualData(targetRef);
 
   currentRef.value = refData;
-  emit('manual-set', targetRef.page, refData, matchedTarget.value.key);
+  emit('manual-set', resolvePageForLayout(targetRef.page, layoutKey.value), refData, matchedTarget.value.key);
 };
 
 watch(() => props.selectedRef, (newRef) => {
@@ -919,7 +957,7 @@ watch(() => props.page, (newPage) => {
 
 const computedPageTitle = computed(() => {
   if (props.page === null) return [] as string[];
-  return getPageTitleKeys(props.page, currentRef.value, options.isInGola);
+  return getPageTitleKeys(props.page, currentRef.value, options.isInGola, torahPageTitles.value);
 });
 
 const getVisibleReadingTitleKeysForCurrentRef = (): string[] => {
@@ -977,7 +1015,7 @@ const applyResolvedSelection = (
     const refData = toManualData(targetRef);
 
     currentRef.value = refData;
-    emit('manual-set', targetRef.page, refData, matchedManualTarget.key);
+    emit('manual-set', resolvePageForLayout(targetRef.page, layoutKey.value), refData, matchedManualTarget.key);
     return;
   }
 

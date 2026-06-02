@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import realDb from '@/data/real_db.json';
+import { useTorahData } from '@/composables/torahData';
 import type { RealDb } from '@/types';
 import { getRemainingAfterBookForRoll } from '@/composables/rollResultUtils';
 
@@ -56,12 +56,14 @@ const props = defineProps({
   toPage: { type: Number as () => number | null, default: null }
 });
 
+const { realDb: torahRealDb } = useTorahData();
+
 const remainingAfterBook = computed<{ count: number; bookKey: BookLabelKey } | null>(() => {
   if (props.pages === null || props.fromPage === null || props.toPage === null || props.fromPage === props.toPage) {
     return null;
   }
 
-  const remaining = getRemainingAfterBookForRoll(props.fromPage, props.toPage, realDb as RealDb);
+  const remaining = getRemainingAfterBookForRoll(props.fromPage, props.toPage, torahRealDb.value);
   if (!remaining) return null;
   const bookKey = bookLabelKeys[remaining.bookIndex];
   if (!bookKey) return null;

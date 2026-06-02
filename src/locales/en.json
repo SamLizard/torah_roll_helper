@@ -1,7 +1,7 @@
 {
   "language": "English",
   "dir": "ltr",
-  "title": "Torah Roll Assistant",
+  "title": "Torah Rolling Assistant",
   "seo": {
     "siteName": "Torah Roll Helper",
     "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
@@ -29,7 +29,7 @@
   },
   "about": {
     "title": "About",
-    "description": "The Torah Rolling Assistant is designed for Gabbaim and Ba'alei Kriah to reduce Tircha d'Tzibbur. Given the current Torah position and the next reading, it calculates the exact rolling direction and number of columns required.",
+    "description": "Built for Gabbaim and Ba'alei Kriah to reduce Torach Tzibbur. Set the current column and the target reading — the app instantly calculates the rolling direction and exact Amud count.",
     "github": "View on GitHub",
     "dataCreditsTitle": "Data Sources & Acknowledgements",
     "dataCreditsPrefix": "The database for this project is based on open-source files from",
@@ -46,7 +46,7 @@
     "from": {
       "title": "FROM",
       "subtitle": "Current location",
-      "emptyHint": "Where is the Torah scroll currently open?"
+      "emptyHint": "Where is the Sefer Torah currently open?"
     },
     "to": {
       "title": "TO",
@@ -68,15 +68,15 @@
       "loadingOcr": "Reading image with Dicta OCR...",
       "loadingSearch": "Searching Dicta sources...",
       "noResultTitle": "No source found",
-      "noResultSubtitle": "Try again following the instructions, or take a picture of a different part of the page.",
+      "noResultSubtitle": "Retry following the instructions, or photograph a different section of the Klaf.",
       "tryFirstWords": "Type the first words instead",
-      "idleTitle": "Take a photo with Dicta",
+      "idleTitle": "Scan the Klaf with Dicta",
       "idleSubtitle": "Use the frame lines to align text before capture.",
       "errorTitle": "Could not complete Dicta scan",
       "unexpectedError": "Unexpected Dicta error.",
       "cameraUnavailable": "Camera API is not available in this browser context.",
       "cameraHttpsHint": "Camera authorization is not available on localhost. Open the app over HTTPS instead of localhost.",
-      "cameraPermissionHint": "Your device might be blocking camera access before the browser can even ask. Open your device settings, find your browser app, and allow Camera access. If you already blocked this site inside the browser, re-enable it in the browser's site settings.",
+      "cameraPermissionHint": "Your device may be blocking camera access before the browser can ask. Open device Settings → your browser app → allow Camera. If you already blocked this site inside the browser, re-enable it in the browser's site settings.",
       "offlineUnavailable": "Dicta photo search requires an internet connection.",
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
@@ -106,13 +106,13 @@
       }
     },
     "golaBanner": {
-      "text": "Readings are set to Israel. Are you outside Israel?"
+      "text": "Israel reading schedule active — are you outside Israel?"
     },
     "actions": {
       "photo": "Take photo",
       "choose": "Choose reading",
       "clear": "Clear",
-      "input": "Choose by ref.",
+      "input": "Enter ref.",
       "firstLine": "First line"
     },
     "selected": "Selected",
@@ -126,7 +126,7 @@
       "step2": "Select your target reading from the upcoming list or the full index.",
       "step3": "The app calculates the rolling direction (Forward/Backward) and the number of columns to roll."
     },
-    "tip": "Tip: update FROM first, then choose TO.",
+    "tip": "Tip: Set FROM first, then pick TO.",
     "camera": {
       "title": "Camera usage",
       "step1": "Allow camera access when prompted by your browser.",
@@ -141,9 +141,9 @@
       "full": "Start full tour"
     }
   },
-"tutorialPrompt": {
+  "tutorialPrompt": {
     "title": "New here?",
-    "text": "Guided tours are available in the 'How To' page. You can also start a quick tour right now to learn the basics.",
+    "text": "Guided tours are available on the 'How To' page. Start a quick tour right now to learn the basics.",
     "openQuick": "Start short tour"
   },
   "onboarding": {
@@ -166,11 +166,11 @@
       },
       "step2": {
         "title": "Choose your language",
-        "description": "Select your preferred language. The tutorial text will update immediately. If current language is good, tap Next."
+        "description": "Select your preferred language. Tutorial text will update immediately. If current language is good, tap Next."
       },
       "step3": {
         "title": "Set the current scroll location",
-        "description": "This is the FROM side. Use 'Choose manually' for all readings, 'Camera' to identify the open column from the Klaf, or 'Input' for an exact reference, page number, or the page's first words. The cards below show last month's readings for quick access."
+        "description": "This is the FROM side. Use 'Choose reading' for all readings, 'First line' to identify the open column using the page's first words, 'Take photo' to identify the open column from the Klaf, or 'Enter ref.' for an exact reference or page number. The cards below show last month's readings for quick access."
       },
       "step4": {
         "title": "Choose your destination",
@@ -188,7 +188,7 @@
       },
       "step2": {
         "title": "Choose your language",
-        "description": "Select your preferred language. The tutorial text will update immediately. If current language is good, tap Next."
+        "description": "Select your preferred language. Tutorial text will update immediately. If current language is good, tap Next."
       },
       "step3": {
         "title": "The FROM card",
@@ -196,7 +196,7 @@
       },
       "step4": {
         "title": "The full reading list",
-        "description": "Click 'Choose manually' when you need to find a specific Parasha, Yom Tov, Rosh Chodesh, fast day, or special Maftir."
+        "description": "Click 'Choose reading' when you need to access the complete list of readings."
       },
       "step5": {
         "title": "The index overlay",
@@ -220,7 +220,7 @@
       },
       "step10": {
         "title": "Manual input",
-        "description": "Click 'Input' when you already know the exact Perek/Pasuk or the specific page number in the Tikkun Korim."
+        "description": "Click 'Enter ref.' when you already know the exact Perek/Pasuk or the specific page number in the Tikkun Korim."
       },
       "step11": {
         "title": "Exact location dialog",
@@ -275,15 +275,17 @@
     "nusachLabel": "Rite",
     "torahTypeLabel": "Scroll layout",
     "help": {
-      "gola": "Enable this if you are outside Israel to synchronize the weekly Parasha readings and special Diaspora holiday readings with the Diaspora calendar.",
+      "gola": "If you are outside Israel, enable Gola mode to synchronize readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
-      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
+      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts exist, like the Teimani (תאג') which is 226 pages."
     },
     "nusachOptions": {
       "sefaradic": "Sefaradic"
     },
     "torahTypeOptions": {
-      "klaf_245": "רמ\"ה (245 pages)"
+      "klaf_226": "Teimani according to Rambam (226 pages)",
+      "klaf_245": "רמ\"ה (245 pages)",
+      "klaf_248": "רמ\"ח (248 pages)"
     },
     "savedSettingsBanner": {
       "defaultText": "Settings are saved in this browser.",
@@ -316,7 +318,7 @@
     "installGuide": {
       "open": "Add to Home Screen",
       "title": "Add to Home Screen",
-      "subtitle": "Install Torah Roll Helper so it opens like an app and keeps working after the first load.",
+      "subtitle": "Add to your home screen for one-tap access and offline use.",
       "ios": {
         "title": "iPhone and iPad",
         "step1": "Open this site in Safari.",
@@ -347,7 +349,7 @@
   },
   "result": {
     "title": "Rolling Instructions",
-    "noData": "Select both FROM and TO to compute roll",
+    "noData": "Set FROM and TO to calculate the roll.",
     "from": "From",
     "to": "To",
     "remainingAfterBook": "{count} pages remaining after {book}",
@@ -368,12 +370,13 @@
     "lineUnavailable": "First line is unavailable for this page.",
     "openTikkun": "See full page in tikkun.io",
     "openTikkunShort": "Full page",
+    "tikkunLayoutWarning": "tikkun.io uses the רמ\"ה (245) layout. You are on {layout}.",
     "withNikud": "With nikud",
     "withoutNikud": "No nikud",
     "shiftTip": "Tip: Hold Shift to toggle quickly"
   },
   "manual": {
-    "title": "Enter Location Manually",
+    "title": "Set Location Manually",
     "book": "Book",
     "chapter": "Chapter",
     "verse": "Verse",
@@ -389,7 +392,7 @@
   },
   "firstLineSearch": {
     "title": "Search by First Words",
-    "description": "Type the first words that appear at the top of the page. Each result shows the line that opens that page.",
+    "description": "Type the first words at the top of the column. Each result shows the opening line of that column.",
     "placeholder": "Example: וידבר",
     "ocrAction": "Scan with camera",
     "ocrCameraTitle": "Scan the first line",
@@ -406,7 +409,7 @@
     "ocrNoText": "No usable Hebrew text yet.",
     "ocrNoTextDetected": "No usable Hebrew text was detected in that photo.",
     "ocrUnexpectedError": "Could not run OCR on this image. Try another photo.",
-    "ocrLowQuality": "The photo wasn't clear enough. Try a tighter shot of the first line, or type the words manually.",
+    "ocrLowQuality": "Image too blurry. Try a tighter shot of the first line, or type manually.",
     "ocrBestMatch": "Best match",
     "restoreOcrResults": "Back to OCR results",
     "ocrSuggestionsFound": "{count} OCR suggestions",
@@ -414,11 +417,11 @@
     "ocrConfirmed": "Strong match",
     "ocrLikely": "Possible match",
     "ocrUnreliable": "Uncertain",
-    "emptyState": "Find the page from its opening words",
-    "emptyStateHint": "Type the beginning of the line that starts the page.",
+    "emptyState": "Find the column by its opening words",
+    "emptyStateHint": "Type the first words of the opening line.",
     "keepTyping": "Type a bit more to narrow the results.",
     "resultsFound": "{count} matching pages",
-    "layoutNote": "Works with the scroll layout set in Settings (currently: {layout})",
+    "layoutNote": "Based on scroll layout in Settings (current: {layout})",
     "searchFromStart": "Line starts with these words",
     "noMatches": "No matching opening lines found",
     "noMatchesHint": "Try fewer words, or switch to searching anywhere in the opening line.",
@@ -449,11 +452,11 @@
     "chanukah": "Chanukah",
     "pesach": "Pesach",
     "shavuot": "Shavuot",
-    "genesis": "Genesis",
-    "exodus": "Exodus",
-    "leviticus": "Leviticus",
-    "numbers": "Numbers",
-    "deuteronomy": "Deuteronomy",
+    "genesis": "Genesis (Bereshit)",
+    "exodus": "Exodus (Shemot)",
+    "leviticus": "Leviticus (Vayikra)",
+    "numbers": "Numbers (Bamidbar)",
+    "deuteronomy": "Deuteronomy (Devarim)",
     "four-readings": "Four Parashiot"
   },
   "readingTargets": {
@@ -545,7 +548,7 @@
     "taanit-tzibur": "Ta'anit Tzibur (Public Fast Day)",
     "pesach-1": "Pesach (Day 1)",
     "pesach-1-shabbat": "Pesach (Day 1 - Shabbat)",
-    "pesach-yom-tov-maftir": "Pessah (Yom Tov - Maftir)",
+    "pesach-yom-tov-maftir": "Pesach (Yom Tov - Maftir)",
     "pesach-2": "Pesach (Day 2)",
     "pesach-3": "Pesach (Day 3)",
     "pesach-chol-hamoed-maftir": "Pesach (Chol HaMoed - Maftir)",

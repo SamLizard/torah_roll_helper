@@ -1,9 +1,11 @@
 import {
   createRouter,
   createWebHashHistory,
+  type RouteLocationNormalized,
   type RouteRecordRaw,
 } from "vue-router";
 import { trackPageView } from '@/composables/analytics';
+import i18n, { isSupportedLocale, setLocale } from '@/plugins/i18n';
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import HowToUseView from "../views/HowToUseView.vue";
@@ -51,6 +53,33 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+const getQueryLang = (to: RouteLocationNormalized): string | undefined => {
+  const queryLang = to.query.lang;
+  const lang = Array.isArray(queryLang) ? queryLang[0] : queryLang;
+
+  return isSupportedLocale(lang) ? lang : undefined;
+};
+
+// Keep the active language in sync with the URL so a shared link opens in the
+// right language. The query param wins over the stored preference, and we add
+// it back when missing so it persists as the user navigates.
+router.beforeEach((to) => {
+  const queryLang = getQueryLang(to);
+
+  if (queryLang) {
+    setLocale(queryLang);
+    return true;
+  }
+
+  const currentLocale = i18n.global.locale.value;
+
+  return {
+    ...to,
+    query: { ...to.query, lang: currentLocale },
+    replace: true,
+  };
 });
 
 router.afterEach((to) => {

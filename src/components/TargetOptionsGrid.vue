@@ -102,10 +102,10 @@
                             :key="item.key"
                             :ref="(el) => setCardRef(item.key, el)"
                             :reading-key="item.key"
-                            :page="item.ref.page"
+                            :page="resolvePageForLayout(item.ref.page, layoutKey)"
                             :specific-badge="getTargetBadgeKind(item)"
                             :highlight-next-parasha="isNextParasha(item)"
-                            :roll-preview="getRollPreview(item.ref.page)"
+                            :roll-preview="getRollPreview(resolvePageForLayout(item.ref.page, layoutKey))"
                             @click="select(item)"
                           />
                         </div>
@@ -119,10 +119,10 @@
                       :key="item.key"
                       :ref="(el) => setCardRef(item.key, el)"
                       :reading-key="item.key"
-                      :page="item.ref.page"
+                      :page="resolvePageForLayout(item.ref.page, layoutKey)"
                       :specific-badge="getTargetBadgeKind(item)"
                       :highlight-next-parasha="isNextParasha(item)"
-                      :roll-preview="getRollPreview(item.ref.page)"
+                      :roll-preview="getRollPreview(resolvePageForLayout(item.ref.page, layoutKey))"
                       @click="select(item)"
                     />
                   </div>
@@ -143,6 +143,7 @@ import { storeToRefs } from 'pinia';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import { computeRoll } from '@/composables/utils';
+import { resolvePageForLayout, useTorahData } from '@/composables/torahData';
 import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
 import {
   findReadingTargetByKey,
@@ -175,6 +176,7 @@ const emit = defineEmits<{
 const store = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
+const { layoutKey } = useTorahData();
 const filter = ref('');
 const isFullList = ref(true); 
 
@@ -335,7 +337,8 @@ const filtered = computed(() => {
   
   return list.filter((target) => {
     if (!q) return true;
-    const searchStr = `${target.key} ${target.type} ${target.ref.page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
+    const page = resolvePageForLayout(target.ref.page, layoutKey.value);
+    const searchStr = `${target.key} ${target.type} ${page} ${t(`readingTargets.${target.key}`)}`.toLowerCase();
     return searchStr.includes(q);
   });
 });

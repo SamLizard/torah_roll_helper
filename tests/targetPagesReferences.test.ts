@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getPageNumber } from '../src/composables/utils';
 import targetPagesData from '../src/data/target_pages.json';
-import realDb from '../src/data/real_db.json';
+import realDb from '../src/data/245/real_db.json';
 import type { RealDb, TorahRef } from '../src/types';
 
 type RefKey = 'ref' | 'refEndPartial' | 'refEnd';
@@ -23,13 +23,16 @@ interface TargetReferenceCase {
 const db = realDb as RealDb;
 const targetPages = targetPagesData as ReadingTargetForTest[];
 const refKeys: RefKey[] = ['ref', 'refEndPartial', 'refEnd'];
+const LAYOUT_KEY = '245';
 
 const expectedOnePageAfterStartRefIds = [
   'beshalach|both|refEndPartial',
   'eikev|both|refEnd',
   'emor|both|refEnd',
   'ki_tisa|both|refEnd',
+  'pesach-6|both|refEnd',
   'sukkot-2|israel|refEnd',
+  'tisha-bav|both|refEnd',
   'vayechi|both|refEnd',
   'vayetzei|both|refEnd',
   'vezot_haberakhah|both|refEndPartial',
@@ -50,7 +53,7 @@ const getAllReferenceCases = () =>
 
       return [{
         refId: getRefId(target, refKey),
-        page: ref.page,
+        page: ref.page[LAYOUT_KEY],
         calculatedPage: getCalculatedPage(ref),
       } satisfies TargetReferenceCase];
     })
@@ -61,7 +64,7 @@ describe('target_pages references', () => {
     const mismatches = targetPages
       .map((target) => ({
         refId: getRefId(target, 'ref'),
-        page: target.ref.page,
+        page: target.ref.page[LAYOUT_KEY],
         calculatedPage: getCalculatedPage(target.ref),
       }))
       .filter(({ page, calculatedPage }) => page !== calculatedPage);

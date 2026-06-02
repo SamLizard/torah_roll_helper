@@ -116,7 +116,7 @@ import { ref, computed, watch, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getPageNumber } from '@/composables/utils';
 import { useManualEntryRules } from '@/composables/rules';
-import realDb from '@/data/real_db.json';
+import { useTorahData } from '@/composables/torahData';
 import type { ManualData, RealDb } from '@/types';
 import { useOptionsStore } from '@/stores/options';
 import Swal from 'sweetalert2';
@@ -135,7 +135,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const db = realDb as RealDb;
+const { realDb: torahRealDb } = useTorahData();
 const optionsStore = useOptionsStore();
 
 const localState = reactive<ManualData>({
@@ -386,7 +386,7 @@ const confirm = () => {
 
   if (isRefValid.value) {
     const page = getPageNumber(
-      db, 
+      torahRealDb.value, 
       localState.book, 
       localState.chapter as number, 
       localState.verse as number

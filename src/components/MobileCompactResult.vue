@@ -9,7 +9,7 @@
       class="mobile-compact-result__side text-body-2 font-weight-medium"
       :class="hasResult ? colorClass : 'invisible'"
     >
-      {{ $t('preview.cols', { count: pages }) }} · {{ $t(`result.direction.${direction}`) }}
+      {{ $t('preview.cols', { count: pages }) }} · {{ direction ? $t(`result.direction.${direction}`) : '' }}
     </span>
 
     <v-icon size="36" class="mx-2">mdi-arrow-down</v-icon>
@@ -21,7 +21,7 @@
         <span>{{ remainingAfterBookLabel }}</span>
       </span>
       <span v-else class="invisible text-body-2">
-        {{ $t('preview.cols', { count: pages }) }} · {{ $t(`result.direction.${direction}`) }}
+        {{ $t('preview.cols', { count: pages }) }} · {{ direction ? $t(`result.direction.${direction}`) : '' }}
       </span>
     </span>
   </div>

@@ -29,5 +29,23 @@ const i18n = createI18n({
   messages
 });
 
+const SUPPORTED_LOCALES = Object.keys(messages);
 
+const isSupportedLocale = (locale: unknown): locale is string => {
+  return typeof locale === 'string' && Object.prototype.hasOwnProperty.call(messages, locale);
+};
+
+const setLocale = (locale: string): void => {
+  if (!isSupportedLocale(locale) || i18n.global.locale.value === locale) {
+    return;
+  }
+
+  i18n.global.locale.value = locale;
+
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, locale);
+  }
+};
+
+export { SUPPORTED_LOCALES, isSupportedLocale, setLocale };
 export default i18n;

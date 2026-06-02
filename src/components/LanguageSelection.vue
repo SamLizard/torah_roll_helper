@@ -34,12 +34,14 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { trackLanguageChange } from '@/composables/analytics';
 import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys';
 import { setLanguageMenuOpen } from '@/composables/tutorialUi';
 
 const i18n = useI18n();
 const t = i18n.t;
+const router = useRouter();
 
 const baseUrl = import.meta.env.BASE_URL || '/';
 const isMenuOpen = ref(false);
@@ -59,6 +61,12 @@ const onLocaleChanged = (nextLocale: string | null) => {
   i18n.locale.value = nextLocale;
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
   trackLanguageChange(previousLocale, nextLocale);
+
+  // Reflect the chosen language in the URL so the current view can be shared
+  // and reopened directly in this language.
+  void router.replace({
+    query: { ...router.currentRoute.value.query, lang: nextLocale },
+  });
 };
 
 const openMenu = (): void => {

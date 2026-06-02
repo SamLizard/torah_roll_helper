@@ -1,9 +1,7 @@
 import type { ManualData, RealDb, RollInstructions, Verse } from '../types';
-import pageTitlesData from '@/data/page_titles_keys.json';
 import { matchesTargetSpecific, readingTargets } from './readingTargets';
 import type { ReadingTarget } from './readingTargets';
 
-const pageTitles = pageTitlesData as string[][];
 const readingTargetsByKey = new Map<string, ReadingTarget>(
   readingTargets.map((target) => [target.key, target])
 );
@@ -119,7 +117,7 @@ const computeRoll = (fromPage: number, toPage: number): RollInstructions => {
   return { pages, rollDirection };
 };
 
-const getPageTitleKeys = (pageNumber: number, ref: ManualData | null, isInGola: boolean): string[] => {
+const getPageTitleKeys = (pageNumber: number, ref: ManualData | null, isInGola: boolean, pageTitles: string[][]): string[] => {
   const readingMatches: string[] = [];
 
   if (ref && ref.chapter != null && ref.verse != null) {

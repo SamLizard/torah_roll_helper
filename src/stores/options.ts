@@ -7,6 +7,8 @@ type NusachOption = (typeof NUSACH_OPTIONS)[number];
 
 const TORAH_TYPE_OPTIONS = [
   { id: 'klaf_245', pageCount: 245 },
+  { id: 'klaf_226', pageCount: 226 },
+  // { id: 'klaf_248', pageCount: 248 }, // the lines couldn't be verified for the moment.
 ] as const;
 type TorahTypeOption = (typeof TORAH_TYPE_OPTIONS)[number]['id'];
 
@@ -21,6 +23,10 @@ interface State {
 const getTorahPageCount = (torahType: TorahTypeOption): number => {
   const match = TORAH_TYPE_OPTIONS.find((option) => option.id === torahType);
   return match?.pageCount ?? 245;
+};
+
+const getLayoutKey = (torahType: TorahTypeOption): string => {
+  return String(getTorahPageCount(torahType));
 };
 
 const useOptionsStore = defineStore('options', () => {
@@ -71,5 +77,5 @@ const useOptionsStore = defineStore('options', () => {
   },
 });
 
-export { useOptionsStore, NUSACH_OPTIONS, TORAH_TYPE_OPTIONS, getTorahPageCount };
+export { useOptionsStore, NUSACH_OPTIONS, TORAH_TYPE_OPTIONS, getTorahPageCount, getLayoutKey };
 export type { NusachOption, TorahTypeOption };

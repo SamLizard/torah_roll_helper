@@ -1,8 +1,10 @@
+type TorahRefPageMap = Record<string, number>;
+
 interface TorahRef {
   book: number;
   chapter: number;
   verse: number;
-  page: number;
+  page: TorahRefPageMap;
 }
 
 type Verse = Omit<TorahRef, 'page'>;
@@ -30,6 +32,7 @@ interface RollInstructions {
 export {
   type ManualData,
   type TorahRef,
+  type TorahRefPageMap,
   type Verse,
   type PageEntry,
   type BookData,

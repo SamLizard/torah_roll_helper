@@ -42,7 +42,6 @@ const getRemainingAfterBookForRoll = (
   if (fromBookIndex === -1 || toBookIndex === -1 
       || fromBookIndex === toBookIndex
       || (goingBackward && toBookIndex === ranges.length - 1)
-      || isBoundaryPage(fromPage, ranges)
       || isBoundaryPage(toPage, ranges)
     ) {
     return null;
