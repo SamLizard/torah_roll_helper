@@ -277,13 +277,15 @@
     "help": {
       "gola": "If you are outside Israel, enable Gola mode to synchronize readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
-      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts, like רמ\"ח (248), can be added later."
+      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts exist, like the Teimani (תאג') which is 226 pages."
     },
     "nusachOptions": {
       "sefaradic": "Sefaradic"
     },
     "torahTypeOptions": {
-      "klaf_245": "רמ\"ה (245 pages)"
+      "klaf_226": "Teimani according to Rambam (226 pages)",
+      "klaf_245": "רמ\"ה (245 pages)",
+      "klaf_248": "רמ\"ח (248 pages)"
     },
     "savedSettingsBanner": {
       "defaultText": "Settings are saved in this browser.",
@@ -368,6 +370,7 @@
     "lineUnavailable": "First line is unavailable for this page.",
     "openTikkun": "See full page in tikkun.io",
     "openTikkunShort": "Full page",
+    "tikkunLayoutWarning": "tikkun.io uses the רמ\"ה (245) layout. You are on {layout}.",
     "withNikud": "With nikud",
     "withoutNikud": "No nikud",
     "shiftTip": "Tip: Hold Shift to toggle quickly"

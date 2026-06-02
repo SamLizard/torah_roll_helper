@@ -277,13 +277,15 @@
     "help": {
       "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures avec le calendrier de la Diaspora.",
       "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
-      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats, comme רמ״ח (248), pourront être ajoutés."
+      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats existent, comme le Témanite (תאג') qui est en 226 pages."
     },
     "nusachOptions": {
       "sefaradic": "Séfarade"
     },
     "torahTypeOptions": {
-      "klaf_245": "רמ״ה (245 pages)"
+      "klaf_226": "Témani selon Rambam (226 pages)",
+      "klaf_245": "רמ״ה (245 pages)",
+      "klaf_248": "רמ״ח (248 pages)"
     },
     "savedSettingsBanner": {
       "defaultText": "Les paramètres sont enregistrés dans ce navigateur.",
@@ -368,6 +370,7 @@
     "lineUnavailable": "La première ligne n'est pas disponible pour cette page.",
     "openTikkun": "Voir la page complète dans tikkun.io",
     "openTikkunShort": "Page complète",
+    "tikkunLayoutWarning": "tikkun.io utilise la mise en page רמ״ה (245). Vous êtes sur {layout}.",
     "withNikud": "Avec nikoud",
     "withoutNikud": "Sans nikoud",
     "shiftTip": "Astuce: maintenez Shift pour basculer rapidement"

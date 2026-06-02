@@ -10,7 +10,7 @@ const createTarget = (overrides: Partial<TikkunLinkTarget>): TikkunLinkTarget =>
     book: 1,
     chapter: 1,
     verse: 1,
-    page: 1,
+    page: { '245': 1, '248': 1 },
   },
   ...overrides,
 });
@@ -23,7 +23,7 @@ describe('tikkun link generation', () => {
         book: 4,
         chapter: 30,
         verse: 2,
-        page: 192,
+        page: { '245': 192, '248': 195 },
       },
     }));
 
@@ -41,7 +41,7 @@ describe('tikkun link generation', () => {
         book: 2,
         chapter: 12,
         verse: 1,
-        page: 73,
+        page: { '245': 73, '248': 75 },
       },
     }));
 
@@ -57,7 +57,7 @@ describe('tikkun link generation', () => {
         book: 3,
         chapter: 22,
         verse: 26,
-        page: 139,
+        page: { '245': 139, '248': 142 },
       },
     }));
 
@@ -76,7 +76,7 @@ describe('tikkun link generation', () => {
         book: 4,
         chapter: 29,
         verse: 17,
-        page: 190,
+        page: { '245': 190, '248': 194 },
       },
     }));
 
@@ -91,7 +91,7 @@ describe('tikkun link generation', () => {
         book: 5,
         chapter: 33,
         verse: 1,
-        page: 244,
+        page: { '245': 244, '248': 247 },
       },
     }));
 
@@ -107,11 +107,14 @@ describe('tikkun link generation', () => {
         book: 5,
         chapter: 15,
         verse: 19,
-        page: 222,
+        page: { '245': 222, '248': 225 },
       },
     }));
 
-    expect(route).toBeNull();
+    expect(route).toEqual({
+      route: 'h',
+      slug: 'shavuot-2',
+    });
   });
 
   it('uses the base tikkun slug for shabbat-suffixed Yom Tov variants', () => {
@@ -123,7 +126,7 @@ describe('tikkun link generation', () => {
         book: 5,
         chapter: 14,
         verse: 22,
-        page: 220,
+        page: { '245': 220, '248': 223 },
       },
     }));
 
@@ -138,7 +141,7 @@ describe('tikkun link generation', () => {
         book: 2,
         chapter: 12,
         verse: 14,
-        page: 74,
+        page: { '245': 74, '248': 75 },
       },
     }));
 

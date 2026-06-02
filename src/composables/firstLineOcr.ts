@@ -1,5 +1,5 @@
 import { extract, partial_ratio, ratio, token_set_ratio, WRatio } from 'fuzzball';
-import pageFirstLinesData from '@/data/page_first_lines.json';
+import { LAYOUT_DATA } from '@/composables/torahData';
 import {
   normalizeForTypedInput,
   preparePageFirstLines,
@@ -40,6 +40,7 @@ interface FirstLineTextAnalysis {
 
 interface AnalyzeFirstLineTextOptions {
   candidatePages?: PreparedPageFirstLine[];
+  layoutKey?: string;
 }
 
 interface OcrProgressPayload {
@@ -49,6 +50,7 @@ interface OcrProgressPayload {
 
 interface RecognizeFirstLineOptions {
   onProgress?: (payload: OcrProgressPayload) => void;
+  layoutKey?: string;
 }
 
 interface FirstLineOcrResult extends FirstLineTextAnalysis {
@@ -126,7 +128,22 @@ const SUGGESTION_MATCH_SCORE = 85;
 const UNRELIABLE_MATCH_SCORE = 70;
 const CONFIRMED_GAP_SCORE = 5;
 const DEFAULT_MATCH_LIMIT = 5;
-const PREPARED_PAGE_FIRST_LINES = preparePageFirstLines(pageFirstLinesData as PageFirstLine[]);
+
+// Combine all layouts' first lines for the word dictionary (OCR correction benefits from a broad vocabulary)
+const ALL_PAGE_FIRST_LINES = Object.values(LAYOUT_DATA).flatMap((layout) => layout.pageFirstLines);
+const ALL_PREPARED_PAGE_FIRST_LINES = preparePageFirstLines(ALL_PAGE_FIRST_LINES as PageFirstLine[]);
+
+// Per-layout prepared pages cache
+const preparedPagesByLayout = new Map<string, PreparedPageFirstLine[]>();
+const getPreparedPagesForLayout = (layoutKey: string): PreparedPageFirstLine[] => {
+  const cached = preparedPagesByLayout.get(layoutKey);
+  if (cached) return cached;
+  const layoutData = LAYOUT_DATA[layoutKey] ?? LAYOUT_DATA['245'];
+  const prepared = preparePageFirstLines(layoutData.pageFirstLines as PageFirstLine[]);
+  preparedPagesByLayout.set(layoutKey, prepared);
+  return prepared;
+};
+
 const FINAL_FORM_TO_STANDARD_FORM: Record<string, string> = {
   ך: 'כ',
   ם: 'מ',
@@ -135,7 +152,7 @@ const FINAL_FORM_TO_STANDARD_FORM: Record<string, string> = {
   ץ: 'צ',
 };
 const KNOWN_HEBREW_WORDS = Array.from(
-  new Set(PREPARED_PAGE_FIRST_LINES.flatMap((page) => page.words).filter((word) => word.length > 0)),
+  new Set(ALL_PREPARED_PAGE_FIRST_LINES.flatMap((page) => page.words).filter((word) => word.length > 0)),
 ).sort((left, right) => left.localeCompare(right, 'he'));
 const KNOWN_HEBREW_WORDS_SET = new Set(KNOWN_HEBREW_WORDS);
 
@@ -289,7 +306,7 @@ const scoreSentenceMatch = (inputText: string, candidate: PreparedPageFirstLine)
 
 const buildRankedMatches = (
   correctedText: string,
-  candidatePages: PreparedPageFirstLine[] = PREPARED_PAGE_FIRST_LINES,
+  candidatePages: PreparedPageFirstLine[],
 ): RankedFirstLineMatch[] => {
   if (correctedText.length === 0) return [];
 
@@ -361,9 +378,10 @@ const analyzeFirstLineText = (
 ): FirstLineTextAnalysis => {
   const normalizedText = normalizeOcrText(text);
   const correctionResult = correctOcrWords(normalizedText);
+  const defaultPages = getPreparedPagesForLayout(options.layoutKey ?? '245');
   const rankedMatches = buildRankedMatches(
     correctionResult.correctedText,
-    options.candidatePages ?? PREPARED_PAGE_FIRST_LINES,
+    options.candidatePages ?? defaultPages,
   );
   const reliability = getReliability(
     rankedMatches,
@@ -506,7 +524,7 @@ const recognizeFirstLineFromImage = async (
       },
     );
     const { primaryText, extractedLines } = getPrimaryOcrText(recognitionResult.data);
-    const analysis = analyzeFirstLineText(primaryText);
+    const analysis = analyzeFirstLineText(primaryText, { layoutKey: options.layoutKey });
 
     return {
       ...analysis,
@@ -523,7 +541,7 @@ export {
   analyzeFirstLineText,
   correctOcrWords,
   normalizeOcrText,
-  PREPARED_PAGE_FIRST_LINES,
+  getPreparedPagesForLayout,
   recognizeFirstLineFromImage,
 };
 

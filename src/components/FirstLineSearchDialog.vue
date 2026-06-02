@@ -486,8 +486,7 @@ import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import DictaCameraCapture from './DictaCameraCapture.vue';
 import PagePreviewDialog from './PagePreviewDialog.vue';
-import realDb from '@/data/real_db.json';
-import pageFirstLinesData from '@/data/page_first_lines.json';
+import { useTorahData, resolvePageForLayout } from '@/composables/torahData';
 import {
   trackFirstLineSearchOutcome,
   trackFromToAction,
@@ -497,6 +496,7 @@ import {
 import {
   findPreparedPagesByLineStart,
   findPreparedPagesContainingTextInLine,
+  getMinimumLineStartQueryLength,
   normalizeForTypedInput,
   preparePageFirstLines,
   type PageFirstLine,
@@ -552,8 +552,9 @@ const { t } = useI18n();
 const { smAndDown } = useDisplay();
 const { isOnline } = useOnlineStatus();
 const optionsStore = useOptionsStore();
-const db = realDb as RealDb;
-const preparedPages = preparePageFirstLines(pageFirstLinesData as PageFirstLine[]);
+const { layoutKey, realDb: torahRealDb, pageFirstLines: torahPageFirstLines, pageTitlesKeys: torahPageTitles } = useTorahData();
+const db = computed(() => torahRealDb.value);
+const preparedPages = computed(() => preparePageFirstLines(torahPageFirstLines.value));
 const MINIMUM_ASSISTANT_WORD_COVERAGE = 0.25;
 const MINIMUM_ASSISTANT_RESULT_SCORE = 70;
 
@@ -575,7 +576,7 @@ const ocrSuggestedQuery = ref('');
 
 const keyboardRows = HEBREW_KEYBOARD_ROWS;
 const isKeyboardLockingNativeInput = computed(() => smAndDown.value && showKeyboard.value);
-const preparedPagesByNumber = new Map(preparedPages.map((page) => [page.pageNumber, page]));
+const preparedPagesByNumber = computed(() => new Map(preparedPages.value.map((page) => [page.pageNumber, page])));
 const isPhoneOcrCameraMode = computed(() => smAndDown.value);
 const shouldHideDialogForPhoneCamera = computed(() => isPhoneOcrCameraMode.value && isOcrCameraOpen.value);
 const isOcrCameraButtonDisabled = computed(() => isOcrProcessing.value || isOcrCameraOpen.value || !isOnline.value);
@@ -599,14 +600,12 @@ const hasQuery = computed(() => normalizedQuery.value.length > 0);
 const minimumQueryLength = computed(() => {
   if (includeMatches.value) return 3;
 
-  const firstLetter = normalizedQuery.value[0];
-  if (!firstLetter) return 2;
-  return firstLetter === 'ו' ? 2 : 1;
+  return getMinimumLineStartQueryLength(normalizedQuery.value, preparedPages.value);
 });
 const isQueryReady = computed(() => normalizedQuery.value.length >= minimumQueryLength.value);
 
 const toManualData = (pageNumber: number): ManualData => {
-  const pageStartRef = getPageStartRef(db, pageNumber);
+  const pageStartRef = getPageStartRef(db.value, pageNumber);
 
   if (!pageStartRef) {
     return {
@@ -624,7 +623,7 @@ const toManualData = (pageNumber: number): ManualData => {
 };
 
 const getTitleForPage = (pageNumber: number): string => {
-  const titleKeys = getPageTitleKeys(pageNumber, toManualData(pageNumber), optionsStore.isInGola);
+  const titleKeys = getPageTitleKeys(pageNumber, toManualData(pageNumber), optionsStore.isInGola, torahPageTitles.value);
   if (titleKeys.length === 0) return '';
   return titleKeys.map((key) => t(key)).join(t('separator'));
 };
@@ -634,10 +633,10 @@ const matchedPages = computed(() => {
   if (!isQueryReady.value) return [];
 
   if (includeMatches.value) {
-    return findPreparedPagesContainingTextInLine(searchQuery.value, preparedPages);
+    return findPreparedPagesContainingTextInLine(searchQuery.value, preparedPages.value);
   }
 
-  return findPreparedPagesByLineStart(searchQuery.value, preparedPages);
+  return findPreparedPagesByLineStart(searchQuery.value, preparedPages.value);
 });
 
 const searchResults = computed<SearchDisplayItem[]>(() => {
@@ -675,7 +674,7 @@ const getAssistantCandidatePages = (text: string): PreparedPageFirstLine[] => {
 
   for (let wordCount = words.length; wordCount >= 1; wordCount -= 1) {
     const prefix = words.slice(0, wordCount).join(' ');
-    const matches = findPreparedPagesByLineStart(prefix, preparedPages);
+    const matches = findPreparedPagesByLineStart(prefix, preparedPages.value);
     if (matches.length === 0) continue;
 
     if (narrowestMatches.length === 0 || matches.length < narrowestMatches.length) {
@@ -700,6 +699,7 @@ const assistantAnalysis = computed(() => {
   if (normalizedQuery.value.length === 0) return null;
   return analyzeFirstLineText(searchQuery.value, {
     candidatePages: assistantCandidatePages.value.length > 0 ? assistantCandidatePages.value : undefined,
+    layoutKey: layoutKey.value,
   });
 });
 
@@ -718,7 +718,7 @@ const assistantResults = computed<SearchDisplayItem[]>(() => {
   if (!assistantAnalysis.value) return [];
 
   const mappedResults = assistantAnalysis.value.rankedMatches.reduce<SearchDisplayItem[]>((results, match) => {
-    const page = preparedPagesByNumber.get(match.pageNumber);
+    const page = preparedPagesByNumber.value.get(match.pageNumber);
     if (!page) return results;
 
     results.push({
@@ -783,12 +783,12 @@ const shouldUseCompactResults = computed(() => {
 const isPreviewOpen = computed(() => previewPage.value !== null);
 const previewResult = computed(() => {
   if (previewPage.value == null) return null;
-  return preparedPages.find((page) => page.pageNumber === previewPage.value) ?? null;
+  return preparedPages.value.find((page) => page.pageNumber === previewPage.value) ?? null;
 });
 const previewColumns = computed(() => previewResult.value?.previewColumns ?? []);
 const previewTikkunUrl = computed(() => {
   if (previewPage.value == null) return null;
-  const pageStartRef = getPageStartRef(db, previewPage.value);
+  const pageStartRef = getPageStartRef(db.value, previewPage.value);
   return pageStartRef ? toRefUrl(pageStartRef) : null;
 });
 
@@ -924,6 +924,7 @@ const runOcrFromFile = async (selectedFile: File) => {
   try {
     const result = await recognizeFirstLineFromImage(selectedFile, {
       onProgress: onOcrProgress,
+      layoutKey: layoutKey.value,
     });
 
     ocrResult.value = result;

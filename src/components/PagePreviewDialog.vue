@@ -86,24 +86,30 @@
         </div>
       </v-card-text>
 
-      <v-card-actions class="justify-space-between">
+      <v-card-actions class="justify-space-between align-end">
         <v-btn variant="text" @click="closeDialog">
           {{ $t('actions.close') }}
         </v-btn>
-        <v-btn
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-open-in-new"
-          data-tutorial="page-preview-link"
-          :href="tikkunUrl ?? undefined"
-          target="_blank"
-          rel="noopener noreferrer"
-          :disabled="!tikkunUrl"
-          class="preview-open-btn"
-          @click="onOpenTikkun"
-        >
-          {{ openTikkunLabel }}
-        </v-btn>
+        <div class="preview-tikkun-section">
+          <div v-if="showTikkunLayoutWarning" class="text-caption text-warning preview-tikkun-warning">
+            <v-icon size="14" class="me-1">mdi-alert-outline</v-icon>
+            {{ $t('preview.tikkunLayoutWarning', { layout: $t(`settings.torahTypeOptions.${optionsStore.torahType}`) }) }}
+          </div>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            prepend-icon="mdi-open-in-new"
+            data-tutorial="page-preview-link"
+            :href="tikkunUrl ?? undefined"
+            target="_blank"
+            rel="noopener noreferrer"
+            :disabled="!tikkunUrl"
+            class="preview-open-btn"
+            @click="onOpenTikkun"
+          >
+            {{ openTikkunLabel }}
+          </v-btn>
+        </div>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -114,6 +120,7 @@ import { computed, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import TikkunPreviewLine from './TikkunPreviewLine.vue';
+import { useOptionsStore } from '@/stores/options';
 
 const NUN_HAFUCHA = '׆';
 
@@ -131,9 +138,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { smAndDown } = useDisplay();
+const optionsStore = useOptionsStore();
 
 const previewWithNikud = ref(true);
 const isShiftPressed = ref(false);
+
+const showTikkunLayoutWarning = computed(() => optionsStore.torahType !== 'klaf_245');
 
 const ketiv = (text: string) =>
   text
@@ -368,5 +378,18 @@ onUnmounted(() => {
   white-space: normal;
   line-height: 1.15;
   text-align: center;
+}
+
+.preview-tikkun-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.preview-tikkun-warning {
+  display: flex;
+  align-items: center;
+  text-align: end;
 }
 </style>

@@ -659,13 +659,12 @@ import {
   closeTutorialNavDrawer,
   openTutorialNavDrawer,
 } from '@/composables/tutorialUi';
-import realDb from '@/data/real_db.json';
-import pageFirstLinesData from '@/data/page_first_lines.json';
+import { useTorahData, resolvePageForLayout, getLayoutData } from '@/composables/torahData';
 import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
 import { toRefUrl } from '@/composables/tikkunLinks';
-import type { ManualData, RealDb, RollInstructions, TorahRef } from '@/types';
+import type { ManualData, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
   key: string;
@@ -724,7 +723,7 @@ const router = useRouter();
 const route = useRoute();
 const { smAndDown } = useDisplay();
 const { isRtl } = useRtl();
-const db = realDb as RealDb;
+const { realDb: torahRealDb, pageFirstLines: torahPageFirstLines, pageTitlesKeys: torahPageTitles, layoutKey } = useTorahData();
 const onboardingWrapper = ref();
 const {
   start: startOnboarding,
@@ -818,6 +817,55 @@ watch(
   { immediate: true }
 );
 
+// Recalculate pages when the layout changes
+watch(layoutKey, (newLayoutKey, oldLayoutKey) => {
+  if (newLayoutKey === oldLayoutKey) return;
+
+  const oldDb = getLayoutData(oldLayoutKey).realDb;
+  const newDb = torahRealDb.value;
+
+  if (options.fromPage != null) {
+    const ref = fromRef.value;
+    if (ref && ref.chapter != null && ref.verse != null) {
+      const newPage = getPageNumber(newDb, ref.book, ref.chapter, ref.verse);
+      options.changeFromPage(newPage > 0 ? newPage : null);
+    } else {
+      // Manual page entry without ref — resolve the first verse on that page in the old layout, then find it in the new one
+      const pageStartRef = getPageStartRef(oldDb, options.fromPage);
+      if (pageStartRef) {
+        const newPage = getPageNumber(newDb, pageStartRef.book, pageStartRef.chapter, pageStartRef.verse);
+        fromRef.value = { book: pageStartRef.book, chapter: pageStartRef.chapter, verse: pageStartRef.verse };
+        options.changeFromPage(newPage > 0 ? newPage : null);
+      } else {
+        options.changeFromPage(null);
+        fromRef.value = null;
+        fromTargetKey.value = null;
+      }
+    }
+  }
+
+  if (options.toPage != null) {
+    const ref = toRef.value;
+    if (ref && ref.chapter != null && ref.verse != null) {
+      const newPage = getPageNumber(newDb, ref.book, ref.chapter, ref.verse);
+      options.changeToPage(newPage > 0 ? newPage : null);
+    } else {
+      const pageStartRef = getPageStartRef(oldDb, options.toPage);
+      if (pageStartRef) {
+        const newPage = getPageNumber(newDb, pageStartRef.book, pageStartRef.chapter, pageStartRef.verse);
+        toRef.value = { book: pageStartRef.book, chapter: pageStartRef.chapter, verse: pageStartRef.verse };
+        options.changeToPage(newPage > 0 ? newPage : null);
+      } else {
+        options.changeToPage(null);
+        toRef.value = null;
+        toTargetKey.value = null;
+      }
+    }
+  }
+
+  trackFromToAction({ side: 'from', action: 'layout-change', value: `${oldLayoutKey}-to-${newLayoutKey}` });
+});
+
 const rollResultRef = ref<InstanceType<typeof RollResult> | null>(null);
 
 const remainingAfterBookLabel = computed(() => {
@@ -852,7 +900,7 @@ const resetDictaSession = () => {
 };
 
 const applyDictaReference = (reference: DictaReference, page: number): boolean => {
-  const resolvedPage = getPageNumber(db, reference.book, reference.chapter, reference.verse ?? 1);
+  const resolvedPage = getPageNumber(torahRealDb.value, reference.book, reference.chapter, reference.verse ?? 1);
   const finalPage = page > 0 ? page : resolvedPage;
   if (finalPage <= 0) return false;
 
@@ -915,11 +963,11 @@ const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi
 const isDictaChoicePreviewOpen = computed(() => dictaPreviewPage.value !== null);
 const dictaPreviewColumns = computed(() => {
   if (dictaPreviewPage.value == null) return [];
-  return toPreviewColumns((pageFirstLinesData as unknown[])[dictaPreviewPage.value - 1]);
+  return toPreviewColumns((torahPageFirstLines.value as unknown[])[dictaPreviewPage.value - 1]);
 });
 const dictaPreviewTikkunUrl = computed(() => {
   if (dictaPreviewPage.value == null) return null;
-  const pageStartRef = getPageStartRef(db, dictaPreviewPage.value);
+  const pageStartRef = getPageStartRef(torahRealDb.value, dictaPreviewPage.value);
   return pageStartRef ? toRefUrl(pageStartRef) : null;
 });
 const isPhoneCameraMode = computed(() => {
@@ -935,7 +983,7 @@ const getPageTitleLabel = (page: number, reference: DictaReference): string => {
     book: reference.book,
     chapter: reference.chapter,
     verse: reference.verse,
-  }, options.isInGola);
+  }, options.isInGola, torahPageTitles.value);
   if (!keys.length) return '-';
   return keys.map((key) => t(key)).join(t('separator'));
 };
@@ -982,7 +1030,7 @@ const buildDictaCandidates = (results: DictaParallelItem[]): DictaCandidate[] =>
       const reference = parseDictaPayload(item);
       if (!reference) return null;
 
-      const page = getPageNumber(db, reference.book, reference.chapter, reference.verse ?? 1);
+      const page = getPageNumber(torahRealDb.value, reference.book, reference.chapter, reference.verse ?? 1);
       return {
         index,
         page,
@@ -999,7 +1047,7 @@ const expandCandidatePages = (candidate: DictaCandidate): number[] => {
     return candidate.page > 0 ? [candidate.page] : [];
   }
 
-  return getApproximatePages(db, candidate.reference.book, candidate.reference.chapter)
+  return getApproximatePages(torahRealDb.value, candidate.reference.book, candidate.reference.chapter)
     .filter((page) => page > 0);
 };
 
@@ -1385,13 +1433,14 @@ const onSetToPage = (
 const onTargetSelected = (item: HomeTargetItem) => {
   const selectedRef = getDefaultRefForSide(item, activeSide.value);
   const newRef = toManualData(selectedRef);
+  const page = resolvePageForLayout(selectedRef.page, layoutKey.value);
 
   if (activeSide.value === 'from') {
-    options.changeFromPage(selectedRef.page);
+    options.changeFromPage(page);
     fromRef.value = newRef;
     fromTargetKey.value = item.key;
   } else {
-    options.changeToPage(selectedRef.page);
+    options.changeToPage(page);
     toRef.value = newRef;
     toTargetKey.value = item.key;
   }
@@ -1837,9 +1886,9 @@ const selectTutorialTarget = (side: 'from' | 'to', target: HomeTargetItem): bool
   const refData = toManualData(targetRef);
 
   if (side === 'from') {
-    onSetFromPage(targetRef.page, refData, target.key);
+    onSetFromPage(resolvePageForLayout(targetRef.page, layoutKey.value), refData, target.key);
   } else {
-    onSetToPage(targetRef.page, refData, target.key);
+    onSetToPage(resolvePageForLayout(targetRef.page, layoutKey.value), refData, target.key);
   }
 
   return true;
