@@ -6,8 +6,8 @@ const NUSACH_OPTIONS = ['sefaradic'] as const;
 type NusachOption = (typeof NUSACH_OPTIONS)[number];
 
 const TORAH_TYPE_OPTIONS = [
-  { id: 'klaf_226', pageCount: 226 },
   { id: 'klaf_245', pageCount: 245 },
+  { id: 'klaf_226', pageCount: 226 },
   // { id: 'klaf_248', pageCount: 248 }, // the lines couldn't be verified for the moment.
 ] as const;
 type TorahTypeOption = (typeof TORAH_TYPE_OPTIONS)[number]['id'];
