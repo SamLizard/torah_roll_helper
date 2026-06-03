@@ -1,7 +1,7 @@
 <template>
-  <div ref="rootRef" :data-tutorial="appMode ? 'language-selector' : undefined">
+  <div ref="rootRef" data-tutorial="language-selector">
     <v-select
-      :data-tutorial="appMode ? 'language-select' : undefined"
+      data-tutorial="language-select"
       v-model:menu="isMenuOpen"
       :items="otherLocales"
       item-title="text"
@@ -18,7 +18,7 @@
       <template #selection="{ item }">
         <v-img :src="`${baseUrl}flags/${item.value}.svg`" width="50" />
         <div class="ms-2">
-          {{ appMode ? $t("language") : $t("language", 1, { locale: item.value }) }}
+          {{ $t("language") }}
         </div>
       </template>
       <template #item="{ item, props }">
@@ -39,17 +39,6 @@ import { trackLanguageChange } from '@/composables/analytics';
 import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys';
 import { setLanguageMenuOpen } from '@/composables/tutorialUi';
 
-const props = defineProps<{
-  // When provided, the component is "controlled": it selects this locale and
-  // emits changes instead of switching the whole app language. Used to pick a
-  // message language (e.g. in the share dialog) without affecting the site.
-  modelValue?: string;
-}>();
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void;
-}>();
-
 const i18n = useI18n();
 const t = i18n.t;
 const router = useRouter();
@@ -63,19 +52,10 @@ interface LocaleItem {
   text: string;
 }
 
-const appMode = computed(() => props.modelValue === undefined);
-
-const selectedLocale = computed(() =>
-  appMode.value ? i18n.locale.value : (props.modelValue as string),
-);
+const selectedLocale = computed(() => i18n.locale.value);
 
 const onLocaleChanged = (nextLocale: string | null) => {
-  if (!nextLocale || nextLocale === selectedLocale.value) return;
-
-  if (!appMode.value) {
-    emit('update:modelValue', nextLocale);
-    return;
-  }
+  if (!nextLocale || nextLocale === i18n.locale.value) return;
 
   const previousLocale = i18n.locale.value;
   i18n.locale.value = nextLocale;
@@ -118,19 +98,18 @@ const isVisible = (): boolean => {
 };
 
 const otherLocales = computed((): LocaleItem[] => {
-  return i18n.availableLocales.filter((locale) => locale !== selectedLocale.value).map((lang) => ({
+  return i18n.availableLocales.filter((locale) => locale !== i18n.locale.value).map((lang) => ({
     lang: lang,
     text: t("language", 1, { locale: lang }) as string
   }))
 });
 
 watch(isMenuOpen, (isOpen) => {
-  if (!appMode.value) return;
   setLanguageMenuOpen(isOpen);
 });
 
 onUnmounted(() => {
-  if (appMode.value && isMenuOpen.value) {
+  if (isMenuOpen.value) {
     setLanguageMenuOpen(false);
   }
 });
