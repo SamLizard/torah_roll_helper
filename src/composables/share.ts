@@ -13,6 +13,9 @@ const CANONICAL_ORIGIN = 'https://samlizard.github.io/torah_roll_helper/';
 const FALLBACK_LOCALE = 'en';
 const TOAST_TIMER_MS = 3000;
 
+// What the shared payload contains.
+type ShareContent = 'full' | 'short' | 'link';
+
 type NavigatorWithShare = Navigator & {
   share?: (data: ShareData) => Promise<void>;
 };
@@ -66,8 +69,8 @@ const useShare = () => {
     return `${CANONICAL_ORIGIN}#${hashPath}`;
   };
 
-  const translate = (key: string, locale: string): string => {
-    const value = i18n.t(key, {}, { locale });
+  const translate = (key: string, locale: string, named: Record<string, unknown> = {}): string => {
+    const value = i18n.t(key, named, { locale });
     return typeof value === 'string' ? value : '';
   };
 
@@ -75,8 +78,19 @@ const useShare = () => {
     return translate('share.shareTitle', resolveLocale(shareLocale));
   };
 
-  const buildShareText = (shareLocale: string): string => {
-    return translate('share.shareText', resolveLocale(shareLocale));
+  // Builds the text that will be shared, in the chosen message language. The
+  // link is passed as a named i18n parameter ({link}) so vue-i18n interpolates
+  // it for us and the message stays a normal, self-updating translation.
+  const buildShareText = (shareLocale: string, content: ShareContent): string => {
+    const lang = resolveLocale(shareLocale);
+    const link = buildShareLink(lang);
+
+    if (content === 'link') {
+      return link;
+    }
+
+    const key = content === 'short' ? 'share.messageShort' : 'share.message';
+    return translate(key, lang, { link });
   };
 
   const toastPosition = (): SweetAlertPosition => {
@@ -96,6 +110,9 @@ const useShare = () => {
       showConfirmButton: false,
       timer: TOAST_TIMER_MS,
       timerProgressBar: true,
+      customClass: {
+        container: 'share-toast-container',
+      },
     });
   };
 
@@ -103,20 +120,25 @@ const useShare = () => {
     trackShareOpened();
   };
 
-  const nativeShare = async (shareLocale: string): Promise<'shared' | 'cancelled' | 'unsupported' | 'error'> => {
+  const nativeShare = async (
+    shareLocale: string,
+    content: ShareContent,
+  ): Promise<'shared' | 'cancelled' | 'unsupported' | 'error'> => {
     if (!canNativeShare()) {
       return 'unsupported';
     }
 
     const lang = resolveLocale(shareLocale);
+    const link = buildShareLink(lang);
+
+    // For link-only we still pass url; otherwise the text already embeds the link.
+    const data: ShareData =
+      content === 'link'
+        ? { title: buildShareTitle(lang), url: link }
+        : { title: buildShareTitle(lang), text: buildShareText(lang, content) };
 
     try {
-      await (navigator as NavigatorWithShare).share!({
-        title: buildShareTitle(lang),
-        text: buildShareText(lang),
-        url: buildShareLink(lang),
-      });
-
+      await (navigator as NavigatorWithShare).share!(data);
       trackShareCompleted('native', lang);
       return 'shared';
     } catch (error) {
@@ -128,16 +150,16 @@ const useShare = () => {
     }
   };
 
-  const copyLink = async (shareLocale: string): Promise<boolean> => {
+  const copyText = async (shareLocale: string, content: ShareContent): Promise<boolean> => {
     const lang = resolveLocale(shareLocale);
-    const link = buildShareLink(lang);
+    const text = buildShareText(lang, content);
 
     try {
       if (typeof navigator === 'undefined' || !navigator.clipboard) {
         throw new Error('Clipboard API unavailable');
       }
 
-      await navigator.clipboard.writeText(link);
+      await navigator.clipboard.writeText(text);
       trackShareCompleted('copy-link', lang);
       showToast('success', i18n.t('share.copied') as string);
       return true;
@@ -147,9 +169,9 @@ const useShare = () => {
     }
   };
 
-  const shareViaWhatsApp = (shareLocale: string): void => {
+  const shareViaWhatsApp = (shareLocale: string, content: ShareContent): void => {
     const lang = resolveLocale(shareLocale);
-    const message = `${buildShareText(lang)}\n${buildShareLink(lang)}`;
+    const message = buildShareText(lang, content);
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     const opened = window.open(url, '_blank', 'noopener,noreferrer');
 
@@ -161,10 +183,10 @@ const useShare = () => {
     trackShareCompleted('whatsapp', lang);
   };
 
-  const shareViaEmail = (shareLocale: string): void => {
+  const shareViaEmail = (shareLocale: string, content: ShareContent): void => {
     const lang = resolveLocale(shareLocale);
     const subject = buildShareTitle(lang);
-    const body = `${buildShareText(lang)}\n\n${buildShareLink(lang)}`;
+    const body = buildShareText(lang, content);
     const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
     window.location.href = url;
@@ -174,9 +196,10 @@ const useShare = () => {
   return {
     canNativeShare,
     buildShareLink,
+    buildShareText,
     openShareOpenedEvent,
     nativeShare,
-    copyLink,
+    copyText,
     shareViaWhatsApp,
     shareViaEmail,
     showToast,
@@ -184,4 +207,4 @@ const useShare = () => {
 };
 
 export { useShare };
-export type { ShareMethod };
+export type { ShareMethod, ShareContent };

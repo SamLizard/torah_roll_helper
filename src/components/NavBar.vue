@@ -118,7 +118,7 @@
         :aria-label="$t('pwa.installPrompt.install')"
         @click="install"
       />
-      <share-button mode="icon" />
+      <share-button mode="icon" wrapper-class="d-none d-md-inline-flex" />
       <v-btn
         icon="mdi-cog"
         variant="text"

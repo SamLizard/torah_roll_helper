@@ -14,12 +14,17 @@
     v-else
     icon="mdi-share-variant"
     variant="text"
-    class="ms-1"
+    :class="['ms-1', wrapperClass]"
     :aria-label="$t('share.label')"
     @click="openPanel"
   />
 
-  <v-dialog v-model="panelOpen" max-width="460px">
+  <v-dialog
+    v-model="panelOpen"
+    max-width="520px"
+    content-class="share-dialog-content"
+    scrollable
+  >
     <v-card class="rounded-xl">
       <v-card-title class="text-h6 font-weight-bold d-flex align-center">
         <v-icon start>mdi-share-variant</v-icon>
@@ -27,36 +32,39 @@
       </v-card-title>
 
       <v-card-text class="pt-2">
-        <p class="text-body-2 mb-3">{{ $t('share.languagePrompt') }}</p>
+        <div class="mb-4">
+          <label class="text-caption text-medium-emphasis">{{ $t('share.languagePrompt') }}</label>
+          <language-selection v-model="shareLocale" class="share-lang" />
+        </div>
 
+        <label class="text-caption text-medium-emphasis">{{ $t('share.contentPrompt') }}</label>
         <v-btn-toggle
-          v-model="shareLocale"
+          v-model="content"
           mandatory
           divided
+          density="compact"
           color="primary"
-          class="d-flex mb-4 share-lang-toggle"
+          class="d-flex mb-4 mt-1 share-content-toggle"
         >
-          <v-btn
-            v-for="locale in localeOptions"
-            :key="locale.value"
-            :value="locale.value"
-            class="flex-grow-1"
-            :aria-label="locale.label"
-          >
-            <v-img :src="`${baseUrl}flags/${locale.value}.svg`" width="28" class="me-2" />
-            <span class="text-caption">{{ locale.label }}</span>
-          </v-btn>
+          <v-btn value="full" size="small" class="flex-grow-1 px-1 text-caption">{{ $t('share.contentFull') }}</v-btn>
+          <v-btn value="short" size="small" class="flex-grow-1 px-1 text-caption">{{ $t('share.contentShort') }}</v-btn>
+          <v-btn value="link" size="small" class="flex-grow-1 px-1 text-caption">{{ $t('share.contentLink') }}</v-btn>
         </v-btn-toggle>
 
-        <v-text-field
-          :model-value="shareLink"
+        <label class="text-caption text-medium-emphasis">{{ $t('share.previewLabel') }}</label>
+        <v-textarea
+          :model-value="previewText"
           readonly
+          auto-grow
+          rows="4"
+          max-rows="10"
           variant="outlined"
           density="compact"
           hide-details
-          class="mb-3 share-link-field"
-          :aria-label="$t('share.linkLabel')"
-          @focus="selectLinkText"
+          class="mt-1 mb-4 share-preview"
+          :dir="previewDir"
+          :aria-label="$t('share.previewLabel')"
+          @focus="selectAll"
         />
 
         <v-btn
@@ -75,7 +83,7 @@
             class="flex-grow-1"
             variant="tonal"
             prepend-icon="mdi-content-copy"
-            @click="onCopyLink"
+            @click="onCopy"
           >
             {{ $t('share.copy') }}
           </v-btn>
@@ -112,20 +120,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import LanguageSelection from '@/components/LanguageSelection.vue';
 import { SUPPORTED_LOCALES, isSupportedLocale } from '@/plugins/i18n';
-import { useShare } from '@/composables/share';
-
-interface LocaleOption {
-  value: string;
-  label: string;
-}
+import { useShare, type ShareContent } from '@/composables/share';
 
 withDefaults(
   defineProps<{
     mode?: 'icon' | 'list-item';
+    wrapperClass?: string;
   }>(),
   {
     mode: 'icon',
+    wrapperClass: '',
   },
 );
 
@@ -134,47 +140,47 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
-const baseUrl = import.meta.env.BASE_URL || '/';
 
 const {
   canNativeShare,
-  buildShareLink,
+  buildShareText,
   openShareOpenedEvent,
   nativeShare,
-  copyLink,
+  copyText,
   shareViaWhatsApp,
   shareViaEmail,
   showToast,
 } = useShare();
 
+const RTL_LOCALES = new Set(['he']);
+
 const panelOpen = ref(false);
 const nativeShareAvailable = canNativeShare();
-const defaultLocale = isSupportedLocale(i18n.locale.value) ? i18n.locale.value : SUPPORTED_LOCALES[0];
-const shareLocale = ref<string>(defaultLocale);
+const content = ref<ShareContent>('full');
 
-const localeOptions = computed<LocaleOption[]>(() => {
-  return SUPPORTED_LOCALES.map((value) => ({
-    value,
-    label: i18n.t('language', 1, { locale: value }) as string,
-  }));
-});
+const resolveInitialLocale = (): string =>
+  isSupportedLocale(i18n.locale.value) ? i18n.locale.value : SUPPORTED_LOCALES[0];
 
-const shareLink = computed(() => buildShareLink(shareLocale.value));
+const shareLocale = ref<string>(resolveInitialLocale());
+
+const previewText = computed(() => buildShareText(shareLocale.value, content.value));
+const previewDir = computed(() => (RTL_LOCALES.has(shareLocale.value) ? 'rtl' : 'ltr'));
 
 const openPanel = (): void => {
-  shareLocale.value = isSupportedLocale(i18n.locale.value) ? i18n.locale.value : SUPPORTED_LOCALES[0];
+  shareLocale.value = resolveInitialLocale();
+  content.value = 'full';
   openShareOpenedEvent();
   emit('open');
   panelOpen.value = true;
 };
 
-const selectLinkText = (event: FocusEvent): void => {
-  const target = event.target as HTMLInputElement | null;
+const selectAll = (event: FocusEvent): void => {
+  const target = event.target as HTMLTextAreaElement | null;
   target?.select();
 };
 
 const onNativeShare = async (): Promise<void> => {
-  const result = await nativeShare(shareLocale.value);
+  const result = await nativeShare(shareLocale.value, content.value);
 
   if (result === 'shared') {
     panelOpen.value = false;
@@ -187,25 +193,55 @@ const onNativeShare = async (): Promise<void> => {
   // 'cancelled' / 'unsupported': keep the panel open with fallback options.
 };
 
-const onCopyLink = async (): Promise<void> => {
-  await copyLink(shareLocale.value);
+const onCopy = async (): Promise<void> => {
+  await copyText(shareLocale.value, content.value);
 };
 
 const onWhatsApp = (): void => {
-  shareViaWhatsApp(shareLocale.value);
+  shareViaWhatsApp(shareLocale.value, content.value);
 };
 
 const onEmail = (): void => {
-  shareViaEmail(shareLocale.value);
+  shareViaEmail(shareLocale.value, content.value);
 };
 </script>
 
 <style scoped>
-.share-lang-toggle {
-  height: 48px;
+.share-content-toggle {
+  height: 36px;
 }
 
-.share-link-field :deep(input) {
+.share-content-toggle :deep(.v-btn) {
+  min-width: 0;
+  letter-spacing: 0;
+}
+
+.share-preview :deep(textarea) {
   font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.share-lang {
+  max-width: 140px;
+}
+</style>
+
+<style>
+/* Keep share feedback toasts above the Vuetify dialog overlay scrim. */
+.share-toast-container {
+  z-index: 30000 !important;
+}
+
+/*
+ * Vuetify caps dialog content at `width: calc(100% - 48px)` with 24px margins,
+ * which overrides max-width. On small screens widen the content and shrink the
+ * margins so the share message is comfortably readable.
+ */
+@media (max-width: 400px) {
+  .share-dialog-content.v-overlay__content {
+    width: calc(100% - 16px) !important;
+    max-width: calc(100% - 16px) !important;
+    margin: 8px !important;
+  }
 }
 </style>
