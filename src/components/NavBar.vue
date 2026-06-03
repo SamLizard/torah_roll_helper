@@ -41,7 +41,6 @@
               {{ $t('settings.subtitle') }}
             </v-list-item-subtitle>
           </v-list-item>
-          <share-button mode="list-item" @open="drawer = false" />
           <v-list-item
             v-if="canInstall"
             prepend-icon="mdi-cellphone-arrow-down"
@@ -118,7 +117,6 @@
         :aria-label="$t('pwa.installPrompt.install')"
         @click="install"
       />
-      <share-button mode="icon" wrapper-class="d-none d-md-inline-flex" />
       <v-btn
         icon="mdi-cog"
         variant="text"
@@ -138,7 +136,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LanguageSelection from "./LanguageSelection.vue";
 import SettingsDialog from './SettingsDialog.vue';
-import ShareButton from './ShareButton.vue';
 import {
   setTutorialLanguageMenuControls,
   setTutorialNavDrawerControls,
