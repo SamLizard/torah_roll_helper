@@ -9,6 +9,7 @@ type FirstLineSearchMode = 'line-start' | 'inside-line';
 type PhotoAttemptOutcome = 'single-result' | 'multiple-results' | 'no-result' | 'error';
 type PhotoSuccessType = 'single-result' | 'multiple-results';
 type ShareMethod = 'native' | 'copy-link' | 'whatsapp' | 'email';
+type ShareContentKind = 'full' | 'short' | 'link';
 
 interface GoatCounterCountPayload {
   path: string;
@@ -379,11 +380,35 @@ const trackShareOpened = () => {
   });
 };
 
-const trackShareCompleted = (method: ShareMethod, shareLocale: string) => {
+interface TrackShareCompletedInput {
+  method: ShareMethod;
+  shareLocale: string;
+  content: ShareContentKind;
+  // The app's active locale at the moment of sharing, so we can tell whether
+  // the user shared in the site language or picked a different one.
+  appLocale: string;
+}
+
+const trackShareCompleted = ({
+  method,
+  shareLocale,
+  content,
+  appLocale,
+}: TrackShareCompletedInput) => {
   if (!isAnalyticsEnabled()) return;
 
-  const path = `${EVENT_PATH_PREFIX}/share/completed/${toSlug(method)}/${toSlug(shareLocale)}`;
-  const title = `share-completed:${method}:${shareLocale}`;
+  const matchedSiteLocale = shareLocale === appLocale ? 'same-lang' : 'other-lang';
+
+  const path = [
+    EVENT_PATH_PREFIX,
+    'share',
+    'completed',
+    toSlug(method),
+    toSlug(content),
+    toSlug(shareLocale),
+    matchedSiteLocale,
+  ].join('/');
+  const title = `share-completed:${method}:${content}:${shareLocale}:${matchedSiteLocale}`;
 
   trackGoatCounterEvent({
     path,
@@ -413,5 +438,6 @@ export {
 export type {
   FirstLineSearchMode,
   FirstLineSearchSource,
+  ShareContentKind,
   ShareMethod,
 };

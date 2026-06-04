@@ -139,7 +139,7 @@ const useShare = () => {
 
     try {
       await (navigator as NavigatorWithShare).share!(data);
-      trackShareCompleted('native', lang);
+      trackShareCompleted({ method: 'native', shareLocale: lang, content, appLocale: i18n.locale.value });
       return 'shared';
     } catch (error) {
       if (isAbortError(error)) {
@@ -160,7 +160,7 @@ const useShare = () => {
       }
 
       await navigator.clipboard.writeText(text);
-      trackShareCompleted('copy-link', lang);
+      trackShareCompleted({ method: 'copy-link', shareLocale: lang, content, appLocale: i18n.locale.value });
       showToast('success', i18n.t('share.copied') as string);
       return true;
     } catch {
@@ -173,14 +173,13 @@ const useShare = () => {
     const lang = resolveLocale(shareLocale);
     const message = buildShareText(lang, content);
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    const opened = window.open(url, '_blank', 'noopener,noreferrer');
 
-    if (!opened) {
-      showToast('error', i18n.t('share.openFailed') as string);
-      return;
-    }
-
-    trackShareCompleted('whatsapp', lang);
+    // Track before opening: with `noopener`, window.open returns null even on
+    // success, so we cannot rely on its return value to confirm the share.
+    trackShareCompleted({ method: 'whatsapp', shareLocale: lang, content, appLocale: i18n.locale.value });
+    // Open in a new tab so the app stays open in the original tab. WhatsApp has
+    // no URL option to auto-close its tab, so a new tab is the cleanest choice.
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const shareViaEmail = (shareLocale: string, content: ShareContent): void => {
@@ -189,8 +188,8 @@ const useShare = () => {
     const body = buildShareText(lang, content);
     const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
+    trackShareCompleted({ method: 'email', shareLocale: lang, content, appLocale: i18n.locale.value });
     window.location.href = url;
-    trackShareCompleted('email', lang);
   };
 
   return {
