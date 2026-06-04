@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Add a language (guide)
+    url: https://github.com/SamLizard/torah_roll_helper/blob/dev/docs/contributing/add-a-language.md
+    about: Step-by-step recipe for adding or fixing a translation. No issue needed.
+  - name: Add a Torah scroll layout (guide)
+    url: https://github.com/SamLizard/torah_roll_helper/blob/dev/docs/contributing/add-a-torah-layout.md
+    about: Step-by-step recipe for adding a new page-count layout.
+  - name: Contributing overview
+    url: https://github.com/SamLizard/torah_roll_helper/blob/dev/CONTRIBUTING.md
+    about: How the project is organized and how to pick something to work on.

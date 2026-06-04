@@ -1,0 +1,36 @@
+name: Feature request / idea
+description: Propose a new feature or an idea that needs discussion before code.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For step-by-step tasks (add a language, add a layout), see the guides in
+        `docs/contributing/` instead — they don't need an issue.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What gap or pain does this address? Who benefits (Gabbai, Ba'al Kriah, etc.)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      description: How might it work? Sketch the UX/data/flow. Rough is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints to respect
+      description: e.g. frontend-only / no server, PWA/offline, RTL + i18n, accuracy of scroll data.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
