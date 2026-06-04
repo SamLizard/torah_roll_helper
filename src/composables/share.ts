@@ -20,8 +20,24 @@ type NavigatorWithShare = Navigator & {
   share?: (data: ShareData) => Promise<void>;
 };
 
+type NavigatorWithStandalone = Navigator & {
+  standalone?: boolean;
+};
+
 const isAbortError = (error: unknown): boolean => {
   return error instanceof DOMException && error.name === 'AbortError';
+};
+
+// Detects whether the app is running as an installed PWA (standalone display).
+const isStandalonePwa = (): boolean => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const standaloneDisplay = window.matchMedia('(display-mode: standalone)').matches;
+  const iosStandalone = (window.navigator as NavigatorWithStandalone).standalone === true;
+
+  return standaloneDisplay || iosStandalone;
 };
 
 const useShare = () => {
@@ -172,14 +188,25 @@ const useShare = () => {
   const shareViaWhatsApp = (shareLocale: string, content: ShareContent): void => {
     const lang = resolveLocale(shareLocale);
     const message = buildShareText(lang, content);
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const encoded = encodeURIComponent(message);
 
-    // Track before opening: with `noopener`, window.open returns null even on
-    // success, so we cannot rely on its return value to confirm the share.
     trackShareCompleted({ method: 'whatsapp', shareLocale: lang, content, appLocale: i18n.locale.value });
-    // Open in a new tab so the app stays open in the original tab. WhatsApp has
-    // no URL option to auto-close its tab, so a new tab is the cleanest choice.
-    window.open(url, '_blank', 'noopener,noreferrer');
+
+    if (isStandalonePwa()) {
+      // Inside an installed PWA, opening the https `wa.me` link spawns an
+      // intermediate browser tab that deep-links into the WhatsApp app and is
+      // then left behind blank (the PWA cannot close it). The `whatsapp://`
+      // custom scheme is handled directly by the OS, which launches the app
+      // without creating a tab and without navigating the PWA away.
+      window.location.href = `whatsapp://send?text=${encoded}`;
+      return;
+    }
+
+    // In a regular browser tab, use the api.whatsapp.com endpoint: unlike the
+    // `wa.me` redirector (which can drop the text during the hand-off to the
+    // desktop app in some browsers, e.g. Chrome), this passes the prefilled
+    // message through reliably and needs no phone number.
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank', 'noopener,noreferrer');
   };
 
   const shareViaEmail = (shareLocale: string, content: ShareContent): void => {
