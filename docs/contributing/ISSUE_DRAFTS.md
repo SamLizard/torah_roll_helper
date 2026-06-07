@@ -152,17 +152,3 @@ panel — across desktop and mobile, in LTR and RTL, in three+ languages.
 
 Mockups or a Figma link welcome before code. Built on Vuetify 3; please keep
 i18n/RTL in mind.
-
----
-
-## 9. Project governance: add a LICENSE (and maybe a CoC)
-**Labels:** chore, governance
-
-**Problem**
-There is no `LICENSE` file. Without one, outside contributions are legally
-ambiguous and people may hesitate to contribute.
-
-**Ask**
-Maintainer to choose and add a license (e.g. MIT for permissive, or AGPL if you
-want to keep derivatives open). Consider a short Code of Conduct too. Once added,
-update `CONTRIBUTING.md` to drop the "no license yet" warning.

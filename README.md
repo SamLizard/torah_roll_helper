@@ -164,29 +164,36 @@ Active development. Feature set is usable, with ongoing improvements to UX, came
 
 ## How To Help Develop
 
-Here are the most useful contribution areas right now.
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full guide: how the project is
+organized, how to pick something to work on, and our "issue vs. documentation"
+rule. Detailed step-by-step guides live in [`docs/contributing/`](docs/contributing/).
+
+The most useful contribution areas right now:
 
 ### 1) Add a language
 
-1. Create a new locale file in `src/locales/<lang>.json`.
-2. Use `src/locales/en.json` as a template and keep exactly the same keys.
-3. Add the matching flag file in `public/flags/<lang>.svg` (same `<lang>` code).
-4. Register the locale in `src/plugins/i18n.ts` and update RTL mapping in `src/plugins/vuetify.ts` when needed.
+Full guide: **[docs/contributing/add-a-language.md](docs/contributing/add-a-language.md)**.
 
-### 2) Add a new nusach option
+In short: copy `src/locales/en.json` to `src/locales/<lang>.json` (keep the keys,
+use a real language tag), add `public/flags/<lang>.svg`, and register the locale in
+`src/plugins/i18n.ts` (plus the RTL map in `src/plugins/vuetify.ts` if needed).
+
+### 2) Add a new scroll layout option
+
+Full guide: **[docs/contributing/add-a-torah-layout.md](docs/contributing/add-a-torah-layout.md)**.
+
+In short: create `src/data/<pageCount>/` with `real_db.json`,
+`page_first_lines.json`, `page_titles_keys.json`; register it in
+`src/composables/torahData.ts` and `TORAH_TYPE_OPTIONS`
+(`src/stores/options.ts`); add the locale label; and add a `"<pageCount>"` key to
+every `page` object in `src/data/target_pages.json`.
+
+### 3) Add a new nusach option
 
 1. Add a new nusach id in `NUSACH_OPTIONS` in `src/stores/options.ts`.
 2. Add translated labels for this id under `settings.nusachOptions` in all locale files in `src/locales/`.
 3. Update `src/data/target_pages.json` for this nusach, including all sheni/hamishi ends for all readings (currently represented by `refEndPartial`).
 4. Make sure selection of nusach uses the correct target data in the UI.
-
-### 3) Add a new scroll layout option
-
-1. Create a folder `src/data/<pageCount>/` with `real_db.json`, `page_first_lines.json`, `page_titles_keys.json`.
-2. Import the three files in `src/composables/torahData.ts` and add an entry to the `LAYOUT_DATA` registry.
-3. Add `{ id: 'klaf_<pageCount>', pageCount: <pageCount> }` to `TORAH_TYPE_OPTIONS` in `src/stores/options.ts`.
-4. Add a translation key `settings.torahTypeOptions.klaf_<pageCount>` in each locale file under `src/locales/`.
-5. Add a `"<pageCount>"` key to every `page` object in `src/data/target_pages.json`.
 
 ### 4) Add links to other online tikkun providers
 
@@ -194,9 +201,19 @@ Here are the most useful contribution areas right now.
    - parasha pages
    - holiday pages
    - direct references (`book/chapter/verse` or `page`)
-2. Generalize link generation currently in `src/components/LocationSelector.vue` (`toRefUrl` and `tikkunUrl`).
+2. Generalize link generation currently in `src/components/LocationSelector.vue` (`toRefUrl` and `tikkunUrl`, which call `src/composables/tikkunLinks.ts`).
 3. Add a user setting to choose the provider (`src/stores/options.ts` + `src/components/SettingsDialog.vue` + locale labels).
 4. Keep `tikkun.io` as the default provider.
+
+> Note: tikkun link coverage can depend on the layout (a provider's pages may only
+> match a specific klaf). Keep that in mind when designing the provider setting.
+
+### Bigger ideas (open an issue first)
+
+Open-ended ideas — better OCR, other page-detection methods, PWA persistence,
+saved Sifrei Torah, calendar-driven scroll suggestions, data export/import, more
+rites, UI/UX redesign — should start as a GitHub issue. Drafts are collected in
+[`docs/contributing/ISSUE_DRAFTS.md`](docs/contributing/ISSUE_DRAFTS.md).
 
 Important note:
 - Codex (ChatGPT) helped with an important part of this project.

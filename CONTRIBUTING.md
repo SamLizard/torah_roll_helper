@@ -20,10 +20,8 @@ npm run build      # type-check + production build
 
 Branch from `dev`. Open pull requests against `dev`.
 
-> ⚠️ **No LICENSE yet.** This repository currently has no license file, which
-> legally makes outside contributions ambiguous. If you maintain the project,
-> please add one (see the "Project governance" issue). If you want to contribute
-> before then, ask the maintainer how they'd like contributions handled.
+This project is licensed under the [MIT License](LICENSE). By contributing, you
+agree that your contributions are licensed under it.
 
 ## How we decide: issue vs. documentation
 
@@ -38,6 +36,9 @@ We keep two kinds of "how to help" material, and it matters which one a task is:
 
 If you're not sure, open an issue and ask. Turning a recurring question into a
 new guide under `docs/contributing/` is itself a welcome contribution.
+
+> Ready-to-post issue drafts live in
+> [docs/contributing/ISSUE_DRAFTS.md](docs/contributing/ISSUE_DRAFTS.md).
 
 ## Good first contributions (recipes — see the guides)
 

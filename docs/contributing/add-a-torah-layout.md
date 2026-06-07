@@ -149,8 +149,7 @@ npm run list-questionable-reference-pages
 ```
 
 > Note: this script currently checks layout `245` only (see
-> `scripts/list-questionable-reference-pages.ts`, `LAYOUT_KEY = '245'`). Adapting it
-> to take a layout argument would itself be a useful contribution.
+> `scripts/list-questionable-reference-pages.ts`, `LAYOUT_KEY = '245'`).
 
 Then test in the app:
 

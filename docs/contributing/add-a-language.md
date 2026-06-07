@@ -6,8 +6,47 @@ The app ships with English (`en`), Hebrew (`he`), and French (`fr`). Adding a ne
 language means providing a locale file with the same keys, a flag icon, and
 registering the locale.
 
-Use a two-letter code where possible (e.g. `es`, `ru`, `de`). We'll call it
-`<lang>` below.
+Pick the correct **language code** — not a name you invent. The filename (without
+`.json`) becomes the locale id used everywhere in the app, and that id is passed to
+the browser's `Intl.DateTimeFormat` (for calendar dates, in
+`src/components/LocationSelector.vue`) and to Vuetify's locale/RTL system. An
+invalid code (e.g. `mylang`) will break date formatting and Vuetify lookups.
+
+We'll call it `<lang>` below, and the **same** `<lang>` must be used everywhere
+(locale file name, flag file name, and i18n registration).
+
+### How to find your language's code (no coding needed)
+
+Use the standard two-letter **ISO 639-1** code for your language. To find it:
+
+1. Open the list of codes on Wikipedia:
+   **[List of ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)**.
+2. Find your language in the table and read its two-letter code from the
+   **"639-1"** column (e.g. Spanish = `es`, Russian = `ru`, German = `de`,
+   Italian = `it`, Yiddish = `yi`, Arabic = `ar`).
+
+Only add a region/script suffix if your language really needs one — and only use a
+value that exists in the Vuetify list below (e.g. `zh-Hans` / `zh-Hant` for
+Simplified / Traditional Chinese, `pt` for Portuguese).
+
+### Languages Vuetify already translates
+
+If your code is in this list, Vuetify's own UI strings (date pickers, etc.) are
+translated too — just register it in step 3. If it is **not** in the list, your
+language still works; only Vuetify's internal strings fall back to English.
+
+```
+af, ar, az, bg, ca, ckb, cs, da, de, el, en, es, et, fa, fi, fr, he, hr, hu,
+id, it, ja, km, ko, lt, lv, nl, no, pl, pt, ro, ru, sk, sl, sr-Cyrl, sr-Latn,
+sv, th, tr, uk, vi, zh-Hans, zh-Hant
+```
+
+(This is the current list of files under `node_modules/vuetify/lib/locale/`.)
+
+> The code matters: the locale id is also passed to the browser's
+> `Intl.DateTimeFormat` (calendar dates, in `src/components/LocationSelector.vue`)
+> and to Vuetify's locale/RTL system. An invented code (e.g. `mylang`) breaks date
+> formatting and Vuetify lookups, so stick to a real ISO 639-1 code.
 
 ## 1. Create the locale file
 
@@ -28,9 +67,22 @@ Rules:
 
 ## 2. Add the flag icon
 
-Add `public/flags/<lang>.svg`. It must use the **same `<lang>` code** as the
-locale file. Match the style/size of the existing flags in `public/flags/`
-(`en.svg`, `fr.svg`, `he.svg`).
+Add `public/flags/<lang>.svg` — it must use the **same `<lang>` code** as the
+locale file (the selector loads it as `flags/<lang>.svg`, see
+`src/components/LanguageSelection.vue`).
+
+Use the **official** flag, not a hand-made one. Get it from Wikimedia Commons,
+which hosts the official SVG flags:
+
+1. Go to Wikipedia/Wikimedia Commons and search "Flag of <country>" — e.g. the
+   [Flag of France](https://en.wikipedia.org/wiki/File:Flag_of_France.svg).
+2. Download the **SVG** version.
+3. Save it as `public/flags/<lang>.svg`.
+
+Notes:
+- Pick the flag that best represents the language's main community (for some
+  languages this is a national flag; choose the most widely recognized one).
+- SVG keeps it crisp at any size; it renders at `width="50"` in the menu.
 
 ## 3. Register the locale
 
@@ -58,6 +110,12 @@ const messages = mapValues({ he, en, fr, es }, /* ... */);
 
 If Vuetify does **not** ship your language, it will still work — it just falls
 back to English for Vuetify's internal strings.
+
+> Note: when importing from `vuetify/locale`, the export name is the locale id
+> with no dash — e.g. `zh-Hans` is imported as `zhHans`, `sr-Cyrl` as `srCyrl`.
+> For plain two-letter languages the import name and locale id are identical
+> (`es`, `ru`, …), which is the simple, recommended case. If you need a
+> script/region variant, open an issue and we'll help wire it up.
 
 ## 4. Set RTL if needed
 
