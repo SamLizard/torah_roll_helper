@@ -19,7 +19,7 @@ const rtl = Object.fromEntries(
 const vuetify = createVuetify({
   locale: {
     rtl,
-    adapter: createVueI18nAdapter({ i18n, useI18n }),
+    adapter: createVueI18nAdapter({ i18n: i18n as any, useI18n }),
   },
   icons: {
     defaultSet: 'mdi',

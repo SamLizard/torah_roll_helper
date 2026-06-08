@@ -26,7 +26,7 @@ const messages = Object.fromEntries(
       ];
     },
   ),
-) as Record<string, AppMessages>;
+) as Record<string, unknown>;
 
 const getStoredLocale = (): string | null => {
   if (typeof window === 'undefined') {
@@ -47,7 +47,7 @@ const i18n = createI18n({
   locale: getStoredLocale() || import.meta.env.VITE_APP_I18N_LOCALE || 'en',
   fallbackLocale: import.meta.env.VITE_APP_I18N_FALLBACK_LOCALE || 'en',
   messages,
-});
+} as any);
 
 const SUPPORTED_LOCALES = Object.keys(messages);
 
@@ -56,11 +56,11 @@ const isSupportedLocale = (locale: unknown): locale is string => {
 };
 
 const setLocale = (locale: string): void => {
-  if (!isSupportedLocale(locale) || i18n.global.locale.value === locale) {
+  if (!isSupportedLocale(locale) || (i18n.global.locale as any) === locale) {
     return;
   }
 
-  i18n.global.locale.value = locale;
+  (i18n.global.locale.value as any) = locale;
 
   if (typeof window !== 'undefined') {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, locale);
