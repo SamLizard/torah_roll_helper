@@ -212,8 +212,7 @@ every `page` object in `src/data/target_pages.json`.
 
 Open-ended ideas — better OCR, other page-detection methods, PWA persistence,
 saved Sifrei Torah, calendar-driven scroll suggestions, data export/import, more
-rites, UI/UX redesign — should start as a GitHub issue. Drafts are collected in
-[`docs/contributing/ISSUE_DRAFTS.md`](docs/contributing/ISSUE_DRAFTS.md).
+rites, UI/UX redesign — should start as a GitHub issue. 
 
 Important note:
 - Codex (ChatGPT) helped with an important part of this project.

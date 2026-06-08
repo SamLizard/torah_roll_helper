@@ -1,12 +1,32 @@
 import { createI18n } from 'vue-i18n';
 import sourceMessages from '@intlify/unplugin-vue-i18n/messages';
-import { he, en, fr } from 'vuetify/locale';
-import { defaults, mapValues } from 'lodash';
+import * as vuetifyLocales from 'vuetify/locale';
 import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys';
+import { getLocaleMeta } from '@/plugins/localeMeta';
 
-const messages = mapValues({he, en, fr}, (messages, key) => {
-  return defaults(sourceMessages?.[key], {$vuetify: messages});
-})
+type AppMessages = Record<string, unknown>;
+type VuetifyMessages = Record<string, unknown>;
+type VuetifyLocaleModule = Record<string, VuetifyMessages>;
+
+const vuetifyLocaleMessages = vuetifyLocales as unknown as VuetifyLocaleModule;
+
+const messages = Object.fromEntries(
+  Object.entries(sourceMessages as Record<string, AppMessages>).map(
+    ([locale, appMessages]) => {
+      const { vuetifyExportName } = getLocaleMeta(locale);
+      const vuetifyMessages =
+        vuetifyLocaleMessages[vuetifyExportName ?? locale];
+
+      return [
+        locale,
+        {
+          ...appMessages,
+          ...(vuetifyMessages ? { $vuetify: vuetifyMessages } : {}),
+        },
+      ];
+    },
+  ),
+) as Record<string, AppMessages>;
 
 const getStoredLocale = (): string | null => {
   if (typeof window === 'undefined') {
@@ -26,7 +46,7 @@ const i18n = createI18n({
   legacy: false,
   locale: getStoredLocale() || import.meta.env.VITE_APP_I18N_LOCALE || 'en',
   fallbackLocale: import.meta.env.VITE_APP_I18N_FALLBACK_LOCALE || 'en',
-  messages
+  messages,
 });
 
 const SUPPORTED_LOCALES = Object.keys(messages);

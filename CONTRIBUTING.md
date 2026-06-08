@@ -37,9 +37,6 @@ We keep two kinds of "how to help" material, and it matters which one a task is:
 If you're not sure, open an issue and ask. Turning a recurring question into a
 new guide under `docs/contributing/` is itself a welcome contribution.
 
-> Ready-to-post issue drafts live in
-> [docs/contributing/ISSUE_DRAFTS.md](docs/contributing/ISSUE_DRAFTS.md).
-
 ## Good first contributions (recipes — see the guides)
 
 | Area | Difficulty | Guide |
