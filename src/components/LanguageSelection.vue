@@ -32,7 +32,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { trackLanguageChange } from '@/composables/analytics';
@@ -77,15 +77,26 @@ const onLocaleChanged = (nextLocale: string | null) => {
     return;
   }
 
-  const previousLocale = i18n.locale.value;
-  i18n.locale.value = nextLocale;
-  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
-  trackLanguageChange(previousLocale, nextLocale);
+  // Close the menu before switching the locale. Otherwise the still-open
+  // overlay briefly repositions to the new side when the text direction flips
+  // (LTR <-> RTL). Defer the locale change until after the close has painted.
+  isMenuOpen.value = false;
 
-  // Reflect the chosen language in the URL so the current view can be shared
-  // and reopened directly in this language.
-  void router.replace({
-    query: { ...router.currentRoute.value.query, lang: nextLocale },
+  const applyLocale = () => {
+    const previousLocale = i18n.locale.value;
+    i18n.locale.value = nextLocale;
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
+    trackLanguageChange(previousLocale, nextLocale);
+
+    // Reflect the chosen language in the URL so the current view can be shared
+    // and reopened directly in this language.
+    void router.replace({
+      query: { ...router.currentRoute.value.query, lang: nextLocale },
+    });
+  };
+
+  void nextTick(() => {
+    window.requestAnimationFrame(applyLocale);
   });
 };
 
