@@ -139,6 +139,7 @@ npm run preview
 - `npm run type-check` - run `vue-tsc`
 - `npm run lint` - eslint (with `--fix`)
 - `npm run test` - run Vitest
+- `npm run generate-layout-data -- --layout <n>` - verify a new layout's data, generate its `page_titles_keys.json`, and fill `target_pages.json` (see the add-a-layout guide)
 - `npm run deploy` - publish `dist/` to GitHub Pages via `gh-pages`
 
 ## Deployment Notes
@@ -182,11 +183,12 @@ use a real language tag), add `public/flags/<lang>.svg`, and register the locale
 
 Full guide: **[docs/contributing/add-a-torah-layout.md](docs/contributing/add-a-torah-layout.md)**.
 
-In short: create `src/data/<pageCount>/` with `real_db.json`,
-`page_first_lines.json`, `page_titles_keys.json`; register it in
-`src/composables/torahData.ts` and `TORAH_TYPE_OPTIONS`
-(`src/stores/options.ts`); add the locale label; and add a `"<pageCount>"` key to
-every `page` object in `src/data/target_pages.json`.
+In short: create `src/data/<pageCount>/` with two files you write by hand —
+`real_db.json` and `page_first_lines.json` — then run
+`npm run generate-layout-data -- --layout <pageCount>`, which verifies them,
+generates `page_titles_keys.json`, and fills in `src/data/target_pages.json`.
+Finally register the layout in `src/composables/torahData.ts` and
+`TORAH_TYPE_OPTIONS` (`src/stores/options.ts`) and add the locale label.
 
 ### 3) Add a new nusach option
 

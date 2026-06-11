@@ -69,16 +69,65 @@ that appear on that page (used for page titles/preview).
 ]
 ```
 
+**You don't write this file by hand.** The generator script (step 2) produces it
+for you from `real_db.json` + the first lines.
+
 ## Steps
 
-### 1. Create the data folder
+### 1. Create the two input files
 
-Create `src/data/<pageCount>/` with the three files above. Make sure:
-- `real_db.json` covers all 5 books with correct `[chapter, verse, page]` triples.
-- `page_first_lines.json` and `page_titles_keys.json` each have exactly
-  `<pageCount>` entries.
+Create `src/data/<pageCount>/` and add only the two files **you** are responsible
+for:
 
-### 2. Register the layout in `torahData.ts`
+- `real_db.json` — covers all 5 books with correct `[chapter, verse, page]` triples.
+- `page_first_lines.json` — exactly `<pageCount>` entries.
+
+The third file (`page_titles_keys.json`) and the per-target page numbers in
+`target_pages.json` are generated and verified in the next step.
+
+### 2. Run the generator
+
+[`src/scripts/generate-layout-data.ts`](../../src/scripts/generate-layout-data.ts)
+does three things at once: it **verifies** your two files against the original
+Torah text, **updates** `src/data/target_pages.json` with this layout's page
+numbers, and **generates** `src/data/<pageCount>/page_titles_keys.json`.
+
+```bash
+# from the repo root
+npm run generate-layout-data -- --layout <pageCount>
+
+# preview without writing any files
+npm run generate-layout-data -- --layout <pageCount> --dry-run
+```
+
+If the page count can't be inferred from `page_first_lines.json`, pass it
+explicitly: `--page-count <n>`.
+
+**Torah source files.** The script needs the original tikkun.io Torah page JSON
+(`1.json`..`245.json`). By default it looks in `scripts/torah`. If you don't have
+that folder (it isn't shipped in a clean clone), download the tikkun.io export and
+point the script at it:
+
+```bash
+npm run generate-layout-data -- --layout <pageCount> --source-dir path/to/torah-json
+```
+
+**What it checks (and refuses to write on failure):**
+
+- `real_db.json` has exactly one valid entry per page, no duplicates, all within
+  `1..pageCount`.
+- `page_first_lines.json` has exactly `<pageCount>` entries, each found in order in
+  the Torah text, and each matching the verse `real_db.json` claims starts that page.
+- The base `245` layout still verifies (a safety net for the shared logic).
+
+When it succeeds it prints how many `target_pages` refs it set and where it wrote
+the title-keys file. Read any error: it names the exact page and the
+expected/actual verse so you can fix your input.
+
+Other useful flags (run with `--help` to see all): `--real-db`, `--first-lines`,
+`--title-keys-output`, `--target-pages`.
+
+### 3. Register the layout in `torahData.ts`
 
 In [`src/composables/torahData.ts`](../../src/composables/torahData.ts), import the
 three files and add an entry to `LAYOUT_DATA`:
@@ -100,7 +149,7 @@ const LAYOUT_DATA: Record<string, LayoutData> = {
 
 The layout key is the **string of the page count** (e.g. `'226'`).
 
-### 3. Add the option in the store
+### 4. Add the option in the store
 
 In [`src/stores/options.ts`](../../src/stores/options.ts), add to `TORAH_TYPE_OPTIONS`:
 
@@ -115,34 +164,23 @@ const TORAH_TYPE_OPTIONS = [
 `getLayoutKey()` turns the `pageCount` into the layout key used by `torahData.ts`,
 so no other store wiring is needed.
 
-### 4. Add the translation label
+### 5. Add the translation label
 
 Add a key `settings.torahTypeOptions.klaf_<pageCount>` in **every** locale file in
 `src/locales/` (`en.json`, `fr.json`, `he.json`, and any others). See
 [add-a-language.md](add-a-language.md).
 
-### 5. Add per-target page numbers
-
-In [`src/data/target_pages.json`](../../src/data/target_pages.json), every `ref`,
-`refEndPartial`, and `refEnd` has a `page` object keyed by layout. Add a
-`"<pageCount>"` key to **every** `page` object:
-
-```json
-"page": {
-  "226": 1,
-  "245": 1,
-  "248": 1,
-  "<pageCount>": 1
-}
-```
-
-If you skip this, `resolvePageForLayout()` falls back to the default layout (`245`),
-which will give wrong roll counts for your layout.
+> Step 2 already added the `"<pageCount>"` key to every `page` object in
+> `src/data/target_pages.json`. If you ever need to do it by hand, every `ref`,
+> `refEndPartial`, and `refEnd` has a `page` object keyed by layout — add your
+> `"<pageCount>"` to each, or `resolvePageForLayout()` falls back to `245` and the
+> roll counts will be wrong.
 
 ## Verify your data
 
-Run the data-sanity script, which flags reading references that look like they sit
-on the wrong page boundary:
+The generator (step 2) already verified `real_db.json` and `page_first_lines.json`
+against the Torah text. As an extra check, run the reference-page sanity script,
+which flags reading references that look like they sit on the wrong page boundary:
 
 ```bash
 npm run list-questionable-reference-pages
@@ -166,9 +204,9 @@ npm run dev
 
 - [ ] `src/data/<pageCount>/real_db.json` (5 books, correct triples)
 - [ ] `src/data/<pageCount>/page_first_lines.json` (length = `<pageCount>`)
-- [ ] `src/data/<pageCount>/page_titles_keys.json` (length = `<pageCount>`)
+- [ ] `npm run generate-layout-data -- --layout <pageCount>` passes and writes
+      `page_titles_keys.json` + updates `target_pages.json`
 - [ ] `LAYOUT_DATA` entry in `torahData.ts`
 - [ ] `TORAH_TYPE_OPTIONS` entry in `options.ts`
 - [ ] `settings.torahTypeOptions.klaf_<pageCount>` in all locales
-- [ ] `"<pageCount>"` page key added to every `page` in `target_pages.json`
-- [ ] Verified with the script and against a real scroll
+- [ ] Verified with the sanity script and against a real scroll
