@@ -746,7 +746,39 @@ const verifyFirstLinesAgainstSource = ({
         `${label}: page ${page} first line maps to verse ${formatRef(preferred.firstVerseRef)} ` +
           `but real_db says ${formatRef(realDbEntry.ref)}`,
       );
+      return;
     }
+
+    // Exact-source-text check: the recorded first line must be the *exact* text
+    // from the Torah source (right letters AND right vowels/te'amim/makaf), not
+    // an approximation. The matcher only anchors on consonants, so without this
+    // a wrong or missing nikud/te'amim mark would slip through. Compared
+    // segment by segment so multi-column entries (e.g. a paragraph break on the
+    // first line) are validated as real, contiguous source text.
+    const expectedParts = getFirstLineParts(firstLineEntry);
+    const sourceParts = preferred.match.parts;
+
+    if (expectedParts.length !== sourceParts.length) {
+      issues.push(
+        `${label}: page ${page} first line has ${expectedParts.length} segment(s) ` +
+          `but matched ${sourceParts.length} in the source`,
+      );
+      return;
+    }
+
+    expectedParts.forEach((expectedPart, partIndex) => {
+      // Strip source annotation markers like #(פ)/#(ס) from both sides: they are
+      // petucha/setuma annotations some datasets keep on the recorded line, not
+      // Torah letters/vowels, so they must not cause a false mismatch.
+      const expectedText = normalizeSpaces(stripSourceMarkers(expectedPart));
+      const sourceText = normalizeSpaces(stripSourceMarkers(sourceParts[partIndex]));
+      if (sourceText !== expectedText) {
+        issues.push(
+          `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${partIndex + 1}` : ''} ` +
+            `differs from the exact Torah source text\n    recorded: ${expectedText}\n    source:   ${sourceText}`,
+        );
+      }
+    });
   });
 
   return issues;
