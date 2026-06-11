@@ -63,7 +63,7 @@
     </template>
   </v-navigation-drawer>
 
-  <v-app-bar app color="#f2f2f2" flat density="comfortable">
+  <v-app-bar app color="rgba(23, 37, 84, 0.85)" flat density="comfortable" class="nav-app-bar">
     <v-app-bar-nav-icon
       class="d-md-none"
       data-tutorial="menu-button"
@@ -240,7 +240,13 @@ onUnmounted(() => {
 }
 
 .border-t {
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid rgba(248, 250, 252, 0.12) !important;
+}
+
+.nav-app-bar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(248, 250, 252, 0.08) !important;
 }
 
 .v-btn--active {

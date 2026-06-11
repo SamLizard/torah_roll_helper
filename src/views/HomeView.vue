@@ -3,536 +3,60 @@
     <GolaBanner />
     <SavedSettingsBanner />
 
-    <v-row class="position-relative">
-      <v-col cols="12" md="6" class="px-md-5">
-        <LocationSelector
-          ref="fromLocationSelectorRef"
-          key="from"
-          side="from"
-          :page="options.fromPage" 
-          :selected-ref="fromRef"
-          :target-key="fromTargetKey"
-          :balance-calendar-card-height="balanceCalendarCardHeight"
-          :allow-photo="true"
-          @open-dicta="openDictaFor('from')"
-          @choose-manual="openTargets('from')"
-          @calendar-requires-expanded-height-change="(requiresExpandedHeight) => onCalendarExpandedHeightChange('from', requiresExpandedHeight)"
-          @manual-set="onSetFromPage"
-        />
-      </v-col>
-
-      <v-icon
-        class="position-absolute d-none d-md-flex"
-        style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-        size="36"
-      >
-        mdi-arrow-{{ $vuetify.locale.isRtl ? 'left' : 'right' }}
-      </v-icon>
-
-      <v-col cols="12" class="d-md-none py-0">
-        <MobileCompactResult
-          :pages="roll?.pages ?? null"
-          :direction="roll?.rollDirection ?? null"
-          :remaining-after-book-label="remainingAfterBookLabel"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="px-md-5">
-        <LocationSelector
-          ref="toLocationSelectorRef"
-          key="to"
-          side="to"
-          :page="options.toPage" 
-          :selected-ref="toRef"
-          :target-key="toTargetKey"
-          :balance-calendar-card-height="balanceCalendarCardHeight"
-          :allow-photo="false"
-          @open-dicta="openDictaFor('to')"
-          @choose-manual="openTargets('to')"
-          @calendar-requires-expanded-height-change="(requiresExpandedHeight) => onCalendarExpandedHeightChange('to', requiresExpandedHeight)"
-          @manual-set="onSetToPage"
-        />
-      </v-col>
-    </v-row>
-
-    <v-row class="mt-6" justify="center">
+    <!-- Guided Wizard Layout -->
+    <v-row justify="center" class="mb-4">
       <v-col cols="12" md="8">
-        <div data-tutorial="roll-result">
-          <RollResult
-            ref="rollResultRef"
-            :pages="roll?.pages ?? null"
-            :direction="roll?.rollDirection ?? null"
-            :from-page="options.fromPage"
-            :to-page="options.toPage"
-          />
-        </div>
+        <WizardProgress 
+          :current-step="wizardStore.currentStep" 
+          :max-page-set="wizardStore.fromPage !== null"
+          @navigate="wizardStore.setStep"
+        />
       </v-col>
     </v-row>
 
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <!-- Transition container for smooth step switching -->
+        <v-window v-model="wizardStore.currentStep" disabled>
+          <v-window-item :value="1">
+            <div data-tutorial="from-selector">
+              <WizardStepFrom 
+                ref="fromLocationSelectorRef" 
+                @choose-manual="openTargets('from')"
+              />
+            </div>
+          </v-window-item>
+
+          <v-window-item :value="2">
+            <div data-tutorial="to-selector">
+              <WizardStepTo 
+                ref="toLocationSelectorRef" 
+                @choose-manual="openTargets('to')"
+              />
+            </div>
+          </v-window-item>
+
+          <v-window-item :value="3">
+            <div data-tutorial="roll-result">
+              <WizardStepResult 
+                ref="rollResultRef"
+              />
+            </div>
+          </v-window-item>
+        </v-window>
+      </v-col>
+    </v-row>
+
+    <!-- Global shared modals and overlays -->
     <TargetOptionsGrid
       v-model="targetsOpen"
       :side="activeSide"
-      :selected-target-key="(activeSide === 'from' ? fromTargetKey : toTargetKey) ?? undefined"
-      :allow-gola="allowGolaInTargets"
+      :selected-target-key="(activeSide === 'from' ? wizardStore.fromTargetKey : wizardStore.toTargetKey) ?? undefined"
+      :allow-gola="true"
       @select="onTargetSelected"
     />
 
-    <transition name="dialog-bottom-transition">
-      <div
-        v-if="!isPhoneCameraMode && dictaOpen"
-        class="dicta-overlay bg-background"
-        :dir="photoUiDirection"
-      >
-        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0" data-tutorial="dicta-dialog">
-          <v-card-title class="dicta-card-title">
-            <span>{{ $t('home.dicta.title') }}</span>
-            <div class="dicta-card-toolbar">
-              <v-btn
-                v-if="hasCachedOptionsForActiveSide"
-                size="small"
-                variant="text"
-                :prepend-icon="backToOptionsIcon"
-                :disabled="isDictaBusy"
-                @click="onDictaShowCachedOptions"
-              >
-                {{ $t('home.dicta.backToOptions') }}
-              </v-btn>
-              <v-btn
-                size="small"
-                variant="text"
-                prepend-icon="mdi-camera-retake"
-                :disabled="isDictaBusy"
-                @click="onDictaRetake"
-              >
-                {{ $t('home.dicta.newPhoto') }}
-              </v-btn>
-              <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
-            </div>
-          </v-card-title>
-
-          <v-divider />
-
-          <v-card-text class="dicta-card-content">
-            <div
-              v-if="
-                dictaFlowState === 'analyzing-ocr' ||
-                dictaFlowState === 'analyzing-parallels' ||
-                dictaFlowState === 'success'
-              "
-              class="dicta-state dicta-state--loading"
-            >
-              <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
-                <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
-              </div>
-              <template v-else>
-                <v-progress-circular indeterminate color="primary" size="54" width="5" />
-                <div class="text-subtitle-1 font-weight-medium mt-4">
-                  {{
-                    dictaFlowState === 'analyzing-ocr'
-                      ? $t('home.dicta.loadingOcr')
-                      : $t('home.dicta.loadingSearch')
-                  }}
-                </div>
-              </template>
-            </div>
-
-            <div v-else class="dicta-state">
-              <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
-                <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
-                <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
-                <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    prepend-icon="mdi-text-search"
-                    data-tutorial="dicta-first-line-fallback"
-                    @click="onOpenFirstLineSearchFromDicta"
-                  >
-                    {{ $t('home.dicta.tryFirstWords') }}
-                  </v-btn>
-                  <v-btn
-                    size="small"
-                    variant="tonal"
-                    prepend-icon="mdi-camera-retake"
-                    @click="onDictaRetake"
-                  >
-                    {{ $t('home.dicta.newPhoto') }}
-                  </v-btn>
-                </div>
-              </div>
-
-              <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
-                <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
-                <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
-                <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    prepend-icon="mdi-text-search"
-                    data-tutorial="dicta-first-line-fallback"
-                    @click="onOpenFirstLineSearchFromDicta"
-                  >
-                    {{ $t('home.dicta.tryFirstWords') }}
-                  </v-btn>
-                  <v-btn
-                    size="small"
-                    variant="tonal"
-                    prepend-icon="mdi-camera-retake"
-                    @click="onDictaRetake"
-                  >
-                    {{ $t('home.dicta.newPhoto') }}
-                  </v-btn>
-                </div>
-              </div>
-
-              <div
-                v-else
-                class="dicta-state-headline"
-                :class="{ 'dicta-state-headline--compact': smAndDown }"
-              >
-                <v-icon size="46" class="mb-2 text-primary">mdi-camera</v-icon>
-                <div class="dicta-idle-title">{{ $t('home.dicta.idleTitle') }}</div>
-                <div class="dicta-idle-subtitle">{{ $t('home.dicta.idleSubtitle') }}</div>
-              </div>
-
-              <DictaCameraCapture
-                v-if="dictaOpen"
-                :key="dictaCaptureKey"
-                :busy="isDictaBusy"
-                :auto-fallback="isPhoneCameraMode && !isTutorialActive"
-                :hide-file-button="isPhoneCameraMode"
-                :suppress-errors="isPhoneCameraMode"
-                :mobile-mode="isPhoneCameraMode"
-                @captured="onDictaCaptured"
-                @error="onDictaCameraError"
-                @close="closeDictaDialog"
-              />
-            </div>
-          </v-card-text>
-        </v-card>
-      </div>
-    </transition>
-
-    <transition name="dialog-bottom-transition">
-      <div
-        v-if="isPhoneCameraMode && dictaOpen && dictaFlowState !== 'idle'"
-        class="dicta-overlay bg-background"
-        :dir="photoUiDirection"
-      >
-        <v-card class="dicta-card dicta-card--camera" rounded="0" elevation="0" data-tutorial="dicta-dialog">
-          <v-card-title class="dicta-card-title">
-            <span>{{ $t('home.dicta.title') }}</span>
-            <div class="dicta-card-toolbar">
-              <v-btn
-                size="small"
-                variant="text"
-                prepend-icon="mdi-camera-retake"
-                :disabled="isDictaBusy"
-                @click="onDictaRetake"
-              >
-                {{ $t('home.dicta.newPhoto') }}
-              </v-btn>
-              <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
-            </div>
-          </v-card-title>
-
-          <v-divider />
-
-          <v-card-text class="dicta-card-content">
-            <div
-              v-if="
-                dictaFlowState === 'analyzing-ocr' ||
-                dictaFlowState === 'analyzing-parallels' ||
-                dictaFlowState === 'success'
-              "
-              class="dicta-state dicta-state--loading"
-            >
-              <div v-if="dictaFlowState === 'success'" class="dicta-state-headline">
-                <v-icon size="64" class="mb-2 text-success">mdi-check-circle</v-icon>
-              </div>
-              <template v-else>
-                <v-progress-circular indeterminate color="primary" size="54" width="5" />
-                <div class="text-subtitle-1 font-weight-medium mt-4">
-                  {{
-                    dictaFlowState === 'analyzing-ocr'
-                      ? $t('home.dicta.loadingOcr')
-                      : $t('home.dicta.loadingSearch')
-                  }}
-                </div>
-              </template>
-            </div>
-
-            <div v-else class="dicta-state">
-              <div v-if="dictaFlowState === 'no-result'" class="dicta-state-headline">
-                <v-icon size="46" class="mb-2 text-medium-emphasis">mdi-book-open-page-variant-outline</v-icon>
-                <div class="dicta-no-result-title">{{ dictaNoResultTitle }}</div>
-                <div class="dicta-no-result-subtitle">{{ dictaNoResultSubtitle }}</div>
-                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    prepend-icon="mdi-text-search"
-                    data-tutorial="dicta-first-line-fallback"
-                    @click="onOpenFirstLineSearchFromDicta"
-                  >
-                    {{ $t('home.dicta.tryFirstWords') }}
-                  </v-btn>
-                  <v-btn
-                    size="small"
-                    variant="tonal"
-                    prepend-icon="mdi-camera-retake"
-                    @click="onDictaRetake"
-                  >
-                    {{ $t('home.dicta.newPhoto') }}
-                  </v-btn>
-                </div>
-              </div>
-
-              <div v-else-if="dictaFlowState === 'error'" class="dicta-state-headline">
-                <v-icon size="46" class="mb-2 text-error">mdi-alert-circle-outline</v-icon>
-                <div class="dicta-error-title">{{ $t('home.dicta.errorTitle') }}</div>
-                <div class="dicta-error-message">{{ dictaErrorMessage }}</div>
-                <div class="d-flex ga-3 justify-center flex-wrap mt-4">
-                  <v-btn
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    prepend-icon="mdi-text-search"
-                    data-tutorial="dicta-first-line-fallback"
-                    @click="onOpenFirstLineSearchFromDicta"
-                  >
-                    {{ $t('home.dicta.tryFirstWords') }}
-                  </v-btn>
-                  <v-btn
-                    size="small"
-                    variant="tonal"
-                    prepend-icon="mdi-camera-retake"
-                    @click="onDictaRetake"
-                  >
-                    {{ $t('home.dicta.newPhoto') }}
-                  </v-btn>
-                </div>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </div>
-    </transition>
-
-    <section
-      v-if="isPhoneCameraMode && dictaOpen && dictaFlowState === 'idle'"
-      class="dicta-mobile-screen"
-      data-tutorial="dicta-dialog"
-      :dir="photoUiDirection"
-    >
-      <div class="dicta-mobile-screen__header">
-        <span class="dicta-mobile-screen__title">{{ $t('home.dicta.title') }}</span>
-        <div class="dicta-mobile-screen__toolbar">
-          <v-btn
-            v-if="hasCachedOptionsForActiveSide"
-            size="small"
-            variant="text"
-            :prepend-icon="backToOptionsIcon"
-            :disabled="isDictaBusy"
-            @click="onDictaShowCachedOptions"
-          >
-            {{ $t('home.dicta.backToOptions') }}
-          </v-btn>
-          <v-btn
-            size="small"
-            variant="text"
-            prepend-icon="mdi-camera-retake"
-            :disabled="isDictaBusy"
-            @click="onDictaRetake"
-          >
-            {{ $t('home.dicta.newPhoto') }}
-          </v-btn>
-          <v-btn icon="mdi-close" variant="text" size="small" @click="closeDictaDialog" />
-        </div>
-      </div>
-
-      <v-divider />
-
-      <div class="dicta-mobile-screen__content">
-        <div class="dicta-state">
-          <DictaCameraCapture
-            v-if="dictaOpen"
-            :key="dictaCaptureKey"
-            :busy="isDictaBusy"
-            :auto-fallback="isPhoneCameraMode && !isTutorialActive"
-            :hide-file-button="isPhoneCameraMode"
-            :suppress-errors="isPhoneCameraMode"
-            :mobile-mode="isPhoneCameraMode"
-            @captured="onDictaCaptured"
-            @error="onDictaCameraError"
-            @close="closeDictaDialog"
-          />
-        </div>
-      </div>
-    </section>
-
-    <transition name="dialog-bottom-transition">
-      <div
-        v-if="dictaChoiceOpen"
-        class="dicta-choice-overlay bg-background"
-        :dir="photoUiDirection"
-      >
-        <v-card class="dicta-choice-shell" rounded="0" elevation="0">
-          <v-card-title class="dicta-card-title">
-            <span>{{ $t('home.dicta.chooseTitle') }}</span>
-            <div class="dicta-card-toolbar">
-              <v-btn
-                size="small"
-                variant="text"
-                prepend-icon="mdi-camera-retake"
-                @click="onDictaChoiceRetake"
-              >
-                {{ $t('home.dicta.newPhoto') }}
-              </v-btn>
-              <v-btn icon="mdi-close" variant="text" size="small" @click="onDictaChoiceCancel" />
-            </div>
-          </v-card-title>
-          <v-card-text class="dicta-choice-content">
-            <p class="text-body-2 mb-4">{{ $t('home.dicta.chooseSubtitle') }}</p>
-            <v-table
-              v-if="!smAndDown"
-              density="compact"
-              class="dicta-choice-table"
-            >
-              <thead>
-                <tr>
-                  <th>{{ $t('home.dicta.result.index') }}</th>
-                  <th>{{ $t('home.dicta.result.matches') }}</th>
-                  <th>{{ $t('home.dicta.result.rank') }}</th>
-                  <th>{{ $t('home.dicta.result.reference') }}</th>
-                  <th>{{ $t('manual.book') }}</th>
-                  <th>{{ $t('manual.chapter') }}</th>
-                  <th>{{ $t('manual.verse') }}</th>
-                  <th>{{ $t('manual.page') }}</th>
-                  <th>{{ $t('home.dicta.result.pageTitle') }}</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(option, index) in dictaChoiceOptions"
-                  :key="option.key"
-                >
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ option.matchCount }}</td>
-                  <td>
-                    <v-chip
-                      size="x-small"
-                      :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
-                      variant="tonal"
-                    >
-                      {{ getRankLabel(option.rank) }}
-                    </v-chip>
-                  </td>
-                  <td class="dicta-choice-source">{{ getOptionExtraMatchesLabel(option) }}</td>
-                  <td>{{ getBookLabel(option.candidate.reference.book) }}</td>
-                  <td>{{ option.candidate.reference.chapter }}</td>
-                  <td>{{ option.candidate.reference.verse ?? '-' }}</td>
-                  <td>{{ option.page }}</td>
-                  <td class="dicta-choice-page-title">{{ getOptionPageTitle(option) }}</td>
-                  <td class="dicta-choice-actions">
-                    <v-btn
-                      icon="mdi-book-open-page-variant-outline"
-                      size="x-small"
-                      variant="text"
-                      color="primary"
-                      :title="$t('preview.openPage')"
-                      :aria-label="$t('preview.openPage')"
-                      @click="openDictaChoicePreview(option.page)"
-                    />
-                    <v-btn
-                      size="small"
-                      color="primary"
-                      variant="tonal"
-                      @click="onDictaChoiceSelect(option)"
-                    >
-                      {{ $t('home.dicta.result.choose') }}
-                    </v-btn>
-                  </td>
-                </tr>
-              </tbody>
-            </v-table>
-
-            <v-row v-else dense>
-              <v-col
-                v-for="(option, index) in dictaChoiceOptions"
-                :key="option.key"
-                cols="12"
-              >
-                <v-card variant="outlined" class="dicta-choice-card">
-                  <v-card-text class="py-2 px-3">
-                    <div class="d-flex align-center justify-space-between mb-1">
-                      <strong>#{{ index + 1 }}</strong>
-                      <v-chip
-                        size="x-small"
-                        :color="option.rank === 'high' ? 'success' : (option.rank === 'medium' ? 'warning' : 'default')"
-                        variant="tonal"
-                      >
-                        {{ getRankLabel(option.rank) }}
-                      </v-chip>
-                    </div>
-                    <div class="d-flex flex-wrap ga-2 text-body-2 mb-1">
-                      <strong>{{ $t('manual.page') }} {{ option.page }}</strong>
-                      <span>{{ getOptionPageTitle(option) }}</span>
-                    </div>
-                    <div class="text-caption text-medium-emphasis mb-1">
-                      {{ $t('manual.book') }} {{ getBookLabel(option.candidate.reference.book) }} ·
-                      {{ $t('manual.chapter') }} {{ option.candidate.reference.chapter }} ·
-                      {{ $t('manual.verse') }} {{ option.candidate.reference.verse ?? '-' }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      {{ option.matchCount }} {{ $t('home.dicta.result.matches') }}
-                      <template v-if="option.sourceCount > 1">
-                        · {{ getOptionExtraMatchesLabel(option) }}
-                      </template>
-                    </div>
-                  </v-card-text>
-                  <v-card-actions class="pt-0 px-3 pb-2 dicta-choice-card-actions">
-                    <v-btn
-                      icon="mdi-book-open-page-variant-outline"
-                      size="small"
-                      variant="text"
-                      color="primary"
-                      :title="$t('preview.openPage')"
-                      :aria-label="$t('preview.openPage')"
-                      @click="openDictaChoicePreview(option.page)"
-                    />
-                    <v-btn
-                      size="small"
-                      color="primary"
-                      class="flex-grow-1"
-                      variant="tonal"
-                      @click="onDictaChoiceSelect(option)"
-                    >
-                      {{ $t('home.dicta.result.choose') }}
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </div>
-    </transition>
-
-    <PagePreviewDialog
-      :model-value="isDictaChoicePreviewOpen"
-      :page="dictaPreviewPage"
-      :preview-columns="dictaPreviewColumns"
-      :tikkun-url="dictaPreviewTikkunUrl"
-      @update:model-value="onDictaChoicePreviewModelValueChange"
-    />
-
+    <!-- Onboarding wrapper -->
     <VOnboardingWrapper
       ref="onboardingWrapper"
       class="home-onboarding"
@@ -603,7 +127,6 @@
         </VOnboardingStep>
       </template>
     </VOnboardingWrapper>
-
   </v-container>
 </template>
 
@@ -614,8 +137,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { useDisplay } from 'vuetify';
-import { useRtl } from 'vuetify';
+import { useDisplay, useRtl } from 'vuetify';
 import {
   VOnboardingStep,
   VOnboardingWrapper,
@@ -623,65 +145,39 @@ import {
   type StepEntity,
   type VOnboardingWrapperOptions,
 } from 'v-onboarding';
+
+import { useWizardStore } from '@/stores/wizard';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
-import LocationSelector from '@/components/LocationSelector.vue';
-import MobileCompactResult from '@/components/MobileCompactResult.vue';
-import GolaBanner from '@/components/GolaBanner.vue';
-import SavedSettingsBanner from '@/components/SavedSettingsBanner.vue';
-import RollResult from '@/components/RollResult.vue';
-import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
-import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
-import PagePreviewDialog from '@/components/PagePreviewDialog.vue';
-import {
-  computeRoll,
-  getPageNumber,
-  getApproximatePages,
-  getPageStartRef,
-  getPageTitleKeys,
-} from '@/composables/utils';
-import { splitPairedParashaReadingId } from '@/composables/calendar/calendar';
+import { useTorahData, resolvePageForLayout } from '@/composables/torahData';
 import { findReadingTargetByKey } from '@/composables/readingTargets';
-import {
-  trackPhotoAttemptOutcome,
-  trackPhotoMultiResultRetake,
-  trackPhotoMultiResultSelection,
-  trackPhotoSuccess,
-  trackFromToAction,
-  trackRollResultDisplayed,
-  trackTutorialEvent,
-} from '@/composables/analytics';
 import { markTutorialStarted } from '@/composables/tutorials';
 import {
   closeTutorialLanguageMenu,
-  isLanguageMenuOpen,
   openTutorialLanguageMenu,
   closeTutorialNavDrawer,
   openTutorialNavDrawer,
+  isLanguageMenuOpen,
 } from '@/composables/tutorialUi';
-import { useTorahData, resolvePageForLayout, getLayoutData } from '@/composables/torahData';
-import { toPreviewColumns } from '@/composables/firstLineSearch';
-import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
-import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
-import { toRefUrl } from '@/composables/tikkunLinks';
-import type { ManualData, RollInstructions, TorahRef } from '@/types';
+import {
+  trackTutorialEvent,
+} from '@/composables/analytics';
 
-interface HomeTargetItem {
-  key: string;
-  group?: string;
-  specific?: 'both' | 'gola' | 'israel';
-  type?: 'parasha' | 'holyday';
-  ref: TorahRef;
-  refEndPartial?: TorahRef;
-  refEnd: TorahRef;
-}
+import WizardProgress from '@/components/wizard/WizardProgress.vue';
+import WizardStepFrom from '@/components/wizard/WizardStepFrom.vue';
+import WizardStepTo from '@/components/wizard/WizardStepTo.vue';
+import WizardStepResult from '@/components/wizard/WizardStepResult.vue';
+import GolaBanner from '@/components/GolaBanner.vue';
+import SavedSettingsBanner from '@/components/SavedSettingsBanner.vue';
+import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
+
+import type { ManualData, TorahRef } from '@/types';
 
 interface TutorialStepEntity extends StepEntity {
   id: string;
 }
 
 type TutorialKind = 'quick' | 'full';
-type FirstLineSearchOpenSource = 'manual' | 'camera-fallback' | 'tutorial' | 'card';
 
 interface TutorialSnapshot {
   fromPage: number | null;
@@ -692,55 +188,43 @@ interface TutorialSnapshot {
   toTargetKey: string | null;
 }
 
-const BOOK_LABEL_KEYS = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy'] as const;
-type DictaFlowState = 'idle' | 'analyzing-ocr' | 'analyzing-parallels' | 'success' | 'no-result' | 'error';
-
-interface DictaCandidate {
-  index: number;
-  page: number;
-  reference: DictaReference;
-}
-
-interface DictaPageOption {
+interface HomeTargetItem {
   key: string;
-  candidate: DictaCandidate;
-  page: number;
-  rank: 'high' | 'medium' | 'low';
-  matchCount: number;
-  sourceCount: number;
+  ref: TorahRef;
+  refEndPartial?: TorahRef;
+  refEnd: TorahRef;
+  type?: string;
 }
 
-interface DictaMetricsSession {
-  attemptCount: number;
-  multiResultRetakeCount: number;
-}
-
-const options = useOptionsStore();
+// Stores
+const wizardStore = useWizardStore();
+const optionsStore = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
+const { isRtl } = useRtl();
 const { t, locale } = useI18n();
+const { smAndDown } = useDisplay();
+const { layoutKey } = useTorahData();
 const router = useRouter();
 const route = useRoute();
-const { smAndDown } = useDisplay();
-const { isRtl } = useRtl();
-const { realDb: torahRealDb, pageFirstLines: torahPageFirstLines, pageTitlesKeys: torahPageTitles, layoutKey } = useTorahData();
+
+// Component Refs
+const fromLocationSelectorRef = ref<any>(null);
+const toLocationSelectorRef = ref<any>(null);
+const rollResultRef = ref<any>(null);
+
+// Modal state
+const targetsOpen = ref(false);
+const activeSide = ref<'from' | 'to'>('from');
+
+// Onboarding & Tutorial State
 const onboardingWrapper = ref();
 const {
   start: startOnboarding,
   finish: finishOnboarding,
   goToStep: goToOnboardingStep,
 } = useVOnboarding(onboardingWrapper);
-const fromRef = ref<ManualData | null>(null);
-const toRef = ref<ManualData | null>(null);
-const fromTargetKey = ref<string | null>(null);
-const toTargetKey = ref<string | null>(null);
-const calendarNeedsExpandedHeight = ref<Record<'from' | 'to', boolean>>({
-  from: false,
-  to: false,
-});
 
-const targetsOpen = ref(false);
-const activeSide = ref<'from' | 'to'>('to');
 const activeTutorial = ref<TutorialKind | null>(null);
 const activeTutorialStepId = ref<string | null>(null);
 const activeTutorialSource = ref('home-page');
@@ -750,812 +234,88 @@ const isTutorialActive = ref(false);
 const tutorialSnapshot = ref<TutorialSnapshot | null>(null);
 const pendingTutorialNavigation = ref<'about' | null>(null);
 
-interface LocationSelectorExposed {
-  openManualDialog: () => void;
-  closeManualDialog: () => void;
-  openFirstLineSearchDialog: (source?: FirstLineSearchOpenSource) => void;
-  closeFirstLineSearchDialog: () => void;
-  openPagePreview: () => void;
-  closePagePreview: () => void;
-}
-
-const fromLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
-const toLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
-
-const dictaOpen = ref(false);
-const dictaFlowState = ref<DictaFlowState>('idle');
-const dictaErrorMessage = ref('');
-const dictaRawResults = ref<DictaParallelItem[]>([]);
-const dictaCandidates = ref<DictaCandidate[]>([]);
-const dictaChoiceOpen = ref(false);
-const dictaChoiceOptions = ref<DictaPageOption[]>([]);
-const dictaChoiceResolver = ref<((option: DictaPageOption | null) => void) | null>(null);
-const dictaCaptureKey = ref(0);
-const dictaAnalyzeJobId = ref(0);
-const dictaPreviewPage = ref<number | null>(null);
-const dictaOptionsBySide = ref<Record<'from' | 'to', DictaPageOption[]>>({
-  from: [],
-  to: [],
-});
-const dictaMetricsBySide = ref<Record<'from' | 'to', DictaMetricsSession | null>>({
-  from: null,
-  to: null,
-});
-
-const allowGolaInTargets = computed(() => {
-  return true;
-});
-
-const balanceCalendarCardHeight = computed(() => {
-  if (smAndDown.value) return false;
-  return calendarNeedsExpandedHeight.value.from || calendarNeedsExpandedHeight.value.to;
-});
-
-const roll = ref<RollInstructions | null>(null);
-
-const onCalendarExpandedHeightChange = (side: 'from' | 'to', requiresExpandedHeight: boolean) => {
-  calendarNeedsExpandedHeight.value = {
-    ...calendarNeedsExpandedHeight.value,
-    [side]: requiresExpandedHeight,
-  };
-};
-
-watch(
-  [() => options.fromPage, () => options.toPage], 
-  ([newFrom, newTo]) => {
-    if (newFrom != null && newTo != null) {
-      const computedRoll = computeRoll(newFrom, newTo);
-      roll.value = computedRoll;
-      trackRollResultDisplayed({
-        direction: computedRoll.rollDirection,
-        pages: computedRoll.pages,
-      });
-    } else {
-      roll.value = null;
-    }
-  },
-  { immediate: true }
-);
-
-// Recalculate pages when the layout changes
-watch(layoutKey, (newLayoutKey, oldLayoutKey) => {
-  if (newLayoutKey === oldLayoutKey) return;
-
-  const oldDb = getLayoutData(oldLayoutKey).realDb;
-  const newDb = torahRealDb.value;
-
-  if (options.fromPage != null) {
-    const ref = fromRef.value;
-    if (ref && ref.chapter != null && ref.verse != null) {
-      const newPage = getPageNumber(newDb, ref.book, ref.chapter, ref.verse);
-      options.changeFromPage(newPage > 0 ? newPage : null);
-    } else {
-      // Manual page entry without ref — resolve the first verse on that page in the old layout, then find it in the new one
-      const pageStartRef = getPageStartRef(oldDb, options.fromPage);
-      if (pageStartRef) {
-        const newPage = getPageNumber(newDb, pageStartRef.book, pageStartRef.chapter, pageStartRef.verse);
-        fromRef.value = { book: pageStartRef.book, chapter: pageStartRef.chapter, verse: pageStartRef.verse };
-        options.changeFromPage(newPage > 0 ? newPage : null);
-      } else {
-        options.changeFromPage(null);
-        fromRef.value = null;
-        fromTargetKey.value = null;
-      }
-    }
-  }
-
-  if (options.toPage != null) {
-    const ref = toRef.value;
-    if (ref && ref.chapter != null && ref.verse != null) {
-      const newPage = getPageNumber(newDb, ref.book, ref.chapter, ref.verse);
-      options.changeToPage(newPage > 0 ? newPage : null);
-    } else {
-      const pageStartRef = getPageStartRef(oldDb, options.toPage);
-      if (pageStartRef) {
-        const newPage = getPageNumber(newDb, pageStartRef.book, pageStartRef.chapter, pageStartRef.verse);
-        toRef.value = { book: pageStartRef.book, chapter: pageStartRef.chapter, verse: pageStartRef.verse };
-        options.changeToPage(newPage > 0 ? newPage : null);
-      } else {
-        options.changeToPage(null);
-        toRef.value = null;
-        toTargetKey.value = null;
-      }
-    }
-  }
-
-  trackFromToAction({ side: 'from', action: 'layout-change', value: `${oldLayoutKey}-to-${newLayoutKey}` });
-});
-
-const rollResultRef = ref<InstanceType<typeof RollResult> | null>(null);
-
-const remainingAfterBookLabel = computed(() => {
-  const data = rollResultRef.value?.remainingAfterBook;
-  if (!data) return null;
-  return t('result.remainingAfterBook', { count: data.count, book: t(`group.${data.bookKey}`) });
-});
-
-const toManualData = (torahRef: TorahRef): ManualData => ({
-  book: torahRef.book,
-  chapter: torahRef.chapter,
-  verse: torahRef.verse,
-});
-
-const getDefaultRefForSide = (target: HomeTargetItem, side: 'from' | 'to'): TorahRef => {
-  if (side === 'from') return target.refEndPartial ?? target.refEnd;
-  return target.ref;
-};
-
-const closeDictaDialog = (preserveJob = false) => {
-  dictaOpen.value = false;
-  if (!preserveJob) {
-    dictaAnalyzeJobId.value += 1;
-  }
-};
-
-const resetDictaSession = () => {
-  dictaFlowState.value = 'idle';
-  dictaErrorMessage.value = '';
-  dictaRawResults.value = [];
-  dictaCandidates.value = [];
-};
-
-const applyDictaReference = (reference: DictaReference, page: number): boolean => {
-  const resolvedPage = getPageNumber(torahRealDb.value, reference.book, reference.chapter, reference.verse ?? 1);
-  const finalPage = page > 0 ? page : resolvedPage;
-  if (finalPage <= 0) return false;
-
-  const data: ManualData = {
-    book: reference.book,
-    chapter: reference.chapter,
-    verse: reference.verse,
-  };
-
-  if (activeSide.value === 'from') {
-    onSetFromPage(finalPage, data, null);
-  } else {
-    onSetToPage(finalPage, data, null);
-  }
-
-  return true;
-};
-
-const createDictaMetricsSession = (): DictaMetricsSession => ({
-  attemptCount: 0,
-  multiResultRetakeCount: 0,
-});
-
-const startDictaMetricsSession = (side: 'from' | 'to') => {
-  dictaMetricsBySide.value[side] = createDictaMetricsSession();
-};
-
-const ensureDictaMetricsSession = (side: 'from' | 'to'): DictaMetricsSession => {
-  const existingSession = dictaMetricsBySide.value[side];
-  if (existingSession) return existingSession;
-
-  const nextSession = createDictaMetricsSession();
-  dictaMetricsBySide.value[side] = nextSession;
-  return nextSession;
-};
-
-const getDictaMetricsSession = (side: 'from' | 'to') => {
-  return dictaMetricsBySide.value[side];
-};
-
-const clearDictaMetricsSession = (side: 'from' | 'to') => {
-  dictaMetricsBySide.value[side] = null;
-};
-
-const getBookLabel = (book: number): string => {
-  const key = BOOK_LABEL_KEYS[book - 1];
-  return key ? t(`group.${key}`) : `${book}`;
-};
-
-const dictaNoResultTitle = computed(() => t('home.dicta.noResultTitle'));
-const dictaNoResultSubtitle = computed(() => t('home.dicta.noResultSubtitle'));
-const isDictaBusy = computed(
-  () => dictaFlowState.value === 'analyzing-ocr' || dictaFlowState.value === 'analyzing-parallels'
-);
-const hasCachedOptionsForActiveSide = computed(
-  () => dictaOptionsBySide.value[activeSide.value].length > 1
-);
-const photoUiDirection = computed<'rtl' | 'ltr'>(() => (isRtl.value ? 'rtl' : 'ltr'));
-const backToOptionsIcon = computed(() => (isRtl.value ? 'mdi-arrow-right' : 'mdi-arrow-left'));
-const isDictaChoicePreviewOpen = computed(() => dictaPreviewPage.value !== null);
-const dictaPreviewColumns = computed(() => {
-  if (dictaPreviewPage.value == null) return [];
-  return toPreviewColumns((torahPageFirstLines.value as unknown[])[dictaPreviewPage.value - 1]);
-});
-const dictaPreviewTikkunUrl = computed(() => {
-  if (dictaPreviewPage.value == null) return null;
-  const pageStartRef = getPageStartRef(torahRealDb.value, dictaPreviewPage.value);
-  return pageStartRef ? toRefUrl(pageStartRef) : null;
-});
-const isPhoneCameraMode = computed(() => {
-  if (typeof navigator === 'undefined') return false;
-  const userAgent = navigator.userAgent.toLowerCase();
-  const mobileUserAgent = /android|iphone|ipod|windows phone|mobile/.test(userAgent);
-  const iPadLike = /ipad/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  return mobileUserAgent || iPadLike;
-});
-
-const getPageTitleLabel = (page: number, reference: DictaReference): string => {
-  const keys = getPageTitleKeys(page, {
-    book: reference.book,
-    chapter: reference.chapter,
-    verse: reference.verse,
-  }, options.isInGola, torahPageTitles.value);
-  if (!keys.length) return '-';
-  return keys.map((key) => t(key)).join(t('separator'));
-};
-
-const getRankFromPosition = (position: number): 'high' | 'medium' | 'low' => {
-  if (position === 0) return 'high';
-  if (position <= 4) return 'medium';
-  return 'low';
-};
-
-const getRankLabel = (rank: 'high' | 'medium' | 'low'): string => {
-  if (rank === 'high') return t('home.dicta.result.rankHigh');
-  if (rank === 'medium') return t('home.dicta.result.rankMedium');
-  return t('home.dicta.result.rankLow');
-};
-
-const isTorahResult = (source: DictaParallelItem): boolean => {
-  const xml = typeof source.compBookXmlId === 'string' ? source.compBookXmlId.toLowerCase() : '';
-  if (xml.includes('tanakh.torah')) return true;
-
-  const url = typeof source.url === 'string' ? source.url.toLowerCase() : '';
-  return (
-    url.includes('/genesis.') ||
-    url.includes('/exodus.') ||
-    url.includes('/leviticus.') ||
-    url.includes('/numbers.') ||
-    url.includes('/deuteronomy.')
-  );
-};
-
-const getOptionExtraMatchesLabel = (option: DictaPageOption): string => {
-  if (option.sourceCount <= 1) return '-';
-  return `(+${option.sourceCount - 1})`;
-};
-
-const getOptionPageTitle = (option: DictaPageOption): string => {
-  return getPageTitleLabel(option.page, option.candidate.reference);
-};
-
-const buildDictaCandidates = (results: DictaParallelItem[]): DictaCandidate[] => {
-  const candidates = results
-    .map((item, index) => {
-      if (!isTorahResult(item)) return null;
-      const reference = parseDictaPayload(item);
-      if (!reference) return null;
-
-      const page = getPageNumber(torahRealDb.value, reference.book, reference.chapter, reference.verse ?? 1);
-      return {
-        index,
-        page,
-        reference,
-      } as DictaCandidate;
-    })
-    .filter((candidate): candidate is DictaCandidate => candidate !== null);
-
-  return candidates.sort((a, b) => a.index - b.index);
-};
-
-const expandCandidatePages = (candidate: DictaCandidate): number[] => {
-  if (candidate.reference.verse != null) {
-    return candidate.page > 0 ? [candidate.page] : [];
-  }
-
-  return getApproximatePages(torahRealDb.value, candidate.reference.book, candidate.reference.chapter)
-    .filter((page) => page > 0);
-};
-
-const compareByChapterAndVerse = (a: DictaCandidate, b: DictaCandidate): number => {
-  const chapterDiff = a.reference.chapter - b.reference.chapter;
-  if (chapterDiff !== 0) return chapterDiff;
-
-  const aVerse = a.reference.verse ?? Number.MAX_SAFE_INTEGER;
-  const bVerse = b.reference.verse ?? Number.MAX_SAFE_INTEGER;
-  const verseDiff = aVerse - bVerse;
-  if (verseDiff !== 0) return verseDiff;
-
-  const bookDiff = a.reference.book - b.reference.book;
-  if (bookDiff !== 0) return bookDiff;
-
-  return a.index - b.index;
-};
-
-const getRepresentativeCandidate = (candidates: DictaCandidate[]): DictaCandidate => {
-  const sorted = [...candidates].sort(compareByChapterAndVerse);
-  const withVerse = sorted.find((candidate) => candidate.reference.verse != null);
-  return withVerse ?? sorted[0];
-};
-
-const buildDictaPageOptions = (candidates: DictaCandidate[]): DictaPageOption[] => {
-  const optionsByPage = new Map<
-    number,
-    {
-      candidates: DictaCandidate[];
-      referenceKeys: Set<string>;
-      matchCount: number;
-    }
-  >();
-
-  candidates.forEach((candidate) => {
-    const pages = expandCandidatePages(candidate);
-    const referenceKey = `${candidate.reference.book}:${candidate.reference.chapter}:${candidate.reference.verse ?? '-'}`;
-
-    pages.forEach((page) => {
-      const existing = optionsByPage.get(page);
-      if (!existing) {
-        optionsByPage.set(page, {
-          candidates: [candidate],
-          referenceKeys: new Set([referenceKey]),
-          matchCount: 1,
-        });
-        return;
-      }
-
-      existing.candidates.push(candidate);
-      existing.referenceKeys.add(referenceKey);
-      existing.matchCount += 1;
-    });
-  });
-
-  const sorted = Array.from(optionsByPage.entries())
-    .map(([page, value]) => {
-      const candidate = getRepresentativeCandidate(value.candidates);
-      const sourceCount = value.referenceKeys.size;
-
-      return {
-        key: `page-${page}`,
-        candidate,
-        page,
-        rank: 'low' as const,
-        matchCount: value.matchCount,
-        sourceCount,
-      };
-    })
-    .sort((a, b) => {
-      const matchDiff = b.matchCount - a.matchCount;
-      if (matchDiff !== 0) return matchDiff;
-
-      const candidateDiff = compareByChapterAndVerse(a.candidate, b.candidate);
-      if (candidateDiff !== 0) return candidateDiff;
-
-      return a.page - b.page;
-    });
-
-  return sorted.map((option, index) => {
-    const rank = getRankFromPosition(index);
-    return {
-      ...option,
-      rank,
-    };
-  });
-};
-
-const pickDictaPageOption = async (options: DictaPageOption[]): Promise<DictaPageOption | null> => {
-  if (options.length === 0) return null;
-  if (options.length === 1) return options[0];
-
-  dictaChoiceOptions.value = options;
-  dictaChoiceOpen.value = true;
-
-  return await new Promise((resolve) => {
-    dictaChoiceResolver.value = resolve;
-  });
-};
-
-const isCurrentAnalyzeJob = (jobId: number): boolean => jobId === dictaAnalyzeJobId.value;
-const wait = async (ms: number): Promise<void> => {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
-};
-
-const processDictaFile = async (file: File): Promise<void> => {
-  const jobId = ++dictaAnalyzeJobId.value;
-  const side = activeSide.value;
-  const metricsSession = ensureDictaMetricsSession(side);
-  metricsSession.attemptCount += 1;
-
-  try {
-    if (!isCurrentAnalyzeJob(jobId)) return;
-    dictaErrorMessage.value = '';
-    dictaFlowState.value = 'analyzing-ocr';
-
-    const analysis = await analyzeDictaImage(file);
-    if (!isCurrentAnalyzeJob(jobId)) return;
-
-    if (!analysis.ocrText) {
-      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
-      dictaFlowState.value = 'no-result';
-      return;
-    }
-
-    dictaFlowState.value = 'analyzing-parallels';
-    dictaRawResults.value = analysis.parallels;
-
-    if (analysis.parallels.length === 0) {
-      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
-      dictaFlowState.value = 'no-result';
-      return;
-    }
-
-    const candidates = buildDictaCandidates(analysis.parallels);
-    dictaCandidates.value = candidates;
-    const pageOptions = buildDictaPageOptions(candidates);
-
-    if (pageOptions.length === 0) {
-      trackPhotoAttemptOutcome({ side, outcome: 'no-result' });
-      dictaFlowState.value = 'no-result';
-      return;
-    }
-
-    dictaOptionsBySide.value[side] = pageOptions;
-
-    if (pageOptions.length === 1) {
-      trackPhotoAttemptOutcome({ side, outcome: 'single-result' });
-    } else {
-      trackPhotoAttemptOutcome({
-        side,
-        outcome: 'multiple-results',
-        multipleResultCount: pageOptions.length,
-      });
-    }
-
-    if (pageOptions.length === 1) {
-      dictaFlowState.value = 'success';
-      await wait(500);
-      if (!isCurrentAnalyzeJob(jobId)) return;
-    }
-
-    closeDictaDialog(true);
-    if (!isCurrentAnalyzeJob(jobId)) return;
-
-    const selectedOption = await pickDictaPageOption(pageOptions);
-    if (!isCurrentAnalyzeJob(jobId)) return;
-
-    if (!selectedOption) {
-      return;
-    }
-
-    const applied = applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
-    if (!applied) return;
-
-    const metricsSessionAfterSelection = getDictaMetricsSession(side);
-    if (!metricsSessionAfterSelection) return;
-
-    if (pageOptions.length > 1) {
-      const selectedPosition = pageOptions.findIndex((option) => option.key === selectedOption.key);
-      if (selectedPosition >= 0) {
-        trackPhotoMultiResultSelection({
-          side,
-          position: selectedPosition,
-          totalOptions: pageOptions.length,
-        });
-      }
-    }
-
-    trackPhotoSuccess({
-      side,
-      successType: pageOptions.length === 1 ? 'single-result' : 'multiple-results',
-      triesBeforeSuccess: metricsSessionAfterSelection.attemptCount,
-      multiResultRetakesBeforeSuccess: metricsSessionAfterSelection.multiResultRetakeCount,
-    });
-    clearDictaMetricsSession(side);
-  } catch (error) {
-    if (!isCurrentAnalyzeJob(jobId)) return;
-    trackPhotoAttemptOutcome({ side, outcome: 'error' });
-    dictaFlowState.value = 'error';
-    dictaErrorMessage.value = error instanceof Error ? error.message : t('home.dicta.unexpectedError');
-  }
-};
-
-const onDictaCaptured = (file: File): void => {
-  void processDictaFile(file);
-};
-
-const onDictaCameraError = (message: string): void => {
-  dictaFlowState.value = 'error';
-  dictaErrorMessage.value = message;
-};
-
-const resolveDictaChoice = (choice: DictaPageOption | null): void => {
-  dictaPreviewPage.value = null;
-  dictaChoiceOpen.value = false;
-  dictaChoiceOptions.value = [];
-  if (dictaChoiceResolver.value) {
-    const resolver = dictaChoiceResolver.value;
-    dictaChoiceResolver.value = null;
-    resolver(choice);
-  }
-};
-
-const onDictaChoiceSelect = (option: DictaPageOption): void => {
-  resolveDictaChoice(option);
-};
-
-const onDictaChoiceCancel = (): void => {
-  resolveDictaChoice(null);
-};
-
-const onDictaChoiceRetake = (): void => {
-  const metricsSession = getDictaMetricsSession(activeSide.value);
-  if (metricsSession) {
-    metricsSession.multiResultRetakeCount += 1;
-    trackPhotoMultiResultRetake(activeSide.value);
-  } else {
-    startDictaMetricsSession(activeSide.value);
-  }
-
-  resolveDictaChoice(null);
-  openDictaCaptureForSide(activeSide.value);
-};
-
-const openDictaChoicePreview = (page: number): void => {
-  trackFromToAction({
-    side: activeSide.value,
-    action: 'preview-open',
-    value: 'photo-multi-result',
-  });
-  dictaPreviewPage.value = page;
-};
-
-const onDictaChoicePreviewModelValueChange = (value: boolean): void => {
-  if (!value) {
-    dictaPreviewPage.value = null;
-  }
-};
-
-const onDictaOverlayKeydown = (event: KeyboardEvent): void => {
-  if (event.key !== 'Escape') return;
-  if (dictaChoiceOpen.value) {
-    onDictaChoiceCancel();
-    return;
-  }
-  if (dictaOpen.value) {
-    closeDictaDialog();
-  }
-};
-
-const openCachedOptionsForSide = (side: 'from' | 'to'): void => {
-  const cachedOptions = dictaOptionsBySide.value[side];
-  if (cachedOptions.length <= 1) {
-    openDictaCaptureForSide(side);
-    return;
-  }
-
-  void pickDictaPageOption(cachedOptions).then((selectedOption) => {
-    if (!selectedOption) return;
-
-    const applied = applyDictaReference(selectedOption.candidate.reference, selectedOption.page);
-    if (!applied) return;
-
-    const metricsSession = getDictaMetricsSession(side);
-    if (!metricsSession) return;
-
-    const selectedPosition = cachedOptions.findIndex((option) => option.key === selectedOption.key);
-    if (selectedPosition >= 0) {
-      trackPhotoMultiResultSelection({
-        side,
-        position: selectedPosition,
-        totalOptions: cachedOptions.length,
-      });
-    }
-
-    trackPhotoSuccess({
-      side,
-      successType: 'multiple-results',
-      triesBeforeSuccess: metricsSession.attemptCount,
-      multiResultRetakesBeforeSuccess: metricsSession.multiResultRetakeCount,
-    });
-    clearDictaMetricsSession(side);
-  });
-};
-
-const openDictaCaptureForSide = (
-  side: 'from' | 'to',
-  options: { resetMetricsSession?: boolean } = {}
-): void => {
-  activeSide.value = side;
-  if (options.resetMetricsSession) {
-    startDictaMetricsSession(side);
-  }
-  dictaAnalyzeJobId.value += 1;
-  resetDictaSession();
-  dictaCaptureKey.value += 1;
-  dictaOpen.value = true;
-};
-
-const onDictaRetake = (): void => {
-  openDictaCaptureForSide(activeSide.value);
-};
-
-const onDictaShowCachedOptions = (): void => {
-  closeDictaDialog();
-  openCachedOptionsForSide(activeSide.value);
-};
-
-const openDictaFor = (side: 'from' | 'to') => {
-  activeSide.value = side;
-  if (dictaOptionsBySide.value[side].length > 1) {
-    openCachedOptionsForSide(side);
-    return;
-  }
-  openDictaCaptureForSide(side, { resetMetricsSession: true });
-};
-
-const openFirstLineSearchForSide = async (
-  side: 'from' | 'to',
-  source: FirstLineSearchOpenSource
-): Promise<void> => {
-  const selectorRef = getLocationSelectorRef(side);
-  if (!selectorRef) return;
-
-  selectorRef.openFirstLineSearchDialog(source);
-  await nextTick();
-};
-
-const onOpenFirstLineSearchFromDicta = async (): Promise<void> => {
-  closeDictaDialog();
-  await nextTick();
-  await openFirstLineSearchForSide(activeSide.value, 'camera-fallback');
-};
-
 const openTargets = (side: 'from' | 'to') => {
   activeSide.value = side;
   targetsOpen.value = true;
 };
 
-const onSetFromPage = (
-  p: number | null,
-  refData: ManualData | null = null,
-  targetKey: string | null = null
-) => {
-  options.changeFromPage(p);
-  fromRef.value = refData;
-  fromTargetKey.value = p == null ? null : targetKey;
-};
-
-const onSetToPage = (
-  p: number | null,
-  refData: ManualData | null = null,
-  targetKey: string | null = null
-) => {
-  options.changeToPage(p);
-  toRef.value = refData;
-  toTargetKey.value = p == null ? null : targetKey;
-};
-
 const onTargetSelected = (item: HomeTargetItem) => {
-  const selectedRef = getDefaultRefForSide(item, activeSide.value);
-  const newRef = toManualData(selectedRef);
+  const selectedRef = activeSide.value === 'from' ? item.refEndPartial ?? item.refEnd : item.ref;
+  const newRef: ManualData = {
+    book: selectedRef.book,
+    chapter: selectedRef.chapter,
+    verse: selectedRef.verse,
+  };
   const page = resolvePageForLayout(selectedRef.page, layoutKey.value);
 
   if (activeSide.value === 'from') {
-    options.changeFromPage(page);
-    fromRef.value = newRef;
-    fromTargetKey.value = item.key;
+    wizardStore.setFromLocation(page, newRef, item.key);
+    wizardStore.setStep(2); // Auto progress to step 2 once FROM selection is made
   } else {
-    options.changeToPage(page);
-    toRef.value = newRef;
-    toTargetKey.value = item.key;
+    wizardStore.setToLocation(page, newRef, item.key);
+    wizardStore.setStep(3); // Auto progress to step 3 once TO selection is made
   }
   targetsOpen.value = false;
 };
 
-const cloneManualData = (value: ManualData | null): ManualData | null => {
-  return value ? { ...value } : null;
+// Tutorial State Synchronization
+watch(activeTutorialStepId, (stepId) => {
+  if (!stepId) return;
+
+  const isFromStep = stepId.includes('from') || 
+                     stepId.includes('choose-manually') || 
+                     stepId.includes('first-line') || 
+                     stepId.includes('camera') || 
+                     stepId.includes('input') || 
+                     stepId.includes('manual');
+  
+  const isToStep = stepId.includes('to') || 
+                   stepId.includes('reference-point');
+  
+  const isResultStep = stepId.includes('result') || 
+                       stepId.includes('preview') || 
+                       stepId.includes('remaining-after-book') ||
+                       stepId.includes('settings');
+
+  if (isFromStep) {
+    wizardStore.setStep(1);
+  } else if (isToStep) {
+    wizardStore.setStep(2);
+  } else if (isResultStep) {
+    wizardStore.setStep(3);
+  }
+});
+
+// Demo state functions called programmatically by onboarding steps
+const onSetFromPage = (page: number | null, data?: ManualData, targetKey?: string | null) => {
+  wizardStore.setFromLocation(page, data || undefined, targetKey);
 };
 
-const captureTutorialSnapshot = (): void => {
-  if (tutorialSnapshot.value) return;
-
-  tutorialSnapshot.value = {
-    fromPage: options.fromPage,
-    toPage: options.toPage,
-    fromRef: cloneManualData(fromRef.value),
-    toRef: cloneManualData(toRef.value),
-    fromTargetKey: fromTargetKey.value,
-    toTargetKey: toTargetKey.value,
-  };
+const onSetToPage = (page: number | null, data?: ManualData, targetKey?: string | null) => {
+  wizardStore.setToLocation(page, data || undefined, targetKey);
 };
 
-const restoreTutorialSnapshot = (): void => {
-  const snapshot = tutorialSnapshot.value;
-  if (!snapshot) return;
-
-  onSetFromPage(snapshot.fromPage, cloneManualData(snapshot.fromRef), snapshot.fromTargetKey);
-  onSetToPage(snapshot.toPage, cloneManualData(snapshot.toRef), snapshot.toTargetKey);
-  tutorialSnapshot.value = null;
+// Onboarding helpers & target selections
+const wait = async (ms: number): Promise<void> => {
+  await new Promise<void>((resolve) => setTimeout(resolve, ms));
 };
 
-const getSingleQueryValue = (value: unknown): string | null => {
-  if (Array.isArray(value)) {
-    return typeof value[0] === 'string' ? value[0] : null;
-  }
-
-  return typeof value === 'string' ? value : null;
-};
-
-const clearTutorialQuery = (): void => {
-  const tutorialQuery = getSingleQueryValue(route.query.tutorial);
-  const sourceQuery = getSingleQueryValue(route.query.source);
-
-  if (!tutorialQuery && !sourceQuery) {
-    return;
-  }
-
-  const nextQuery = {
-    ...route.query,
-  };
-
-  delete nextQuery.tutorial;
-  delete nextQuery.source;
-
-  void router.replace({ query: nextQuery });
-};
-
-const getTutorialProgressPercent = (highestStep: number, totalSteps: number): number => {
-  return Math.round((highestStep / totalSteps) * 100);
-};
-
-const getTutorialDurationSeconds = (): number => {
-  if (tutorialStartedAt.value == null) {
-    return 0;
-  }
-
-  return Math.max(0, Math.round((Date.now() - tutorialStartedAt.value) / 1000));
-};
-
-const isTutorialElementVisible = (element: HTMLElement): boolean => {
-  const drawerRoot = element.closest('.v-navigation-drawer');
-  if (drawerRoot && !drawerRoot.classList.contains('v-navigation-drawer--active')) {
-    return false;
-  }
-
-  const style = window.getComputedStyle(element);
-  if (style.display === 'none' || style.visibility === 'hidden') {
-    return false;
-  }
-
-  const rect = element.getBoundingClientRect();
-  if (rect.width <= 0 || rect.height <= 0) {
-    return false;
-  }
-
-  if (drawerRoot instanceof HTMLElement) {
-    const drawerRect = drawerRoot.getBoundingClientRect();
-    const drawerVisibleWidth = Math.min(drawerRect.right, window.innerWidth) - Math.max(drawerRect.left, 0);
-    const drawerVisibleHeight = Math.min(drawerRect.bottom, window.innerHeight) - Math.max(drawerRect.top, 0);
-
-    return (
-      drawerVisibleWidth > drawerRect.width * 0.8 &&
-      drawerVisibleHeight > drawerRect.height * 0.5 &&
-      rect.bottom > 0 &&
-      rect.right > 0 &&
-      rect.top < window.innerHeight &&
-      rect.left < window.innerWidth
-    );
-  }
-
-  return (
-    rect.bottom > 0 &&
-    rect.right > 0 &&
-    rect.top < window.innerHeight &&
-    rect.left < window.innerWidth
-  );
+const pressEscape = (): void => {
+  const keyboardEventOptions = { key: 'Escape', bubbles: true, cancelable: true };
+  window.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
+  document.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
 };
 
 const getVisibleTutorialElement = (selector: string): HTMLElement | null => {
   for (const candidate of Array.from(document.querySelectorAll(selector))) {
     if (!(candidate instanceof HTMLElement)) continue;
-    if (isTutorialElementVisible(candidate)) return candidate;
+    
+    // Check visibility
+    const style = window.getComputedStyle(candidate);
+    if (style.display === 'none' || style.visibility === 'hidden') continue;
+    const rect = candidate.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) return candidate;
   }
-
   return null;
 };
 
@@ -1563,40 +323,15 @@ const waitForTutorialElement = async (selector: string, attempts = 12): Promise<
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const element = getVisibleTutorialElement(selector);
     if (element) return element;
-
     await nextTick();
     await wait(80);
   }
-
   return null;
 };
 
 const waitForTutorialElementToDisappear = async (selector: string, attempts = 12): Promise<void> => {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    if (!getVisibleTutorialElement(selector)) {
-      return;
-    }
-
-    await nextTick();
-    await wait(80);
-  }
-};
-
-const waitForNavDrawerToOpen = async (attempts = 16): Promise<void> => {
-  if (!smAndDown.value) return;
-
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const drawer = document.querySelector('.v-navigation-drawer.v-navigation-drawer--temporary.v-navigation-drawer--active');
-    if (drawer instanceof HTMLElement) {
-      const rect = drawer.getBoundingClientRect();
-      const visibleWidth = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
-      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-
-      if (visibleWidth > rect.width * 0.8 && visibleHeight > rect.height * 0.5) {
-        return;
-      }
-    }
-
+    if (!getVisibleTutorialElement(selector)) return;
     await nextTick();
     await wait(80);
   }
@@ -1605,37 +340,10 @@ const waitForNavDrawerToOpen = async (attempts = 16): Promise<void> => {
 const clickTutorialElement = async (selector: string): Promise<boolean> => {
   const element = await waitForTutorialElement(selector, 8);
   if (!element) return false;
-
   element.click();
   await nextTick();
   await wait(120);
   return true;
-};
-
-const pressEscape = (): void => {
-  const keyboardEventOptions = {
-    key: 'Escape',
-    bubbles: true,
-    cancelable: true,
-  };
-
-  window.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
-  document.dispatchEvent(new KeyboardEvent('keydown', keyboardEventOptions));
-};
-
-const resolveTutorialTarget = (selector: string, fallbackSelector?: string) => {
-  return () => {
-    const primaryElement = getVisibleTutorialElement(selector);
-    if (primaryElement) {
-      return primaryElement;
-    }
-
-    return fallbackSelector ? getVisibleTutorialElement(fallbackSelector) : null;
-  };
-};
-
-const rememberTutorialStep = (stepNumber: number): void => {
-  tutorialHighestStep.value = Math.max(tutorialHighestStep.value, stepNumber);
 };
 
 const closeLanguageMenu = async (): Promise<void> => {
@@ -1654,20 +362,18 @@ const openLanguageMenuForTutorial = async (): Promise<void> => {
   await waitForTutorialElement('.tutorial-language-menu');
 };
 
-const getLocationSelectorRef = (side: 'from' | 'to'): LocationSelectorExposed | null => {
+const getLocationSelectorRef = (side: 'from' | 'to') => {
   return side === 'from' ? fromLocationSelectorRef.value : toLocationSelectorRef.value;
 };
 
 const openManualDialogFor = async (side: 'from' | 'to'): Promise<void> => {
   const selectorRef = getLocationSelectorRef(side);
-
   if (selectorRef) {
     selectorRef.openManualDialog();
     await nextTick();
   } else {
     await clickTutorialElement(`[data-tutorial="${side}-input"]`);
   }
-
   await waitForTutorialElement('[data-tutorial="manual-dialog"]');
   await wait(120);
 };
@@ -1676,11 +382,9 @@ const closeManualDialog = async (): Promise<void> => {
   fromLocationSelectorRef.value?.closeManualDialog();
   toLocationSelectorRef.value?.closeManualDialog();
   await nextTick();
-
   const closeButton = getVisibleTutorialElement('[data-tutorial="manual-close"]');
   if (closeButton) {
     closeButton.click();
-    await nextTick();
   } else {
     pressEscape();
   }
@@ -1689,7 +393,12 @@ const closeManualDialog = async (): Promise<void> => {
 };
 
 const openFirstLineSearchForTutorial = async (side: 'from' | 'to'): Promise<void> => {
-  await openFirstLineSearchForSide(side, 'tutorial');
+  const selectorRef = getLocationSelectorRef(side);
+  if (selectorRef) {
+    selectorRef.openFirstLineSearchDialog();
+  } else {
+    await clickTutorialElement(`[data-tutorial="${side}-first-line"]`);
+  }
   await waitForTutorialElement('[data-tutorial="first-line-search-dialog"]');
   await wait(120);
 };
@@ -1703,33 +412,18 @@ const closeFirstLineSearchDialogForTutorial = async (): Promise<void> => {
 
 const openPreviewFor = async (side: 'from' | 'to'): Promise<void> => {
   const selectorRef = getLocationSelectorRef(side);
-
   if (selectorRef) {
     selectorRef.openPagePreview();
-    await nextTick();
-  } else {
-    const opened =
-      await clickTutorialElement(`[data-tutorial="${side}-page-preview-trigger"] .location-page-number-btn`) ||
-      await clickTutorialElement(`[data-tutorial="${side}-page-preview-trigger"] button`);
-
-    if (!opened) return;
+  } else if (rollResultRef.value) {
+    rollResultRef.value.openPreview(side);
   }
-
   await waitForTutorialElement('[data-tutorial="page-preview-dialog"]');
   await wait(120);
 };
 
 const closePreviewDialog = async (): Promise<void> => {
-  fromLocationSelectorRef.value?.closePagePreview();
-  toLocationSelectorRef.value?.closePagePreview();
-  await nextTick();
-
-  const closeButton = getVisibleTutorialElement('[data-tutorial="page-preview-close"]');
-  if (closeButton) {
-    closeButton.click();
-    await nextTick();
-  } else {
-    pressEscape();
+  if (rollResultRef.value) {
+    rollResultRef.value.isPreviewOpen = false;
   }
   await nextTick();
   await waitForTutorialElementToDisappear('[data-tutorial="page-preview-dialog"]');
@@ -1763,10 +457,27 @@ const openNavDrawerIfNeeded = async (): Promise<void> => {
   await wait(120);
 };
 
+const waitForNavDrawerToOpen = async (attempts = 16): Promise<void> => {
+  if (!smAndDown.value) return;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const drawer = document.querySelector('.v-navigation-drawer.v-navigation-drawer--temporary.v-navigation-drawer--active');
+    if (drawer instanceof HTMLElement) {
+      const rect = drawer.getBoundingClientRect();
+      const visibleWidth = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+      if (visibleWidth > rect.width * 0.8 && visibleHeight > rect.height * 0.5) {
+        return;
+      }
+    }
+    await nextTick();
+    await wait(80);
+  }
+};
+
 const closeNavDrawer = async (): Promise<void> => {
   if (!smAndDown.value) return;
-  if (!getVisibleTutorialElement('[data-tutorial="about-nav"]')) return;
-
   closeTutorialNavDrawer();
   await nextTick();
   await waitForTutorialElementToDisappear('[data-tutorial="about-nav"]');
@@ -1780,37 +491,21 @@ const openTargetsForTutorial = async (side: 'from' | 'to'): Promise<void> => {
 };
 
 const closeTargetsForTutorial = async (): Promise<void> => {
-  if (!targetsOpen.value) return;
-
   targetsOpen.value = false;
   await nextTick();
   await waitForTutorialElementToDisappear('[data-tutorial="target-overlay"]');
 };
 
 const openDictaForTutorial = async (side: 'from' | 'to'): Promise<void> => {
-  openDictaCaptureForSide(side);
-  await nextTick();
-  await waitForTutorialElement('[data-tutorial="dicta-dialog"]');
+  // Simulator camera click on Step 1 FROM
+  await clickTutorialElement('[data-tutorial="from-photo"]');
   await wait(120);
 };
 
 const closeDictaForTutorial = async (): Promise<void> => {
-  let didClose = false;
-
-  if (dictaChoiceOpen.value) {
-    onDictaChoiceCancel();
-    didClose = true;
-  }
-
-  if (dictaOpen.value) {
-    closeDictaDialog();
-    didClose = true;
-  }
-
-  if (!didClose) return;
-
-  await nextTick();
-  await waitForTutorialElementToDisappear('[data-tutorial="dicta-dialog"]');
+  // Standard escape
+  pressEscape();
+  await wait(80);
 };
 
 const closeTutorialOverlays = async (
@@ -1836,25 +531,8 @@ const closeTutorialOverlays = async (
 };
 
 const resolveTutorialReadingTarget = (readingId: string): HomeTargetItem | null => {
-  const pairedReadingIds = splitPairedParashaReadingId(readingId);
-  if (!pairedReadingIds) {
-    return findReadingTargetByKey(readingId, options.isInGola) as HomeTargetItem | null;
-  }
-
-  const [startReadingId, endReadingId] = pairedReadingIds;
-  const startTarget = findReadingTargetByKey(startReadingId, options.isInGola) as HomeTargetItem | null;
-  const endTarget = findReadingTargetByKey(endReadingId, options.isInGola) as HomeTargetItem | null;
-
-  if (!startTarget || !endTarget) return null;
-
-  return {
-    ...startTarget,
-    key: readingId,
-    type: 'parasha',
-    ref: startTarget.ref,
-    refEndPartial: startTarget.refEndPartial,
-    refEnd: endTarget.refEnd,
-  };
+  const target = findReadingTargetByKey(readingId, optionsStore.isInGola);
+  return (target as HomeTargetItem) || null;
 };
 
 const getTutorialOrderedTargets = (side: 'from' | 'to', preferParasha = false): HomeTargetItem[] => {
@@ -1863,16 +541,9 @@ const getTutorialOrderedTargets = (side: 'from' | 'to', preferParasha = false): 
   ];
 
   sourceReadings.sort((left, right) => {
-    const leftDate = side === 'from'
-      ? left.dates[left.dates.length - 1] ?? ''
-      : left.dates[0] ?? '';
-    const rightDate = side === 'from'
-      ? right.dates[right.dates.length - 1] ?? ''
-      : right.dates[0] ?? '';
-
-    return side === 'from'
-      ? rightDate.localeCompare(leftDate)
-      : leftDate.localeCompare(rightDate);
+    const leftDate = side === 'from' ? left.dates[left.dates.length - 1] ?? '' : left.dates[0] ?? '';
+    const rightDate = side === 'from' ? right.dates[right.dates.length - 1] ?? '' : right.dates[0] ?? '';
+    return side === 'from' ? rightDate.localeCompare(leftDate) : leftDate.localeCompare(rightDate);
   });
 
   return sourceReadings
@@ -1882,8 +553,8 @@ const getTutorialOrderedTargets = (side: 'from' | 'to', preferParasha = false): 
 };
 
 const selectTutorialTarget = (side: 'from' | 'to', target: HomeTargetItem): boolean => {
-  const targetRef = getDefaultRefForSide(target, side);
-  const refData = toManualData(targetRef);
+  const targetRef = side === 'from' ? target.refEndPartial ?? target.refEnd : target.ref;
+  const refData = { book: targetRef.book, chapter: targetRef.chapter, verse: targetRef.verse };
 
   if (side === 'from') {
     onSetFromPage(resolvePageForLayout(targetRef.page, layoutKey.value), refData, target.key);
@@ -1895,9 +566,8 @@ const selectTutorialTarget = (side: 'from' | 'to', target: HomeTargetItem): bool
 };
 
 const selectTutorialTargetKey = (side: 'from' | 'to', key: string): boolean => {
-  const target = findReadingTargetByKey(key, options.isInGola) as HomeTargetItem | null;
+  const target = findReadingTargetByKey(key, optionsStore.isInGola) as HomeTargetItem | null;
   if (!target) return false;
-
   return selectTutorialTarget(side, target);
 };
 
@@ -1907,18 +577,14 @@ const applyTutorialCalendarDemoState = async (): Promise<void> => {
   const fromTarget = getTutorialOrderedTargets('from')[0];
   const toTarget = getTutorialOrderedTargets('to', true)[0] ?? getTutorialOrderedTargets('to')[0];
 
-  const hasFromSelection = fromTarget
-    ? selectTutorialTarget('from', fromTarget)
-    : selectTutorialTargetKey('from', 'pekudei');
-  const hasToSelection = toTarget
-    ? selectTutorialTarget('to', toTarget)
-    : selectTutorialTargetKey('to', 'tazria');
+  const hasFromSelection = fromTarget ? selectTutorialTarget('from', fromTarget) : selectTutorialTargetKey('from', 'pekudei');
+  const hasToSelection = toTarget ? selectTutorialTarget('to', toTarget) : selectTutorialTargetKey('to', 'tazria');
 
-  if (!hasFromSelection && options.fromPage == null) {
+  if (!hasFromSelection && optionsStore.fromPage == null) {
     selectTutorialTargetKey('from', 'shemot');
   }
 
-  if (!hasToSelection && options.toPage == null) {
+  if (!hasToSelection && optionsStore.toPage == null) {
     selectTutorialTargetKey('to', 'vayikra');
   }
 
@@ -1927,14 +593,12 @@ const applyTutorialCalendarDemoState = async (): Promise<void> => {
 };
 
 const applyLongTutorialResultDemoState = async (): Promise<void> => {
-  const hasFromSelection =
-    selectTutorialTargetKey('from', 'pekudei') ||
-    selectTutorialTargetKey('from', 'vayakhel') ||
-    selectTutorialTargetKey('from', 'shemot');
-  const hasToSelection =
-    selectTutorialTargetKey('to', 'nasso') ||
-    selectTutorialTargetKey('to', 'tazria') ||
-    selectTutorialTargetKey('to', 'vayikra');
+  const hasFromSelection = selectTutorialTargetKey('from', 'pekudei') || 
+                           selectTutorialTargetKey('from', 'vayakhel') || 
+                           selectTutorialTargetKey('from', 'shemot');
+  const hasToSelection = selectTutorialTargetKey('to', 'nasso') || 
+                         selectTutorialTargetKey('to', 'tazria') || 
+                         selectTutorialTargetKey('to', 'vayikra');
 
   if (!hasFromSelection || !hasToSelection) {
     await applyTutorialCalendarDemoState();
@@ -1951,18 +615,29 @@ const prepareTutorialDemoState = async (): Promise<void> => {
   await applyTutorialCalendarDemoState();
 };
 
-interface TutorialStepConfig {
-  id: string;
-  stepNumber: number;
-  selector: string;
-  fallbackSelector?: string;
-  titleKey: string;
-  descriptionKey: string;
-  options?: VOnboardingWrapperOptions;
-  beforeStep?: () => void | Promise<void>;
-  afterStep?: (options?: { isForward: boolean; isBackward: boolean }) => void | Promise<void>;
-}
+const captureTutorialSnapshot = (): void => {
+  if (tutorialSnapshot.value) return;
 
+  tutorialSnapshot.value = {
+    fromPage: optionsStore.fromPage,
+    toPage: optionsStore.toPage,
+    fromRef: wizardStore.fromRef ? { ...wizardStore.fromRef } : null,
+    toRef: wizardStore.toRef ? { ...wizardStore.toRef } : null,
+    fromTargetKey: wizardStore.fromTargetKey,
+    toTargetKey: wizardStore.toTargetKey,
+  };
+};
+
+const restoreTutorialSnapshot = (): void => {
+  const snapshot = tutorialSnapshot.value;
+  if (!snapshot) return;
+
+  onSetFromPage(snapshot.fromPage, snapshot.fromRef || undefined, snapshot.fromTargetKey);
+  onSetToPage(snapshot.toPage, snapshot.toRef || undefined, snapshot.toTargetKey);
+  tutorialSnapshot.value = null;
+};
+
+// Tutorial step definitions (reused)
 const createTutorialStep = ({
   id,
   stepNumber,
@@ -1973,10 +648,14 @@ const createTutorialStep = ({
   options,
   beforeStep,
   afterStep,
-}: TutorialStepConfig): TutorialStepEntity => ({
+}: any): TutorialStepEntity => ({
   id,
   attachTo: {
-    element: resolveTutorialTarget(selector, fallbackSelector),
+    element: () => {
+      const primaryElement = getVisibleTutorialElement(selector);
+      if (primaryElement) return primaryElement;
+      return fallbackSelector ? getVisibleTutorialElement(fallbackSelector) : null;
+    },
   },
   content: {
     title: t(titleKey),
@@ -1986,7 +665,7 @@ const createTutorialStep = ({
   on: {
     beforeStep: async () => {
       activeTutorialStepId.value = id;
-      rememberTutorialStep(stepNumber);
+      tutorialHighestStep.value = Math.max(tutorialHighestStep.value, stepNumber);
       await beforeStep?.();
     },
     afterStep,
@@ -1994,9 +673,7 @@ const createTutorialStep = ({
 });
 
 const interactiveTutorialStepOptions: VOnboardingWrapperOptions = {
-  overlay: {
-    preventOverlayInteraction: false,
-  },
+  overlay: { preventOverlayInteraction: false },
 };
 
 const quickTutorialSteps = computed<TutorialStepEntity[]>(() => ([
@@ -2008,9 +685,7 @@ const quickTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     titleKey: 'onboarding.quick.step1.title',
     descriptionKey: 'onboarding.quick.step1.description',
     options: interactiveTutorialStepOptions,
-    beforeStep: async () => {
-      await closeLanguageMenu();
-    },
+    beforeStep: async () => { await closeLanguageMenu(); },
   }),
   createTutorialStep({
     id: 'quick-language-menu',
@@ -2025,7 +700,7 @@ const quickTutorialSteps = computed<TutorialStepEntity[]>(() => ([
         await openLanguageMenuForTutorial();
       }
     },
-    afterStep: async (stepOptions) => {
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward || stepOptions?.isBackward) {
         await closeLanguageMenu();
       }
@@ -2037,10 +712,8 @@ const quickTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="from-selector"]',
     titleKey: 'onboarding.quick.step3.title',
     descriptionKey: 'onboarding.quick.step3.description',
-    beforeStep: async () => {
-      await closeLanguageMenu();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeLanguageMenu(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isBackward) {
         await openLanguageMenuForTutorial();
       }
@@ -2071,9 +744,7 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     titleKey: 'onboarding.full.step1.title',
     descriptionKey: 'onboarding.full.step1.description',
     options: interactiveTutorialStepOptions,
-    beforeStep: async () => {
-      await closeLanguageMenu();
-    },
+    beforeStep: async () => { await closeLanguageMenu(); },
   }),
   createTutorialStep({
     id: 'full-language-menu',
@@ -2088,7 +759,7 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
         await openLanguageMenuForTutorial();
       }
     },
-    afterStep: async (stepOptions) => {
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward || stepOptions?.isBackward) {
         await closeLanguageMenu();
       }
@@ -2104,7 +775,7 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       await closeLanguageMenu();
       await closeTutorialOverlays();
     },
-    afterStep: async (stepOptions) => {
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isBackward) {
         await openLanguageMenuForTutorial();
       }
@@ -2116,14 +787,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="from-choose-manual"]',
     titleKey: 'onboarding.full.step4.title',
     descriptionKey: 'onboarding.full.step4.description',
-    beforeStep: async () => {
-      await closeTargetsForTutorial();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeTargetsForTutorial(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openTargetsForTutorial('from');
       }
-
       if (stepOptions?.isBackward) {
         await closeTutorialOverlays();
       }
@@ -2136,17 +804,9 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     fallbackSelector: '[data-tutorial="target-overlay"]',
     titleKey: 'onboarding.full.step5.title',
     descriptionKey: 'onboarding.full.step5.description',
-    beforeStep: async () => {
-      await openTargetsForTutorial('from');
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closeTargetsForTutorial();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeTargetsForTutorial();
-      }
+    beforeStep: async () => { await openTargetsForTutorial('from'); },
+    afterStep: async (stepOptions: any) => {
+      await closeTargetsForTutorial();
     },
   }),
   createTutorialStep({
@@ -2155,14 +815,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="from-first-line"]',
     titleKey: 'onboarding.full.step6.title',
     descriptionKey: 'onboarding.full.step6.description',
-    beforeStep: async () => {
-      await closeTutorialOverlays();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeTutorialOverlays(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openFirstLineSearchForTutorial('from');
       }
-
       if (stepOptions?.isBackward) {
         await openTargetsForTutorial('from');
       }
@@ -2174,17 +831,9 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="first-line-search-dialog"]',
     titleKey: 'onboarding.full.step7.title',
     descriptionKey: 'onboarding.full.step7.description',
-    beforeStep: async () => {
-      await openFirstLineSearchForTutorial('from');
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closeFirstLineSearchDialogForTutorial();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeFirstLineSearchDialogForTutorial();
-      }
+    beforeStep: async () => { await openFirstLineSearchForTutorial('from'); },
+    afterStep: async (stepOptions: any) => {
+      await closeFirstLineSearchDialogForTutorial();
     },
   }),
   createTutorialStep({
@@ -2193,14 +842,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="from-photo"]',
     titleKey: 'onboarding.full.step8.title',
     descriptionKey: 'onboarding.full.step8.description',
-    beforeStep: async () => {
-      await closeTutorialOverlays();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeTutorialOverlays(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openDictaForTutorial('from');
       }
-
       if (stepOptions?.isBackward) {
         await openFirstLineSearchForTutorial('from');
       }
@@ -2212,17 +858,9 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="dicta-dialog"]',
     titleKey: 'onboarding.full.step9.title',
     descriptionKey: 'onboarding.full.step9.description',
-    beforeStep: async () => {
-      await openDictaForTutorial('from');
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closeDictaForTutorial();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeDictaForTutorial();
-      }
+    beforeStep: async () => { await openDictaForTutorial('from'); },
+    afterStep: async (stepOptions: any) => {
+      await closeDictaForTutorial();
     },
   }),
   createTutorialStep({
@@ -2231,14 +869,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="from-input"]',
     titleKey: 'onboarding.full.step10.title',
     descriptionKey: 'onboarding.full.step10.description',
-    beforeStep: async () => {
-      await closeTutorialOverlays();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeTutorialOverlays(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openManualDialogFor('from');
       }
-
       if (stepOptions?.isBackward) {
         await openDictaForTutorial('from');
       }
@@ -2250,17 +885,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="manual-dialog"]',
     titleKey: 'onboarding.full.step11.title',
     descriptionKey: 'onboarding.full.step11.description',
-    beforeStep: async () => {
-      await openManualDialogFor('from');
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await openManualDialogFor('from'); },
+    afterStep: async (stepOptions: any) => {
+      await closeManualDialog();
       if (stepOptions?.isForward) {
-        await closeManualDialog();
         await applyTutorialCalendarDemoState();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeManualDialog();
       }
     },
   }),
@@ -2270,14 +899,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="to-selector"]',
     titleKey: 'onboarding.full.step12.title',
     descriptionKey: 'onboarding.full.step12.description',
-    beforeStep: async () => {
-      await closeManualDialog();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeManualDialog(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await applyLongTutorialResultDemoState();
       }
-
       if (stepOptions?.isBackward) {
         await openManualDialogFor('from');
       }
@@ -2290,10 +916,8 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     fallbackSelector: '[data-tutorial="to-page-preview-trigger"]',
     titleKey: 'onboarding.full.step13.title',
     descriptionKey: 'onboarding.full.step13.description',
-    beforeStep: async () => {
-      await applyLongTutorialResultDemoState();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await applyLongTutorialResultDemoState(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isBackward) {
         await applyTutorialCalendarDemoState();
       }
@@ -2305,9 +929,7 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step14.title',
     descriptionKey: 'onboarding.full.step14.description',
-    beforeStep: async () => {
-      await applyLongTutorialResultDemoState();
-    },
+    beforeStep: async () => { await applyLongTutorialResultDemoState(); },
   }),
   createTutorialStep({
     id: 'full-remaining-after-book',
@@ -2316,9 +938,7 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     fallbackSelector: '[data-tutorial="roll-result"]',
     titleKey: 'onboarding.full.step15.title',
     descriptionKey: 'onboarding.full.step15.description',
-    beforeStep: async () => {
-      await applyLongTutorialResultDemoState();
-    },
+    beforeStep: async () => { await applyLongTutorialResultDemoState(); },
   }),
   createTutorialStep({
     id: 'full-preview-trigger',
@@ -2326,14 +946,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="to-page-preview-trigger"]',
     titleKey: 'onboarding.full.step16.title',
     descriptionKey: 'onboarding.full.step16.description',
-    beforeStep: async () => {
-      await closePreviewDialog();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closePreviewDialog(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openPreviewFor('to');
       }
-
       if (stepOptions?.isBackward) {
         await closePreviewDialog();
       }
@@ -2345,17 +962,9 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="page-preview-dialog"]',
     titleKey: 'onboarding.full.step17.title',
     descriptionKey: 'onboarding.full.step17.description',
-    beforeStep: async () => {
-      await openPreviewFor('to');
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closePreviewDialog();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closePreviewDialog();
-      }
+    beforeStep: async () => { await openPreviewFor('to'); },
+    afterStep: async (stepOptions: any) => {
+      await closePreviewDialog();
     },
   }),
   createTutorialStep({
@@ -2364,14 +973,11 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="settings-button"]',
     titleKey: 'onboarding.full.step18.title',
     descriptionKey: 'onboarding.full.step18.description',
-    beforeStep: async () => {
-      await closeSettingsDialog();
-    },
-    afterStep: async (stepOptions) => {
+    beforeStep: async () => { await closeSettingsDialog(); },
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openSettingsDialog();
       }
-
       if (stepOptions?.isBackward) {
         await openPreviewFor('to');
       }
@@ -2383,17 +989,9 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
     selector: '[data-tutorial="settings-dialog"]',
     titleKey: 'onboarding.full.step19.title',
     descriptionKey: 'onboarding.full.step19.description',
-    beforeStep: async () => {
-      await openSettingsDialog();
-    },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isForward) {
-        await closeSettingsDialog();
-      }
-
-      if (stepOptions?.isBackward) {
-        await closeSettingsDialog();
-      }
+    beforeStep: async () => { await openSettingsDialog(); },
+    afterStep: async (stepOptions: any) => {
+      await closeSettingsDialog();
     },
   }),
   createTutorialStep({
@@ -2407,11 +1005,10 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       await closeSettingsDialog();
       await closeNavDrawer();
     },
-    afterStep: async (stepOptions) => {
+    afterStep: async (stepOptions: any) => {
       if (stepOptions?.isForward) {
         await openNavDrawerIfNeeded();
       }
-
       if (stepOptions?.isBackward) {
         await closeNavDrawer();
         await openSettingsDialog();
@@ -2428,84 +1025,47 @@ const fullTutorialSteps = computed<TutorialStepEntity[]>(() => ([
       await openNavDrawerIfNeeded();
       await waitForTutorialElement('[data-tutorial="about-nav"]');
     },
-    afterStep: async (stepOptions) => {
-      if (stepOptions?.isBackward) {
-        await closeNavDrawer();
-        return;
-      }
-
+    afterStep: async (stepOptions: any) => {
       await closeNavDrawer();
     },
   }),
 ]));
 
 const isTutorialPrimaryActionDisabled = computed(() => {
-  return (
-    activeTutorialStepId.value === 'quick-language-selector' ||
-    activeTutorialStepId.value === 'full-language-selector'
-  );
+  return activeTutorialStepId.value === 'quick-language-selector' || 
+         activeTutorialStepId.value === 'full-language-selector';
 });
 
 const isTutorialInteractiveStep = computed(() => {
-  return (
-    activeTutorialStepId.value === 'quick-language-selector' ||
-    activeTutorialStepId.value === 'quick-language-menu' ||
-    activeTutorialStepId.value === 'full-language-selector' ||
-    activeTutorialStepId.value === 'full-language-menu'
-  );
+  return activeTutorialStepId.value === 'quick-language-selector' || 
+         activeTutorialStepId.value === 'quick-language-menu' || 
+         activeTutorialStepId.value === 'full-language-selector' || 
+         activeTutorialStepId.value === 'full-language-menu';
 });
 
 watch(isLanguageMenuOpen, (isOpen) => {
   if (!isTutorialActive.value) return;
-
-  if (
-    isOpen &&
-    (activeTutorialStepId.value === 'quick-language-selector' || activeTutorialStepId.value === 'full-language-selector')
-  ) {
-    goToOnboardingStep((currentStepIndex) => currentStepIndex + 1);
+  if (isOpen && (activeTutorialStepId.value === 'quick-language-selector' || activeTutorialStepId.value === 'full-language-selector')) {
+    goToOnboardingStep((index) => index + 1);
   }
 });
 
 watch(() => locale.value, (nextLocale, previousLocale) => {
   if (!isTutorialActive.value) return;
   if (!previousLocale || nextLocale === previousLocale) return;
-
-  if (
-    activeTutorialStepId.value === 'quick-language-menu' ||
-    activeTutorialStepId.value === 'full-language-menu'
-  ) {
-    goToOnboardingStep((currentStepIndex) => currentStepIndex + 1);
+  if (activeTutorialStepId.value === 'quick-language-menu' || activeTutorialStepId.value === 'full-language-menu') {
+    goToOnboardingStep((index) => index + 1);
   }
 });
 
 const currentTutorialSteps = computed<TutorialStepEntity[]>(() => {
-  if (activeTutorial.value === 'quick') {
-    return quickTutorialSteps.value;
-  }
-
-  if (activeTutorial.value === 'full') {
-    return fullTutorialSteps.value;
-  }
-
-  return [];
+  return activeTutorial.value === 'quick' ? quickTutorialSteps.value : (activeTutorial.value === 'full' ? fullTutorialSteps.value : []);
 });
 
 const onboardingOptions = computed<VOnboardingWrapperOptions>(() => ({
-  overlay: {
-    enabled: true,
-    padding: 10,
-    borderRadius: 18,
-    preventOverlayInteraction: true,
-  },
+  overlay: { enabled: true, padding: 10, borderRadius: 18, preventOverlayInteraction: true },
   hideNextStepDuringHook: true,
-  scrollToStep: {
-    enabled: true,
-    options: {
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'center',
-    },
-  },
+  scrollToStep: { enabled: true, options: { behavior: 'smooth', block: 'center', inline: 'center' } },
 }));
 
 const getTutorialStepCount = (tutorial: TutorialKind): number => {
@@ -2513,9 +1073,7 @@ const getTutorialStepCount = (tutorial: TutorialKind): number => {
 };
 
 const startTutorial = async (tutorial: TutorialKind, source = 'home-page'): Promise<void> => {
-  if (isTutorialActive.value) {
-    return;
-  }
+  if (isTutorialActive.value) return;
 
   activeTutorial.value = tutorial;
   activeTutorialStepId.value = null;
@@ -2536,7 +1094,7 @@ const startTutorial = async (tutorial: TutorialKind, source = 'home-page'): Prom
     action: 'open',
     step: 1,
     totalSteps,
-    progressPercent: getTutorialProgressPercent(1, totalSteps),
+    progressPercent: Math.round((1 / totalSteps) * 100),
     source,
   });
 
@@ -2552,7 +1110,12 @@ const finalizeTutorial = async (): Promise<void> => {
     await closeTutorialOverlays();
     restoreTutorialSnapshot();
     activeTutorialStepId.value = null;
-    clearTutorialQuery();
+    if (route.query.tutorial) {
+      const nextQuery = { ...route.query };
+      delete nextQuery.tutorial;
+      delete nextQuery.source;
+      void router.replace({ query: nextQuery });
+    }
     if (pendingNavigation === 'about') {
       await router.push({ name: 'about' });
     }
@@ -2565,8 +1128,8 @@ const finalizeTutorial = async (): Promise<void> => {
     action: 'close',
     step: tutorialHighestStep.value,
     totalSteps,
-    progressPercent: getTutorialProgressPercent(tutorialHighestStep.value, totalSteps),
-    durationSeconds: getTutorialDurationSeconds(),
+    progressPercent: Math.round((tutorialHighestStep.value / totalSteps) * 100),
+    durationSeconds: Math.max(0, Math.round((Date.now() - (tutorialStartedAt.value || 0)) / 1000)),
     source: activeTutorialSource.value,
   });
 
@@ -2579,7 +1142,13 @@ const finalizeTutorial = async (): Promise<void> => {
 
   await closeTutorialOverlays();
   restoreTutorialSnapshot();
-  clearTutorialQuery();
+  
+  if (route.query.tutorial) {
+    const nextQuery = { ...route.query };
+    delete nextQuery.tutorial;
+    delete nextQuery.source;
+    void router.replace({ query: nextQuery });
+  }
 
   if (pendingNavigation === 'about') {
     await router.push({ name: 'about' });
@@ -2595,11 +1164,9 @@ const onTutorialPrimaryAction = (isLast: boolean, next: () => void): void => {
     next();
     return;
   }
-
   if (activeTutorialStepId.value === 'full-about') {
     pendingTutorialNavigation.value = 'about';
   }
-
   finishOnboarding();
 };
 
@@ -2612,55 +1179,18 @@ const onOnboardingExit = (): void => {
 };
 
 const maybeStartTutorialFromRoute = async (): Promise<void> => {
-  const tutorialQuery = getSingleQueryValue(route.query.tutorial);
-  const source = getSingleQueryValue(route.query.source) ?? 'route-query';
+  const tutorialQuery = route.query.tutorial;
+  const source = (route.query.source as string) || 'route-query';
 
-  if (route.name !== 'home' || isTutorialActive.value) {
-    return;
-  }
-
-  if (tutorialQuery !== 'quick' && tutorialQuery !== 'full') {
-    return;
-  }
+  if (route.name !== 'home' || isTutorialActive.value) return;
+  if (tutorialQuery !== 'quick' && tutorialQuery !== 'full') return;
 
   await startTutorial(tutorialQuery, source);
 };
 
-watch(dictaOpen, (isOpen) => {
-  if (!isOpen) {
-    resetDictaSession();
-  }
-});
-
-watch(dictaChoiceOpen, (isOpen) => {
-  if (!isOpen && dictaChoiceResolver.value) {
-    resolveDictaChoice(null);
-  }
-});
-
-watch(
-  [
-    () => !isPhoneCameraMode.value && dictaOpen.value,
-    () => isPhoneCameraMode.value && dictaOpen.value && dictaFlowState.value !== 'idle',
-    () => dictaChoiceOpen.value,
-  ],
-  ([isDesktopCameraOverlayOpen, isPhoneLoadingOverlayOpen, isChoiceOverlayOpen]) => {
-    const hasOverlay = isDesktopCameraOverlayOpen || isPhoneLoadingOverlayOpen || isChoiceOverlayOpen;
-    if (hasOverlay) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', onDictaOverlayKeydown);
-      return;
-    }
-    document.body.style.overflow = '';
-    window.removeEventListener('keydown', onDictaOverlayKeydown);
-  }
-);
-
 watch(
   () => route.query.tutorial,
-  () => {
-    void maybeStartTutorialFromRoute();
-  },
+  () => { void maybeStartTutorialFromRoute(); },
   { immediate: true },
 );
 
@@ -2671,206 +1201,27 @@ onMounted(() => {
 onUnmounted(() => {
   if (activeTutorial.value) {
     const totalSteps = getTutorialStepCount(activeTutorial.value);
-
     trackTutorialEvent({
       tutorial: activeTutorial.value,
       action: 'close',
       step: tutorialHighestStep.value,
       totalSteps,
-      progressPercent: getTutorialProgressPercent(tutorialHighestStep.value, totalSteps),
-      durationSeconds: getTutorialDurationSeconds(),
+      progressPercent: Math.round((tutorialHighestStep.value / totalSteps) * 100),
+      durationSeconds: Math.max(0, Math.round((Date.now() - (tutorialStartedAt.value || 0)) / 1000)),
       source: activeTutorialSource.value,
     });
   }
-
   restoreTutorialSnapshot();
-  document.body.style.overflow = '';
-  window.removeEventListener('keydown', onDictaOverlayKeydown);
 });
 </script>
 
 <style scoped>
-.dicta-overlay,
-.dicta-choice-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 950;
-  padding-top: 64px;
-  display: flex;
-  flex-direction: column;
-}
-
-.dialog-bottom-transition-enter-active,
-.dialog-bottom-transition-leave-active {
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-}
-
-.dialog-bottom-transition-enter-from,
-.dialog-bottom-transition-leave-to {
-  transform: translateY(100%);
-}
-
-.dicta-card {
-  overflow: clip;
-  display: flex;
-  flex-direction: column;
-}
-
-.dicta-card--camera,
-.dicta-choice-shell {
-  width: min(1200px, calc(100% - 24px));
-  margin: 12px auto;
-  height: calc(100% - 24px);
-  display: flex;
-  flex-direction: column;
-}
-
-.dicta-choice-content {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-}
-
-.dicta-mobile-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 2400;
-  background: rgb(var(--v-theme-surface));
-  display: flex;
-  flex-direction: column;
-}
-
-.dicta-mobile-screen__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 8px 8px;
-  background: rgb(var(--v-theme-surface));
-}
-
-.dicta-mobile-screen__title {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.dicta-mobile-screen__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-inline-start: auto;
-}
-
-.dicta-mobile-screen__content {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 0;
-}
-
-.dicta-card-title {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-}
-
-.dicta-card-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-inline-start: auto;
-}
-
-.dicta-card-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 20px 20px;
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
-.dicta-state {
-  width: 100%;
-  text-align: start;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  overflow: auto;
-}
-
-.dicta-state-headline {
-  width: 100%;
-  text-align: center;
-  padding-inline: 16px;
-}
-
-.dicta-state-headline--compact {
-  display: none;
-}
-
-.dicta-state--loading {
-  min-height: 230px;
-}
-
-.dicta-no-result-title,
-.dicta-error-title,
-.dicta-idle-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.dicta-no-result-subtitle,
-.dicta-error-message,
-.dicta-idle-subtitle {
-  color: rgba(var(--v-theme-on-surface), 0.72);
-  margin-bottom: 16px;
-  max-width: 36ch;
-}
-
-.dicta-choice-table {
-  width: 100%;
-}
-
-.dicta-choice-source {
-  max-width: 380px;
-  overflow-wrap: anywhere;
-}
-
-.dicta-choice-page-title {
-  max-width: 270px;
-  overflow-wrap: anywhere;
-}
-
-.dicta-choice-actions {
-  white-space: nowrap;
-}
-
-.dicta-choice-actions :deep(.v-btn + .v-btn) {
-  margin-inline-start: 4px;
-}
-
-.dicta-choice-card {
-  height: 100%;
-}
-
-.dicta-choice-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .home-onboarding {
   --v-onboarding-step-z: 2605;
   --v-onboarding-overlay-z: 2600;
   --v-onboarding-overlay-fill: rgba(8, 19, 40, 0.6);
   --v-onboarding-overlay-opacity: 1;
-  --v-onboarding-step-arrow-background: white;
+  --v-onboarding-step-arrow-background: #172554;
 }
 
 .home-onboarding--interactive[data-v-onboarding-wrapper] {
@@ -2886,9 +1237,9 @@ onUnmounted(() => {
   max-width: calc(100vw - 24px);
   padding: 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(23, 37, 84, 0.98);
   box-shadow: 0 22px 56px rgba(15, 23, 42, 0.26);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(248, 250, 252, 0.12);
   display: grid;
   gap: 14px;
   overflow-wrap: anywhere;
@@ -2899,7 +1250,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  min-width: 0;
 }
 
 .onboarding-card__eyebrow {
@@ -2907,35 +1257,24 @@ onUnmounted(() => {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(18, 48, 99, 0.76);
-  min-width: 0;
-  overflow-wrap: anywhere;
+  color: #14B8A6;
 }
 
 .onboarding-card__progress {
   font-size: 0.82rem;
-  color: rgba(15, 23, 42, 0.65);
-  min-width: 0;
-  overflow-wrap: anywhere;
-  text-align: end;
+  color: rgba(248, 250, 252, 0.65);
 }
 
 .onboarding-card__title {
   margin: 0;
   font-size: 1.08rem;
   line-height: 1.35;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 .onboarding-card__description {
   margin: 0;
-  color: rgba(15, 23, 42, 0.82);
+  color: rgba(248, 250, 252, 0.82);
   line-height: 1.55;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 .onboarding-card__actions {
@@ -2943,7 +1282,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  min-width: 0;
   flex-wrap: wrap;
 }
 
@@ -2951,66 +1289,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
   flex-wrap: wrap;
 }
 
 @media (max-width: 600px) {
-  .dicta-overlay,
-  .dicta-choice-overlay {
-    padding-top: 56px;
-  }
-
-  .dicta-choice-shell {
-    width: 100%;
-    margin: 0;
-    height: 100%;
-  }
-
-  .dicta-card--camera {
-    width: 100%;
-    margin: 0;
-    height: 100%;
-  }
-
-  .dicta-card {
-    height: 100dvh;
-  }
-
-  .dicta-card-content {
-    min-height: 0;
-    padding: 0;
-  }
-
-  .dicta-card-title {
-    padding-inline: 8px;
-  }
-
-  .dicta-card-toolbar :deep(.v-btn) {
-    min-width: 0;
-    padding-inline: 8px;
-    font-size: 0.75rem;
-  }
-
-  .dicta-mobile-screen__toolbar :deep(.v-btn) {
-    min-width: 0;
-    padding-inline: 8px;
-    font-size: 0.75rem;
-  }
-
   .onboarding-card {
     width: min(340px, calc(100vw - 20px));
     padding: 16px;
-  }
-
-  .onboarding-card__actions {
-    margin-top: 8px;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .onboarding-card__buttons {
-    justify-content: flex-end;
   }
 }
 </style>

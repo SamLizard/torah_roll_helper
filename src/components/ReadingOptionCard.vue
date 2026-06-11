@@ -202,14 +202,14 @@ onUnmounted(() => {
 
 .reading-option-card {
   background-color: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
+  border: 1px solid rgba(248, 250, 252, 0.08);
+  border-radius: 16px;
   padding: 16px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 6px 20px -5px rgba(15, 23, 42, 0.4);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -340,7 +340,7 @@ onUnmounted(() => {
 @media (hover: hover) and (pointer: fine) {
   .reading-option-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 24px -10px rgba(20, 184, 166, 0.4);
     border-color: rgb(var(--v-theme-primary));
   }
 }
@@ -348,7 +348,7 @@ onUnmounted(() => {
 @media (hover: none), (pointer: coarse) {
   .reading-option-card:active {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 24px -10px rgba(20, 184, 166, 0.4);
     border-color: rgb(var(--v-theme-primary));
   }
 }
