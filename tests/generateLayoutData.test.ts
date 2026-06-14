@@ -170,7 +170,7 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     const lines = cloneFirstLines();
     lines[1][0][0] = (lines[1][0][0] as string).normalize('NFD').replace(/[\u0591-\u05C7]/gu, '');
     expect(() => runWithFirstLines('stripped-nikud', lines)).toThrowError(
-      /exact Torah source text/,
+      /does not match the source structure/,
     );
   }, 30000);
 
@@ -182,7 +182,7 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
 
   it('rejects a multi-segment line whose segments are not contiguous in the source', () => {
     const lines = cloneFirstLines();
-    // page 4 is a real two-segment line (paragraph break). Replace the second
+    // page 4 is a real two-segment line (setuma). Replace the second
     // segment with a real word that does not immediately follow the first.
     lines[3] = [[lines[3][0][0], 'מֹשֶׁה']];
     expect(() => runWithFirstLines('noncontiguous', lines)).toThrowError(/page 4/);
@@ -196,7 +196,18 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     expect(second).toBeTypeOf('string'); // guard: page 4 really has two segments
     lines[3] = [[`${first} ${second}`]];
     expect(() => runWithFirstLines('merged-segments', lines)).toThrowError(
-      /merges a source paragraph break/,
+      /does not match the source structure/,
+    );
+  }, 30000);
+
+  it('rejects splitting a single-column setuma into two columns', () => {
+    // page 4 is one column with two segments `[["A","B"]]`. Recording it as two
+    // columns `[["A"],["B"]]` is a different (wrong) structure.
+    const lines = cloneFirstLines();
+    const [first, second] = lines[3][0] as string[];
+    lines[3] = [[first], [second]];
+    expect(() => runWithFirstLines('wrong-column-split', lines)).toThrowError(
+      /does not match the source structure/,
     );
   }, 30000);
 
@@ -230,5 +241,27 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
       layoutFirstLines: knownGoodFirstLines(layout),
     });
     expect(result.changedFirstLinePages).toEqual([]);
+  }, 30000);
+
+  it('preserves a Haazinu two-column page (does not collapse it into one column)', () => {
+    // Haazinu's poem is written in two columns on a page, recorded as two outer
+    // arrays `[["A"],["B"]]`. This must verify, and --fix must not rewrite it.
+    const twoColumnIndex = firstLines.findIndex(
+      (entry) => Array.isArray(entry) && entry.length === 2,
+    );
+    expect(twoColumnIndex).toBeGreaterThanOrEqual(0);
+
+    const result = generateLayoutData({
+      ...basePaths,
+      layout,
+      pageCount: null,
+      dryRun: true,
+      fixFirstLines: true,
+      layoutFirstLines: knownGoodFirstLines(layout),
+    });
+
+    expect(result.changedFirstLinePages).not.toContain(twoColumnIndex + 1);
+    expect(result.fixedFirstLines?.[twoColumnIndex]).toEqual(firstLines[twoColumnIndex]);
+    expect((result.fixedFirstLines?.[twoColumnIndex] as unknown[]).length).toBe(2);
   }, 30000);
 });

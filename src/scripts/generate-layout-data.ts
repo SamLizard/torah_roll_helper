@@ -91,10 +91,13 @@ type TorahStream = {
   verseStarts: VerseStart[];
   nextVerseByKey: Map<string, VerseRef>;
   pageStartWordIndexes245: Map<number, number>;
-  // Word indices that begin a new *intra-line* source segment (a setuma/petucha
-  // break inside a physical line, represented as a separate string in the
-  // source `text` array). Used to validate first-line segmentation.
-  segmentStartWordIndexes: Set<number>;
+  // The source `text` of a physical line is an array of COLUMNS (outer array;
+  // length 2 only for Haazinu's two-column passage), and each column is an array
+  // of SEGMENTS split by a setuma. We track both kinds of boundary by the word
+  // index that starts them, so first-line entries can reproduce the exact
+  // nesting: `[["A","B"]]` (one column, setuma) vs `[["A"],["B"]]` (two columns).
+  columnStartWordIndexes: Set<number>;
+  setumaStartWordIndexes: Set<number>;
 };
 
 type RealDbPageEntry = {
@@ -439,7 +442,8 @@ const readTorahStream = (sourceDir: string): TorahStream => {
   const words: SourceWord[] = [];
   const verseStarts: VerseStart[] = [];
   const pageStartWordIndexes245 = new Map<number, number>();
-  const segmentStartWordIndexes = new Set<number>();
+  const columnStartWordIndexes = new Set<number>();
+  const setumaStartWordIndexes = new Set<number>();
   let nextWordStartsVerse = true;
 
   getSourcePageFiles(sourceDir).forEach((path) => {
@@ -448,54 +452,64 @@ const readTorahStream = (sourceDir: string): TorahStream => {
 
     lines.forEach((line, lineIndex) => {
       const pendingVerses = getLineVerses(line);
-      // A physical source line can hold several text segments (a setuma/petucha
-      // gap inside the line is stored as separate strings). We must track those
-      // boundaries so a recorded first line cannot merge across them.
-      const segments = collectStrings(isRecord(line) ? line.text : null)
-        .map((segment) => normalizeSpaces(stripSourceMarkers(segment)))
-        .filter((segment) => segment.length > 0);
+      // `text` is an array of COLUMNS; each column is an array of SEGMENTS split
+      // by a setuma. Preserve that two-level shape so first lines can reproduce
+      // it exactly (column break = Haazinu two-column passage; setuma = gap).
+      const lineText = isRecord(line) ? line.text : null;
+      const columns = (Array.isArray(lineText) ? lineText : [lineText]).map((column) =>
+        collectStrings(column)
+          .map((segment) => normalizeSpaces(stripSourceMarkers(segment)))
+          .filter((segment) => segment.length > 0),
+      );
       let pendingVerseIndex = 0;
 
-      segments.forEach((segmentText, segmentIndex) => {
-        const sourceTextWithSegment = appendSourceLine(sourceText, segmentText);
-        const globalStartChar = sourceTextWithSegment.length - segmentText.length;
-        const segmentWords = tokenizeLineWords({
-          globalStartChar,
-          lineText: segmentText,
-          line: lineIndex + 1,
-          sourcePage,
-          wordCountSoFar: words.length,
+      columns.forEach((columnSegments, columnIndex) => {
+        columnSegments.forEach((segmentText, segmentIndex) => {
+          const sourceTextWithSegment = appendSourceLine(sourceText, segmentText);
+          const globalStartChar = sourceTextWithSegment.length - segmentText.length;
+          const segmentWords = tokenizeLineWords({
+            globalStartChar,
+            lineText: segmentText,
+            line: lineIndex + 1,
+            sourcePage,
+            wordCountSoFar: words.length,
+          });
+
+          segmentWords.forEach((word, wordIndexInSegment) => {
+            const raw = sourceTextWithSegment.slice(word.startChar, word.endChar);
+            const endsVerse = raw.includes('׃');
+
+            if (!pageStartWordIndexes245.has(sourcePage)) {
+              pageStartWordIndexes245.set(sourcePage, words.length);
+            }
+
+            if (wordIndexInSegment === 0) {
+              // First word of a non-initial column starts a new column; first
+              // word of a non-initial segment within a column starts after a
+              // setuma.
+              if (columnIndex > 0 && segmentIndex === 0) {
+                columnStartWordIndexes.add(words.length);
+              } else if (segmentIndex > 0) {
+                setumaStartWordIndexes.add(words.length);
+              }
+            }
+
+            if (nextWordStartsVerse && pendingVerseIndex < pendingVerses.length) {
+              verseStarts.push({
+                wordIndex: words.length,
+                ref: pendingVerses[pendingVerseIndex],
+              });
+              pendingVerseIndex += 1;
+              nextWordStartsVerse = false;
+            }
+
+            words.push({ ...word, wordIndex: words.length });
+
+            if (endsVerse) nextWordStartsVerse = true;
+          });
+
+          sourceText = sourceTextWithSegment;
         });
-
-        segmentWords.forEach((word, wordIndexInSegment) => {
-          const raw = sourceTextWithSegment.slice(word.startChar, word.endChar);
-          const endsVerse = raw.includes('׃');
-
-          if (!pageStartWordIndexes245.has(sourcePage)) {
-            pageStartWordIndexes245.set(sourcePage, words.length);
-          }
-
-          // The first word of a non-initial segment begins after a real
-          // intra-line break (setuma/petucha gap).
-          if (segmentIndex > 0 && wordIndexInSegment === 0) {
-            segmentStartWordIndexes.add(words.length);
-          }
-
-          if (nextWordStartsVerse && pendingVerseIndex < pendingVerses.length) {
-            verseStarts.push({
-              wordIndex: words.length,
-              ref: pendingVerses[pendingVerseIndex],
-            });
-            pendingVerseIndex += 1;
-            nextWordStartsVerse = false;
-          }
-
-          words.push({ ...word, wordIndex: words.length });
-
-          if (endsVerse) nextWordStartsVerse = true;
-        });
-
-        sourceText = sourceTextWithSegment;
       });
 
       if (pendingVerseIndex !== pendingVerses.length) {
@@ -528,7 +542,8 @@ const readTorahStream = (sourceDir: string): TorahStream => {
     verseStarts,
     nextVerseByKey,
     pageStartWordIndexes245,
-    segmentStartWordIndexes,
+    columnStartWordIndexes,
+    setumaStartWordIndexes,
   };
 };
 
@@ -567,14 +582,30 @@ const getVerseStartPage = (realDb: RealDb, ref: VerseRef): number => {
 
 // --- First-line matching (verification) ------------------------------------
 
-// Each fragment string in the entry is a distinct "segment". A break between
-// fragments represents a setuma/petucha gap in the scroll, so the segments must
-// stay separate (never merged into one string). `[["A","B"]]` -> ["A","B"];
-// `[["A B"]]` -> ["A B"]; `[["A"]]` -> ["A"].
+// A recorded first line mirrors the source `text`: an array of COLUMNS, each an
+// array of SEGMENTS (split by a setuma). `[["A","B"]]` = 1 column / 2 segments
+// (setuma between A and B); `[["A"],["B"]]` = 2 columns (Haazinu); `[["A"]]` =
+// plain. We expose both a flat fragment list (for contiguous matching + exact
+// text) and the column structure (to validate/rebuild nesting).
+const getFirstLineColumns = (entry: unknown): string[][] => {
+  if (!Array.isArray(entry)) {
+    const text = normalizeSpaces(collectStrings(entry).join(' '));
+    return text ? [[text]] : [];
+  }
+
+  return entry
+    .map((column) =>
+      collectStrings(column)
+        .map((segment) => normalizeSpaces(segment))
+        .filter((segment) => segment.length > 0),
+    )
+    .filter((column) => column.length > 0);
+};
+
+// Flatten the columns/segments to an ordered fragment text list, used for
+// contiguous matching against the source.
 const getFirstLineParts = (entry: unknown): string[] => {
-  return collectStrings(entry)
-    .map((fragment) => normalizeSpaces(fragment))
-    .filter((fragment) => fragment.length > 0);
+  return getFirstLineColumns(entry).flat();
 };
 
 const flattenFirstLineEntry = (entry: unknown): string => {
@@ -790,9 +821,8 @@ const analyzeFirstLinePage = ({
 
   const nextStartLetterIndex = preferred.match.startLetterIndex + 1;
 
-  // Build the corrected entry: exact source text, re-split at any source
-  // segment boundary that falls inside the matched span. One column, N
-  // fragments (matching the existing data shape `[[ "..." , "..." ]]`).
+  // Build the corrected entry: exact source text with the exact column/setuma
+  // structure of the matched span (see buildSourceColumns).
   const corrected = buildCorrectedFirstLine(preferred.match, stream);
 
   if (!realDbEntry) {
@@ -812,88 +842,73 @@ const analyzeFirstLinePage = ({
     return { issues, corrected, nextStartLetterIndex };
   }
 
-  // Exact-source-text check: the recorded first line must be the *exact* text
-  // from the Torah source (right letters AND right vowels/te'amim/makaf), not an
-  // approximation. The matcher only anchors on consonants, so without this a
-  // wrong or missing nikud/te'amim mark would slip through. Compared segment by
-  // segment so multi-fragment entries (a paragraph break on the first line) are
-  // validated as real, contiguous source text.
-  const expectedParts = getFirstLineParts(firstLineEntry);
-  const sourceParts = preferred.match.parts;
+  // Exact-source-text + structure check. The recorded first line must reproduce
+  // the source exactly: same letters AND vowels/te'amim, and the same nesting —
+  // columns (outer array, Haazinu's two-column passage) and setuma segments
+  // (inner strings). We rebuild the expected structure from the source over the
+  // matched span and compare it to what was recorded.
+  const expectedColumns = buildSourceColumns(preferred.match, stream);
+  const recordedColumns = getFirstLineColumns(firstLineEntry).map((column) =>
+    column.map((segment) => normalizeSpaces(stripSourceMarkers(segment))),
+  );
 
-  if (expectedParts.length !== sourceParts.length) {
+  if (!columnsEqual(recordedColumns, expectedColumns)) {
     issues.push(
-      `${label}: page ${page} first line has ${expectedParts.length} segment(s) ` +
-        `but matched ${sourceParts.length} in the source`,
+      `${label}: page ${page} first line does not match the source structure\n` +
+        `    recorded: ${JSON.stringify(recordedColumns)}\n` +
+        `    source:   ${JSON.stringify(expectedColumns)}`,
     );
-    return { issues, corrected, nextStartLetterIndex };
   }
-
-  expectedParts.forEach((expectedPart, partIndex) => {
-    // Strip source annotation markers like #(פ)/#(ס) from both sides: they are
-    // petucha/setuma annotations some datasets keep on the recorded line, not
-    // Torah letters/vowels, so they must not cause a false mismatch.
-    const expectedText = normalizeSpaces(stripSourceMarkers(expectedPart));
-    const sourceText = normalizeSpaces(stripSourceMarkers(sourceParts[partIndex]));
-    if (sourceText !== expectedText) {
-      issues.push(
-        `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${partIndex + 1}` : ''} ` +
-          `differs from the exact Torah source text\n    recorded: ${expectedText}\n    source:   ${sourceText}`,
-      );
-    }
-  });
-
-  // Segmentation check: the source splits some physical lines into several
-  // segments (an intra-line setuma/petucha gap). A recorded first line must keep
-  // those gaps as separate strings, never merge them into one. We detect a
-  // wrongly-merged segment when a *source* segment boundary falls strictly
-  // inside one of the recorded segments' word span.
-  preferred.match.segments.forEach((segment, segmentIndex) => {
-    const mergedBoundary = (() => {
-      for (let wordIndex = segment.startWordIndex + 1; wordIndex <= segment.endWordIndex; wordIndex += 1) {
-        if (stream.segmentStartWordIndexes.has(wordIndex)) return wordIndex;
-      }
-      return null;
-    })();
-
-    if (mergedBoundary != null) {
-      const before = stream.words[mergedBoundary - 1]?.normalized ?? '';
-      const after = stream.words[mergedBoundary]?.normalized ?? '';
-      issues.push(
-        `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${segmentIndex + 1}` : ''} ` +
-          `merges a source paragraph break — the text should be split into two segments here ` +
-          `(between "${before}" and "${after}")`,
-      );
-    }
-  });
 
   return { issues, corrected, nextStartLetterIndex };
 };
 
+const columnsEqual = (left: string[][], right: string[][]): boolean => {
+  return JSON.stringify(left) === JSON.stringify(right);
+};
+
 /**
- * Rebuild a page's first-line entry from the matched source: exact source text,
- * re-split at every source segment boundary inside the matched span. Returns a
- * single column with one or more fragments, matching the data shape used in
- * `page_first_lines.json` (`[[ "frag", "frag" ]]`).
+ * Rebuild a page's first-line entry from the matched source, preserving the
+ * exact two-level structure: an array of COLUMNS (split at source column breaks,
+ * i.e. Haazinu's two-column passage) where each column is an array of SEGMENTS
+ * (split at a setuma). Text is the exact source slice. This is the shape used in
+ * `page_first_lines.json`: `[["A","B"]]`, `[["A"],["B"]]`, or `[["A"]]`.
  */
-const buildCorrectedFirstLine = (match: FirstLineMatch, stream: TorahStream): string[][] => {
-  const startChar = stream.words[match.startWordIndex].startChar;
+const buildSourceColumns = (match: FirstLineMatch, stream: TorahStream): string[][] => {
+  const firstWordIndex = match.startWordIndex;
   const lastWordIndex = match.segments[match.segments.length - 1].endWordIndex;
   const endChar = match.segments[match.segments.length - 1].endChar;
 
-  const fragments: string[] = [];
-  let fragmentStartChar = startChar;
+  const columns: string[][] = [];
+  let currentColumn: string[] = [];
+  let fragmentStartChar = stream.words[firstWordIndex].startChar;
 
-  for (let wordIndex = match.startWordIndex + 1; wordIndex <= lastWordIndex; wordIndex += 1) {
-    if (stream.segmentStartWordIndexes.has(wordIndex)) {
-      const fragmentEndChar = stream.words[wordIndex - 1].endChar;
-      fragments.push(normalizeSpaces(stream.sourceText.slice(fragmentStartChar, fragmentEndChar)));
-      fragmentStartChar = stream.words[wordIndex].startChar;
+  const pushFragment = (fragmentEndChar: number) => {
+    currentColumn.push(normalizeSpaces(stream.sourceText.slice(fragmentStartChar, fragmentEndChar)));
+  };
+
+  for (let wordIndex = firstWordIndex + 1; wordIndex <= lastWordIndex; wordIndex += 1) {
+    const isColumnBreak = stream.columnStartWordIndexes.has(wordIndex);
+    const isSetumaBreak = stream.setumaStartWordIndexes.has(wordIndex);
+    if (!isColumnBreak && !isSetumaBreak) continue;
+
+    pushFragment(stream.words[wordIndex - 1].endChar);
+    fragmentStartChar = stream.words[wordIndex].startChar;
+
+    if (isColumnBreak) {
+      columns.push(currentColumn);
+      currentColumn = [];
     }
   }
-  fragments.push(normalizeSpaces(stream.sourceText.slice(fragmentStartChar, endChar)));
 
-  return [fragments];
+  pushFragment(endChar);
+  columns.push(currentColumn);
+
+  return columns;
+};
+
+const buildCorrectedFirstLine = (match: FirstLineMatch, stream: TorahStream): string[][] => {
+  return buildSourceColumns(match, stream);
 };
 
 const verifyFirstLinesAgainstSource = ({
