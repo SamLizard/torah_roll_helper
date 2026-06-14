@@ -1443,11 +1443,13 @@ const formatFirstLinesFile = (pageFirstLines: string[][][]): string => {
   const lines = ['['];
   pageFirstLines.forEach((pageLine, index) => {
     const comma = index === pageFirstLines.length - 1 ? '' : ',';
-    const fragments = pageLine
-      .flat()
-      .map((fragment) => `${JSON.stringify(fragment)}`)
+    // Preserve the two-level structure: each COLUMN is its own array, and the
+    // SEGMENTS (setuma-separated) are the strings inside it. e.g. one column
+    // with a setuma -> `[[ "A", "B" ]]`; two columns (Haazinu) -> `[[ "A" ], [ "B" ]]`.
+    const columns = pageLine
+      .map((column) => `[ ${column.map((fragment) => JSON.stringify(fragment)).join(', ')} ]`)
       .join(', ');
-    lines.push(`    [[ ${fragments} ]]${comma}`);
+    lines.push(`    [${columns}]${comma}`);
   });
   lines.push(']');
   return `${lines.join('\r\n')}\r\n`;
@@ -1504,5 +1506,5 @@ if (isDirectRun) {
   }
 }
 
-export { generateLayoutData, buildDefaultPaths, parseArgs };
+export { generateLayoutData, buildDefaultPaths, parseArgs, formatFirstLinesFile };
 export type { CliOptions, GenerateResult, TargetPageEntry, RealDb };

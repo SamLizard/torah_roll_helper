@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   generateLayoutData,
   buildDefaultPaths,
+  formatFirstLinesFile,
   type CliOptions,
 } from '../src/scripts/generate-layout-data';
 
@@ -299,4 +300,20 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     expect(result.fixedFirstLines?.[twoColumnIndex]).toEqual(firstLines[twoColumnIndex]);
     expect((result.fixedFirstLines?.[twoColumnIndex] as unknown[]).length).toBe(2);
   }, 30000);
+
+  it('formatFirstLinesFile preserves column vs segment nesting when writing', () => {
+    // Guards the writer (not just the in-memory result): a two-column page and a
+    // one-column/two-segment page must serialize to the right shapes and parse
+    // back identically.
+    const sample: string[][][] = [
+      [['only one column']],
+      [['col one'], ['col two']],
+      [['seg one', 'seg two']],
+    ];
+    const parsed = JSON.parse(formatFirstLinesFile(sample));
+    expect(parsed).toEqual(sample);
+    expect(parsed[1].length).toBe(2); // two columns stay two columns
+    expect(parsed[2].length).toBe(1); // one column with two segments stays one column
+    expect(parsed[2][0].length).toBe(2);
+  });
 });
