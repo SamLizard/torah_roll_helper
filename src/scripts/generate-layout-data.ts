@@ -863,8 +863,22 @@ const analyzeFirstLinePage = ({
   return { issues, corrected, nextStartLetterIndex };
 };
 
+// Compare column/segment structures, treating makaf (־), paseq (׀) and spaces
+// as equivalent word separators. The recorded data uses a plain space at seams
+// where a first line crosses a source segment boundary (and omits the paseq),
+// while the raw source keeps the makaf/paseq; both are valid, so only real
+// differences (letters, vowels, nesting) should be flagged.
+const canonicalizeSeparators = (text: string): string => {
+  return text
+    .replace(/[\u05be\u05c0]/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+};
+
 const columnsEqual = (left: string[][], right: string[][]): boolean => {
-  return JSON.stringify(left) === JSON.stringify(right);
+  const canon = (columns: string[][]) =>
+    JSON.stringify(columns.map((column) => column.map(canonicalizeSeparators)));
+  return canon(left) === canon(right);
 };
 
 /**

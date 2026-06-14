@@ -160,6 +160,18 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     expect(() => runWithFirstLines('shorter-prefix', lines)).not.toThrow();
   }, 30000);
 
+  it('accepts a recorded line that uses a space where the source has a makaf', () => {
+    // The recorded data legitimately uses a plain space at seams where the
+    // source has a makaf (־) or paseq (׀). Such a line must still verify.
+    const lines = cloneFirstLines();
+    const replaced = (lines[3][0][0] as string).replace(/\u05be/gu, ' ');
+    // only meaningful if page 4 actually contains a makaf
+    if (replaced !== lines[3][0][0]) {
+      lines[3][0][0] = replaced;
+      expect(() => runWithFirstLines('space-for-makaf', lines)).not.toThrow();
+    }
+  }, 30000);
+
   it('rejects an added word that is not in the source at that position', () => {
     const lines = cloneFirstLines();
     lines[1][0][0] = `${lines[1][0][0]} זזזזז`;
@@ -241,6 +253,29 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
       layoutFirstLines: knownGoodFirstLines(layout),
     });
     expect(result.changedFirstLinePages).toEqual([]);
+  }, 30000);
+
+  it('--fix-first-lines is idempotent: a second fix changes nothing', () => {
+    const firstPass = generateLayoutData({
+      ...basePaths,
+      layout,
+      pageCount: null,
+      dryRun: true,
+      fixFirstLines: true,
+      layoutFirstLines: knownGoodFirstLines(layout),
+    });
+    const fixedPath = join(tempDir, 'after-first-fix.json');
+    writeFileSync(fixedPath, JSON.stringify(firstPass.fixedFirstLines ?? []));
+
+    const secondPass = generateLayoutData({
+      ...basePaths,
+      layout,
+      pageCount: null,
+      dryRun: true,
+      fixFirstLines: true,
+      layoutFirstLines: fixedPath,
+    });
+    expect(secondPass.changedFirstLinePages).toEqual([]);
   }, 30000);
 
   it('preserves a Haazinu two-column page (does not collapse it into one column)', () => {
