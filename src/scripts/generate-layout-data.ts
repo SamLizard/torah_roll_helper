@@ -1455,6 +1455,34 @@ const formatFirstLinesFile = (pageFirstLines: string[][][]): string => {
   return `${lines.join('\r\n')}\r\n`;
 };
 
+/**
+ * Write `content` to `path` only if it differs from what's already there, and
+ * match the file's existing line-ending style. This keeps the script idempotent:
+ * re-running with no real change leaves files byte-identical, so git does not
+ * report them as modified (avoids spurious diffs from LF-vs-CRLF rewrites).
+ * Returns true if the file was actually written.
+ */
+const writeFileIfChanged = (path: string, content: string): boolean => {
+  const existing = existsSync(path) ? readFileSync(path, 'utf8') : null;
+
+  // Match the existing file's dominant EOL so unchanged content stays identical.
+  const usesCrlf = existing != null ? existing.includes('\r\n') : process.platform === 'win32';
+  let normalized = content.replace(/\r\n/gu, '\n');
+
+  // Match the existing file's trailing-newline convention too (some committed
+  // files end without a final newline), so a no-op run stays byte-identical.
+  if (existing != null && !existing.endsWith('\n') && normalized.endsWith('\n')) {
+    normalized = normalized.replace(/\n+$/u, '');
+  }
+
+  const finalContent = usesCrlf ? normalized.replace(/\n/gu, '\r\n') : normalized;
+
+  if (existing === finalContent) return false;
+
+  writeFileSync(path, finalContent);
+  return true;
+};
+
 const main = (): void => {
   const options = parseArgs(process.argv.slice(2));
   const result = generateLayoutData(options);
@@ -1474,20 +1502,39 @@ const main = (): void => {
   }
 
   if (options.fixFirstLines && result.fixedFirstLines) {
-    writeFileSync(options.layoutFirstLines, formatFirstLinesFile(result.fixedFirstLines));
+    const wrote = writeFileIfChanged(
+      options.layoutFirstLines,
+      formatFirstLinesFile(result.fixedFirstLines),
+    );
     console.log(
-      `Rewrote ${options.layoutFirstLines} (${result.changedFirstLinePages.length} page(s) changed` +
-        (result.changedFirstLinePages.length > 0
-          ? `: ${result.changedFirstLinePages.join(', ')}`
-          : '') +
-        '). Review the git diff before committing.',
+      wrote
+        ? `Rewrote ${options.layoutFirstLines} (${result.changedFirstLinePages.length} page(s) changed` +
+            (result.changedFirstLinePages.length > 0
+              ? `: ${result.changedFirstLinePages.join(', ')}`
+              : '') +
+            '). Review the git diff before committing.'
+        : `${options.layoutFirstLines} already correct (no change).`,
     );
   }
 
-  writeFileSync(options.targetPages, `${JSON.stringify(result.updatedTargetPages, null, 2)}\n`);
-  writeFileSync(options.titleKeysOutput, `${JSON.stringify(result.pageTitleKeys, null, 2)}\n`);
+  const wroteTargets = writeFileIfChanged(
+    options.targetPages,
+    `${JSON.stringify(result.updatedTargetPages, null, 2)}\n`,
+  );
+  const wroteTitleKeys = writeFileIfChanged(
+    options.titleKeysOutput,
+    `${JSON.stringify(result.pageTitleKeys, null, 2)}\n`,
+  );
 
-  console.log('Wrote updated target_pages.json and page_titles_keys.');
+  const changedFiles = [
+    wroteTargets ? 'target_pages.json' : null,
+    wroteTitleKeys ? 'page_titles_keys.json' : null,
+  ].filter(Boolean);
+  console.log(
+    changedFiles.length > 0
+      ? `Updated ${changedFiles.join(' and ')}.`
+      : 'target_pages.json and page_titles_keys.json already up to date (no change).',
+  );
   printSummary(options, result);
 };
 
@@ -1506,5 +1553,5 @@ if (isDirectRun) {
   }
 }
 
-export { generateLayoutData, buildDefaultPaths, parseArgs, formatFirstLinesFile };
+export { generateLayoutData, buildDefaultPaths, parseArgs, formatFirstLinesFile, writeFileIfChanged };
 export type { CliOptions, GenerateResult, TargetPageEntry, RealDb };

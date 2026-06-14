@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -6,6 +6,7 @@ import {
   generateLayoutData,
   buildDefaultPaths,
   formatFirstLinesFile,
+  writeFileIfChanged,
   type CliOptions,
 } from '../src/scripts/generate-layout-data';
 
@@ -315,5 +316,47 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     expect(parsed[1].length).toBe(2); // two columns stay two columns
     expect(parsed[2].length).toBe(1); // one column with two segments stays one column
     expect(parsed[2][0].length).toBe(2);
+  });
+});
+
+// Guards against spurious git diffs: re-writing identical content (only EOL or
+// trailing-newline differences) must not touch the file.
+describe('writeFileIfChanged', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'write-if-changed-'));
+
+  it('does not rewrite a file whose content differs only by line endings', () => {
+    const path = join(tempDir, 'crlf.json');
+    writeFileSync(path, 'line one\r\nline two\r\n'); // CRLF on disk
+    const before = statSync(path).mtimeMs;
+
+    const wrote = writeFileIfChanged(path, 'line one\nline two\n'); // same content, LF
+
+    expect(wrote).toBe(false);
+    expect(readFileSync(path, 'utf8')).toBe('line one\r\nline two\r\n'); // unchanged
+    expect(statSync(path).mtimeMs).toBe(before); // not even touched
+  });
+
+  it('preserves a file with no trailing newline', () => {
+    const path = join(tempDir, 'no-eol.json');
+    writeFileSync(path, '[\r\n  1\r\n]'); // no final newline
+    const wrote = writeFileIfChanged(path, '[\n  1\n]\n'); // same content + trailing NL
+    expect(wrote).toBe(false);
+    expect(readFileSync(path, 'utf8')).toBe('[\r\n  1\r\n]');
+  });
+
+  it('writes (and reports true) when content really changed, keeping CRLF', () => {
+    const path = join(tempDir, 'change.json');
+    writeFileSync(path, 'old\r\n');
+    const wrote = writeFileIfChanged(path, 'new\n');
+    expect(wrote).toBe(true);
+    expect(readFileSync(path, 'utf8')).toBe('new\r\n'); // CRLF preserved
+  });
+
+  it('creates a new file when it does not exist', () => {
+    const path = join(tempDir, 'created.json');
+    expect(existsSync(path)).toBe(false);
+    const wrote = writeFileIfChanged(path, 'hello\n');
+    expect(wrote).toBe(true);
+    expect(existsSync(path)).toBe(true);
   });
 });
