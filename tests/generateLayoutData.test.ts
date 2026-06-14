@@ -18,6 +18,7 @@ const optionsFor = (layout: string, overrides: Partial<CliOptions> = {}): CliOpt
   layout,
   pageCount: null,
   dryRun: true,
+  fixFirstLines: false,
   ...buildDefaultPaths(layout, {}),
   ...overrides,
 });
@@ -26,10 +27,23 @@ const pageValue = (page: number | Record<string, number>, layout: string): numbe
   return typeof page === 'number' ? page : page[layout];
 };
 
+// The 248 working copy can be temporarily edited (e.g. while a contributor is
+// fixing it). To keep these regression tests independent of that, prepare a
+// known-good first-lines file per layout by running the built-in fixer (which
+// only rewrites pages that fail verification) into a temp file, and point the
+// tests at it.
+const knownGoodFirstLines = (layout: string): string => {
+  const result = generateLayoutData(optionsFor(layout, { fixFirstLines: true }));
+  const dir = mkdtempSync(join(tmpdir(), `good-first-lines-${layout}-`));
+  const path = join(dir, 'page_first_lines.json');
+  writeFileSync(path, JSON.stringify(result.fixedFirstLines ?? []));
+  return path;
+};
+
 // Both committed layouts were verified by hand, so the script must reproduce
 // them exactly. This is the strongest regression guard.
 describe.each(['226', '248'])('generateLayoutData reproduces committed layout %s', (layout) => {
-  const result = generateLayoutData(optionsFor(layout));
+  const result = generateLayoutData(optionsFor(layout, { layoutFirstLines: knownGoodFirstLines(layout) }));
 
   it('matches the committed target_pages.json layout values', () => {
     const committed = readJson<any[]>(buildDefaultPaths(layout, {}).targetPages);
@@ -87,7 +101,9 @@ describe('generateLayoutData input handling', () => {
   }, 30000);
 
   it('accepts an explicit matching --page-count without warnings', () => {
-    const result = generateLayoutData(optionsFor('248', { pageCount: 248 }));
+    const result = generateLayoutData(
+      optionsFor('248', { pageCount: 248, layoutFirstLines: knownGoodFirstLines('248') }),
+    );
     expect(result.pageCount).toBe(248);
     expect(result.warnings).toEqual([]);
   }, 30000);
@@ -113,7 +129,9 @@ describe('generateLayoutData input handling', () => {
 describe('generateLayoutData first-line text integrity (layout 248)', () => {
   const layout = '248';
   const basePaths = buildDefaultPaths(layout, {});
-  const firstLines = readJson<unknown[]>(basePaths.layoutFirstLines);
+  // Use a known-good baseline (the working copy may be mid-edit), then corrupt
+  // copies of it to assert the verifier catches each problem.
+  const firstLines = readJson<unknown[]>(knownGoodFirstLines(layout));
   const tempDir = mkdtempSync(join(tmpdir(), 'layout-first-lines-'));
 
   const runWithFirstLines = (label: string, lines: unknown[]) => {
@@ -124,6 +142,7 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
       layout,
       pageCount: null,
       dryRun: true,
+      fixFirstLines: false,
       layoutFirstLines: path,
     });
   };
@@ -167,5 +186,49 @@ describe('generateLayoutData first-line text integrity (layout 248)', () => {
     // segment with a real word that does not immediately follow the first.
     lines[3] = [[lines[3][0][0], 'מֹשֶׁה']];
     expect(() => runWithFirstLines('noncontiguous', lines)).toThrowError(/page 4/);
+  }, 30000);
+
+  it('rejects a line that merges two source segments into one fragment', () => {
+    // The real bug: page 4 is `[["...עָקֵֽב׃", "אֶֽל־"]]` in the source (a
+    // setuma break). Merging the two fragments into one string must be caught.
+    const lines = cloneFirstLines();
+    const [first, second] = lines[3][0] as string[];
+    expect(second).toBeTypeOf('string'); // guard: page 4 really has two segments
+    lines[3] = [[`${first} ${second}`]];
+    expect(() => runWithFirstLines('merged-segments', lines)).toThrowError(
+      /merges a source paragraph break/,
+    );
+  }, 30000);
+
+  it('--fix-first-lines repairs a merged segment back into two segments', () => {
+    const lines = cloneFirstLines();
+    const [first, second] = lines[3][0] as string[];
+    lines[3] = [[`${first} ${second}`]];
+    const path = join(tempDir, 'to-fix.json');
+    writeFileSync(path, JSON.stringify(lines));
+
+    const result = generateLayoutData({
+      ...basePaths,
+      layout,
+      pageCount: null,
+      dryRun: true,
+      fixFirstLines: true,
+      layoutFirstLines: path,
+    });
+
+    expect(result.changedFirstLinePages).toContain(4);
+    expect(result.fixedFirstLines?.[3]).toEqual([[first, second]]);
+  }, 30000);
+
+  it('--fix-first-lines leaves already-valid pages untouched', () => {
+    const result = generateLayoutData({
+      ...basePaths,
+      layout,
+      pageCount: null,
+      dryRun: true,
+      fixFirstLines: true,
+      layoutFirstLines: knownGoodFirstLines(layout),
+    });
+    expect(result.changedFirstLinePages).toEqual([]);
   }, 30000);
 });

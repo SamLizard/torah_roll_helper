@@ -91,6 +91,10 @@ type TorahStream = {
   verseStarts: VerseStart[];
   nextVerseByKey: Map<string, VerseRef>;
   pageStartWordIndexes245: Map<number, number>;
+  // Word indices that begin a new *intra-line* source segment (a setuma/petucha
+  // break inside a physical line, represented as a separate string in the
+  // source `text` array). Used to validate first-line segmentation.
+  segmentStartWordIndexes: Set<number>;
 };
 
 type RealDbPageEntry = {
@@ -98,9 +102,18 @@ type RealDbPageEntry = {
   ref: VerseRef;
 };
 
+type FirstLineSegmentMatch = {
+  startLetterIndex: number;
+  startWordIndex: number;
+  endWordIndex: number;
+  endChar: number;
+  text: string;
+};
+
 type FirstLineMatch = {
   endChar: number;
   parts: string[];
+  segments: FirstLineSegmentMatch[];
   startLetterIndex: number;
   startWordIndex: number;
 };
@@ -119,6 +132,7 @@ type CliOptions = LayoutPaths & {
   layout: string;
   pageCount: number | null;
   dryRun: boolean;
+  fixFirstLines: boolean;
 };
 
 // --- Paths -----------------------------------------------------------------
@@ -155,6 +169,9 @@ Options:
   --real-db <file>         Default: src/data/<layout>/real_db.json
   --first-lines <file>     Default: src/data/<layout>/page_first_lines.json
   --title-keys-output <file>     Default: src/data/<layout>/page_titles_keys.json
+  --fix-first-lines        Rewrite page_first_lines from the source: exact text +
+                           correct setuma/petucha segmentation, preserving each
+                           line's length. Review the git diff afterwards.
   --dry-run                Verify and report planned writes without modifying files.
   --help                   Show this help.
 `;
@@ -215,6 +232,7 @@ const parseArgs = (argv: string[]): CliOptions => {
   let layout: string | null = null;
   let pageCount: number | null = null;
   let dryRun = false;
+  let fixFirstLines = false;
   const overrides: Partial<LayoutPaths> = {};
 
   const requireNext = (arg: string, next: string | undefined): string => {
@@ -232,6 +250,10 @@ const parseArgs = (argv: string[]): CliOptions => {
     }
     if (arg === '--dry-run') {
       dryRun = true;
+      continue;
+    }
+    if (arg === '--fix-first-lines') {
+      fixFirstLines = true;
       continue;
     }
     if (arg === '--layout') {
@@ -290,6 +312,7 @@ const parseArgs = (argv: string[]): CliOptions => {
     layout,
     pageCount,
     dryRun,
+    fixFirstLines,
     ...buildDefaultPaths(layout, overrides),
   };
 };
@@ -416,6 +439,7 @@ const readTorahStream = (sourceDir: string): TorahStream => {
   const words: SourceWord[] = [];
   const verseStarts: VerseStart[] = [];
   const pageStartWordIndexes245 = new Map<number, number>();
+  const segmentStartWordIndexes = new Set<number>();
   let nextWordStartsVerse = true;
 
   getSourcePageFiles(sourceDir).forEach((path) => {
@@ -424,38 +448,54 @@ const readTorahStream = (sourceDir: string): TorahStream => {
 
     lines.forEach((line, lineIndex) => {
       const pendingVerses = getLineVerses(line);
-      const lineText = normalizeSpaces(stripSourceMarkers(collectStrings(isRecord(line) ? line.text : null).join(' ')));
-      const sourceTextWithLine = appendSourceLine(sourceText, lineText);
-      const globalStartChar = sourceTextWithLine.length - lineText.length;
-      const lineWords = tokenizeLineWords({
-        globalStartChar,
-        lineText,
-        line: lineIndex + 1,
-        sourcePage,
-        wordCountSoFar: words.length,
-      });
+      // A physical source line can hold several text segments (a setuma/petucha
+      // gap inside the line is stored as separate strings). We must track those
+      // boundaries so a recorded first line cannot merge across them.
+      const segments = collectStrings(isRecord(line) ? line.text : null)
+        .map((segment) => normalizeSpaces(stripSourceMarkers(segment)))
+        .filter((segment) => segment.length > 0);
       let pendingVerseIndex = 0;
 
-      lineWords.forEach((word) => {
-        const raw = sourceTextWithLine.slice(word.startChar, word.endChar);
-        const endsVerse = raw.includes('׃');
+      segments.forEach((segmentText, segmentIndex) => {
+        const sourceTextWithSegment = appendSourceLine(sourceText, segmentText);
+        const globalStartChar = sourceTextWithSegment.length - segmentText.length;
+        const segmentWords = tokenizeLineWords({
+          globalStartChar,
+          lineText: segmentText,
+          line: lineIndex + 1,
+          sourcePage,
+          wordCountSoFar: words.length,
+        });
 
-        if (!pageStartWordIndexes245.has(sourcePage)) {
-          pageStartWordIndexes245.set(sourcePage, words.length);
-        }
+        segmentWords.forEach((word, wordIndexInSegment) => {
+          const raw = sourceTextWithSegment.slice(word.startChar, word.endChar);
+          const endsVerse = raw.includes('׃');
 
-        if (nextWordStartsVerse && pendingVerseIndex < pendingVerses.length) {
-          verseStarts.push({
-            wordIndex: words.length,
-            ref: pendingVerses[pendingVerseIndex],
-          });
-          pendingVerseIndex += 1;
-          nextWordStartsVerse = false;
-        }
+          if (!pageStartWordIndexes245.has(sourcePage)) {
+            pageStartWordIndexes245.set(sourcePage, words.length);
+          }
 
-        words.push({ ...word, wordIndex: words.length });
+          // The first word of a non-initial segment begins after a real
+          // intra-line break (setuma/petucha gap).
+          if (segmentIndex > 0 && wordIndexInSegment === 0) {
+            segmentStartWordIndexes.add(words.length);
+          }
 
-        if (endsVerse) nextWordStartsVerse = true;
+          if (nextWordStartsVerse && pendingVerseIndex < pendingVerses.length) {
+            verseStarts.push({
+              wordIndex: words.length,
+              ref: pendingVerses[pendingVerseIndex],
+            });
+            pendingVerseIndex += 1;
+            nextWordStartsVerse = false;
+          }
+
+          words.push({ ...word, wordIndex: words.length });
+
+          if (endsVerse) nextWordStartsVerse = true;
+        });
+
+        sourceText = sourceTextWithSegment;
       });
 
       if (pendingVerseIndex !== pendingVerses.length) {
@@ -463,8 +503,6 @@ const readTorahStream = (sourceDir: string): TorahStream => {
           `Could not place every verse marker on source page ${sourcePage}, line ${lineIndex + 1}`,
         );
       }
-
-      sourceText = sourceTextWithLine;
     });
   });
 
@@ -490,6 +528,7 @@ const readTorahStream = (sourceDir: string): TorahStream => {
     verseStarts,
     nextVerseByKey,
     pageStartWordIndexes245,
+    segmentStartWordIndexes,
   };
 };
 
@@ -528,11 +567,14 @@ const getVerseStartPage = (realDb: RealDb, ref: VerseRef): number => {
 
 // --- First-line matching (verification) ------------------------------------
 
+// Each fragment string in the entry is a distinct "segment". A break between
+// fragments represents a setuma/petucha gap in the scroll, so the segments must
+// stay separate (never merged into one string). `[["A","B"]]` -> ["A","B"];
+// `[["A B"]]` -> ["A B"]; `[["A"]]` -> ["A"].
 const getFirstLineParts = (entry: unknown): string[] => {
-  if (Array.isArray(entry) && entry.length > 0) {
-    return entry.map((column) => normalizeSpaces(collectStrings(column).join(' ')));
-  }
-  return [normalizeSpaces(collectStrings(entry).join(' '))];
+  return collectStrings(entry)
+    .map((fragment) => normalizeSpaces(fragment))
+    .filter((fragment) => fragment.length > 0);
 };
 
 const flattenFirstLineEntry = (entry: unknown): string => {
@@ -541,6 +583,13 @@ const flattenFirstLineEntry = (entry: unknown): string => {
 
 const getWordIndexAtOrAfterChar = (words: SourceWord[], charIndex: number): number | null => {
   const word = words.find((sourceWord) => sourceWord.endChar > charIndex);
+  return word?.wordIndex ?? null;
+};
+
+const getWordIndexContainingChar = (words: SourceWord[], charIndex: number): number | null => {
+  const word = words.find(
+    (sourceWord) => sourceWord.startChar <= charIndex && charIndex < sourceWord.endChar,
+  );
   return word?.wordIndex ?? null;
 };
 
@@ -563,12 +612,14 @@ const findFirstLinePartMatch = ({
   const lastLetter = stream.letters[matchedLetterIndex + expectedLetters.length - 1];
   const endChar = getSourceEndChar(stream.sourceText, lastLetter.charIndex);
   const startWordIndex = getWordIndexAtOrAfterChar(stream.words, startChar);
-  if (startWordIndex == null) return null;
+  const endWordIndex = getWordIndexContainingChar(stream.words, lastLetter.charIndex);
+  if (startWordIndex == null || endWordIndex == null) return null;
 
   return {
     endChar,
     startLetterIndex: matchedLetterIndex,
     startWordIndex,
+    endWordIndex,
     text: stream.sourceText.slice(startChar, endChar),
   };
 };
@@ -584,6 +635,7 @@ const findFirstLineMatch = ({
 }): FirstLineMatch | null => {
   const expectedParts = getFirstLineParts(firstLineEntry);
   const matchedParts: string[] = [];
+  const segments: FirstLineSegmentMatch[] = [];
   let currentStartLetterIndex = startLetterIndex;
   let firstPartStartLetterIndex: number | null = null;
   let firstPartStartWordIndex: number | null = null;
@@ -600,6 +652,13 @@ const findFirstLineMatch = ({
     firstPartStartLetterIndex ??= match.startLetterIndex;
     firstPartStartWordIndex ??= match.startWordIndex;
     matchedParts.push(match.text);
+    segments.push({
+      startLetterIndex: match.startLetterIndex,
+      startWordIndex: match.startWordIndex,
+      endWordIndex: match.endWordIndex,
+      endChar: match.endChar,
+      text: match.text,
+    });
     currentStartLetterIndex = match.startLetterIndex + normalizeLetters(expectedPart).length;
     endChar = match.endChar;
   }
@@ -609,6 +668,7 @@ const findFirstLineMatch = ({
   return {
     endChar,
     parts: matchedParts,
+    segments,
     startLetterIndex: firstPartStartLetterIndex,
     startWordIndex: firstPartStartWordIndex,
   };
@@ -677,6 +737,165 @@ const verifyRealDbStructure = ({
   return issues;
 };
 
+type FirstLineAnalysis = {
+  issues: string[];
+  corrected: string[][] | null;
+};
+
+const analyzeFirstLinePage = ({
+  firstLineEntry,
+  page,
+  realDbEntry,
+  stream,
+  startLetterIndex,
+  label,
+}: {
+  firstLineEntry: unknown;
+  page: number;
+  realDbEntry: RealDbPageEntry | undefined;
+  stream: TorahStream;
+  startLetterIndex: number;
+  label: string;
+}): { issues: string[]; corrected: string[][] | null; nextStartLetterIndex: number } => {
+  const issues: string[] = [];
+  const expectedLine = flattenFirstLineEntry(firstLineEntry);
+
+  if (!expectedLine) {
+    issues.push(`${label}: page ${page} has an empty first-line entry`);
+    return { issues, corrected: null, nextStartLetterIndex: startLetterIndex };
+  }
+
+  const matches = findAllFirstLineMatches({ firstLineEntry, startLetterIndex, stream });
+
+  if (matches.length === 0) {
+    issues.push(
+      `${label}: page ${page} first line not found in source after the previous page start: "${expectedLine}"`,
+    );
+    return { issues, corrected: null, nextStartLetterIndex: startLetterIndex };
+  }
+
+  const matchesWithRefs = matches.map((candidate) => ({
+    match: candidate,
+    firstVerseRef: findFirstVerseStartAtOrAfter(stream.verseStarts, candidate.startWordIndex),
+  }));
+
+  // Prefer the occurrence whose first verse equals the real_db ref for this
+  // page; short first lines can occur several times in the source stream.
+  const preferred =
+    (realDbEntry &&
+      matchesWithRefs.find(
+        ({ firstVerseRef }) => firstVerseRef != null && refsEqual(firstVerseRef, realDbEntry.ref),
+      )) ||
+    matchesWithRefs[0];
+
+  const nextStartLetterIndex = preferred.match.startLetterIndex + 1;
+
+  // Build the corrected entry: exact source text, re-split at any source
+  // segment boundary that falls inside the matched span. One column, N
+  // fragments (matching the existing data shape `[[ "..." , "..." ]]`).
+  const corrected = buildCorrectedFirstLine(preferred.match, stream);
+
+  if (!realDbEntry) {
+    return { issues, corrected, nextStartLetterIndex };
+  }
+
+  if (!preferred.firstVerseRef) {
+    issues.push(`${label}: page ${page} has no verse start at or after the matched first line`);
+    return { issues, corrected, nextStartLetterIndex };
+  }
+
+  if (!refsEqual(preferred.firstVerseRef, realDbEntry.ref)) {
+    issues.push(
+      `${label}: page ${page} first line maps to verse ${formatRef(preferred.firstVerseRef)} ` +
+        `but real_db says ${formatRef(realDbEntry.ref)}`,
+    );
+    return { issues, corrected, nextStartLetterIndex };
+  }
+
+  // Exact-source-text check: the recorded first line must be the *exact* text
+  // from the Torah source (right letters AND right vowels/te'amim/makaf), not an
+  // approximation. The matcher only anchors on consonants, so without this a
+  // wrong or missing nikud/te'amim mark would slip through. Compared segment by
+  // segment so multi-fragment entries (a paragraph break on the first line) are
+  // validated as real, contiguous source text.
+  const expectedParts = getFirstLineParts(firstLineEntry);
+  const sourceParts = preferred.match.parts;
+
+  if (expectedParts.length !== sourceParts.length) {
+    issues.push(
+      `${label}: page ${page} first line has ${expectedParts.length} segment(s) ` +
+        `but matched ${sourceParts.length} in the source`,
+    );
+    return { issues, corrected, nextStartLetterIndex };
+  }
+
+  expectedParts.forEach((expectedPart, partIndex) => {
+    // Strip source annotation markers like #(פ)/#(ס) from both sides: they are
+    // petucha/setuma annotations some datasets keep on the recorded line, not
+    // Torah letters/vowels, so they must not cause a false mismatch.
+    const expectedText = normalizeSpaces(stripSourceMarkers(expectedPart));
+    const sourceText = normalizeSpaces(stripSourceMarkers(sourceParts[partIndex]));
+    if (sourceText !== expectedText) {
+      issues.push(
+        `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${partIndex + 1}` : ''} ` +
+          `differs from the exact Torah source text\n    recorded: ${expectedText}\n    source:   ${sourceText}`,
+      );
+    }
+  });
+
+  // Segmentation check: the source splits some physical lines into several
+  // segments (an intra-line setuma/petucha gap). A recorded first line must keep
+  // those gaps as separate strings, never merge them into one. We detect a
+  // wrongly-merged segment when a *source* segment boundary falls strictly
+  // inside one of the recorded segments' word span.
+  preferred.match.segments.forEach((segment, segmentIndex) => {
+    const mergedBoundary = (() => {
+      for (let wordIndex = segment.startWordIndex + 1; wordIndex <= segment.endWordIndex; wordIndex += 1) {
+        if (stream.segmentStartWordIndexes.has(wordIndex)) return wordIndex;
+      }
+      return null;
+    })();
+
+    if (mergedBoundary != null) {
+      const before = stream.words[mergedBoundary - 1]?.normalized ?? '';
+      const after = stream.words[mergedBoundary]?.normalized ?? '';
+      issues.push(
+        `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${segmentIndex + 1}` : ''} ` +
+          `merges a source paragraph break — the text should be split into two segments here ` +
+          `(between "${before}" and "${after}")`,
+      );
+    }
+  });
+
+  return { issues, corrected, nextStartLetterIndex };
+};
+
+/**
+ * Rebuild a page's first-line entry from the matched source: exact source text,
+ * re-split at every source segment boundary inside the matched span. Returns a
+ * single column with one or more fragments, matching the data shape used in
+ * `page_first_lines.json` (`[[ "frag", "frag" ]]`).
+ */
+const buildCorrectedFirstLine = (match: FirstLineMatch, stream: TorahStream): string[][] => {
+  const startChar = stream.words[match.startWordIndex].startChar;
+  const lastWordIndex = match.segments[match.segments.length - 1].endWordIndex;
+  const endChar = match.segments[match.segments.length - 1].endChar;
+
+  const fragments: string[] = [];
+  let fragmentStartChar = startChar;
+
+  for (let wordIndex = match.startWordIndex + 1; wordIndex <= lastWordIndex; wordIndex += 1) {
+    if (stream.segmentStartWordIndexes.has(wordIndex)) {
+      const fragmentEndChar = stream.words[wordIndex - 1].endChar;
+      fragments.push(normalizeSpaces(stream.sourceText.slice(fragmentStartChar, fragmentEndChar)));
+      fragmentStartChar = stream.words[wordIndex].startChar;
+    }
+  }
+  fragments.push(normalizeSpaces(stream.sourceText.slice(fragmentStartChar, endChar)));
+
+  return [fragments];
+};
+
 const verifyFirstLinesAgainstSource = ({
   firstLines,
   realDb,
@@ -694,94 +913,67 @@ const verifyFirstLinesAgainstSource = ({
 
   firstLines.forEach((firstLineEntry, pageIndex) => {
     const page = pageIndex + 1;
-    const expectedLine = flattenFirstLineEntry(firstLineEntry);
-
-    if (!expectedLine) {
-      issues.push(`${label}: page ${page} has an empty first-line entry`);
-      return;
-    }
-
-    const matches = findAllFirstLineMatches({
+    const result = analyzeFirstLinePage({
       firstLineEntry,
-      startLetterIndex: nextSearchStartLetterIndex,
+      page,
+      realDbEntry: realDbByPage.get(page),
       stream,
+      startLetterIndex: nextSearchStartLetterIndex,
+      label,
     });
-
-    if (matches.length === 0) {
-      issues.push(
-        `${label}: page ${page} first line not found in source after the previous page start: "${expectedLine}"`,
-      );
-      return;
-    }
-
-    const realDbEntry = realDbByPage.get(page);
-    const matchesWithRefs = matches.map((candidate) => ({
-      match: candidate,
-      firstVerseRef: findFirstVerseStartAtOrAfter(stream.verseStarts, candidate.startWordIndex),
-    }));
-
-    // Prefer the occurrence whose first verse equals the real_db ref for this
-    // page; short first lines can occur several times in the source stream.
-    const preferred =
-      (realDbEntry &&
-        matchesWithRefs.find(
-          ({ firstVerseRef }) => firstVerseRef != null && refsEqual(firstVerseRef, realDbEntry.ref),
-        )) ||
-      matchesWithRefs[0];
-
-    nextSearchStartLetterIndex = preferred.match.startLetterIndex + 1;
-
-    if (!realDbEntry) {
-      // structural check already reports missing pages.
-      return;
-    }
-
-    if (!preferred.firstVerseRef) {
-      issues.push(`${label}: page ${page} has no verse start at or after the matched first line`);
-      return;
-    }
-
-    if (!refsEqual(preferred.firstVerseRef, realDbEntry.ref)) {
-      issues.push(
-        `${label}: page ${page} first line maps to verse ${formatRef(preferred.firstVerseRef)} ` +
-          `but real_db says ${formatRef(realDbEntry.ref)}`,
-      );
-      return;
-    }
-
-    // Exact-source-text check: the recorded first line must be the *exact* text
-    // from the Torah source (right letters AND right vowels/te'amim/makaf), not
-    // an approximation. The matcher only anchors on consonants, so without this
-    // a wrong or missing nikud/te'amim mark would slip through. Compared
-    // segment by segment so multi-column entries (e.g. a paragraph break on the
-    // first line) are validated as real, contiguous source text.
-    const expectedParts = getFirstLineParts(firstLineEntry);
-    const sourceParts = preferred.match.parts;
-
-    if (expectedParts.length !== sourceParts.length) {
-      issues.push(
-        `${label}: page ${page} first line has ${expectedParts.length} segment(s) ` +
-          `but matched ${sourceParts.length} in the source`,
-      );
-      return;
-    }
-
-    expectedParts.forEach((expectedPart, partIndex) => {
-      // Strip source annotation markers like #(פ)/#(ס) from both sides: they are
-      // petucha/setuma annotations some datasets keep on the recorded line, not
-      // Torah letters/vowels, so they must not cause a false mismatch.
-      const expectedText = normalizeSpaces(stripSourceMarkers(expectedPart));
-      const sourceText = normalizeSpaces(stripSourceMarkers(sourceParts[partIndex]));
-      if (sourceText !== expectedText) {
-        issues.push(
-          `${label}: page ${page} first line${expectedParts.length > 1 ? ` segment ${partIndex + 1}` : ''} ` +
-            `differs from the exact Torah source text\n    recorded: ${expectedText}\n    source:   ${sourceText}`,
-        );
-      }
-    });
+    issues.push(...result.issues);
+    nextSearchStartLetterIndex = result.nextStartLetterIndex;
   });
 
   return issues;
+};
+
+/**
+ * Rewrite ONLY the pages whose recorded first line fails verification, using the
+ * exact source text and correct setuma/petucha segmentation (preserving each
+ * line's length). Pages that already verify are left byte-for-byte untouched, so
+ * the fix is minimal and never reformats valid data. Used by --fix-first-lines.
+ */
+const buildFixedFirstLines = ({
+  firstLines,
+  realDb,
+  stream,
+}: {
+  firstLines: unknown[];
+  realDb: RealDb;
+  stream: TorahStream;
+}): { fixed: string[][][]; changedPages: number[] } => {
+  const realDbByPage = buildRealDbEntryByPage(realDb);
+  const fixed: string[][][] = [];
+  const changedPages: number[] = [];
+  let nextSearchStartLetterIndex = 0;
+
+  firstLines.forEach((firstLineEntry, pageIndex) => {
+    const page = pageIndex + 1;
+    const result = analyzeFirstLinePage({
+      firstLineEntry,
+      page,
+      realDbEntry: realDbByPage.get(page),
+      stream,
+      startLetterIndex: nextSearchStartLetterIndex,
+      label: 'fix',
+    });
+    nextSearchStartLetterIndex = result.nextStartLetterIndex;
+
+    const original = Array.isArray(firstLineEntry) ? (firstLineEntry as string[][]) : [];
+
+    // Leave verified pages exactly as they are. Only rewrite a page that has a
+    // real problem AND that we could confidently relocate in the source.
+    if (result.issues.length === 0 || !result.corrected) {
+      fixed.push(original);
+      return;
+    }
+
+    fixed.push(result.corrected);
+    changedPages.push(page);
+  });
+
+  return { fixed, changedPages };
 };
 
 // --- target_pages page resolution ------------------------------------------
@@ -1040,6 +1232,9 @@ type GenerateResult = {
   updatedTargetPages: TargetPageEntry[];
   pageTitleKeys: string[][];
   warnings: string[];
+  // Set only when --fix-first-lines is used.
+  fixedFirstLines: string[][][] | null;
+  changedFirstLinePages: number[];
 };
 
 const assertNoIssues = (issues: string[]): void => {
@@ -1124,14 +1319,31 @@ const generateLayoutData = (options: CliOptions): GenerateResult => {
     );
   }
 
-  // 2) Verify the contributor layout.
+  // 2) Optionally rewrite the contributor's first lines from the source before
+  // verifying. The fix preserves each recorded line's length but corrects exact
+  // text (nikud/te'amim) and setuma/petucha segmentation.
+  let effectiveFirstLines: unknown[] = layoutFirstLines;
+  let fixedFirstLines: string[][][] | null = null;
+  let changedFirstLinePages: number[] = [];
+  if (options.fixFirstLines) {
+    const fixResult = buildFixedFirstLines({
+      firstLines: layoutFirstLines,
+      realDb: layoutRealDb,
+      stream,
+    });
+    fixedFirstLines = fixResult.fixed;
+    changedFirstLinePages = fixResult.changedPages;
+    effectiveFirstLines = fixResult.fixed;
+  }
+
+  // 3) Verify the contributor layout.
   const layoutIssues: string[] = [];
   layoutIssues.push(
     ...verifyRealDbStructure({ realDb: layoutRealDb, pageCount, label: `${options.layout} real_db` }),
   );
   layoutIssues.push(
     ...verifyFirstLinesAgainstSource({
-      firstLines: layoutFirstLines,
+      firstLines: effectiveFirstLines,
       realDb: layoutRealDb,
       stream,
       label: `${options.layout} page_first_lines`,
@@ -1139,9 +1351,9 @@ const generateLayoutData = (options: CliOptions): GenerateResult => {
   );
   assertNoIssues(layoutIssues);
 
-  // 3) Update target_pages.
+  // 4) Update target_pages.
   const pageStartsAtListedVerse = buildPageStartsAtListedVerse({
-    firstLines: layoutFirstLines,
+    firstLines: effectiveFirstLines,
     realDb: layoutRealDb,
     pageCount,
     stream,
@@ -1162,7 +1374,7 @@ const generateLayoutData = (options: CliOptions): GenerateResult => {
     layout: options.layout,
   });
 
-  // 4) Generate page_titles_keys for the new layout.
+  // 5) Generate page_titles_keys for the new layout.
   const pageTitleKeys = buildPageTitleKeys({
     entries: updatedTargetPages,
     layout: options.layout,
@@ -1183,6 +1395,8 @@ const generateLayoutData = (options: CliOptions): GenerateResult => {
     updatedTargetPages,
     pageTitleKeys,
     warnings,
+    fixedFirstLines,
+    changedFirstLinePages,
   };
 };
 
@@ -1196,14 +1410,47 @@ const printSummary = (options: CliOptions, result: GenerateResult): void => {
   result.warnings.forEach((warning) => console.log(`warning:               ${warning}`));
 };
 
+const formatFirstLinesFile = (pageFirstLines: string[][][]): string => {
+  const lines = ['['];
+  pageFirstLines.forEach((pageLine, index) => {
+    const comma = index === pageFirstLines.length - 1 ? '' : ',';
+    const fragments = pageLine
+      .flat()
+      .map((fragment) => `${JSON.stringify(fragment)}`)
+      .join(', ');
+    lines.push(`    [[ ${fragments} ]]${comma}`);
+  });
+  lines.push(']');
+  return `${lines.join('\r\n')}\r\n`;
+};
+
 const main = (): void => {
   const options = parseArgs(process.argv.slice(2));
   const result = generateLayoutData(options);
 
   if (options.dryRun) {
     console.log('Dry run (no files written).');
+    if (options.fixFirstLines) {
+      console.log(
+        `--fix-first-lines would update ${result.changedFirstLinePages.length} page(s)` +
+          (result.changedFirstLinePages.length > 0
+            ? `: ${result.changedFirstLinePages.join(', ')}`
+            : ''),
+      );
+    }
     printSummary(options, result);
     return;
+  }
+
+  if (options.fixFirstLines && result.fixedFirstLines) {
+    writeFileSync(options.layoutFirstLines, formatFirstLinesFile(result.fixedFirstLines));
+    console.log(
+      `Rewrote ${options.layoutFirstLines} (${result.changedFirstLinePages.length} page(s) changed` +
+        (result.changedFirstLinePages.length > 0
+          ? `: ${result.changedFirstLinePages.join(', ')}`
+          : '') +
+        '). Review the git diff before committing.',
+    );
   }
 
   writeFileSync(options.targetPages, `${JSON.stringify(result.updatedTargetPages, null, 2)}\n`);
