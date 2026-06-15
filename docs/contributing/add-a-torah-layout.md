@@ -42,17 +42,29 @@ So `[1, 26, 2]` means "Bereshit 1:26 is where page 2 begins".
 
 ### `page_first_lines.json` — first line(s) of each page (for OCR/search)
 
-One entry per page, in page order. Each entry is an array of line "segments"
-(vocalized Hebrew text) used by the photo-OCR matcher and the first-line search
-dialog.
+One entry per page, in page order, used by the photo-OCR matcher and the
+first-line search dialog. Each entry mirrors the **same two-level structure as the
+tikkun.io source `text`**:
+
+- The **outer array is columns.** Almost every page has one column. The exception
+  is Haazinu, whose poem is written in two side-by-side columns on a page — there
+  the entry has two arrays.
+- Each **column is an array of segments**, split where there is a *setuma* (a gap
+  in the middle of a line). Most columns have a single segment.
 
 ```json
 [
   [[ "בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים אֵ֥ת הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃" ]],
-  [[ "וְאֵ֛ת כׇּל־רֶ֥מֶשׂ הָֽאֲדָמָ֖ה לְמִינֵ֑הוּ ..." ]],
-  ...
+  [[ "וְאַתָּ֖ה תְּשׁוּפֶ֥נּוּ עָקֵֽב׃", "אֶֽל־" ]],
+  [[ "וַתִּיקַ֖ד עַד־שְׁא֣וֹל תַּחְתִּ֑ית" ], [ "וַתֹּ֤אכַל אֶ֙רֶץ֙ וִֽיבֻלָ֔הּ" ]]
 ]
 ```
+
+So `[["A","B"]]` is **one column with a setuma** between A and B, while
+`[["A"],["B"]]` is **two columns** (Haazinu). The text must be the exact source
+text (letters and vowels/te'amim). A recorded line may be shorter than the full
+physical line — record up to wherever you stopped — but it must be an exact prefix
+of the source and keep the setuma/column splits.
 
 The array length must equal `<pageCount>`.
 
@@ -116,13 +128,36 @@ npm run generate-layout-data -- --layout <pageCount> --source-dir path/to/torah-
 
 - `real_db.json` has exactly one valid entry per page, no duplicates, all within
   `1..pageCount`.
-- `page_first_lines.json` has exactly `<pageCount>` entries, each found in order in
-  the Torah text, and each matching the verse `real_db.json` claims starts that page.
+- `page_first_lines.json` has exactly `<pageCount>` entries. Each entry is found in
+  order in the Torah text, is the **exact** source text (letters and
+  vowels/te'amim), maps to the verse `real_db.json` claims starts that page, and
+  has the **right column/setuma structure** (it won't accept a setuma merged into
+  one string, or a two-column Haazinu page collapsed into one).
 - The base `245` layout still verifies (a safety net for the shared logic).
 
 When it succeeds it prints how many `target_pages` refs it set and where it wrote
 the title-keys file. Read any error: it names the exact page and the
-expected/actual verse so you can fix your input.
+expected/actual text or verse so you can fix your input.
+
+**Auto-fixing the first lines.** If the verifier reports problems with
+`page_first_lines.json` (wrong vowels, a merged setuma, etc.), you can let the
+script rewrite that file from the source — exact text and correct
+setuma/column segmentation, keeping each line's length:
+
+```bash
+# preview which pages would change
+npm run generate-layout-data -- --layout <pageCount> --fix-first-lines --dry-run
+
+# actually rewrite page_first_lines.json
+npm run generate-layout-data -- --layout <pageCount> --fix-first-lines
+```
+
+It only rewrites pages that fail verification, leaves correct pages byte-for-byte
+untouched, and re-running it changes nothing. Always review the git diff
+afterward — you have git to roll back if needed.
+
+> The script never rewrites a file whose content hasn't actually changed (it
+> preserves the existing line endings), so a no-op run leaves a clean `git status`.
 
 Other useful flags (run with `--help` to see all): `--real-db`, `--first-lines`,
 `--title-keys-output`, `--target-pages`.
