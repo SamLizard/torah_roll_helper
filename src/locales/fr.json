@@ -104,6 +104,7 @@
       "captureFailed": "Impossible de capturer l'image.",
       "capture": "Capturer",
       "chooseFile": "Choisir un fichier",
+      "switchCamera": "Changer de caméra",
       "retryCamera": "Réessayer la caméra",
       "newPhoto": "Nouvelle photo",
       "backToOptions": "Retour aux options",
