@@ -211,18 +211,10 @@ Add a key `settings.torahTypeOptions.klaf_<pageCount>` in **every** locale file 
 > `"<pageCount>"` to each, or `resolvePageForLayout()` falls back to `245` and the
 > roll counts will be wrong.
 
-## Verify your data
+## Verify in the app
 
-The generator (step 2) already verified `real_db.json` and `page_first_lines.json`
-against the Torah text. As an extra check, run the reference-page sanity script,
-which flags reading references that look like they sit on the wrong page boundary:
-
-```bash
-npm run list-questionable-reference-pages
-```
-
-> Note: this script currently checks layout `245` only (see
-> `scripts/list-questionable-reference-pages.ts`, `LAYOUT_KEY = '245'`).
+The generator (step 2) already verified `real_db.json`, `page_first_lines.json`,
+`target_pages.json`, and `page_titles_keys.json` against the Torah text.
 
 Then test in the app:
 

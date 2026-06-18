@@ -18,17 +18,11 @@ guides / scripts as they get done, then delete them from here.
   that both describe the same number of pages, that page numbering is continuous,
   and that the first line recorded for each page lines up with the verse that
   `real_db.json` says starts that page. Report mismatches.
-- [ ] **Generalize `list-questionable-reference-pages`** to take a layout argument
-  instead of the hardcoded `LAYOUT_KEY = '245'`
-  (`scripts/list-questionable-reference-pages.ts`).
-
 ### Then: document the scripts
 
-- [ ] Add an npm script for each (mirroring `list-questionable-reference-pages`).
+- [ ] Add an npm script for each.
 - [ ] In `docs/contributing/add-a-torah-layout.md`, explain for each script:
-  **what it does, when to run it, and how to interpret/act on the output** —
-  especially `list-questionable-reference-pages` (what a "needs review" line means
-  and how to verify against a real scroll / tikkun.io / Sefaria).
+  **what it does, when to run it, and how to interpret/act on the output**.
 
 ## Design decision to revisit: tikkun providers per layout
 
