@@ -116,9 +116,8 @@ If the page count can't be inferred from `page_first_lines.json`, pass it
 explicitly: `--page-count <n>`.
 
 **Torah source files.** The script needs the original tikkun.io Torah page JSON
-(`1.json`..`245.json`). By default it looks in `scripts/torah`. If you don't have
-that folder (it isn't shipped in a clean clone), download the tikkun.io export and
-point the script at it:
+(`1.json`..`245.json`). By default it looks in `src/scripts/torah`. If you keep
+those files somewhere else, point the script at them:
 
 ```bash
 npm run generate-layout-data -- --layout <pageCount> --source-dir path/to/torah-json

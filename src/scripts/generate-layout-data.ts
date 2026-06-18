@@ -24,7 +24,7 @@
  *   node --experimental-strip-types src/scripts/generate-layout-data.ts --layout 250 --page-count 250
  *   node --experimental-strip-types src/scripts/generate-layout-data.ts --layout 226 --dry-run
  *
- * The Torah source files default to scripts/torah (where this repo keeps the
+ * The Torah source files default to src/scripts/torah (where this repo keeps the
  * tikkun.io export). Override with --source-dir <dir>.
  */
 
@@ -144,7 +144,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 // src/scripts -> src -> <repo root>
 const REPO_ROOT = resolve(SCRIPT_DIR, '..', '..');
 const DATA_DIR = resolve(REPO_ROOT, 'src', 'data');
-const DEFAULT_SOURCE_DIR = resolve(REPO_ROOT, 'scripts', 'torah');
+const DEFAULT_SOURCE_DIR = resolve(SCRIPT_DIR, 'torah');
 
 const TARGET_REF_FIELDS: TargetRefField[] = ['ref', 'refEndPartial', 'refEnd'];
 const VERSE_START_WORD_COUNT = 3;
@@ -165,7 +165,7 @@ Usage (from repo root):
 Options:
   --layout <id>            Required. Layout id / page count folder, e.g. 226, 248, 250.
   --page-count <n>         Optional. Inferred from page_first_lines length when omitted.
-  --source-dir <dir>       Torah page JSON files (1.json ...). Default: scripts/torah
+  --source-dir <dir>       Torah page JSON files (1.json ...). Default: src/scripts/torah
   --target-pages <file>    Default: src/data/target_pages.json
   --base-real-db <file>    Default: src/data/245/real_db.json
   --base-page-title-keys <file>  Default: src/data/245/page_titles_keys.json
