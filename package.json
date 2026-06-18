@@ -11,7 +11,6 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "list-questionable-reference-pages": "node --experimental-strip-types scripts/list-questionable-reference-pages.ts",
     "generate-layout-data": "node --experimental-strip-types src/scripts/generate-layout-data.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-pattern \"dist/**\" --ignore-pattern \".eslintrc.cjs\" --fix",
     "deploy": "gh-pages -d dist",
