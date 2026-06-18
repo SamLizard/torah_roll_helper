@@ -31,8 +31,8 @@ Main goal: reduce time spent rolling a Sefer Torah in real synagogue use.
 
 Everything is normalized to a **page number**.
 
-- Selectable Torah layouts: **245 pages** (`klaf_245`, default) and **226 pages** (`klaf_226`)
-- A **248-page** dataset exists in the repository for verification work, but is not currently enabled in the UI
+- Selectable Torah layouts: **245 pages** (`klaf_245`, default), **226 pages** (`klaf_226`), and **248 pages** (`klaf_248`)
+- The **248-page** layout was re-enabled after verification with the rabbi4u source; known source discrepancies remain documented in the layout notes and GitHub issue tracker.
 - Source data maps Torah references and reading targets to page numbers per layout
 - UI always ends with `fromPage` and `toPage`
 
@@ -91,7 +91,7 @@ This keeps the rolling logic simple and deterministic while allowing different k
   - 60 holiday/special readings
 - `src/data/226/`: **5 books**, **226 pages**
 - `src/data/245/`: **5 books**, **245 pages**
-- `src/data/248/`: **5 books**, **248 pages** (data present, not enabled until verified)
+- `src/data/248/`: **5 books**, **248 pages** (verified and selectable)
 - Each layout folder contains:
   - `real_db.json` - Torah reference to page data
   - `page_first_lines.json` - first-line data for page lookup and OCR matching
@@ -122,7 +122,7 @@ src/
   data/
     226/                   # 226-page layout data
     245/                   # 245-page layout data (default)
-    248/                   # 248-page layout data, present for verification work
+    248/                   # 248-page layout data
     target_pages.json      # reading targets with per-layout page maps
   locales/                 # i18n messages (en/he/fr)
   plugins/                 # vuetify + i18n setup
@@ -192,7 +192,7 @@ npm run preview
 
 - No backend account sync; saved settings are local to the browser/device.
 - Only one nusach option currently available (`sefaradic`).
-- The 248-page layout data is present but not selectable until its page-first-line data is verified.
+- A physical scroll may follow a slightly different source/tradition than the selected layout; when in doubt, spot-check the page starts against that scroll.
 - Dicta OCR/parallels, external tikkun links, and browser camera capture depend on the user's network and device capabilities.
 
 ## Tests
@@ -243,8 +243,9 @@ generates `page_titles_keys.json`, and fills in `src/data/target_pages.json`.
 Finally register the layout in `src/composables/torahData.ts` and
 `TORAH_TYPE_OPTIONS` (`src/stores/options.ts`) and add the locale label.
 
-The 248-page layout is a good current verification target: the data exists, but
-the option is disabled until the first-line/page mapping can be trusted.
+The 248-page layout is a useful reference for this workflow: it was verified
+against the rabbi4u source and is now enabled, while its recorded discrepancies
+remain important documentation of source differences.
 
 ### 3) Add a new nusach option
 

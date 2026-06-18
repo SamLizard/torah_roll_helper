@@ -16,9 +16,8 @@ Layouts already present live in `src/data/<pageCount>/`. The registry is
 [`src/composables/torahData.ts`](../../src/composables/torahData.ts).
 
 > The hard part is **the data**, not the wiring. You need a reliable source that
-> maps every verse to a column/page for the target scroll. Layout `248` is already
-> scaffolded in code but commented out in `TORAH_TYPE_OPTIONS` because its lines
-> "couldn't be verified" — accuracy matters more than coverage.
+> maps every verse to a column/page for the target scroll. Layout `248` is an
+> example of a layout that was verified against a second source and then enabled.
 
 ## The data model
 
