@@ -27,6 +27,7 @@ interface TikkunProvider {
   id: TikkunProviderId;
   nameKey: string;
   descriptionKey: string;
+  websiteUrl: string;
   supportedLayoutKeys: readonly string[] | null;
   capabilities: TikkunProviderCapabilities;
   getReadingUrl: (target: TikkunLinkTarget | null) => string | null;
@@ -38,6 +39,7 @@ interface TikkunProviderSelectionOption {
   id: TikkunProviderSelection;
   nameKey: string;
   descriptionKey: string;
+  faviconUrl: string | null;
 }
 
 interface ResolveTikkunLinkInput {
@@ -53,6 +55,7 @@ interface TikkunResolvedLink {
   source: TikkunLinkSource;
   providerId: TikkunProviderId;
   providerNameKey: string;
+  providerFaviconUrl: string;
   providerSupportedLayoutKeys: readonly string[] | null;
   selectedLayoutKey: string;
   hasLayoutWarning: boolean;

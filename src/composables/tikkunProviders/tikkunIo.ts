@@ -101,6 +101,7 @@ const tikkunIoProvider: TikkunProvider = {
   id: 'tikkun_io',
   nameKey: 'settings.tikkunProviders.tikkun_io.name',
   descriptionKey: 'settings.tikkunProviders.tikkun_io.description',
+  websiteUrl: 'https://tikkun.io',
   supportedLayoutKeys: ['245'],
   capabilities: {
     readings: true,

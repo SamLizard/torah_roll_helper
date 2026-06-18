@@ -64,6 +64,7 @@ const exampleProvider: TikkunProvider = {
   id: 'example_provider',
   nameKey: 'settings.tikkunProviders.example_provider.name',
   descriptionKey: 'settings.tikkunProviders.example_provider.description',
+  websiteUrl: 'https://example.com',
   supportedLayoutKeys: null,
   capabilities: {
     readings: false,
@@ -85,6 +86,10 @@ Shared helpers live in
 [`utils.ts`](../../src/composables/tikkunProviders/utils.ts). Reuse them for
 common provider work such as creating `Verse` objects, comparing refs, checking
 Israel/Gola support, and joining URL path parts.
+
+Provider icons are inferred automatically from `websiteUrl` by loading
+`/favicon.ico` from that site. Do not add favicon image files to the app unless a
+provider truly has no usable website favicon.
 
 ## Capabilities and layouts
 

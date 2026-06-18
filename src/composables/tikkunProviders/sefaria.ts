@@ -27,6 +27,7 @@ const sefariaProvider: TikkunProvider = {
   id: 'sefaria',
   nameKey: 'settings.tikkunProviders.sefaria.name',
   descriptionKey: 'settings.tikkunProviders.sefaria.description',
+  websiteUrl: 'https://www.sefaria.org',
   supportedLayoutKeys: null,
   capabilities: {
     readings: false,

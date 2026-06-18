@@ -1,5 +1,6 @@
 import { sefariaProvider } from './sefaria';
 import { tikkunIoProvider } from './tikkunIo';
+import { getFaviconUrl } from './utils';
 import type {
   ResolveTikkunLinkInput,
   TikkunLinkSource,
@@ -18,11 +19,13 @@ const TIKKUN_PROVIDER_SELECTION_OPTIONS: readonly TikkunProviderSelectionOption[
     id: AUTO_TIKKUN_PROVIDER_ID,
     nameKey: 'settings.tikkunProviders.auto.name',
     descriptionKey: 'settings.tikkunProviders.auto.description',
+    faviconUrl: null,
   },
   ...TIKKUN_PROVIDERS.map((provider) => ({
     id: provider.id,
     nameKey: provider.nameKey,
     descriptionKey: provider.descriptionKey,
+    faviconUrl: getFaviconUrl(provider.websiteUrl),
   })),
 ];
 
@@ -52,6 +55,7 @@ const createResolvedLink = (
   source,
   providerId: provider.id,
   providerNameKey: provider.nameKey,
+  providerFaviconUrl: getFaviconUrl(provider.websiteUrl),
   providerSupportedLayoutKeys: provider.supportedLayoutKeys,
   selectedLayoutKey,
   hasLayoutWarning: !providerSupportsLayout(provider, selectedLayoutKey),

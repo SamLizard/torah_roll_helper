@@ -92,9 +92,18 @@
             <template #item="{ props: itemProps, item }">
               <v-list-item
                 v-bind="itemProps"
+                :prepend-avatar="item.raw.faviconUrl ?? undefined"
                 :title="item.raw.title"
                 :subtitle="item.raw.description"
               />
+            </template>
+            <template #selection="{ item }">
+              <div class="provider-selection">
+                <v-avatar v-if="item.raw.faviconUrl" size="20" rounded="0">
+                  <v-img :src="item.raw.faviconUrl" :alt="item.raw.title" />
+                </v-avatar>
+                <span>{{ item.raw.title }}</span>
+              </div>
             </template>
           </v-select>
           <v-tooltip location="top" :text="$t('settings.help.tikkunProvider')">
@@ -216,6 +225,7 @@ const tikkunProviderOptions = computed(() => {
   return TIKKUN_PROVIDER_SELECTION_OPTIONS.map((option) => ({
     title: t(option.nameKey),
     description: t(option.descriptionKey),
+    faviconUrl: option.faviconUrl,
     value: option.id,
   }));
 });
@@ -245,5 +255,12 @@ const openInstallGuide = (): void => {
 
 .info-btn {
   margin-top: 10px;
+}
+
+.provider-selection {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 </style>

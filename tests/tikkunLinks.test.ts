@@ -161,6 +161,7 @@ describe('tikkun link generation', () => {
       url: 'https://tikkun.io/#/p/noach',
       source: 'reading',
       providerId: 'tikkun_io',
+      providerFaviconUrl: 'https://tikkun.io/favicon.ico',
       hasLayoutWarning: false,
     });
   });
@@ -230,6 +231,7 @@ describe('tikkun link generation', () => {
       url: 'https://www.sefaria.org/Exodus.12.1',
       source: 'ref',
       providerId: 'sefaria',
+      providerFaviconUrl: 'https://www.sefaria.org/favicon.ico',
       providerSupportedLayoutKeys: null,
       selectedLayoutKey: '226',
       hasLayoutWarning: false,

@@ -8,7 +8,7 @@
     <v-btn
       color="primary"
       variant="tonal"
-      prepend-icon="mdi-open-in-new"
+      :prepend-icon="link?.providerFaviconUrl ? undefined : 'mdi-open-in-new'"
       data-tutorial="page-preview-link"
       :href="link?.url ?? undefined"
       target="_blank"
@@ -17,6 +17,11 @@
       class="preview-open-btn"
       @click="open"
     >
+      <template v-if="link?.providerFaviconUrl" #prepend>
+        <v-avatar size="18" rounded="0" class="provider-icon">
+          <v-img :src="link.providerFaviconUrl" :alt="providerName" />
+        </v-avatar>
+      </template>
       {{ openLabel }}
     </v-btn>
   </div>
@@ -95,5 +100,9 @@ const open = () => {
   white-space: normal;
   line-height: 1.15;
   text-align: center;
+}
+
+.provider-icon {
+  background: rgb(var(--v-theme-surface));
 }
 </style>

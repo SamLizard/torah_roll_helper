@@ -22,5 +22,7 @@ const joinUrlParts = (baseUrl: string, ...parts: Array<string | number>) => {
   return path ? `${base}/${path}` : base;
 };
 
-export { createVerse, isSameVerse, joinUrlParts, supportsSpecific };
+const getFaviconUrl = (websiteUrl: string) => new URL('/favicon.ico', websiteUrl).toString();
+
+export { createVerse, getFaviconUrl, isSameVerse, joinUrlParts, supportsSpecific };
 export type { SpecificSupport };
