@@ -73,7 +73,7 @@ router.beforeEach((to) => {
     return true;
   }
 
-  const currentLocale = i18n.global.locale.value;
+  const currentLocale = (i18n.global.locale.value as any);
 
   return {
     ...to,

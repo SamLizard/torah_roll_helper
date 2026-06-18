@@ -418,7 +418,7 @@
       :model-value="isPreviewOpen"
       :page="previewPage"
       :preview-columns="previewColumns"
-      :tikkun-url="previewTikkunUrl"
+      :tikkun-link="previewTikkunLink"
       @update:model-value="onPreviewDialogModelValueChange"
     />
   </v-dialog>
@@ -510,7 +510,7 @@ import {
 } from '@/composables/firstLineOcr';
 import { useOnlineStatus } from '@/composables/onlineStatus';
 import { getPageStartRef, getPageTitleKeys } from '@/composables/utils';
-import { toRefUrl } from '@/composables/tikkunLinks';
+import { resolveTikkunLink } from '@/composables/tikkunLinks';
 import { useOptionsStore } from '@/stores/options';
 import type { ManualData, RealDb } from '@/types';
 
@@ -786,10 +786,16 @@ const previewResult = computed(() => {
   return preparedPages.value.find((page) => page.pageNumber === previewPage.value) ?? null;
 });
 const previewColumns = computed(() => previewResult.value?.previewColumns ?? []);
-const previewTikkunUrl = computed(() => {
+const previewTikkunLink = computed(() => {
   if (previewPage.value == null) return null;
   const pageStartRef = getPageStartRef(db.value, previewPage.value);
-  return pageStartRef ? toRefUrl(pageStartRef) : null;
+
+  return resolveTikkunLink({
+    providerSelection: optionsStore.tikkunProvider,
+    layoutKey: layoutKey.value,
+    ref: pageStartRef,
+    page: previewPage.value,
+  });
 });
 
 const getNativeInput = (): HTMLInputElement | null => {

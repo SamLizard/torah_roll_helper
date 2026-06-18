@@ -104,6 +104,7 @@
       "captureFailed": "Could not capture image.",
       "capture": "Capture",
       "chooseFile": "Choose file",
+      "switchCamera": "Switch camera",
       "retryCamera": "Retry camera",
       "newPhoto": "New photo",
       "backToOptions": "Back to options",
@@ -297,10 +298,12 @@
     "golaLabel": "Gola (Diaspora) mode",
     "nusachLabel": "Rite",
     "torahTypeLabel": "Scroll layout",
+    "tikkunProviderLabel": "Online tikkun",
     "help": {
       "gola": "If you are outside Israel, enable Gola mode to synchronize readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
-      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts exist, like the Teimani (תאג') which is 226 pages."
+      "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts exist, like the Teimani (תאג') which is 226 pages.",
+      "tikkunProvider": "Choose which online tikkun opens from page previews. Auto uses tikkun.io on the 245 layout and for named readings, with Sefaria refs on other layouts."
     },
     "nusachOptions": {
       "sefaradic": "Sefaradic"
@@ -310,13 +313,28 @@
       "klaf_245": "רמ\"ה (245 pages)",
       "klaf_248": "רמ\"ח (248 pages)"
     },
+    "tikkunProviders": {
+      "auto": {
+        "name": "Auto",
+        "description": "Use tikkun.io on 245 and for named readings; use Sefaria refs on other layouts."
+      },
+      "tikkun_io": {
+        "name": "tikkun.io",
+        "description": "רמ\"ה (245 pages); opens reading links first, then exact refs."
+      },
+      "sefaria": {
+        "name": "Sefaria",
+        "description": "Layout-free Torah text for exact refs."
+      }
+    },
     "savedSettingsBanner": {
       "defaultText": "Settings are saved in this browser.",
       "text": "Saved in this browser: {settings}.",
       "dontShowAgain": "Don't show again",
       "gola": "Gola mode",
       "nusach": "rite {value}",
-      "torahType": "scroll layout {value}"
+      "torahType": "scroll layout {value}",
+      "tikkunProvider": "online tikkun {value}"
     }
   },
   "targets": {
@@ -391,9 +409,9 @@
     "pageTitle": "Page {page} preview",
     "firstLine": "First line",
     "lineUnavailable": "First line is unavailable for this page.",
-    "openTikkun": "See full page in tikkun.io",
-    "openTikkunShort": "Full page",
-    "tikkunLayoutWarning": "tikkun.io uses the רמ\"ה (245) layout. You are on {layout}.",
+    "openTikkun": "Open in {provider}",
+    "openTikkunShort": "Open",
+    "tikkunLayoutWarning": "{provider} uses {providerLayout}. You are on {layout}; the reading/reference is correct, but the displayed page may start and end differently.",
     "withNikud": "With nikud",
     "withoutNikud": "No nikud",
     "shiftTip": "Tip: Hold Shift to toggle quickly"
@@ -467,7 +485,7 @@
   },
   "group": {
     "rosh-chodesh": "Rosh Chodesh",
-    "rosh": "Rosh Hashanah",
+    "rosh": "Rosh Hashana",
     "yom-kippur": "Yom Kippur",
     "sukkot": "Sukkot",
     "shmini-atzeret": "Shmini Atzeret",
@@ -485,7 +503,7 @@
   "readingTargets": {
     "bereshit": "Bereshit",
     "noach": "Noach",
-    "lech_lecha": "Lech Lecha",
+    "lech_lecha": "Lech-Lecha",
     "vayera": "Vayera",
     "chayei_sara": "Chayei Sara",
     "toldot": "Toldot",
@@ -518,8 +536,8 @@
     "bechukotai": "Bechukotai",
     "bamidbar": "Bamidbar",
     "nasso": "Nasso",
-    "behaalotcha": "Beha'alotcha",
-    "shlach": "Sh'lach",
+    "behaalotcha": "Beha’alotcha",
+    "shlach": "Sh’lach",
     "korach": "Korach",
     "chukat": "Chukat",
     "balak": "Balak",
@@ -529,22 +547,22 @@
     "devarim": "Devarim",
     "vaetchanan": "Vaetchanan",
     "eikev": "Eikev",
-    "reeh": "Re'eh",
+    "reeh": "Re’eh",
     "shoftim": "Shoftim",
     "ki_teitzei": "Ki Teitzei",
     "ki_tavo": "Ki Tavo",
     "nitzavim": "Nitzavim",
     "vayeilech": "Vayeilech",
-    "haazinu": "Ha'Azinu",
+    "haazinu": "Ha’azinu",
     "vezot_haberakhah": "Vezot Haberakhah",
     "rosh-chodesh": "Rosh Chodesh",
     "rosh-chodesh-special": "Rosh Chodesh (Second Sefer Torah)",
-    "rosh-1": "Rosh HaShanah (Day 1)",
-    "rosh-2": "Rosh HaShanah (Day 2)",
-    "rosh-maftir": "Rosh HaShanah (Maftir)",
+    "rosh-1": "Rosh Hashana (Day 1)",
+    "rosh-2": "Rosh Hashana (Day 2)",
+    "rosh-maftir": "Rosh Hashana (Maftir)",
     "yom-kippur": "Yom Kippur",
     "yom-kippur-maftir": "Yom Kippur (Maftir)",
-    "yom-kippur-mincha": "Mincha of Yom Kippur",
+    "yom-kippur-mincha": "Yom Kippur (Mincha)",
     "sukkot-1": "Sukkot (Day 1)",
     "sukkot-maftir": "Sukkot (Day 1 - Maftir)",
     "sukkot-2": "Sukkot (Day 2)",

@@ -104,6 +104,7 @@
       "captureFailed": "לא ניתן לצלם את התמונה.",
       "capture": "צלם",
       "chooseFile": "בחר קובץ",
+      "switchCamera": "החלף מצלמה",
       "retryCamera": "נסו שוב — מצלמה",
       "newPhoto": "צילום חדש",
       "backToOptions": "חזרה לאפשרויות",
@@ -297,10 +298,12 @@
     "golaLabel": "מצב גולה",
     "nusachLabel": "נוסח",
     "torahTypeLabel": "פריסת ספר",
+    "tikkunProviderLabel": "תיקון מקוון",
     "help": {
       "gola": "בחוץ לארץ? הפעילו מצב גולה כדי להתאים את לוח הפרשיות וקריאות יום טוב ללוח הגולה.",
       "nusach": "בחר את מסורת הקריאה. כרגע זמין נוסח ספרדי בלבד.",
-      "torahType": "ברוב ספרי התורה משתמשים בפריסת רמ״ה (245 עמודים). קיימות פריסות נוספות, כמו התימנית (תאג') שהיא 226 עמודים."
+      "torahType": "ברוב ספרי התורה משתמשים בפריסת רמ״ה (245 עמודים). קיימות פריסות נוספות, כמו התימנית (תאג') שהיא 226 עמודים.",
+      "tikkunProvider": "בחרו איזה תיקון מקוון ייפתח מתצוגות העמודים. מצב אוטומטי משתמש ב-tikkun.io בפריסת 245 ולקריאות מוכרות, וב-Sefaria להפניות בפריסות אחרות."
     },
     "nusachOptions": {
       "sefaradic": "ספרדי"
@@ -310,13 +313,28 @@
       "klaf_245": "רמ״ה (245 עמודים)",
       "klaf_248": "רמ״ח (248 עמודים)"
     },
+    "tikkunProviders": {
+      "auto": {
+        "name": "אוטומטי",
+        "description": "משתמש ב-tikkun.io בפריסת 245 ולקריאות מוכרות; Sefaria להפניות בפריסות אחרות."
+      },
+      "tikkun_io": {
+        "name": "tikkun.io",
+        "description": "רמ״ה (245 עמודים); פותח קודם קישורי קריאה, ואחר כך הפניות מדויקות."
+      },
+      "sefaria": {
+        "name": "Sefaria",
+        "description": "טקסט תורה ללא פריסת עמודים להפניות מדויקות."
+      }
+    },
     "savedSettingsBanner": {
       "defaultText": "ההגדרות נשמרות בדפדפן הזה.",
       "text": "נשמר בדפדפן הזה: {settings}.",
       "dontShowAgain": "אל תציג שוב",
       "gola": "מצב גולה",
       "nusach": "נוסח {value}",
-      "torahType": "פריסת ספר {value}"
+      "torahType": "פריסת ספר {value}",
+      "tikkunProvider": "תיקון מקוון {value}"
     }
   },
   "targets": {
@@ -391,9 +409,9 @@
     "pageTitle": "תצוגה מקדימה לעמוד {page}",
     "firstLine": "שורה ראשונה",
     "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",
-    "openTikkun": "צפו בעמוד המלא ב-tikkun.io",
-    "openTikkunShort": "עמוד מלא",
-    "tikkunLayoutWarning": "tikkun.io משתמש בפריסת רמ״ה (245). אתה בפריסת {layout}.",
+    "openTikkun": "פתחו ב-{provider}",
+    "openTikkunShort": "פתחו",
+    "tikkunLayoutWarning": "{provider} משתמש ב{providerLayout}. אתם בפריסת {layout}; הקריאה/ההפניה נכונה, אבל העמוד המוצג עשוי להתחיל ולהסתיים במקום אחר.",
     "withNikud": "עם ניקוד",
     "withoutNikud": "ללא ניקוד",
     "shiftTip": "טיפ: החזק Shift כדי להחליף במהירות"
@@ -515,15 +533,15 @@
     "kedoshim": "קדושים",
     "emor": "אמור",
     "behar": "בהר",
-    "bechukotai": "בחקתי",
+    "bechukotai": "בחוקותי",
     "bamidbar": "במדבר",
     "nasso": "נשא",
     "behaalotcha": "בהעלותך",
     "shlach": "שלח",
-    "korach": "קרח",
-    "chukat": "חקת",
+    "korach": "קורח",
+    "chukat": "חוקת",
     "balak": "בלק",
-    "pinchas": "פנחס",
+    "pinchas": "פינחס",
     "matot": "מטות",
     "masei": "מסעי",
     "devarim": "דברים",
@@ -533,7 +551,7 @@
     "shoftim": "שופטים",
     "ki_teitzei": "כי תצא",
     "ki_tavo": "כי תבוא",
-    "nitzavim": "נצבים",
+    "nitzavim": "ניצבים",
     "vayeilech": "וילך",
     "haazinu": "האזינו",
     "vezot_haberakhah": "וזאת הברכה",
@@ -544,7 +562,7 @@
     "rosh-maftir": "ראש השנה (מפטיר)",
     "yom-kippur": "יום כיפור",
     "yom-kippur-maftir": "יום כיפור (מפטיר)",
-    "yom-kippur-mincha": "מנחה של יום כיפור",
+    "yom-kippur-mincha": "יום כיפור (מנחה)",
     "sukkot-1": "סוכות א׳",
     "sukkot-maftir": "סוכות א׳ (מפטיר)",
     "sukkot-2": "סוכות ב׳",
@@ -553,10 +571,10 @@
     "sukkot-5": "סוכות ה׳",
     "sukkot-6": "סוכות ו׳",
     "sukkot-7": "סוכות ז׳ (הושענא רבה)",
-    "sukkot-shabbat-chol-hamoed": "סוכות - שבת חול המועד",
+    "sukkot-shabbat-chol-hamoed": "סוכות (שבת חול המועד)",
     "shmini-atzeret": "שמיני עצרת",
     "shmini-atzeret-shabbat": "שמיני עצרת - שבת",
-    "sukkot-end-maftir": "סוף סוכות - מפטיר",
+    "sukkot-end-maftir": "סוף סוכות (מפטיר)",
     "simchat-torah-a": "שמחת תורה - ספר תורה ראשון",
     "simchat-torah-b": "שמחת תורה - ספר תורה שני",
     "chanukah-1": "חנוכה א׳",
@@ -570,7 +588,7 @@
     "purim": "פורים",
     "taanit-tzibur": "תענית ציבור",
     "pesach-1": "פסח א׳",
-    "pesach-1-shabbat": "פסח א׳ - שבת",
+    "pesach-1-shabbat": "פסח א׳ (שבת)",
     "pesach-yom-tov-maftir": "פסח (יום טוב - מפטיר)",
     "pesach-2": "פסח ב׳",
     "pesach-3": "פסח ג׳",
@@ -578,14 +596,14 @@
     "pesach-4": "פסח ד׳",
     "pesach-5": "פסח ה׳",
     "pesach-6": "פסח ו׳",
-    "pesach-shabbat-chol-hamoed": "פסח - שבת חול המועד",
+    "pesach-shabbat-chol-hamoed": "פסח (שבת חול המועד)",
     "pesach-7": "פסח ז׳",
     "pesach-8": "פסח ח׳",
-    "pesach-8-shabbat": "פסח ח׳ - שבת",
+    "pesach-8-shabbat": "פסח ח׳ (שבת)",
     "shavuot-1": "שבועות א׳",
     "shavuot-2": "שבועות ב׳",
     "shavuot-maftir": "שבועות (מפטיר)",
-    "shavuot-2-shabbat": "שבועות ב׳ - שבת",
+    "shavuot-2-shabbat": "שבועות ב׳ (שבת)",
     "tisha-bav": "תשעה באב",
     "shekalim": "שקלים",
     "zachor": "זכור",

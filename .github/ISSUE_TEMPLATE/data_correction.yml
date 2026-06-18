@@ -1,0 +1,44 @@
+name: Data correction (reading / page mapping)
+description: Report or propose a fix to reading targets or verse→page data.
+labels: ["data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for wrong roll counts caused by data — not UI bugs. Helpful background:
+        `docs/contributing/add-a-torah-layout.md` explains the data model.
+  - type: input
+    id: layout
+    attributes:
+      label: Layout (page count)
+      description: e.g. 245, 226
+    validations:
+      required: true
+  - type: input
+    id: reading
+    attributes:
+      label: Reading / target key
+      description: e.g. bereshit, vayakhel::pekudei, chanukah-3
+    validations:
+      required: false
+  - type: input
+    id: tikkun-provider
+    attributes:
+      label: Online tikkun provider used as source
+      description: e.g. tikkun.io, Sefaria, real scroll. Include this when comparing against an online tikkun page.
+    validations:
+      required: false
+  - type: textarea
+    id: current
+    attributes:
+      label: Current value
+      description: Which file/entry, and the page or ref it currently shows.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: Correct value + source
+      description: The right page/ref, and the source you verified against (real scroll, tikkun.io, Sefaria…).
+    validations:
+      required: true
