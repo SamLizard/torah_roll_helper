@@ -510,7 +510,7 @@
                     <v-btn
                       size="small"
                       color="primary"
-                      class="flex-grow-1"
+                      class="grow"
                       variant="tonal"
                       @click="onDictaChoiceSelect(option)"
                     >
@@ -529,7 +529,7 @@
       :model-value="isDictaChoicePreviewOpen"
       :page="dictaPreviewPage"
       :preview-columns="dictaPreviewColumns"
-      :tikkun-url="dictaPreviewTikkunUrl"
+      :tikkun-link="dictaPreviewTikkunLink"
       @update:model-value="onDictaChoicePreviewModelValueChange"
     />
 
@@ -663,7 +663,7 @@ import { useTorahData, resolvePageForLayout, getLayoutData } from '@/composables
 import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
-import { toRefUrl } from '@/composables/tikkunLinks';
+import { resolveTikkunLink } from '@/composables/tikkunLinks';
 import type { ManualData, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
@@ -965,10 +965,16 @@ const dictaPreviewColumns = computed(() => {
   if (dictaPreviewPage.value == null) return [];
   return toPreviewColumns((torahPageFirstLines.value as unknown[])[dictaPreviewPage.value - 1]);
 });
-const dictaPreviewTikkunUrl = computed(() => {
+const dictaPreviewTikkunLink = computed(() => {
   if (dictaPreviewPage.value == null) return null;
   const pageStartRef = getPageStartRef(torahRealDb.value, dictaPreviewPage.value);
-  return pageStartRef ? toRefUrl(pageStartRef) : null;
+
+  return resolveTikkunLink({
+    providerSelection: options.tikkunProvider,
+    layoutKey: layoutKey.value,
+    ref: pageStartRef,
+    page: dictaPreviewPage.value,
+  });
 });
 const isPhoneCameraMode = computed(() => {
   if (typeof navigator === 'undefined') return false;

@@ -298,10 +298,12 @@
     "golaLabel": "מצב גולה",
     "nusachLabel": "נוסח",
     "torahTypeLabel": "פריסת ספר",
+    "tikkunProviderLabel": "תיקון מקוון",
     "help": {
       "gola": "בחוץ לארץ? הפעילו מצב גולה כדי להתאים את לוח הפרשיות וקריאות יום טוב ללוח הגולה.",
       "nusach": "בחר את מסורת הקריאה. כרגע זמין נוסח ספרדי בלבד.",
-      "torahType": "ברוב ספרי התורה משתמשים בפריסת רמ״ה (245 עמודים). קיימות פריסות נוספות, כמו התימנית (תאג') שהיא 226 עמודים."
+      "torahType": "ברוב ספרי התורה משתמשים בפריסת רמ״ה (245 עמודים). קיימות פריסות נוספות, כמו התימנית (תאג') שהיא 226 עמודים.",
+      "tikkunProvider": "בחרו איזה תיקון מקוון ייפתח מתצוגות העמודים. מצב אוטומטי משתמש ב-tikkun.io בפריסת 245 ולקריאות מוכרות, וב-Sefaria להפניות בפריסות אחרות."
     },
     "nusachOptions": {
       "sefaradic": "ספרדי"
@@ -311,13 +313,28 @@
       "klaf_245": "רמ״ה (245 עמודים)",
       "klaf_248": "רמ״ח (248 עמודים)"
     },
+    "tikkunProviders": {
+      "auto": {
+        "name": "אוטומטי",
+        "description": "משתמש ב-tikkun.io בפריסת 245 ולקריאות מוכרות; Sefaria להפניות בפריסות אחרות."
+      },
+      "tikkun_io": {
+        "name": "tikkun.io",
+        "description": "רמ״ה (245 עמודים); פותח קודם קישורי קריאה, ואחר כך הפניות מדויקות."
+      },
+      "sefaria": {
+        "name": "Sefaria",
+        "description": "טקסט תורה ללא פריסת עמודים להפניות מדויקות."
+      }
+    },
     "savedSettingsBanner": {
       "defaultText": "ההגדרות נשמרות בדפדפן הזה.",
       "text": "נשמר בדפדפן הזה: {settings}.",
       "dontShowAgain": "אל תציג שוב",
       "gola": "מצב גולה",
       "nusach": "נוסח {value}",
-      "torahType": "פריסת ספר {value}"
+      "torahType": "פריסת ספר {value}",
+      "tikkunProvider": "תיקון מקוון {value}"
     }
   },
   "targets": {
@@ -392,9 +409,9 @@
     "pageTitle": "תצוגה מקדימה לעמוד {page}",
     "firstLine": "שורה ראשונה",
     "lineUnavailable": "אין שורה ראשונה זמינה לעמוד זה.",
-    "openTikkun": "צפו בעמוד המלא ב-tikkun.io",
-    "openTikkunShort": "עמוד מלא",
-    "tikkunLayoutWarning": "tikkun.io משתמש בפריסת רמ״ה (245). אתה בפריסת {layout}.",
+    "openTikkun": "פתחו ב-{provider}",
+    "openTikkunShort": "פתחו",
+    "tikkunLayoutWarning": "{provider} משתמש ב{providerLayout}. אתם בפריסת {layout}; הקריאה/ההפניה נכונה, אבל העמוד המוצג עשוי להתחיל ולהסתיים במקום אחר.",
     "withNikud": "עם ניקוד",
     "withoutNikud": "ללא ניקוד",
     "shiftTip": "טיפ: החזק Shift כדי להחליף במהירות"

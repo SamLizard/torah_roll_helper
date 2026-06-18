@@ -90,26 +90,7 @@
         <v-btn variant="text" @click="closeDialog">
           {{ $t('actions.close') }}
         </v-btn>
-        <div class="preview-tikkun-section">
-          <div v-if="showTikkunLayoutWarning" class="text-caption text-warning preview-tikkun-warning">
-            <v-icon size="14" class="me-1">mdi-alert-outline</v-icon>
-            {{ $t('preview.tikkunLayoutWarning', { layout: $t(`settings.torahTypeOptions.${optionsStore.torahType}`) }) }}
-          </div>
-          <v-btn
-            color="primary"
-            variant="tonal"
-            prepend-icon="mdi-open-in-new"
-            data-tutorial="page-preview-link"
-            :href="tikkunUrl ?? undefined"
-            target="_blank"
-            rel="noopener noreferrer"
-            :disabled="!tikkunUrl"
-            class="preview-open-btn"
-            @click="onOpenTikkun"
-          >
-            {{ openTikkunLabel }}
-          </v-btn>
-        </div>
+        <TikkunProviderButton :link="tikkunLink" @open="onOpenTikkun" />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -117,10 +98,10 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import TikkunPreviewLine from './TikkunPreviewLine.vue';
-import { useOptionsStore } from '@/stores/options';
+import TikkunProviderButton from './TikkunProviderButton.vue';
+import type { TikkunResolvedLink } from '@/composables/tikkunProviders';
 
 const NUN_HAFUCHA = '׆';
 
@@ -128,7 +109,7 @@ const props = defineProps<{
   modelValue: boolean;
   page: number | null;
   previewColumns: string[][];
-  tikkunUrl: string | null;
+  tikkunLink: TikkunResolvedLink | null;
 }>();
 
 const emit = defineEmits<{
@@ -136,14 +117,10 @@ const emit = defineEmits<{
   (e: 'open-tikkun'): void;
 }>();
 
-const { t } = useI18n();
 const { smAndDown } = useDisplay();
-const optionsStore = useOptionsStore();
 
 const previewWithNikud = ref(true);
 const isShiftPressed = ref(false);
-
-const showTikkunLayoutWarning = computed(() => optionsStore.torahType !== 'klaf_245');
 
 const ketiv = (text: string) =>
   text
@@ -219,10 +196,6 @@ const isPetucha = computed(() =>
 const usesRegularBoxWidth = computed(() =>
   props.previewColumns.some((column) => column.length > 1)
 );
-const openTikkunLabel = computed(() =>
-  smAndDown.value ? t('preview.openTikkunShort') : t('preview.openTikkun')
-);
-
 const closeDialog = () => {
   emit('update:modelValue', false);
 };
@@ -236,7 +209,7 @@ const onDialogModelValueChange = (value: boolean) => {
 };
 
 const onOpenTikkun = () => {
-  if (!props.tikkunUrl) return;
+  if (!props.tikkunLink) return;
   emit('open-tikkun');
 };
 
@@ -369,27 +342,4 @@ onUnmounted(() => {
   transform: scale(1.08);
 }
 
-.preview-open-btn {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.preview-open-btn :deep(.v-btn__content) {
-  white-space: normal;
-  line-height: 1.15;
-  text-align: center;
-}
-
-.preview-tikkun-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.preview-tikkun-warning {
-  display: flex;
-  align-items: center;
-  text-align: end;
-}
 </style>

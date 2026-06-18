@@ -168,7 +168,7 @@
           v-model="isPagePreviewOpen"
           :page="page"
           :preview-columns="pagePreviewRawColumns"
-          :tikkun-url="tikkunUrl"
+          :tikkun-link="tikkunLink"
           @open-tikkun="onOpenTikkun"
         />
       </div>
@@ -227,7 +227,7 @@ import {
 } from '@/composables/readingTargets';
 import { useRtl } from 'vuetify';
 import type { ManualData, RealDb, TorahRef, Verse } from '@/types';
-import { toRefUrl, toTikkunUrl } from '@/composables/tikkunLinks';
+import { resolveTikkunLink } from '@/composables/tikkunLinks';
 
 type TargetItem = ReadingTarget;
 
@@ -761,23 +761,20 @@ const selectedTargetRefMode = computed<TargetRefMode | null>(() => {
   return selectedOption?.mode ?? null;
 });
 
-const tikkunUrl = computed(() => {
-  const targetUrl = toTikkunUrl(matchedTarget.value);
-  if (targetUrl) return targetUrl;
+const tikkunRef = computed(() => {
+  if (currentRefAsVerse.value) return currentRefAsVerse.value;
+  if (matchedTarget.value) return matchedTarget.value.ref;
 
-  if (currentRefAsVerse.value) {
-    return toRefUrl(currentRefAsVerse.value);
-  }
-
-  if (matchedTarget.value) {
-    return toRefUrl(matchedTarget.value.ref);
-  }
-
-  const pageStartRef = getPageStartRef(torahRealDb.value, props.page);
-  if (!pageStartRef) return null;
-
-  return toRefUrl(pageStartRef);
+  return getPageStartRef(torahRealDb.value, props.page);
 });
+
+const tikkunLink = computed(() => resolveTikkunLink({
+  providerSelection: options.tikkunProvider,
+  layoutKey: layoutKey.value,
+  target: matchedTarget.value,
+  ref: tikkunRef.value,
+  page: props.page,
+}));
 
 const getCalendarRollPreview = (entry: CalendarEntry) => {
   if (props.side !== 'to') return null;
@@ -1057,7 +1054,7 @@ const closePagePreview = () => {
 };
 
 const onOpenTikkun = () => {
-  if (!tikkunUrl.value) return;
+  if (!tikkunLink.value) return;
   trackAction('preview-open-tikkun');
 };
 

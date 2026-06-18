@@ -24,20 +24,6 @@ guides / scripts as they get done, then delete them from here.
 - [ ] In `docs/contributing/add-a-torah-layout.md`, explain for each script:
   **what it does, when to run it, and how to interpret/act on the output**.
 
-## Design decision to revisit: tikkun providers per layout
-
-Link coverage to an online tikkun can depend on the **layout** — a provider's page
-images may only correspond to one specific klaf. Options to weigh:
-
-- A global **default provider**, and when the active layout has its own better-matching
-  provider, use that by default; offer the layout-agnostic provider(s) in a select.
-- OR let the user pick the provider in **Settings** (simplest, but ignores layout fit).
-- OR per-layout default + user override.
-
-Decide before generalizing `toRefUrl` / `toTikkunUrl` (`src/composables/tikkunLinks.ts`)
-and the `tikkunUrl` computed in `src/components/LocationSelector.vue`. Keep
-`tikkun.io` as the fallback default. **Re-think this later.**
-
 ## Process
 
 - [ ] Whenever I say "I'll do X" for contributor tooling/docs, add it here as a task.

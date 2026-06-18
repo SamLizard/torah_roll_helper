@@ -45,7 +45,7 @@ new guide under `docs/contributing/` is itself a welcome contribution.
 | Fix or improve a translation | easy | [docs/contributing/add-a-language.md](docs/contributing/add-a-language.md) |
 | Add a Torah scroll layout (page count) | medium–hard | [docs/contributing/add-a-torah-layout.md](docs/contributing/add-a-torah-layout.md) |
 | Add a nusach option | medium | README "Add a new nusach option" |
-| Add another online tikkun provider | medium | README "Add links to other online tikkun providers" |
+| Add another online tikkun provider | medium | [docs/contributing/add-a-tikkun-provider.md](docs/contributing/add-a-tikkun-provider.md) |
 | Correct reading/page data | medium | Use the **Data correction** issue template |
 
 ## Bigger ideas (open an issue first)

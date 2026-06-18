@@ -21,6 +21,13 @@ body:
       description: e.g. bereshit, vayakhel::pekudei, chanukah-3
     validations:
       required: false
+  - type: input
+    id: tikkun-provider
+    attributes:
+      label: Online tikkun provider used as source
+      description: e.g. tikkun.io, Sefaria, real scroll. Include this when comparing against an online tikkun page.
+    validations:
+      required: false
   - type: textarea
     id: current
     attributes:

@@ -298,10 +298,12 @@
     "golaLabel": "Mode Diaspora (Gola)",
     "nusachLabel": "Rite",
     "torahTypeLabel": "Mise en page",
+    "tikkunProviderLabel": "Tikkun en ligne",
     "help": {
       "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures avec le calendrier de la Diaspora.",
       "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
-      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats existent, comme le Témanite (תאג') qui est en 226 pages."
+      "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats existent, comme le Témanite (תאג') qui est en 226 pages.",
+      "tikkunProvider": "Choisissez quel tikkun en ligne s'ouvre depuis les aperçus. Auto utilise tikkun.io en 245 et pour les lectures nommées, avec Sefaria pour les références des autres mises en page."
     },
     "nusachOptions": {
       "sefaradic": "Séfarade"
@@ -311,13 +313,28 @@
       "klaf_245": "רמ״ה (245 pages)",
       "klaf_248": "רמ״ח (248 pages)"
     },
+    "tikkunProviders": {
+      "auto": {
+        "name": "Auto",
+        "description": "Utilise tikkun.io en 245 et pour les lectures nommées ; Sefaria pour les références des autres mises en page."
+      },
+      "tikkun_io": {
+        "name": "tikkun.io",
+        "description": "רמ״ה (245 pages) ; ouvre d'abord les liens de lecture, puis les références exactes."
+      },
+      "sefaria": {
+        "name": "Sefaria",
+        "description": "Texte de Torah sans mise en page pour les références exactes."
+      }
+    },
     "savedSettingsBanner": {
       "defaultText": "Les paramètres sont enregistrés dans ce navigateur.",
       "text": "Enregistré dans ce navigateur : {settings}.",
       "dontShowAgain": "Ne plus afficher",
       "gola": "mode Diaspora",
       "nusach": "rite {value}",
-      "torahType": "mise en page {value}"
+      "torahType": "mise en page {value}",
+      "tikkunProvider": "tikkun en ligne {value}"
     }
   },
   "targets": {
@@ -392,9 +409,9 @@
     "pageTitle": "Aperçu de la page {page}",
     "firstLine": "Première ligne",
     "lineUnavailable": "La première ligne n'est pas disponible pour cette page.",
-    "openTikkun": "Voir la page complète dans tikkun.io",
-    "openTikkunShort": "Page complète",
-    "tikkunLayoutWarning": "tikkun.io utilise la mise en page רמ״ה (245). Vous êtes sur {layout}.",
+    "openTikkun": "Ouvrir dans {provider}",
+    "openTikkunShort": "Ouvrir",
+    "tikkunLayoutWarning": "{provider} utilise {providerLayout}. Vous êtes sur {layout} ; la lecture/référence est correcte, mais la page affichée peut commencer et finir ailleurs.",
     "withNikud": "Avec nikoud",
     "withoutNikud": "Sans nikoud",
     "shiftTip": "Astuce: maintenez Shift pour basculer rapidement"

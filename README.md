@@ -199,16 +199,12 @@ Finally register the layout in `src/composables/torahData.ts` and
 
 ### 4) Add links to other online tikkun providers
 
-1. Document how the target provider builds links for:
-   - parasha pages
-   - holiday pages
-   - direct references (`book/chapter/verse` or `page`)
-2. Generalize link generation currently in `src/components/LocationSelector.vue` (`toRefUrl` and `tikkunUrl`, which call `src/composables/tikkunLinks.ts`).
-3. Add a user setting to choose the provider (`src/stores/options.ts` + `src/components/SettingsDialog.vue` + locale labels).
-4. Keep `tikkun.io` as the default provider.
+Use [`docs/contributing/add-a-tikkun-provider.md`](docs/contributing/add-a-tikkun-provider.md).
 
-> Note: tikkun link coverage can depend on the layout (a provider's pages may only
-> match a specific klaf). Keep that in mind when designing the provider setting.
+Providers live in `src/composables/tikkunProviders/`, one provider per file. The
+app uses Auto by default: it uses tikkun.io for the 245 layout and for named
+readings, then falls back to layout-free Sefaria refs on other layouts. It warns
+when a layout-bound provider displays pages from a different klaf layout.
 
 ### Bigger ideas (open an issue first)
 

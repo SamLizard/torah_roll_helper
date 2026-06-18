@@ -22,6 +22,13 @@ body:
       description: e.g. klaf_245 / sefaradic. Roll math depends on the layout.
     validations:
       required: false
+  - type: input
+    id: tikkun-provider
+    attributes:
+      label: Online tikkun provider
+      description: e.g. Auto, tikkun.io. Important for preview-link and layout-warning bugs.
+    validations:
+      required: false
   - type: dropdown
     id: input-mode
     attributes:

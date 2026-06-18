@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { OPTIONS_STORAGE_KEY } from '@/composables/storageKeys';
+import type { TikkunProviderSelection } from '@/composables/tikkunProviders';
 
 const NUSACH_OPTIONS = ['sefaradic'] as const;
 type NusachOption = (typeof NUSACH_OPTIONS)[number];
@@ -16,6 +17,7 @@ interface State {
   isInGola: boolean;
   nusach: NusachOption;
   torahType: TorahTypeOption;
+  tikkunProvider: TikkunProviderSelection;
   fromPage: number | null;
   toPage: number | null;
 }
@@ -33,6 +35,7 @@ const useOptionsStore = defineStore('options', () => {
   const isInGola = ref<State['isInGola']>(false);
   const nusach = ref<State['nusach']>('sefaradic');
   const torahType = ref<State['torahType']>('klaf_245');
+  const tikkunProvider = ref<State['tikkunProvider']>('auto');
   const fromPage = ref<State['fromPage']>(null);
   const toPage = ref<State['toPage']>(null);
   const maxTorahPages = computed<number>(() => getTorahPageCount(torahType.value));
@@ -47,6 +50,10 @@ const useOptionsStore = defineStore('options', () => {
 
   const changeTorahType = (newTorahType: State['torahType']): void => {
     torahType.value = newTorahType;
+  };
+
+  const changeTikkunProvider = (newProvider: State['tikkunProvider']): void => {
+    tikkunProvider.value = newProvider;
   };
 
   const changeFromPage = (newFromPage: State['fromPage']): void => {
@@ -64,6 +71,8 @@ const useOptionsStore = defineStore('options', () => {
     changeNusach,
     torahType,
     changeTorahType,
+    tikkunProvider,
+    changeTikkunProvider,
     maxTorahPages,
     fromPage,
     changeFromPage,
@@ -73,7 +82,7 @@ const useOptionsStore = defineStore('options', () => {
 }, {
   persist: {
     key: OPTIONS_STORAGE_KEY,
-    pick: ['isInGola', 'nusach', 'torahType'],
+    pick: ['isInGola', 'nusach', 'torahType', 'tikkunProvider'],
   },
 });
 

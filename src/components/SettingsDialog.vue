@@ -12,7 +12,7 @@
             :label="$t('settings.golaLabel')"
             color="primary"
             hide-details
-            class="flex-grow-1"
+            class="grow"
           />
           <v-tooltip location="top" :text="$t('settings.help.gola')">
             <template #activator="{ props: tooltipProps }">
@@ -37,7 +37,7 @@
             variant="outlined"
             density="comfortable"
             hide-details="auto"
-            class="flex-grow-1"
+            class="grow"
           />
           <v-tooltip location="top" :text="$t('settings.help.nusach')">
             <template #activator="{ props: tooltipProps }">
@@ -62,9 +62,42 @@
             variant="outlined"
             density="comfortable"
             hide-details="auto"
-            class="flex-grow-1"
+            class="grow"
           />
           <v-tooltip location="top" :text="$t('settings.help.torahType')">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                icon="mdi-information-outline"
+                variant="text"
+                size="small"
+                class="info-btn"
+              />
+            </template>
+          </v-tooltip>
+        </div>
+
+        <div class="setting-control" data-tutorial="settings-tikkun-provider">
+          <v-select
+            v-model="tikkunProvider"
+            :items="tikkunProviderOptions"
+            item-title="title"
+            item-value="value"
+            :label="$t('settings.tikkunProviderLabel')"
+            variant="outlined"
+            density="comfortable"
+            hide-details="auto"
+            class="grow"
+          >
+            <template #item="{ props: itemProps, item }">
+              <v-list-item
+                v-bind="itemProps"
+                :title="item.raw.title"
+                :subtitle="item.raw.description"
+              />
+            </template>
+          </v-select>
+          <v-tooltip location="top" :text="$t('settings.help.tikkunProvider')">
             <template #activator="{ props: tooltipProps }">
               <v-btn
                 v-bind="tooltipProps"
@@ -111,6 +144,7 @@ import { trackGolaChoice } from '@/composables/analytics';
 import { markGolaNoticeSeen } from '@/composables/golaNotice';
 import { useInstallPrompt } from '@/composables/installPrompt';
 import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
+import { TIKKUN_PROVIDER_SELECTION_OPTIONS, type TikkunProviderSelection } from '@/composables/tikkunProviders';
 import {
   NUSACH_OPTIONS,
   TORAH_TYPE_OPTIONS,
@@ -159,6 +193,11 @@ const torahType = computed<TorahTypeOption>({
   set: (value) => optionsStore.changeTorahType(value),
 });
 
+const tikkunProvider = computed<TikkunProviderSelection>({
+  get: () => optionsStore.tikkunProvider,
+  set: (value) => optionsStore.changeTikkunProvider(value),
+});
+
 const nusachOptions = computed(() => {
   return NUSACH_OPTIONS.map((value) => ({
     title: t(`settings.nusachOptions.${value}`),
@@ -169,6 +208,14 @@ const nusachOptions = computed(() => {
 const torahTypeOptions = computed(() => {
   return TORAH_TYPE_OPTIONS.map((option) => ({
     title: t(`settings.torahTypeOptions.${option.id}`, { pages: option.pageCount }),
+    value: option.id,
+  }));
+});
+
+const tikkunProviderOptions = computed(() => {
+  return TIKKUN_PROVIDER_SELECTION_OPTIONS.map((option) => ({
+    title: t(option.nameKey),
+    description: t(option.descriptionKey),
     value: option.id,
   }));
 });
