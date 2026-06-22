@@ -6,7 +6,6 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "scripts/**/*.ts",
     "src/scripts/**/*.ts",
     "src/types/index.ts"
   ],

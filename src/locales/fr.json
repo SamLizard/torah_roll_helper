@@ -42,13 +42,18 @@
       "howTo": {
         "title": "Mode d'emploi | Torah Roll Helper",
         "description": "Apprenez à utiliser Torah Roll Helper pour identifier la position actuelle du Sefer Torah, choisir la prochaine lecture et obtenir des instructions claires."
+      },
+      "savedScrolls": {
+        "title": "Mes Sifrei Torah | Torah Roll Helper",
+        "description": "Gérer les rouleaux enregistrés localement et rouvrir leur dernière position connue dans ce navigateur."
       }
     }
   },
   "routes": {
     "home": "Accueil",
     "about": "À propos",
-    "howTo": "Mode d'emploi"
+    "howTo": "Mode d'emploi",
+    "savedScrolls": "Mes Sifrei Torah"
   },
   "about": {
     "title": "À propos",
@@ -335,7 +340,37 @@
       "nusach": "rite {value}",
       "torahType": "mise en page {value}",
       "tikkunProvider": "tikkun en ligne {value}"
+    },
+    "storageProtection": {
+      "label": "Protection des données locales",
+      "protected": "Protégé",
+      "bestEffort": "Au mieux",
+      "unsupported": "Indisponible",
+      "request": "Protéger les données",
+      "protectedHelp": "Ce navigateur a accordé le stockage persistant pour ce site. Les rouleaux et paramètres restent locaux et ne sont supprimés que par l'utilisateur.",
+      "bestEffortHelpBrowser": "Les rouleaux sont enregistrés dans ce navigateur seulement. Installez l'app ou utilisez-la régulièrement, puis demandez au navigateur de protéger les données locales.",
+      "bestEffortHelpStandalone": "Les rouleaux sont enregistrés sur cet appareil seulement. Le navigateur peut encore refuser le stockage persistant tant que l'app n'est pas assez utilisée.",
+      "unsupportedHelp": "Ce navigateur n'expose pas la protection de stockage persistant. Les données locales peuvent être supprimées par les paramètres du navigateur ou le nettoyage du stockage."
     }
+  },
+  "savedScrolls": {
+    "title": "Mes Sifrei Torah",
+    "open": "Mes Sifrei Torah",
+    "manage": "Ouvrir la vue complète",
+    "localOnlyNote": "Enregistré sur cet appareil seulement. Les images et le transfert vers un autre appareil ne sont pas encore inclus.",
+    "selectLabel": "Rouleau enregistré",
+    "empty": "Aucun rouleau enregistré",
+    "create": "Ajouter un rouleau",
+    "nameLabel": "Nom du rouleau",
+    "save": "Enregistrer",
+    "use": "Utiliser ce rouleau",
+    "updateFrom": "Enregistrer le DE actuel",
+    "updateTo": "Marquer À comme actuel",
+    "updateAfterReading": "Marquer après lecture",
+    "delete": "Supprimer le rouleau",
+    "noPosition": "Aucun emplacement",
+    "positionSummary": "Page {page}",
+    "summary": "{layout} - {position}"
   },
   "targets": {
     "title": "Choisir une lecture",

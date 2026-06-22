@@ -3,6 +3,48 @@
     <GolaBanner />
     <SavedSettingsBanner />
 
+    <div class="home-secondary-actions mb-3">
+      <v-btn
+        size="small"
+        variant="text"
+        color="primary"
+        prepend-icon="mdi-bookshelf"
+        @click="savedScrollsDialogOpen = true"
+      >
+        {{ $t('savedScrolls.open') }}
+      </v-btn>
+    </div>
+
+    <v-dialog v-model="savedScrollsDialogOpen" max-width="720px">
+      <v-card>
+        <v-card-title class="d-flex align-center justify-space-between">
+          <span class="text-h6 font-weight-bold">{{ $t('savedScrolls.title') }}</span>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="savedScrollsDialogOpen = false" />
+        </v-card-title>
+        <v-card-text>
+          <SavedScrollsPanel
+            :current-torah-type="options.torahType"
+            :current-from-page="options.fromPage"
+            :current-from-ref="fromRef"
+            :current-from-target-key="fromTargetKey"
+            :current-to-page="options.toPage"
+            :current-to-ref="toRef"
+            :current-to-target-key="toTargetKey"
+            :current-to-end-page="savedScrollToPosition.page"
+            :current-to-end-ref="savedScrollToPosition.ref"
+            :current-to-end-target-key="savedScrollToPosition.targetKey"
+            @apply="onSavedScrollApply"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" :to="{ name: 'savedScrolls' }" @click="savedScrollsDialogOpen = false">
+            {{ $t('savedScrolls.manage') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-row class="position-relative">
       <v-col cols="12" md="6" class="px-md-5">
         <LocationSelector
@@ -625,10 +667,12 @@ import {
 } from 'v-onboarding';
 import { useOptionsStore } from '@/stores/options';
 import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
+import { useSavedScrollsStore } from '@/stores/savedScrolls';
 import LocationSelector from '@/components/LocationSelector.vue';
 import MobileCompactResult from '@/components/MobileCompactResult.vue';
 import GolaBanner from '@/components/GolaBanner.vue';
 import SavedSettingsBanner from '@/components/SavedSettingsBanner.vue';
+import SavedScrollsPanel from '@/components/SavedScrollsPanel.vue';
 import RollResult from '@/components/RollResult.vue';
 import TargetOptionsGrid from '@/components/TargetOptionsGrid.vue';
 import DictaCameraCapture from '@/components/DictaCameraCapture.vue';
@@ -664,6 +708,7 @@ import { toPreviewColumns } from '@/composables/firstLineSearch';
 import { parseDictaPayload, type DictaReference } from '@/composables/dictaBridge';
 import { analyzeDictaImage, type DictaParallelItem } from '@/composables/dictaApi';
 import { resolveTikkunLink } from '@/composables/tikkunLinks';
+import type { SavedScroll } from '@/stores/savedScrolls';
 import type { ManualData, RollInstructions, TorahRef } from '@/types';
 
 interface HomeTargetItem {
@@ -717,6 +762,7 @@ interface DictaMetricsSession {
 
 const options = useOptionsStore();
 const monthlyReadingsStore = useMonthlyReadingsStore();
+const savedScrollsStore = useSavedScrollsStore();
 const { monthlyReadings } = storeToRefs(monthlyReadingsStore);
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -761,6 +807,7 @@ interface LocationSelectorExposed {
 
 const fromLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
 const toLocationSelectorRef = ref<LocationSelectorExposed | null>(null);
+const savedScrollsDialogOpen = ref(false);
 
 const dictaOpen = ref(false);
 const dictaFlowState = ref<DictaFlowState>('idle');
@@ -878,6 +925,27 @@ const toManualData = (torahRef: TorahRef): ManualData => ({
   book: torahRef.book,
   chapter: torahRef.chapter,
   verse: torahRef.verse,
+});
+
+const savedScrollToPosition = computed(() => {
+  const fallback = {
+    page: options.toPage,
+    ref: toRef.value,
+    targetKey: toTargetKey.value,
+  };
+
+  if (!toTargetKey.value) return fallback;
+
+  const target = findReadingTargetByKey(toTargetKey.value, options.isInGola) as HomeTargetItem | null;
+  if (!target) return fallback;
+
+  const readingEndRef = target.refEndPartial ?? target.refEnd;
+
+  return {
+    page: resolvePageForLayout(readingEndRef.page, layoutKey.value),
+    ref: toManualData(readingEndRef),
+    targetKey: target.key,
+  };
 });
 
 const getDefaultRefForSide = (target: HomeTargetItem, side: 'from' | 'to'): TorahRef => {
@@ -1457,6 +1525,42 @@ const cloneManualData = (value: ManualData | null): ManualData | null => {
   return value ? { ...value } : null;
 };
 
+const onSavedScrollApply = async (scroll: SavedScroll): Promise<void> => {
+  options.changeTorahType(scroll.torahType);
+  await nextTick();
+
+  const position = scroll.lastPosition;
+  onSetFromPage(
+    position?.page ?? null,
+    cloneManualData(position?.ref ?? null),
+    position?.targetKey ?? null,
+  );
+
+  trackFromToAction({
+    side: 'from',
+    action: 'saved-scroll-apply',
+    value: scroll.torahType,
+  });
+
+  savedScrollsDialogOpen.value = false;
+};
+
+const maybeApplySavedScrollFromRoute = async (): Promise<void> => {
+  const savedScrollId = getSingleQueryValue(route.query.savedScroll);
+
+  if (!savedScrollId) {
+    return;
+  }
+
+  const scroll = savedScrollsStore.savedScrolls.find((savedScroll) => savedScroll.id === savedScrollId);
+  if (scroll) {
+    savedScrollsStore.setActiveScroll(scroll.id);
+    await onSavedScrollApply(scroll);
+  }
+
+  clearSavedScrollQuery();
+};
+
 const captureTutorialSnapshot = (): void => {
   if (tutorialSnapshot.value) return;
 
@@ -1501,6 +1605,22 @@ const clearTutorialQuery = (): void => {
 
   delete nextQuery.tutorial;
   delete nextQuery.source;
+
+  void router.replace({ query: nextQuery });
+};
+
+const clearSavedScrollQuery = (): void => {
+  const savedScrollQuery = getSingleQueryValue(route.query.savedScroll);
+
+  if (!savedScrollQuery) {
+    return;
+  }
+
+  const nextQuery = {
+    ...route.query,
+  };
+
+  delete nextQuery.savedScroll;
 
   void router.replace({ query: nextQuery });
 };
@@ -2666,6 +2786,14 @@ watch(
   () => route.query.tutorial,
   () => {
     void maybeStartTutorialFromRoute();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => route.query.savedScroll,
+  () => {
+    void maybeApplySavedScrollFromRoute();
   },
   { immediate: true },
 );

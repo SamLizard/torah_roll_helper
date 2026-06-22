@@ -42,13 +42,18 @@
       "howTo": {
         "title": "How To Use | Torah Roll Helper",
         "description": "Learn how to use Torah Roll Helper to identify the current Torah position, choose the next reading, and get clear rolling instructions."
+      },
+      "savedScrolls": {
+        "title": "My Sifrei Torah | Torah Roll Helper",
+        "description": "Manage locally saved Torah scrolls and reopen their last known positions in this browser."
       }
     }
   },
   "routes": {
     "home": "Home",
     "about": "About",
-    "howTo": "How To Use"
+    "howTo": "How To Use",
+    "savedScrolls": "My Sifrei Torah"
   },
   "about": {
     "title": "About",
@@ -335,7 +340,37 @@
       "nusach": "rite {value}",
       "torahType": "scroll layout {value}",
       "tikkunProvider": "online tikkun {value}"
+    },
+    "storageProtection": {
+      "label": "Local data protection",
+      "protected": "Protected",
+      "bestEffort": "Best effort",
+      "unsupported": "Unavailable",
+      "request": "Protect local data",
+      "protectedHelp": "This browser has granted persistent storage for this site. Saved scrolls and settings stay local and are only removed by the user.",
+      "bestEffortHelpBrowser": "Saved scrolls use this browser only. Install the app or use it regularly, then ask the browser to protect local data from automatic cleanup.",
+      "bestEffortHelpStandalone": "Saved scrolls use this device only. The browser may still deny persistent storage until the app has enough engagement.",
+      "unsupportedHelp": "This browser does not expose persistent storage protection. Local saved data can still be cleared by browser settings or storage cleanup."
     }
+  },
+  "savedScrolls": {
+    "title": "My Sifrei Torah",
+    "open": "My Sifrei Torah",
+    "manage": "Open full view",
+    "localOnlyNote": "Saved on this device only. Images and device transfer are not included yet.",
+    "selectLabel": "Saved scroll",
+    "empty": "No saved scrolls",
+    "create": "Add scroll",
+    "nameLabel": "Scroll name",
+    "save": "Save",
+    "use": "Use saved scroll",
+    "updateFrom": "Save current FROM",
+    "updateTo": "Mark TO current",
+    "updateAfterReading": "Mark after reading",
+    "delete": "Delete saved scroll",
+    "noPosition": "No position",
+    "positionSummary": "Page {page}",
+    "summary": "{layout} - {position}"
   },
   "targets": {
     "title": "Choose a reading",

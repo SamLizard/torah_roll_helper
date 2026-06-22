@@ -9,6 +9,7 @@ import i18n, { isSupportedLocale, setLocale } from '@/plugins/i18n';
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import HowToUseView from "../views/HowToUseView.vue";
+import SavedScrollsView from "../views/SavedScrollsView.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -25,6 +26,17 @@ const routes: RouteRecordRaw[] = [
       titleKey: 'seo.routes.home.title',
       descriptionKey: 'seo.routes.home.description',
     },
+  },
+  {
+    path: '/saved-scrolls',
+    name: 'savedScrolls',
+    component: SavedScrollsView,
+    meta: {
+      icon: 'mdi-bookshelf',
+      showInNav: false,
+      titleKey: 'seo.routes.savedScrolls.title',
+      descriptionKey: 'seo.routes.savedScrolls.description',
+    }
   },
   {
     path: '/about',

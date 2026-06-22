@@ -14,7 +14,7 @@
     "generate-layout-data": "node --experimental-strip-types src/scripts/generate-layout-data.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-pattern \"dist/**\" --ignore-pattern \".eslintrc.cjs\" --fix",
     "deploy": "gh-pages -d dist",
-    "test": "vitest"
+    "test": "vitest --no-file-parallelism --maxWorkers=1"
   },
   "dependencies": {
     "@hebcal/hdate": "^0.21.1",

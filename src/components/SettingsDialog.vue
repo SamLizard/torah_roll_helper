@@ -119,6 +119,47 @@
           </v-tooltip>
         </div>
 
+        <v-divider class="my-4" />
+
+        <section class="storage-protection" data-tutorial="settings-storage-protection">
+          <div class="storage-protection__header">
+            <div>
+              <div class="text-subtitle-2 font-weight-medium">{{ $t('settings.storageProtection.label') }}</div>
+              <div class="text-caption text-medium-emphasis">{{ storageProtectionHelp }}</div>
+            </div>
+            <v-chip
+              size="small"
+              :color="storageProtectionColor"
+              variant="tonal"
+            >
+              {{ storageProtectionStatusLabel }}
+            </v-chip>
+          </div>
+
+          <div class="storage-protection__actions mt-2">
+            <v-btn
+              v-if="isStorageProtectionSupported && !isStorageProtectionPersisted"
+              size="small"
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-shield-check-outline"
+              :loading="isStorageProtectionChecking"
+              @click="requestStorageProtection"
+            >
+              {{ $t('settings.storageProtection.request') }}
+            </v-btn>
+            <v-btn
+              v-if="!isStandalone && !showInstallGuideEntry"
+              size="small"
+              variant="text"
+              prepend-icon="mdi-cellphone-arrow-down"
+              @click="openInstallGuide"
+            >
+              {{ $t('pwa.installGuide.open') }}
+            </v-btn>
+          </div>
+        </section>
+
         <template v-if="showInstallGuideEntry">
           <v-divider class="my-4" />
           <v-btn
@@ -146,12 +187,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { trackGolaChoice } from '@/composables/analytics';
 import { markGolaNoticeSeen } from '@/composables/golaNotice';
 import { useInstallPrompt } from '@/composables/installPrompt';
+import { usePersistentStorage } from '@/composables/persistentStorage';
 import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
 import { TIKKUN_PROVIDER_SELECTION_OPTIONS, type TikkunProviderSelection } from '@/composables/tikkunProviders';
 import {
@@ -177,6 +219,11 @@ const {
 } = useInstallPrompt();
 const optionsStore = useOptionsStore();
 const installGuideDialog = ref(false);
+const persistentStorage = usePersistentStorage();
+
+const isStorageProtectionSupported = computed(() => persistentStorage.isSupported.value);
+const isStorageProtectionPersisted = computed(() => persistentStorage.isPersisted.value);
+const isStorageProtectionChecking = computed(() => persistentStorage.isChecking.value);
 
 const dialog = computed<boolean>({
   get: () => props.modelValue,
@@ -232,6 +279,25 @@ const tikkunProviderOptions = computed(() => {
 
 const showInstallGuideEntry = computed(() => smAndDown.value && !isStandalone.value);
 
+const storageProtectionStatusLabel = computed(() => {
+  if (!isStorageProtectionSupported.value) return t('settings.storageProtection.unsupported');
+  if (isStorageProtectionPersisted.value) return t('settings.storageProtection.protected');
+  return t('settings.storageProtection.bestEffort');
+});
+
+const storageProtectionColor = computed(() => {
+  if (!isStorageProtectionSupported.value) return 'default';
+  return isStorageProtectionPersisted.value ? 'success' : 'warning';
+});
+
+const storageProtectionHelp = computed(() => {
+  if (!isStorageProtectionSupported.value) return t('settings.storageProtection.unsupportedHelp');
+  if (isStorageProtectionPersisted.value) return t('settings.storageProtection.protectedHelp');
+  return isStandalone.value
+    ? t('settings.storageProtection.bestEffortHelpStandalone')
+    : t('settings.storageProtection.bestEffortHelpBrowser');
+});
+
 const close = (): void => {
   dialog.value = false;
 };
@@ -239,6 +305,14 @@ const close = (): void => {
 const openInstallGuide = (): void => {
   installGuideDialog.value = true;
 };
+
+const requestStorageProtection = async (): Promise<void> => {
+  await persistentStorage.requestPersistence();
+};
+
+onMounted(() => {
+  void persistentStorage.refreshPersistenceStatus();
+});
 </script>
 
 <style scoped>
@@ -262,5 +336,18 @@ const openInstallGuide = (): void => {
   align-items: center;
   gap: 8px;
   min-width: 0;
+}
+
+.storage-protection__header,
+.storage-protection__actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.storage-protection__actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 </style>
