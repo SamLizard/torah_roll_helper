@@ -102,7 +102,10 @@ interface TesseractModule {
     langs?: string | string[],
     oem?: number,
     options?: {
+      corePath?: string;
+      langPath?: string;
       logger?: (payload: OcrProgressPayload) => void;
+      workerPath?: string;
     },
     config?: Record<string, string>
   ) => Promise<TesseractWorker>;
@@ -173,6 +176,10 @@ const KNOWN_CANONICAL_WORDS = Array.from(KNOWN_HEBREW_WORDS_BY_CANONICAL.keys())
 
 let workerPromise: Promise<TesseractWorker> | null = null;
 let progressListener: RecognizeFirstLineOptions['onProgress'];
+
+const tesseractAssetUrl = (assetPath: string): string => {
+  return `${import.meta.env.BASE_URL}tesseract/${assetPath}`;
+};
 
 const clampScore = (value: number): number => {
   return Math.max(0, Math.min(100, Math.round(value)));
@@ -479,6 +486,9 @@ const getOcrWorker = async (): Promise<TesseractWorker> => {
         'heb',
         Tesseract.OEM.LSTM_ONLY,
         {
+          workerPath: tesseractAssetUrl('worker.min.js'),
+          corePath: tesseractAssetUrl('core/tesseract-core-lstm.wasm.js'),
+          langPath: tesseractAssetUrl('lang'),
           logger: (payload) => {
             progressListener?.(payload);
           },

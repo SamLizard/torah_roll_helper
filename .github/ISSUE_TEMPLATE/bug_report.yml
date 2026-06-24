@@ -1,0 +1,51 @@
+name: Bug report
+description: Something works incorrectly.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: layout
+    attributes:
+      label: Torah layout / nusach
+      description: e.g. klaf_245 / sefaradic. Roll math depends on the layout.
+    validations:
+      required: false
+  - type: input
+    id: tikkun-provider
+    attributes:
+      label: Online tikkun provider
+      description: e.g. Auto, tikkun.io. Important for preview-link and layout-warning bugs.
+    validations:
+      required: false
+  - type: dropdown
+    id: input-mode
+    attributes:
+      label: Input mode involved
+      options:
+        - Photo / OCR (Dicta)
+        - First-line photo (Tesseract)
+        - Manual verse
+        - Manual page
+        - Target list selection
+        - Other / not sure
+    validations:
+      required: false
+  - type: input
+    id: env
+    attributes:
+      label: Device / browser / language
+      description: e.g. iPhone Safari, Hebrew (RTL), installed as PWA
+    validations:
+      required: false

@@ -8,6 +8,8 @@ type FirstLineSearchStatus = 'success' | 'no-result';
 type FirstLineSearchMode = 'line-start' | 'inside-line';
 type PhotoAttemptOutcome = 'single-result' | 'multiple-results' | 'no-result' | 'error';
 type PhotoSuccessType = 'single-result' | 'multiple-results';
+type ShareMethod = 'native' | 'copy-link' | 'whatsapp' | 'email';
+type ShareContentKind = 'full' | 'short' | 'link';
 
 interface GoatCounterCountPayload {
   path: string;
@@ -368,6 +370,53 @@ const trackPageView = (routePath: string, routeName?: string) => {
   });
 };
 
+const trackShareOpened = () => {
+  if (!isAnalyticsEnabled()) return;
+
+  trackGoatCounterEvent({
+    path: `${EVENT_PATH_PREFIX}/share/opened`,
+    title: 'share:opened',
+    event: true,
+  });
+};
+
+interface TrackShareCompletedInput {
+  method: ShareMethod;
+  shareLocale: string;
+  content: ShareContentKind;
+  // The app's active locale at the moment of sharing, so we can tell whether
+  // the user shared in the site language or picked a different one.
+  appLocale: string;
+}
+
+const trackShareCompleted = ({
+  method,
+  shareLocale,
+  content,
+  appLocale,
+}: TrackShareCompletedInput) => {
+  if (!isAnalyticsEnabled()) return;
+
+  const matchedSiteLocale = shareLocale === appLocale ? 'same-lang' : 'other-lang';
+
+  const path = [
+    EVENT_PATH_PREFIX,
+    'share',
+    'completed',
+    toSlug(method),
+    toSlug(content),
+    toSlug(shareLocale),
+    matchedSiteLocale,
+  ].join('/');
+  const title = `share-completed:${method}:${content}:${shareLocale}:${matchedSiteLocale}`;
+
+  trackGoatCounterEvent({
+    path,
+    title,
+    event: true,
+  });
+};
+
 export {
   bootstrapAnalytics,
   trackFirstLineSearchOutcome,
@@ -380,6 +429,8 @@ export {
   trackPhotoSuccess,
   trackRollResultDisplayed,
   trackPageView,
+  trackShareCompleted,
+  trackShareOpened,
   trackTutorialEvent,
   trackTutorialPromptEvent,
 };
@@ -387,4 +438,6 @@ export {
 export type {
   FirstLineSearchMode,
   FirstLineSearchSource,
+  ShareContentKind,
+  ShareMethod,
 };

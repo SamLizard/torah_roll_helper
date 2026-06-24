@@ -1,5 +1,10 @@
 <template>
-  <v-navigation-drawer v-model="drawer" temporary location="start">
+  <v-navigation-drawer
+    v-model="drawer"
+    temporary
+    location="start"
+    :class="{ 'drawer-no-transition': suppressDrawerTransition }"
+  >
     <v-list-item class="pa-4 pt-6" to="/" link>
       <v-list-item-title class="text-h6 font-weight-bold full-title-wrap">
         {{ $t("title") }}
@@ -41,6 +46,7 @@
               {{ $t('settings.subtitle') }}
             </v-list-item-subtitle>
           </v-list-item>
+          <share-button mode="list-item" @open="drawer = false" />
           <v-list-item
             v-if="canInstall"
             prepend-icon="mdi-cellphone-arrow-down"
@@ -117,6 +123,7 @@
         :aria-label="$t('pwa.installPrompt.install')"
         @click="install"
       />
+      <share-button mode="icon" wrapper-class="d-none d-md-inline-flex" />
       <v-btn
         icon="mdi-cog"
         variant="text"
@@ -132,10 +139,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useRtl } from 'vuetify';
 import LanguageSelection from "./LanguageSelection.vue";
 import SettingsDialog from './SettingsDialog.vue';
+import ShareButton from './ShareButton.vue';
 import {
   setTutorialLanguageMenuControls,
   setTutorialNavDrawerControls,
@@ -150,12 +159,43 @@ interface LanguageSelectionExposed {
 }
 
 const router = useRouter();
+const { isRtl } = useRtl();
 const drawer = ref(false);
 const settingsPopupOpen = ref(false);
+const suppressDrawerTransition = ref(false);
 const topLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const drawerLanguageSelectionRef = ref<LanguageSelectionExposed | null>(null);
 const { canInstall, initializeInstallPrompt, installApp } = useInstallPrompt();
 const { isOnline } = useOnlineStatus();
+
+// When the language switches between an LTR and an RTL locale, the temporary
+// drawer's physical side flips (start -> left/right). Vuetify then animates the
+// closed drawer's transform across the screen, which looks like the drawer
+// opens and closes. Disable the transition for that frame so it just
+// repositions instantly.
+//
+// If the drawer is open (the user changed the language from inside it), it
+// would otherwise briefly render open on the new side before Vuetify's route
+// watcher closes it (the lang query change triggers a navigation). Closing it
+// here, in the same pre-paint flush as the direction flip, avoids that flash.
+let releaseTransitionTimeoutId: number | null = null;
+
+watch(isRtl, () => {
+  suppressDrawerTransition.value = true;
+
+  if (drawer.value) {
+    drawer.value = false;
+  }
+
+  if (releaseTransitionTimeoutId != null) {
+    window.clearTimeout(releaseTransitionTimeoutId);
+  }
+
+  releaseTransitionTimeoutId = window.setTimeout(() => {
+    suppressDrawerTransition.value = false;
+    releaseTransitionTimeoutId = null;
+  }, 300);
+});
 
 const navLinks = computed(() => {
   return router.getRoutes().filter(route => route.meta?.showInNav);
@@ -218,6 +258,11 @@ onMounted(() => {
 onUnmounted(() => {
   setTutorialLanguageMenuControls(null);
   setTutorialNavDrawerControls(null);
+
+  if (releaseTransitionTimeoutId != null) {
+    window.clearTimeout(releaseTransitionTimeoutId);
+    releaseTransitionTimeoutId = null;
+  }
 });
 </script>
 
@@ -245,5 +290,11 @@ onUnmounted(() => {
 
 .v-btn--active {
   font-weight: bold;
+}
+
+/* Prevent the drawer from sliding across the screen when the locale switches
+   between LTR and RTL (which flips its physical side). */
+.drawer-no-transition {
+  transition: none !important;
 }
 </style>

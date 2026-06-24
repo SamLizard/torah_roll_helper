@@ -90,7 +90,13 @@ const config = defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff,woff2,json,gz,wasm}'],
+        globIgnores: [
+          '**/materialdesignicons-webfont-*.eot',
+          '**/materialdesignicons-webfont-*.ttf',
+        ],
+        ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^v$/],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
       },
     }),
   ],

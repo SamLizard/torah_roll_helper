@@ -96,6 +96,12 @@ const savedSettingLabels = computed(() => {
     }));
   }
 
+  if (optionsStore.tikkunProvider !== 'auto') {
+    labels.push(t('settings.savedSettingsBanner.tikkunProvider', {
+      value: getTranslatedText(`settings.tikkunProviders.${optionsStore.tikkunProvider}.name`),
+    }));
+  }
+
   return labels;
 });
 
@@ -163,7 +169,7 @@ onUnmounted(() => {
 });
 
 watch(
-  () => [optionsStore.isInGola, optionsStore.nusach, optionsStore.torahType],
+  () => [optionsStore.isInGola, optionsStore.nusach, optionsStore.torahType, optionsStore.tikkunProvider],
   () => {
     if (!isStandalone.value) {
       hasSavedOptions.value = true;

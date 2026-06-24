@@ -1,3506 +1,968 @@
 [
   {
-    "key": "bereshit",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 1,
-        "245": 1,
-        "248": 1
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 1,
-      "verse": 13,
-      "page": {
-        "226": 1,
-        "245": 1,
-        "248": 1
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 6,
-      "verse": 8,
-      "page": {
-        "226": 6,
-        "245": 6,
-        "248": 6
-      }
-    }
-  },
-  {
-    "key": "noach",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 6,
-      "verse": 9,
-      "page": {
-        "226": 6,
-        "245": 6,
-        "248": 6
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 6,
-      "verse": 22,
-      "page": {
-        "226": 6,
-        "245": 7,
-        "248": 7
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 11,
-      "verse": 32,
-      "page": {
-        "226": 11,
-        "245": 12,
-        "248": 12
-      }
-    }
-  },
-  {
-    "key": "lech_lecha",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 12,
-      "verse": 1,
-      "page": {
-        "226": 11,
-        "245": 12,
-        "248": 12
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 12,
-      "verse": 13,
-      "page": {
-        "226": 11,
-        "245": 12,
-        "248": 12
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 17,
-      "verse": 27,
-      "page": {
-        "226": 16,
-        "245": 17,
-        "248": 17
-      }
-    }
-  },
-  {
-    "key": "vayera",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 18,
-      "verse": 1,
-      "page": {
-        "226": 16,
-        "245": 17,
-        "248": 17
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 18,
-      "verse": 14,
-      "page": {
-        "226": 16,
-        "245": 17,
-        "248": 17
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 22,
-      "verse": 24,
-      "page": {
-        "226": 21,
-        "245": 23,
-        "248": 23
-      }
-    }
-  },
-  {
-    "key": "chayei_sara",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 23,
-      "verse": 1,
-      "page": {
-        "226": 21,
-        "245": 23,
-        "248": 23
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 23,
-      "verse": 16,
-      "page": {
-        "226": 22,
-        "245": 23,
-        "248": 24
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 25,
-      "verse": 18,
-      "page": {
-        "226": 25,
-        "245": 27,
-        "248": 27
-      }
-    }
-  },
-  {
-    "key": "toldot",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 25,
-      "verse": 19,
-      "page": {
-        "226": 25,
-        "245": 27,
-        "248": 27
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 26,
-      "verse": 5,
-      "page": {
-        "226": 26,
-        "245": 28,
-        "248": 28
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 28,
-      "verse": 9,
-      "page": {
-        "226": 29,
-        "245": 31,
-        "248": 31
-      }
-    }
-  },
-  {
-    "key": "vayetzei",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 28,
-      "verse": 10,
-      "page": {
-        "226": 29,
-        "245": 31,
-        "248": 31
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 28,
-      "verse": 22,
-      "page": {
-        "226": 30,
-        "245": 31,
-        "248": 32
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 32,
-      "verse": 3,
-      "page": {
-        "226": 35,
-        "245": 37,
-        "248": 37
-      }
-    }
-  },
-  {
-    "key": "vayishlach",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 32,
-      "verse": 4,
-      "page": {
-        "226": 35,
-        "245": 37,
-        "248": 37
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 32,
-      "verse": 13,
-      "page": {
-        "226": 35,
-        "245": 37,
-        "248": 38
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 36,
-      "verse": 43,
-      "page": {
-        "226": 40,
-        "245": 42,
-        "248": 43
-      }
-    }
-  },
-  {
-    "key": "vayeshev",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 37,
-      "verse": 1,
-      "page": {
-        "226": 40,
-        "245": 42,
-        "248": 43
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 37,
-      "verse": 11,
-      "page": {
-        "226": 40,
-        "245": 43,
-        "248": 43
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 40,
-      "verse": 23,
-      "page": {
-        "226": 44,
-        "245": 47,
-        "248": 48
-      }
-    }
-  },
-  {
-    "key": "miketz",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 41,
-      "verse": 1,
-      "page": {
-        "226": 44,
-        "245": 47,
-        "248": 48
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 41,
-      "verse": 14,
-      "page": {
-        "226": 45,
-        "245": 47,
-        "248": 48
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 44,
-      "verse": 17,
-      "page": {
-        "226": 50,
-        "245": 53,
-        "248": 54
-      }
-    }
-  },
-  {
-    "key": "vayigash",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 44,
-      "verse": 18,
-      "page": {
-        "226": 50,
-        "245": 53,
-        "248": 54
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 44,
-      "verse": 30,
-      "page": {
-        "226": 51,
-        "245": 53,
-        "248": 54
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 47,
-      "verse": 27,
-      "page": {
-        "226": 54,
-        "245": 57,
-        "248": 58
-      }
-    }
-  },
-  {
-    "key": "vayechi",
-    "group": "genesis",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 1,
-      "chapter": 47,
-      "verse": 28,
-      "page": {
-        "226": 54,
-        "245": 57,
-        "248": 58
-      }
-    },
-    "refEndPartial": {
-      "book": 1,
-      "chapter": 48,
-      "verse": 9,
-      "page": {
-        "226": 55,
-        "245": 58,
-        "248": 59
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 50,
-      "verse": 26,
-      "page": {
-        "226": 57,
-        "245": 61,
-        "248": 62
-      }
-    }
-  },
-  {
-    "key": "shemot",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 58,
-        "245": 61,
-        "248": 62
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 1,
-      "verse": 17,
-      "page": {
-        "226": 58,
-        "245": 61,
-        "248": 62
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 6,
-      "verse": 1,
-      "page": {
-        "226": 63,
-        "245": 66,
-        "248": 67
-      }
-    }
-  },
-  {
-    "key": "vaera",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 6,
-      "verse": 2,
-      "page": {
-        "226": 63,
-        "245": 66,
-        "248": 67
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 6,
-      "verse": 13,
-      "page": {
-        "226": 63,
-        "245": 66,
-        "248": 68
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 9,
-      "verse": 35,
-      "page": {
-        "226": 68,
-        "245": 71,
-        "248": 73
-      }
-    }
-  },
-  {
-    "key": "bo",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 10,
-      "verse": 1,
-      "page": {
-        "226": 68,
-        "245": 71,
-        "248": 73
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 10,
-      "verse": 11,
-      "page": {
-        "226": 68,
-        "245": 72,
-        "248": 73
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 13,
-      "verse": 16,
-      "page": {
-        "226": 72,
-        "245": 76,
-        "248": 78
-      }
-    }
-  },
-  {
-    "key": "beshalach",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 13,
-      "verse": 17,
-      "page": {
-        "226": 72,
-        "245": 76,
-        "248": 78
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 14,
-      "verse": 8,
-      "page": {
-        "226": 73,
-        "245": 77,
-        "248": 78
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 17,
-      "verse": 16,
-      "page": {
-        "226": 77,
-        "245": 81,
-        "248": 83
-      }
-    }
-  },
-  {
-    "key": "yitro",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 18,
-      "verse": 1,
-      "page": {
-        "226": 77,
-        "245": 81,
-        "248": 83
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 18,
-      "verse": 12,
-      "page": {
-        "226": 77,
-        "245": 82,
-        "248": 84
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 20,
-      "verse": 23,
-      "page": {
-        "226": 80,
-        "245": 84,
-        "248": 87
-      }
-    }
-  },
-  {
-    "key": "mishpatim",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 21,
-      "verse": 1,
-      "page": {
-        "226": 80,
-        "245": 84,
-        "248": 87
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 21,
-      "verse": 19,
-      "page": {
-        "226": 80,
-        "245": 85,
-        "248": 87
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 24,
-      "verse": 18,
-      "page": {
-        "226": 84,
-        "245": 89,
-        "248": 91
-      }
-    }
-  },
-  {
-    "key": "terumah",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 25,
-      "verse": 1,
-      "page": {
-        "226": 84,
-        "245": 89,
-        "248": 91
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 25,
-      "verse": 16,
-      "page": {
-        "226": 84,
-        "245": 89,
-        "248": 92
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 27,
-      "verse": 19,
-      "page": {
-        "226": 87,
-        "245": 92,
-        "248": 95
-      }
-    }
-  },
-  {
-    "key": "tetzaveh",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 27,
-      "verse": 20,
-      "page": {
-        "226": 87,
-        "245": 92,
-        "248": 95
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 28,
-      "verse": 12,
-      "page": {
-        "226": 88,
-        "245": 93,
-        "248": 96
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 30,
-      "verse": 10,
-      "page": {
-        "226": 91,
-        "245": 97,
-        "248": 99
-      }
-    }
-  },
-  {
-    "key": "ki_tisa",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 30,
-      "verse": 11,
-      "page": {
-        "226": 92,
-        "245": 97,
-        "248": 100
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 30,
-      "verse": 21,
-      "page": {
-        "226": 92,
-        "245": 97,
-        "248": 100
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 35,
-      "page": {
-        "226": 97,
-        "245": 103,
-        "248": 106
-      }
-    }
-  },
-  {
-    "key": "vayakhel",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 35,
-      "verse": 1,
-      "page": {
-        "226": 97,
-        "245": 103,
-        "248": 106
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 35,
-      "verse": 20,
-      "page": {
-        "226": 98,
-        "245": 103,
-        "248": 106
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 38,
-      "verse": 20,
-      "page": {
-        "226": 102,
-        "245": 108,
-        "248": 111
-      }
-    }
-  },
-  {
-    "key": "pekudei",
-    "group": "exodus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 2,
-      "chapter": 38,
-      "verse": 21,
-      "page": {
-        "226": 102,
-        "245": 108,
-        "248": 111
-      }
-    },
-    "refEndPartial": {
-      "book": 2,
-      "chapter": 39,
-      "verse": 1,
-      "page": {
-        "226": 102,
-        "245": 108,
-        "248": 111
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 40,
-      "verse": 38,
-      "page": {
-        "226": 105,
-        "245": 111,
-        "248": 114
-      }
-    }
-  },
-  {
-    "key": "vayikra",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 106,
-        "245": 111,
-        "248": 114
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 1,
-      "verse": 13,
-      "page": {
-        "226": 106,
-        "245": 112,
-        "248": 115
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 5,
-      "verse": 26,
-      "page": {
-        "226": 110,
-        "245": 117,
-        "248": 120
-      }
-    }
-  },
-  {
-    "key": "tzav",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 6,
-      "verse": 1,
-      "page": {
-        "226": 110,
-        "245": 117,
-        "248": 120
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 6,
-      "verse": 11,
-      "page": {
-        "226": 111,
-        "245": 117,
-        "248": 120
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 8,
-      "verse": 36,
-      "page": {
-        "226": 114,
-        "245": 121,
-        "248": 124
-      }
-    }
-  },
-  {
-    "key": "shmini",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 9,
-      "verse": 1,
-      "page": {
-        "226": 114,
-        "245": 121,
-        "248": 124
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 9,
-      "verse": 16,
-      "page": {
-        "226": 115,
-        "245": 121,
-        "248": 124
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 11,
-      "verse": 47,
-      "page": {
-        "226": 118,
-        "245": 124,
-        "248": 127
-      }
-    }
-  },
-  {
-    "key": "tazria",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 12,
-      "verse": 1,
-      "page": {
-        "226": 118,
-        "245": 124,
-        "248": 127
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 13,
-      "verse": 5,
-      "page": {
-        "226": 118,
-        "245": 125,
-        "248": 128
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 13,
-      "verse": 59,
-      "page": {
-        "226": 120,
-        "245": 127,
-        "248": 130
-      }
-    }
-  },
-  {
-    "key": "metzora",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 14,
-      "verse": 1,
-      "page": {
-        "226": 121,
-        "245": 127,
-        "248": 130
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 14,
-      "verse": 12,
-      "page": {
-        "226": 121,
-        "245": 128,
-        "248": 131
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 15,
-      "verse": 33,
-      "page": {
-        "226": 124,
-        "245": 131,
-        "248": 134
-      }
-    }
-  },
-  {
-    "key": "achrei_mot",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 16,
-      "verse": 1,
-      "page": {
-        "226": 124,
-        "245": 131,
-        "248": 134
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 125,
-        "245": 132,
-        "248": 135
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 18,
-      "verse": 30,
-      "page": {
-        "226": 127,
-        "245": 135,
-        "248": 138
-      }
-    }
-  },
-  {
-    "key": "kedoshim",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 19,
-      "verse": 1,
-      "page": {
-        "226": 127,
-        "245": 135,
-        "248": 138
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 19,
-      "verse": 14,
-      "page": {
-        "226": 128,
-        "245": 135,
-        "248": 138
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 20,
-      "verse": 27,
-      "page": {
-        "226": 130,
-        "245": 137,
-        "248": 140
-      }
-    }
-  },
-  {
-    "key": "emor",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 21,
-      "verse": 1,
-      "page": {
-        "226": 130,
-        "245": 137,
-        "248": 140
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 21,
-      "verse": 15,
-      "page": {
-        "226": 130,
-        "245": 138,
-        "248": 141
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 24,
-      "verse": 23,
-      "page": {
-        "226": 134,
-        "245": 143,
-        "248": 146
-      }
-    }
-  },
-  {
-    "key": "behar",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 25,
-      "verse": 1,
-      "page": {
-        "226": 134,
-        "245": 143,
-        "248": 146
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 25,
-      "verse": 13,
-      "page": {
-        "226": 135,
-        "245": 143,
-        "248": 146
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 26,
-      "verse": 2,
-      "page": {
-        "226": 136,
-        "245": 145,
-        "248": 148
-      }
-    }
-  },
-  {
-    "key": "bechukotai",
-    "group": "leviticus",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 3,
-      "chapter": 26,
-      "verse": 3,
-      "page": {
-        "226": 137,
-        "245": 145,
-        "248": 148
-      }
-    },
-    "refEndPartial": {
-      "book": 3,
-      "chapter": 26,
-      "verse": 13,
-      "page": {
-        "226": 137,
-        "245": 145,
-        "248": 148
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 27,
-      "verse": 34,
-      "page": {
-        "226": 139,
-        "245": 148,
-        "248": 151
-      }
-    }
-  },
-  {
-    "key": "bamidbar",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 140,
-        "245": 148,
-        "248": 151
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 1,
-      "verse": 19,
-      "page": {
-        "226": 140,
-        "245": 149,
-        "248": 152
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 4,
-      "verse": 20,
-      "page": {
-        "226": 145,
-        "245": 154,
-        "248": 157
-      }
-    }
-  },
-  {
-    "key": "nasso",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 4,
-      "verse": 21,
-      "page": {
-        "226": 145,
-        "245": 154,
-        "248": 157
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 4,
-      "verse": 33,
-      "page": {
-        "226": 146,
-        "245": 155,
-        "248": 158
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 89,
-      "page": {
-        "226": 152,
-        "245": 162,
-        "248": 165
-      }
-    }
-  },
-  {
-    "key": "behaalotcha",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 8,
-      "verse": 1,
-      "page": {
-        "226": 152,
-        "245": 162,
-        "248": 165
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 8,
-      "verse": 14,
-      "page": {
-        "226": 152,
-        "245": 162,
-        "248": 165
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 12,
-      "verse": 16,
-      "page": {
-        "226": 157,
-        "245": 167,
-        "248": 170
-      }
-    }
-  },
-  {
-    "key": "shlach",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 13,
-      "verse": 1,
-      "page": {
-        "226": 157,
-        "245": 168,
-        "248": 171
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 13,
-      "verse": 20,
-      "page": {
-        "226": 157,
-        "245": 168,
-        "248": 171
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 15,
-      "verse": 41,
-      "page": {
-        "226": 161,
-        "245": 172,
-        "248": 175
-      }
-    }
-  },
-  {
-    "key": "korach",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 16,
-      "verse": 1,
-      "page": {
-        "226": 161,
-        "245": 172,
-        "248": 175
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 16,
-      "verse": 13,
-      "page": {
-        "226": 162,
-        "245": 173,
-        "248": 176
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 18,
-      "verse": 32,
-      "page": {
-        "226": 165,
-        "245": 177,
-        "248": 180
-      }
-    }
-  },
-  {
-    "key": "chukat",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 19,
-      "verse": 1,
-      "page": {
-        "226": 165,
-        "245": 177,
-        "248": 180
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 19,
-      "verse": 17,
-      "page": {
-        "226": 166,
-        "245": 177,
-        "248": 180
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 22,
-      "verse": 1,
-      "page": {
-        "226": 169,
-        "245": 180,
-        "248": 183
-      }
-    }
-  },
-  {
-    "key": "balak",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 22,
-      "verse": 2,
-      "page": {
-        "226": 169,
-        "245": 180,
-        "248": 183
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 22,
-      "verse": 12,
-      "page": {
-        "226": 169,
-        "245": 181,
-        "248": 184
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 25,
-      "verse": 9,
-      "page": {
-        "226": 172,
-        "245": 185,
-        "248": 188
-      }
-    }
-  },
-  {
-    "key": "pinchas",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 25,
-      "verse": 10,
-      "page": {
-        "226": 172,
-        "245": 185,
-        "248": 188
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 26,
-      "verse": 4,
-      "page": {
-        "226": 173,
-        "245": 185,
-        "248": 188
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 30,
-      "verse": 1,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
-  },
-  {
-    "key": "matot",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 30,
-      "verse": 2,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 30,
-      "verse": 17,
-      "page": {
-        "226": 179,
-        "245": 192,
-        "248": 195
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 32,
-      "verse": 42,
-      "page": {
-        "226": 182,
-        "245": 196,
-        "248": 199
-      }
-    }
-  },
-  {
-    "key": "masei",
-    "group": "numbers",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 4,
-      "chapter": 33,
-      "verse": 1,
-      "page": {
-        "226": 182,
-        "245": 196,
-        "248": 199
-      }
-    },
-    "refEndPartial": {
-      "book": 4,
-      "chapter": 33,
-      "verse": 10,
-      "page": {
-        "226": 183,
-        "245": 196,
-        "248": 199
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 36,
-      "verse": 13,
-      "page": {
-        "226": 186,
-        "245": 200,
-        "248": 203
-      }
-    }
-  },
-  {
-    "key": "devarim",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 187,
-        "245": 200,
-        "248": 203
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 1,
-      "verse": 11,
-      "page": {
-        "226": 187,
-        "245": 201,
-        "248": 204
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 3,
-      "verse": 22,
-      "page": {
-        "226": 191,
-        "245": 205,
-        "248": 208
-      }
-    }
-  },
-  {
-    "key": "vaetchanan",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 3,
-      "verse": 23,
-      "page": {
-        "226": 191,
-        "245": 205,
-        "248": 208
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 4,
-      "verse": 8,
-      "page": {
-        "226": 191,
-        "245": 206,
-        "248": 209
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 7,
-      "verse": 11,
-      "page": {
-        "226": 196,
-        "245": 211,
-        "248": 214
-      }
-    }
-  },
-  {
-    "key": "eikev",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 7,
-      "verse": 12,
-      "page": {
-        "226": 196,
-        "245": 211,
-        "248": 214
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 8,
-      "verse": 10,
-      "page": {
-        "226": 197,
-        "245": 212,
-        "248": 215
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 11,
-      "verse": 25,
-      "page": {
-        "226": 201,
-        "245": 217,
-        "248": 220
-      }
-    }
-  },
-  {
-    "key": "reeh",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 11,
-      "verse": 26,
-      "page": {
-        "226": 201,
-        "245": 217,
-        "248": 220
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 12,
-      "verse": 10,
-      "page": {
-        "226": 202,
-        "245": 217,
-        "248": 220
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
-  },
-  {
-    "key": "shoftim",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 18,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 17,
-      "verse": 13,
-      "page": {
-        "226": 207,
-        "245": 224,
-        "248": 227
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 21,
-      "verse": 9,
-      "page": {
-        "226": 211,
-        "245": 227,
-        "248": 230
-      }
-    }
-  },
-  {
-    "key": "ki_teitzei",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 21,
-      "verse": 10,
-      "page": {
-        "226": 211,
-        "245": 227,
-        "248": 230
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 21,
-      "verse": 21,
-      "page": {
-        "226": 211,
-        "245": 228,
-        "248": 231
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 25,
-      "verse": 19,
-      "page": {
-        "226": 215,
-        "245": 232,
-        "248": 235
-      }
-    }
-  },
-  {
-    "key": "ki_tavo",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 26,
-      "verse": 1,
-      "page": {
-        "226": 215,
-        "245": 232,
-        "248": 235
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 26,
-      "verse": 15,
-      "page": {
-        "226": 216,
-        "245": 233,
-        "248": 236
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 29,
-      "verse": 8,
-      "page": {
-        "226": 220,
-        "245": 238,
-        "248": 241
-      }
-    }
-  },
-  {
-    "key": "nitzavim",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 29,
-      "verse": 9,
-      "page": {
-        "226": 220,
-        "245": 238,
-        "248": 241
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 29,
-      "verse": 28,
-      "page": {
-        "226": 221,
-        "245": 239,
-        "248": 242
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 30,
-      "verse": 20,
-      "page": {
-        "226": 222,
-        "245": 240,
-        "248": 243
-      }
-    }
-  },
-  {
-    "key": "vayeilech",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 31,
-      "verse": 1,
-      "page": {
-        "226": 222,
-        "245": 240,
-        "248": 243
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 31,
-      "verse": 13,
-      "page": {
-        "226": 223,
-        "245": 241,
-        "248": 244
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 31,
-      "verse": 30,
-      "page": {
-        "226": 224,
-        "245": 242,
-        "248": 245
-      }
-    }
-  },
-  {
-    "key": "haazinu",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 32,
-      "verse": 1,
-      "page": {
-        "226": 224,
-        "245": 242,
-        "248": 245
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 32,
-      "verse": 12,
-      "page": {
-        "226": 224,
-        "245": 242,
-        "248": 245
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 32,
-      "verse": 52,
-      "page": {
-        "226": 225,
-        "245": 244,
-        "248": 247
-      }
-    }
-  },
-  {
-    "key": "vezot_haberakhah",
-    "group": "deuteronomy",
-    "specific": "both",
-    "type": "parasha",
-    "ref": {
-      "book": 5,
-      "chapter": 33,
-      "verse": 1,
-      "page": {
-        "226": 225,
-        "245": 244,
-        "248": 247
-      }
-    },
-    "refEndPartial": {
-      "book": 5,
-      "chapter": 33,
-      "verse": 17,
-      "page": {
-        "226": 226,
-        "245": 245,
-        "248": 248
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 34,
-      "verse": 12,
-      "page": {
-        "226": 226,
-        "245": 245,
-        "248": 248
-      }
-    }
-  },
-  {
-    "key": "rosh-chodesh",
-    "group": "rosh-chodesh",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 1,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 15,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    }
-  },
-  {
-    "key": "rosh-chodesh-special",
-    "group": "rosh-chodesh",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 9,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 15,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    }
-  },
-  {
-    "key": "rosh-1",
-    "group": "rosh",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 1,
-      "chapter": 21,
-      "verse": 1,
-      "page": {
-        "226": 19,
-        "245": 20,
-        "248": 21
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 21,
-      "verse": 34,
-      "page": {
-        "226": 20,
-        "245": 22,
-        "248": 22
-      }
-    }
-  },
-  {
-    "key": "rosh-2",
-    "group": "rosh",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 1,
-      "chapter": 22,
-      "verse": 1,
-      "page": {
-        "226": 20,
-        "245": 22,
-        "248": 22
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 22,
-      "verse": 24,
-      "page": {
-        "226": 21,
-        "245": 23,
-        "248": 23
-      }
-    }
-  },
-  {
-    "key": "rosh-maftir",
-    "group": "rosh",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 1,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 6,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    }
-  },
-  {
-    "key": "yom-kippur",
-    "group": "yom-kippur",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 3,
-      "chapter": 16,
-      "verse": 1,
-      "page": {
-        "226": 124,
-        "245": 131,
-        "248": 134
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 16,
-      "verse": 34,
-      "page": {
-        "226": 126,
-        "245": 133,
-        "248": 136
-      }
-    }
-  },
-  {
-    "key": "yom-kippur-maftir",
-    "group": "yom-kippur",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 7,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 11,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    }
-  },
-  {
-    "key": "yom-kippur-mincha",
-    "group": "yom-kippur",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 3,
-      "chapter": 18,
-      "verse": 1,
-      "page": {
-        "226": 126,
-        "245": 134,
-        "248": 137
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 18,
-      "verse": 30,
-      "page": {
-        "226": 127,
-        "245": 135,
-        "248": 138
-      }
-    }
-  },
-  {
-    "key": "sukkot-1",
-    "group": "sukkot",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 3,
-      "chapter": 22,
-      "verse": 26,
-      "page": {
-        "226": 132,
-        "245": 139,
-        "248": 142
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 23,
-      "verse": 44,
-      "page": {
-        "226": 134,
-        "245": 142,
-        "248": 145
-      }
-    }
-  },
-  {
-    "key": "sukkot-maftir",
-    "group": "sukkot",
-    "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 12,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 16,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    }
-  },
-  {
-    "key": "sukkot-2",
-    "group": "sukkot",
+    "key"          : "bereshit",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 1, "verse": 1, "page": {"226": 1, "245": 1, "248": 1} },
+    "refEndPartial": { "book": 1, "chapter": 1, "verse": 13, "page": {"226": 1, "245": 1, "248": 1} },
+    "refEnd"       : { "book": 1, "chapter": 6, "verse": 8, "page": {"226": 6, "245": 6, "248": 6} }
+  },
+  {
+    "key"          : "noach",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 6, "verse": 9, "page": {"226": 6, "245": 6, "248": 6} },
+    "refEndPartial": { "book": 1, "chapter": 6, "verse": 22, "page": {"226": 6, "245": 7, "248": 7} },
+    "refEnd"       : { "book": 1, "chapter": 11, "verse": 32, "page": {"226": 11, "245": 12, "248": 12} }
+  },
+  {
+    "key"          : "lech_lecha",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 12, "verse": 1, "page": {"226": 11, "245": 12, "248": 12} },
+    "refEndPartial": { "book": 1, "chapter": 12, "verse": 13, "page": {"226": 11, "245": 12, "248": 12} },
+    "refEnd"       : { "book": 1, "chapter": 17, "verse": 27, "page": {"226": 16, "245": 17, "248": 17} }
+  },
+  {
+    "key"          : "vayera",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 18, "verse": 1, "page": {"226": 16, "245": 17, "248": 17} },
+    "refEndPartial": { "book": 1, "chapter": 18, "verse": 14, "page": {"226": 16, "245": 17, "248": 17} },
+    "refEnd"       : { "book": 1, "chapter": 22, "verse": 24, "page": {"226": 21, "245": 23, "248": 23} }
+  },
+  {
+    "key"          : "chayei_sara",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 23, "verse": 1, "page": {"226": 21, "245": 23, "248": 23} },
+    "refEndPartial": { "book": 1, "chapter": 23, "verse": 16, "page": {"226": 22, "245": 23, "248": 24} },
+    "refEnd"       : { "book": 1, "chapter": 25, "verse": 18, "page": {"226": 25, "245": 27, "248": 27} }
+  },
+  {
+    "key"          : "toldot",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 25, "verse": 19, "page": {"226": 25, "245": 27, "248": 27} },
+    "refEndPartial": { "book": 1, "chapter": 26, "verse": 5, "page": {"226": 26, "245": 28, "248": 28} },
+    "refEnd"       : { "book": 1, "chapter": 28, "verse": 9, "page": {"226": 29, "245": 31, "248": 31} }
+  },
+  {
+    "key"          : "vayetzei",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 28, "verse": 10, "page": {"226": 29, "245": 31, "248": 31} },
+    "refEndPartial": { "book": 1, "chapter": 28, "verse": 22, "page": {"226": 30, "245": 31, "248": 32} },
+    "refEnd"       : { "book": 1, "chapter": 32, "verse": 3, "page": {"226": 35, "245": 37, "248": 37} }
+  },
+  {
+    "key"          : "vayishlach",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 32, "verse": 4, "page": {"226": 35, "245": 37, "248": 37} },
+    "refEndPartial": { "book": 1, "chapter": 32, "verse": 13, "page": {"226": 35, "245": 37, "248": 38} },
+    "refEnd"       : { "book": 1, "chapter": 36, "verse": 43, "page": {"226": 40, "245": 42, "248": 43} }
+  },
+  {
+    "key"          : "vayeshev",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 37, "verse": 1, "page": {"226": 40, "245": 42, "248": 43} },
+    "refEndPartial": { "book": 1, "chapter": 37, "verse": 11, "page": {"226": 40, "245": 43, "248": 43} },
+    "refEnd"       : { "book": 1, "chapter": 40, "verse": 23, "page": {"226": 44, "245": 47, "248": 48} }
+  },
+  {
+    "key"          : "miketz",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 41, "verse": 1, "page": {"226": 44, "245": 47, "248": 48} },
+    "refEndPartial": { "book": 1, "chapter": 41, "verse": 14, "page": {"226": 45, "245": 47, "248": 48} },
+    "refEnd"       : { "book": 1, "chapter": 44, "verse": 17, "page": {"226": 50, "245": 53, "248": 54} }
+  },
+  {
+    "key"          : "vayigash",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 44, "verse": 18, "page": {"226": 50, "245": 53, "248": 54} },
+    "refEndPartial": { "book": 1, "chapter": 44, "verse": 30, "page": {"226": 51, "245": 53, "248": 54} },
+    "refEnd"       : { "book": 1, "chapter": 47, "verse": 27, "page": {"226": 54, "245": 57, "248": 58} }
+  },
+  {
+    "key"          : "vayechi",
+    "group"        : "genesis",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 1, "chapter": 47, "verse": 28, "page": {"226": 54, "245": 57, "248": 58} },
+    "refEndPartial": { "book": 1, "chapter": 48, "verse": 9, "page": {"226": 55, "245": 58, "248": 59} },
+    "refEnd"       : { "book": 1, "chapter": 50, "verse": 26, "page": {"226": 57, "245": 61, "248": 62} }
+  },
+  {
+    "key"          : "shemot",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 1, "verse": 1, "page": {"226": 58, "245": 61, "248": 62} },
+    "refEndPartial": { "book": 2, "chapter": 1, "verse": 17, "page": {"226": 58, "245": 61, "248": 62} },
+    "refEnd"       : { "book": 2, "chapter": 6, "verse": 1, "page": {"226": 63, "245": 66, "248": 67} }
+  },
+  {
+    "key"          : "vaera",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 6, "verse": 2, "page": {"226": 63, "245": 66, "248": 67} },
+    "refEndPartial": { "book": 2, "chapter": 6, "verse": 13, "page": {"226": 63, "245": 66, "248": 68} },
+    "refEnd"       : { "book": 2, "chapter": 9, "verse": 35, "page": {"226": 68, "245": 71, "248": 73} }
+  },
+  {
+    "key"          : "bo",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 10, "verse": 1, "page": {"226": 68, "245": 71, "248": 73} },
+    "refEndPartial": { "book": 2, "chapter": 10, "verse": 11, "page": {"226": 68, "245": 72, "248": 73} },
+    "refEnd"       : { "book": 2, "chapter": 13, "verse": 16, "page": {"226": 72, "245": 76, "248": 78} }
+  },
+  {
+    "key"          : "beshalach",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 13, "verse": 17, "page": {"226": 72, "245": 76, "248": 78} },
+    "refEndPartial": { "book": 2, "chapter": 14, "verse": 8, "page": {"226": 73, "245": 77, "248": 78} },
+    "refEnd"       : { "book": 2, "chapter": 17, "verse": 16, "page": {"226": 77, "245": 81, "248": 83} }
+  },
+  {
+    "key"          : "yitro",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 18, "verse": 1, "page": {"226": 77, "245": 81, "248": 83} },
+    "refEndPartial": { "book": 2, "chapter": 18, "verse": 12, "page": {"226": 77, "245": 82, "248": 84} },
+    "refEnd"       : { "book": 2, "chapter": 20, "verse": 23, "page": {"226": 80, "245": 84, "248": 87} }
+  },
+  {
+    "key"          : "mishpatim",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 21, "verse": 1, "page": {"226": 80, "245": 84, "248": 87} },
+    "refEndPartial": { "book": 2, "chapter": 21, "verse": 19, "page": {"226": 80, "245": 85, "248": 87} },
+    "refEnd"       : { "book": 2, "chapter": 24, "verse": 18, "page": {"226": 84, "245": 89, "248": 91} }
+  },
+  {
+    "key"          : "terumah",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 25, "verse": 1, "page": {"226": 84, "245": 89, "248": 91} },
+    "refEndPartial": { "book": 2, "chapter": 25, "verse": 16, "page": {"226": 84, "245": 89, "248": 92} },
+    "refEnd"       : { "book": 2, "chapter": 27, "verse": 19, "page": {"226": 87, "245": 92, "248": 95} }
+  },
+  {
+    "key"          : "tetzaveh",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 27, "verse": 20, "page": {"226": 87, "245": 92, "248": 95} },
+    "refEndPartial": { "book": 2, "chapter": 28, "verse": 12, "page": {"226": 88, "245": 93, "248": 96} },
+    "refEnd"       : { "book": 2, "chapter": 30, "verse": 10, "page": {"226": 91, "245": 97, "248": 99} }
+  },
+  {
+    "key"          : "ki_tisa",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 30, "verse": 11, "page": {"226": 92, "245": 97, "248": 100} },
+    "refEndPartial": { "book": 2, "chapter": 30, "verse": 21, "page": {"226": 92, "245": 97, "248": 100} },
+    "refEnd"       : { "book": 2, "chapter": 34, "verse": 35, "page": {"226": 97, "245": 103, "248": 106} }
+  },
+  {
+    "key"          : "vayakhel",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 35, "verse": 1, "page": {"226": 97, "245": 103, "248": 106} },
+    "refEndPartial": { "book": 2, "chapter": 35, "verse": 20, "page": {"226": 98, "245": 103, "248": 106} },
+    "refEnd"       : { "book": 2, "chapter": 38, "verse": 20, "page": {"226": 102, "245": 108, "248": 111} }
+  },
+  {
+    "key"          : "pekudei",
+    "group"        : "exodus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 2, "chapter": 38, "verse": 21, "page": {"226": 102, "245": 108, "248": 111} },
+    "refEndPartial": { "book": 2, "chapter": 39, "verse": 1, "page": {"226": 102, "245": 108, "248": 111} },
+    "refEnd"       : { "book": 2, "chapter": 40, "verse": 38, "page": {"226": 105, "245": 111, "248": 114} }
+  },
+  {
+    "key"          : "vayikra",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 1, "verse": 1, "page": {"226": 106, "245": 111, "248": 114} },
+    "refEndPartial": { "book": 3, "chapter": 1, "verse": 13, "page": {"226": 106, "245": 112, "248": 115} },
+    "refEnd"       : { "book": 3, "chapter": 5, "verse": 26, "page": {"226": 110, "245": 117, "248": 120} }
+  },
+  {
+    "key"          : "tzav",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 6, "verse": 1, "page": {"226": 110, "245": 117, "248": 120} },
+    "refEndPartial": { "book": 3, "chapter": 6, "verse": 11, "page": {"226": 111, "245": 117, "248": 120} },
+    "refEnd"       : { "book": 3, "chapter": 8, "verse": 36, "page": {"226": 114, "245": 121, "248": 124} }
+  },
+  {
+    "key"          : "shmini",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 9, "verse": 1, "page": {"226": 114, "245": 121, "248": 124} },
+    "refEndPartial": { "book": 3, "chapter": 9, "verse": 16, "page": {"226": 115, "245": 121, "248": 124} },
+    "refEnd"       : { "book": 3, "chapter": 11, "verse": 47, "page": {"226": 118, "245": 124, "248": 127} }
+  },
+  {
+    "key"          : "tazria",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 12, "verse": 1, "page": {"226": 118, "245": 124, "248": 127} },
+    "refEndPartial": { "book": 3, "chapter": 13, "verse": 5, "page": {"226": 118, "245": 125, "248": 128} },
+    "refEnd"       : { "book": 3, "chapter": 13, "verse": 59, "page": {"226": 120, "245": 127, "248": 130} }
+  },
+  {
+    "key"          : "metzora",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 14, "verse": 1, "page": {"226": 121, "245": 127, "248": 130} },
+    "refEndPartial": { "book": 3, "chapter": 14, "verse": 12, "page": {"226": 121, "245": 128, "248": 131} },
+    "refEnd"       : { "book": 3, "chapter": 15, "verse": 33, "page": {"226": 124, "245": 131, "248": 134} }
+  },
+  {
+    "key"          : "achrei_mot",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 16, "verse": 1, "page": {"226": 124, "245": 131, "248": 134} },
+    "refEndPartial": { "book": 3, "chapter": 16, "verse": 17, "page": {"226": 125, "245": 132, "248": 135} },
+    "refEnd"       : { "book": 3, "chapter": 18, "verse": 30, "page": {"226": 127, "245": 135, "248": 138} }
+  },
+  {
+    "key"          : "kedoshim",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 19, "verse": 1, "page": {"226": 127, "245": 135, "248": 138} },
+    "refEndPartial": { "book": 3, "chapter": 19, "verse": 14, "page": {"226": 128, "245": 135, "248": 138} },
+    "refEnd"       : { "book": 3, "chapter": 20, "verse": 27, "page": {"226": 130, "245": 137, "248": 140} }
+  },
+  {
+    "key"          : "emor",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 21, "verse": 1, "page": {"226": 130, "245": 137, "248": 140} },
+    "refEndPartial": { "book": 3, "chapter": 21, "verse": 15, "page": {"226": 130, "245": 138, "248": 141} },
+    "refEnd"       : { "book": 3, "chapter": 24, "verse": 23, "page": {"226": 134, "245": 143, "248": 146} }
+  },
+  {
+    "key"          : "behar",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 25, "verse": 1, "page": {"226": 134, "245": 143, "248": 146} },
+    "refEndPartial": { "book": 3, "chapter": 25, "verse": 13, "page": {"226": 135, "245": 143, "248": 146} },
+    "refEnd"       : { "book": 3, "chapter": 26, "verse": 2, "page": {"226": 136, "245": 145, "248": 148} }
+  },
+  {
+    "key"          : "bechukotai",
+    "group"        : "leviticus",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 3, "chapter": 26, "verse": 3, "page": {"226": 137, "245": 145, "248": 148} },
+    "refEndPartial": { "book": 3, "chapter": 26, "verse": 13, "page": {"226": 137, "245": 145, "248": 148} },
+    "refEnd"       : { "book": 3, "chapter": 27, "verse": 34, "page": {"226": 139, "245": 148, "248": 151} }
+  },
+  {
+    "key"          : "bamidbar",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 1, "verse": 1, "page": {"226": 140, "245": 148, "248": 151} },
+    "refEndPartial": { "book": 4, "chapter": 1, "verse": 19, "page": {"226": 140, "245": 149, "248": 152} },
+    "refEnd"       : { "book": 4, "chapter": 4, "verse": 20, "page": {"226": 145, "245": 154, "248": 157} }
+  },
+  {
+    "key"          : "nasso",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 4, "verse": 21, "page": {"226": 145, "245": 154, "248": 157} },
+    "refEndPartial": { "book": 4, "chapter": 4, "verse": 33, "page": {"226": 146, "245": 155, "248": 158} },
+    "refEnd"       : { "book": 4, "chapter": 7, "verse": 89, "page": {"226": 152, "245": 162, "248": 165} }
+  },
+  {
+    "key"          : "behaalotcha",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 8, "verse": 1, "page": {"226": 152, "245": 162, "248": 165} },
+    "refEndPartial": { "book": 4, "chapter": 8, "verse": 14, "page": {"226": 152, "245": 162, "248": 165} },
+    "refEnd"       : { "book": 4, "chapter": 12, "verse": 16, "page": {"226": 157, "245": 167, "248": 170} }
+  },
+  {
+    "key"          : "shlach",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 13, "verse": 1, "page": {"226": 157, "245": 168, "248": 171} },
+    "refEndPartial": { "book": 4, "chapter": 13, "verse": 20, "page": {"226": 157, "245": 168, "248": 171} },
+    "refEnd"       : { "book": 4, "chapter": 15, "verse": 41, "page": {"226": 161, "245": 172, "248": 175} }
+  },
+  {
+    "key"          : "korach",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 16, "verse": 1, "page": {"226": 161, "245": 172, "248": 175} },
+    "refEndPartial": { "book": 4, "chapter": 16, "verse": 13, "page": {"226": 162, "245": 173, "248": 176} },
+    "refEnd"       : { "book": 4, "chapter": 18, "verse": 32, "page": {"226": 165, "245": 177, "248": 180} }
+  },
+  {
+    "key"          : "chukat",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 19, "verse": 1, "page": {"226": 165, "245": 177, "248": 180} },
+    "refEndPartial": { "book": 4, "chapter": 19, "verse": 17, "page": {"226": 166, "245": 177, "248": 180} },
+    "refEnd"       : { "book": 4, "chapter": 22, "verse": 1, "page": {"226": 169, "245": 180, "248": 183} }
+  },
+  {
+    "key"          : "balak",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 22, "verse": 2, "page": {"226": 169, "245": 180, "248": 183} },
+    "refEndPartial": { "book": 4, "chapter": 22, "verse": 12, "page": {"226": 169, "245": 181, "248": 184} },
+    "refEnd"       : { "book": 4, "chapter": 25, "verse": 9, "page": {"226": 172, "245": 185, "248": 188} }
+  },
+  {
+    "key"          : "pinchas",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 25, "verse": 10, "page": {"226": 172, "245": 185, "248": 188} },
+    "refEndPartial": { "book": 4, "chapter": 26, "verse": 4, "page": {"226": 173, "245": 185, "248": 188} },
+    "refEnd"       : { "book": 4, "chapter": 30, "verse": 1, "page": {"226": 178, "245": 191, "248": 194} }
+  },
+  {
+    "key"          : "matot",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 30, "verse": 2, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEndPartial": { "book": 4, "chapter": 30, "verse": 17, "page": {"226": 179, "245": 192, "248": 195} },
+    "refEnd"       : { "book": 4, "chapter": 32, "verse": 42, "page": {"226": 182, "245": 196, "248": 199} }
+  },
+  {
+    "key"          : "masei",
+    "group"        : "numbers",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 4, "chapter": 33, "verse": 1, "page": {"226": 182, "245": 196, "248": 199} },
+    "refEndPartial": { "book": 4, "chapter": 33, "verse": 10, "page": {"226": 183, "245": 196, "248": 199} },
+    "refEnd"       : { "book": 4, "chapter": 36, "verse": 13, "page": {"226": 186, "245": 200, "248": 203} }
+  },
+  {
+    "key"          : "devarim",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 1, "verse": 1, "page": {"226": 187, "245": 200, "248": 203} },
+    "refEndPartial": { "book": 5, "chapter": 1, "verse": 11, "page": {"226": 187, "245": 201, "248": 204} },
+    "refEnd"       : { "book": 5, "chapter": 3, "verse": 22, "page": {"226": 191, "245": 205, "248": 208} }
+  },
+  {
+    "key"          : "vaetchanan",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 3, "verse": 23, "page": {"226": 191, "245": 205, "248": 208} },
+    "refEndPartial": { "book": 5, "chapter": 4, "verse": 8, "page": {"226": 191, "245": 206, "248": 209} },
+    "refEnd"       : { "book": 5, "chapter": 7, "verse": 11, "page": {"226": 196, "245": 211, "248": 214} }
+  },
+  {
+    "key"          : "eikev",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 7, "verse": 12, "page": {"226": 196, "245": 211, "248": 214} },
+    "refEndPartial": { "book": 5, "chapter": 8, "verse": 10, "page": {"226": 197, "245": 212, "248": 215} },
+    "refEnd"       : { "book": 5, "chapter": 11, "verse": 25, "page": {"226": 201, "245": 217, "248": 220} }
+  },
+  {
+    "key"          : "reeh",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 11, "verse": 26, "page": {"226": 201, "245": 217, "248": 220} },
+    "refEndPartial": { "book": 5, "chapter": 12, "verse": 10, "page": {"226": 202, "245": 217, "248": 220} },
+    "refEnd"       : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
+  },
+  {
+    "key"          : "shoftim",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 16, "verse": 18, "page": {"226": 206, "245": 223, "248": 226} },
+    "refEndPartial": { "book": 5, "chapter": 17, "verse": 13, "page": {"226": 207, "245": 224, "248": 227} },
+    "refEnd"       : { "book": 5, "chapter": 21, "verse": 9, "page": {"226": 211, "245": 227, "248": 230} }
+  },
+  {
+    "key"          : "ki_teitzei",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 21, "verse": 10, "page": {"226": 211, "245": 227, "248": 230} },
+    "refEndPartial": { "book": 5, "chapter": 21, "verse": 21, "page": {"226": 211, "245": 228, "248": 231} },
+    "refEnd"       : { "book": 5, "chapter": 25, "verse": 19, "page": {"226": 215, "245": 232, "248": 235} }
+  },
+  {
+    "key"          : "ki_tavo",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 26, "verse": 1, "page": {"226": 215, "245": 232, "248": 235} },
+    "refEndPartial": { "book": 5, "chapter": 26, "verse": 15, "page": {"226": 216, "245": 233, "248": 236} },
+    "refEnd"       : { "book": 5, "chapter": 29, "verse": 8, "page": {"226": 220, "245": 238, "248": 241} }
+  },
+  {
+    "key"          : "nitzavim",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 29, "verse": 9, "page": {"226": 220, "245": 238, "248": 241} },
+    "refEndPartial": { "book": 5, "chapter": 29, "verse": 28, "page": {"226": 221, "245": 239, "248": 242} },
+    "refEnd"       : { "book": 5, "chapter": 30, "verse": 20, "page": {"226": 222, "245": 240, "248": 243} }
+  },
+  {
+    "key"          : "vayeilech",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 31, "verse": 1, "page": {"226": 222, "245": 240, "248": 243} },
+    "refEndPartial": { "book": 5, "chapter": 31, "verse": 13, "page": {"226": 223, "245": 241, "248": 244} },
+    "refEnd"       : { "book": 5, "chapter": 31, "verse": 30, "page": {"226": 224, "245": 242, "248": 245} }
+  },
+  {
+    "key"          : "haazinu",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 32, "verse": 1, "page": {"226": 224, "245": 242, "248": 245} },
+    "refEndPartial": { "book": 5, "chapter": 32, "verse": 12, "page": {"226": 224, "245": 242, "248": 245} },
+    "refEnd"       : { "book": 5, "chapter": 32, "verse": 52, "page": {"226": 225, "245": 244, "248": 247} }
+  },
+  {
+    "key"          : "vezot_haberakhah",
+    "group"        : "deuteronomy",
+    "specific"     : "both",
+    "type"         : "parasha",
+    "ref"          : { "book": 5, "chapter": 33, "verse": 1, "page": {"226": 225, "245": 244, "248": 247} },
+    "refEndPartial": { "book": 5, "chapter": 33, "verse": 17, "page": {"226": 226, "245": 245, "248": 248} },
+    "refEnd"       : { "book": 5, "chapter": 34, "verse": 12, "page": {"226": 226, "245": 245, "248": 248} }
+  },
+  {
+    "key"     : "rosh-chodesh",
+    "group"   : "rosh-chodesh",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 28, "verse": 1, "page": {"226": 176, "245": 189, "248": 192} },
+    "refEnd"  : { "book": 4, "chapter": 28, "verse": 15, "page": {"226": 176, "245": 189, "248": 192} }
+  },
+  {
+    "key"     : "rosh-chodesh-special",
+    "group"   : "rosh-chodesh",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 28, "verse": 9, "page": {"226": 176, "245": 189, "248": 192} },
+    "refEnd"  : { "book": 4, "chapter": 28, "verse": 15, "page": {"226": 176, "245": 189, "248": 192} }
+  },
+  {
+    "key"     : "rosh-1",
+    "group"   : "rosh",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 1, "chapter": 21, "verse": 1, "page": {"226": 19, "245": 20, "248": 21} },
+    "refEnd"  : { "book": 1, "chapter": 21, "verse": 34, "page": {"226": 20, "245": 22, "248": 22} }
+  },
+  {
+    "key"     : "rosh-2",
+    "group"   : "rosh",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 1, "chapter": 22, "verse": 1, "page": {"226": 20, "245": 22, "248": 22} },
+    "refEnd"  : { "book": 1, "chapter": 22, "verse": 24, "page": {"226": 21, "245": 23, "248": 23} }
+  },
+  {
+    "key"     : "rosh-maftir",
+    "group"   : "rosh",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 1, "page": {"226": 177, "245": 190, "248": 193} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 6, "page": {"226": 177, "245": 190, "248": 193} }
+  },
+  {
+    "key"     : "yom-kippur",
+    "group"   : "yom-kippur",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 3, "chapter": 16, "verse": 1, "page": {"226": 124, "245": 131, "248": 134} },
+    "refEnd"  : { "book": 3, "chapter": 16, "verse": 34, "page": {"226": 126, "245": 133, "248": 136} }
+  },
+  {
+    "key"     : "yom-kippur-maftir",
+    "group"   : "yom-kippur",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 7, "page": {"226": 177, "245": 190, "248": 193} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 11, "page": {"226": 177, "245": 190, "248": 193} }
+  },
+  {
+    "key"     : "yom-kippur-mincha",
+    "group"   : "yom-kippur",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 3, "chapter": 18, "verse": 1, "page": {"226": 126, "245": 134, "248": 137} },
+    "refEnd"  : { "book": 3, "chapter": 18, "verse": 30, "page": {"226": 127, "245": 135, "248": 138} }
+  },
+  {
+    "key"     : "sukkot-1",
+    "group"   : "sukkot",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 3, "chapter": 22, "verse": 26, "page": {"226": 132, "245": 139, "248": 142} },
+    "refEnd"  : { "book": 3, "chapter": 23, "verse": 44, "page": {"226": 134, "245": 142, "248": 145} }
+  },
+  {
+    "key"     : "sukkot-maftir",
+    "group"   : "sukkot",
+    "specific": "both",
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 12, "page": {"226": 177, "245": 190, "248": 193} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 16, "page": {"226": 177, "245": 190, "248": 193} }
+  },
+  {
+    "key"     : "sukkot-2",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 3,
-      "chapter": 22,
-      "verse": 26,
-      "page": {
-        "226": 132,
-        "245": 139,
-        "248": 142
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 23,
-      "verse": 44,
-      "page": {
-        "226": 134,
-        "245": 142,
-        "248": 145
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 3, "chapter": 22, "verse": 26, "page": {"226": 132, "245": 139, "248": 142} },
+    "refEnd"  : { "book": 3, "chapter": 23, "verse": 44, "page": {"226": 134, "245": 142, "248": 145} }
   },
   {
-    "key": "sukkot-2",
-    "group": "sukkot",
+    "key"     : "sukkot-2",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 17,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 19,
-      "page": {
-        "226": 177,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 17, "page": {"226": 177, "245": 190, "248": 193} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 19, "page": {"226": 177, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-3",
-    "group": "sukkot",
+    "key"     : "sukkot-3",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 20,
-      "page": {
-        "226": 177,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 22,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 20, "page": {"226": 177, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 22, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-3",
-    "group": "sukkot",
+    "key"     : "sukkot-3",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 17,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 22,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 17, "page": {"226": 177, "245": 190, "248": 193} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 22, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-4",
-    "group": "sukkot",
+    "key"     : "sukkot-4",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 23,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 25,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 23, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 25, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-4",
-    "group": "sukkot",
+    "key"     : "sukkot-4",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 20,
-      "page": {
-        "226": 177,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 25,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 20, "page": {"226": 177, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 25, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-5",
-    "group": "sukkot",
+    "key"     : "sukkot-5",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 26,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 28,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 26, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 28, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-5",
-    "group": "sukkot",
+    "key"     : "sukkot-5",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 23,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 28,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 23, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 28, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-6",
-    "group": "sukkot",
+    "key"     : "sukkot-6",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 29,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 31,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 29, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 31, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-6",
-    "group": "sukkot",
+    "key"     : "sukkot-6",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 26,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 31,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 26, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 31, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-7",
-    "group": "sukkot",
+    "key"     : "sukkot-7",
+    "group"   : "sukkot",
     "specific": "israel",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 32,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 34,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 32, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 34, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-7",
-    "group": "sukkot",
+    "key"     : "sukkot-7",
+    "group"   : "sukkot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 29,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 34,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 29, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 29, "verse": 34, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "sukkot-shabbat-chol-hamoed",
-    "group": "sukkot",
+    "key"     : "sukkot-shabbat-chol-hamoed",
+    "group"   : "sukkot",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 33,
-      "verse": 12,
-      "page": {
-        "226": 95,
-        "245": 101,
-        "248": 104
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 26,
-      "page": {
-        "226": 97,
-        "245": 102,
-        "248": 105
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 33, "verse": 12, "page": {"226": 95, "245": 101, "248": 104} },
+    "refEnd"  : { "book": 2, "chapter": 34, "verse": 26, "page": {"226": 97, "245": 102, "248": 105} }
   },
   {
-    "key": "shmini-atzeret",
-    "group": "shmini-atzeret",
+    "key"     : "shmini-atzeret",
+    "group"   : "shmini-atzeret",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 15,
-      "verse": 19,
-      "page": {
-        "226": 206,
-        "245": 222,
-        "248": 225
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 15, "verse": 19, "page": {"226": 206, "245": 222, "248": 225} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "shmini-atzeret-shabbat",
-    "group": "shmini-atzeret",
+    "key"     : "shmini-atzeret-shabbat",
+    "group"   : "shmini-atzeret",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 14,
-      "verse": 22,
-      "page": {
-        "226": 204,
-        "245": 220,
-        "248": 223
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 14, "verse": 22, "page": {"226": 204, "245": 220, "248": 223} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "sukkot-end-maftir",
-    "group": "simchat-torah",
+    "key"     : "sukkot-end-maftir",
+    "group"   : "simchat-torah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 29,
-      "verse": 35,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 30,
-      "verse": 1,
-      "page": {
-        "226": 178,
-        "245": 191,
-        "248": 194
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 29, "verse": 35, "page": {"226": 178, "245": 191, "248": 194} },
+    "refEnd"  : { "book": 4, "chapter": 30, "verse": 1, "page": {"226": 178, "245": 191, "248": 194} }
   },
   {
-    "key": "simchat-torah-a",
-    "group": "simchat-torah",
+    "key"     : "simchat-torah-a",
+    "group"   : "simchat-torah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 33,
-      "verse": 1,
-      "page": {
-        "226": 225,
-        "245": 244,
-        "248": 247
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 34,
-      "verse": 12,
-      "page": {
-        "226": 226,
-        "245": 245,
-        "248": 248
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 33, "verse": 1, "page": {"226": 225, "245": 244, "248": 247} },
+    "refEnd"  : { "book": 5, "chapter": 34, "verse": 12, "page": {"226": 226, "245": 245, "248": 248} }
   },
   {
-    "key": "simchat-torah-b",
-    "group": "simchat-torah",
+    "key"     : "simchat-torah-b",
+    "group"   : "simchat-torah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 1,
-      "chapter": 1,
-      "verse": 1,
-      "page": {
-        "226": 1,
-        "245": 1,
-        "248": 1
-      }
-    },
-    "refEnd": {
-      "book": 1,
-      "chapter": 2,
-      "verse": 3,
-      "page": {
-        "226": 2,
-        "245": 2,
-        "248": 2
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 1, "chapter": 1, "verse": 1, "page": {"226": 1, "245": 1, "248": 1} },
+    "refEnd"  : { "book": 1, "chapter": 2, "verse": 3, "page": {"226": 2, "245": 2, "248": 2} }
   },
   {
-    "key": "chanukah-1",
-    "group": "chanukah",
+    "key"     : "chanukah-1",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 6,
-      "verse": 22,
-      "page": {
-        "226": 148,
-        "245": 158,
-        "248": 161
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 17,
-      "page": {
-        "226": 149,
-        "245": 159,
-        "248": 162
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 6, "verse": 22, "page": {"226": 148, "245": 158, "248": 161} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 17, "page": {"226": 149, "245": 159, "248": 162} }
   },
   {
-    "key": "chanukah-2",
-    "group": "chanukah",
+    "key"     : "chanukah-2",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 18,
-      "page": {
-        "226": 149,
-        "245": 159,
-        "248": 162
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 23,
-      "page": {
-        "226": 149,
-        "245": 159,
-        "248": 162
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 18, "page": {"226": 149, "245": 159, "248": 162} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 23, "page": {"226": 149, "245": 159, "248": 162} }
   },
   {
-    "key": "chanukah-3",
-    "group": "chanukah",
+    "key"     : "chanukah-3",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 24,
-      "page": {
-        "226": 149,
-        "245": 159,
-        "248": 162
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 29,
-      "page": {
-        "226": 149,
-        "245": 159,
-        "248": 162
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 24, "page": {"226": 149, "245": 159, "248": 162} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 29, "page": {"226": 149, "245": 159, "248": 162} }
   },
   {
-    "key": "chanukah-4",
-    "group": "chanukah",
+    "key"     : "chanukah-4",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 30,
-      "page": {
-        "226": 150,
-        "245": 159,
-        "248": 162
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 35,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 30, "page": {"226": 150, "245": 159, "248": 162} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 35, "page": {"226": 150, "245": 160, "248": 163} }
   },
   {
-    "key": "chanukah-5",
-    "group": "chanukah",
+    "key"     : "chanukah-5",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 36,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 41,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 36, "page": {"226": 150, "245": 160, "248": 163} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 41, "page": {"226": 150, "245": 160, "248": 163} }
   },
   {
-    "key": "chanukah-6",
-    "group": "chanukah",
+    "key"     : "chanukah-6",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 42,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 47,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 42, "page": {"226": 150, "245": 160, "248": 163} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 47, "page": {"226": 150, "245": 160, "248": 163} }
   },
   {
-    "key": "chanukah-7",
-    "group": "chanukah",
+    "key"     : "chanukah-7",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 48,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 53,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 48, "page": {"226": 150, "245": 160, "248": 163} },
+    "refEnd"  : { "book": 4, "chapter": 7, "verse": 53, "page": {"226": 150, "245": 160, "248": 163} }
   },
   {
-    "key": "chanukah-8",
-    "group": "chanukah",
+    "key"     : "chanukah-8",
+    "group"   : "chanukah",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 7,
-      "verse": 54,
-      "page": {
-        "226": 150,
-        "245": 160,
-        "248": 163
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 8,
-      "verse": 4,
-      "page": {
-        "226": 152,
-        "245": 162,
-        "248": 165
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 7, "verse": 54, "page": {"226": 150, "245": 160, "248": 163} },
+    "refEnd"  : { "book": 4, "chapter": 8, "verse": 4, "page": {"226": 152, "245": 162, "248": 165} }
   },
   {
-    "key": "purim",
-    "group": "purim",
+    "key"     : "purim",
+    "group"   : "purim",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 17,
-      "verse": 8,
-      "page": {
-        "226": 76,
-        "245": 81,
-        "248": 83
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 17,
-      "verse": 16,
-      "page": {
-        "226": 77,
-        "245": 81,
-        "248": 83
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 17, "verse": 8, "page": {"226": 76, "245": 81, "248": 83} },
+    "refEnd"  : { "book": 2, "chapter": 17, "verse": 16, "page": {"226": 77, "245": 81, "248": 83} }
   },
   {
-    "key": "taanit-tzibur",
-    "group": "taanit-tzibur",
+    "key"     : "taanit-tzibur",
+    "group"   : "taanit-tzibur",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 32,
-      "verse": 11,
-      "page": {
-        "226": 94,
-        "245": 99,
-        "248": 102
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 10,
-      "page": {
-        "226": 96,
-        "245": 101,
-        "248": 104
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 32, "verse": 11, "page": {"226": 94, "245": 99, "248": 102} },
+    "refEnd"  : { "book": 2, "chapter": 34, "verse": 10, "page": {"226": 96, "245": 101, "248": 104} }
   },
   {
-    "key": "pesach-1",
-    "group": "pesach",
+    "key"     : "pesach-1",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 21,
-      "page": {
-        "226": 70,
-        "245": 74,
-        "248": 76
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 51,
-      "page": {
-        "226": 71,
-        "245": 75,
-        "248": 77
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 12, "verse": 21, "page": {"226": 70, "245": 74, "248": 76} },
+    "refEnd"  : { "book": 2, "chapter": 12, "verse": 51, "page": {"226": 71, "245": 75, "248": 77} }
   },
   {
-    "key": "pesach-1-shabbat",
-    "group": "pesach",
+    "key"     : "pesach-1-shabbat",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 14,
-      "page": {
-        "226": 70,
-        "245": 74,
-        "248": 75
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 51,
-      "page": {
-        "226": 71,
-        "245": 75,
-        "248": 77
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 12, "verse": 14, "page": {"226": 70, "245": 74, "248": 75} },
+    "refEnd"  : { "book": 2, "chapter": 12, "verse": 51, "page": {"226": 71, "245": 75, "248": 77} }
   },
   {
-    "key": "pesach-yom-tov-maftir",
-    "group": "pesach",
+    "key"     : "pesach-yom-tov-maftir",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 16,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 25,
-      "page": {
-        "226": 177,
-        "245": 189,
-        "248": 192
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 28, "verse": 16, "page": {"226": 176, "245": 189, "248": 192} },
+    "refEnd"  : { "book": 4, "chapter": 28, "verse": 25, "page": {"226": 177, "245": 189, "248": 192} }
   },
   {
-    "key": "pesach-2",
-    "group": "pesach",
+    "key"     : "pesach-2",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 3,
-      "chapter": 22,
-      "verse": 26,
-      "page": {
-        "226": 132,
-        "245": 139,
-        "248": 142
-      }
-    },
-    "refEnd": {
-      "book": 3,
-      "chapter": 23,
-      "verse": 44,
-      "page": {
-        "226": 134,
-        "245": 142,
-        "248": 145
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 3, "chapter": 22, "verse": 26, "page": {"226": 132, "245": 139, "248": 142} },
+    "refEnd"  : { "book": 3, "chapter": 23, "verse": 44, "page": {"226": 134, "245": 142, "248": 145} }
   },
   {
-    "key": "pesach-chol-hamoed-maftir",
-    "group": "pesach",
+    "key"     : "pesach-chol-hamoed-maftir",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 19,
-      "page": {
-        "226": 176,
-        "245": 189,
-        "248": 192
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 25,
-      "page": {
-        "226": 177,
-        "245": 189,
-        "248": 192
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 28, "verse": 19, "page": {"226": 176, "245": 189, "248": 192} },
+    "refEnd"  : { "book": 4, "chapter": 28, "verse": 25, "page": {"226": 177, "245": 189, "248": 192} }
   },
   {
-    "key": "pesach-3",
-    "group": "pesach",
+    "key"     : "pesach-3",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 13,
-      "verse": 1,
-      "page": {
-        "226": 72,
-        "245": 75,
-        "248": 77
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 13,
-      "verse": 16,
-      "page": {
-        "226": 72,
-        "245": 76,
-        "248": 78
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 13, "verse": 1, "page": {"226": 72, "245": 75, "248": 77} },
+    "refEnd"  : { "book": 2, "chapter": 13, "verse": 16, "page": {"226": 72, "245": 76, "248": 78} }
   },
   {
-    "key": "pesach-4",
-    "group": "pesach",
+    "key"     : "pesach-4",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 22,
-      "verse": 24,
-      "page": {
-        "226": 82,
-        "245": 87,
-        "248": 89
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 23,
-      "verse": 19,
-      "page": {
-        "226": 83,
-        "245": 87,
-        "248": 90
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 22, "verse": 24, "page": {"226": 82, "245": 87, "248": 89} },
+    "refEnd"  : { "book": 2, "chapter": 23, "verse": 19, "page": {"226": 83, "245": 87, "248": 90} }
   },
   {
-    "key": "pesach-5",
-    "group": "pesach",
+    "key"     : "pesach-5",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 1,
-      "page": {
-        "226": 96,
-        "245": 101,
-        "248": 104
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 26,
-      "page": {
-        "226": 97,
-        "245": 102,
-        "248": 105
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 34, "verse": 1, "page": {"226": 96, "245": 101, "248": 104} },
+    "refEnd"  : { "book": 2, "chapter": 34, "verse": 26, "page": {"226": 97, "245": 102, "248": 105} }
   },
   {
-    "key": "pesach-6",
-    "group": "pesach",
+    "key"     : "pesach-6",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 9,
-      "verse": 1,
-      "page": {
-        "226": 153,
-        "245": 163,
-        "248": 166
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 9,
-      "verse": 14,
-      "page": {
-        "226": 153,
-        "245": 164,
-        "248": 167
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 9, "verse": 1, "page": {"226": 153, "245": 163, "248": 166} },
+    "refEnd"  : { "book": 4, "chapter": 9, "verse": 14, "page": {"226": 153, "245": 164, "248": 167} }
   },
   {
-    "key": "pesach-shabbat-chol-hamoed",
-    "group": "pesach",
+    "key"     : "pesach-shabbat-chol-hamoed",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 33,
-      "verse": 12,
-      "page": {
-        "226": 95,
-        "245": 101,
-        "248": 104
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 34,
-      "verse": 26,
-      "page": {
-        "226": 97,
-        "245": 102,
-        "248": 105
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 33, "verse": 12, "page": {"226": 95, "245": 101, "248": 104} },
+    "refEnd"  : { "book": 2, "chapter": 34, "verse": 26, "page": {"226": 97, "245": 102, "248": 105} }
   },
   {
-    "key": "pesach-7",
-    "group": "pesach",
+    "key"     : "pesach-7",
+    "group"   : "pesach",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 13,
-      "verse": 17,
-      "page": {
-        "226": 72,
-        "245": 76,
-        "248": 78
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 15,
-      "verse": 26,
-      "page": {
-        "226": 74,
-        "245": 79,
-        "248": 81
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 13, "verse": 17, "page": {"226": 72, "245": 76, "248": 78} },
+    "refEnd"  : { "book": 2, "chapter": 15, "verse": 26, "page": {"226": 74, "245": 79, "248": 81} }
   },
   {
-    "key": "pesach-8",
-    "group": "pesach",
+    "key"     : "pesach-8",
+    "group"   : "pesach",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 15,
-      "verse": 19,
-      "page": {
-        "226": 206,
-        "245": 222,
-        "248": 225
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 15, "verse": 19, "page": {"226": 206, "245": 222, "248": 225} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "pesach-8-shabbat",
-    "group": "pesach",
+    "key"     : "pesach-8-shabbat",
+    "group"   : "pesach",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 14,
-      "verse": 22,
-      "page": {
-        "226": 204,
-        "245": 220,
-        "248": 223
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 14, "verse": 22, "page": {"226": 204, "245": 220, "248": 223} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "shavuot-1",
-    "group": "shavuot",
+    "key"     : "shavuot-1",
+    "group"   : "shavuot",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 19,
-      "verse": 1,
-      "page": {
-        "226": 78,
-        "245": 82,
-        "248": 84
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 20,
-      "verse": 23,
-      "page": {
-        "226": 80,
-        "245": 84,
-        "248": 87
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 19, "verse": 1, "page": {"226": 78, "245": 82, "248": 84} },
+    "refEnd"  : { "book": 2, "chapter": 20, "verse": 23, "page": {"226": 80, "245": 84, "248": 87} }
   },
   {
-    "key": "shavuot-maftir",
-    "group": "shavuot",
+    "key"     : "shavuot-maftir",
+    "group"   : "shavuot",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 26,
-      "page": {
-        "226": 177,
-        "245": 189,
-        "248": 192
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 28,
-      "verse": 31,
-      "page": {
-        "226": 177,
-        "245": 190,
-        "248": 193
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 28, "verse": 26, "page": {"226": 177, "245": 189, "248": 192} },
+    "refEnd"  : { "book": 4, "chapter": 28, "verse": 31, "page": {"226": 177, "245": 190, "248": 193} }
   },
   {
-    "key": "shavuot-2",
-    "group": "shavuot",
+    "key"     : "shavuot-2",
+    "group"   : "shavuot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 15,
-      "verse": 19,
-      "page": {
-        "226": 206,
-        "245": 222,
-        "248": 225
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 15, "verse": 19, "page": {"226": 206, "245": 222, "248": 225} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "shavuot-2-shabbat",
-    "group": "shavuot",
+    "key"     : "shavuot-2-shabbat",
+    "group"   : "shavuot",
     "specific": "gola",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 14,
-      "verse": 22,
-      "page": {
-        "226": 204,
-        "245": 220,
-        "248": 223
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 16,
-      "verse": 17,
-      "page": {
-        "226": 206,
-        "245": 223,
-        "248": 226
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 14, "verse": 22, "page": {"226": 204, "245": 220, "248": 223} },
+    "refEnd"  : { "book": 5, "chapter": 16, "verse": 17, "page": {"226": 206, "245": 223, "248": 226} }
   },
   {
-    "key": "tisha-bav",
-    "group": "tisha-bav",
+    "key"     : "tisha-bav",
+    "group"   : "tisha-bav",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 4,
-      "verse": 25,
-      "page": {
-        "226": 192,
-        "245": 207,
-        "248": 210
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 4,
-      "verse": 40,
-      "page": {
-        "226": 193,
-        "245": 208,
-        "248": 211
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 4, "verse": 25, "page": {"226": 192, "245": 207, "248": 210} },
+    "refEnd"  : { "book": 5, "chapter": 4, "verse": 40, "page": {"226": 193, "245": 208, "248": 211} }
   },
   {
-    "key": "shekalim",
-    "group": "four-readings",
+    "key"     : "shekalim",
+    "group"   : "four-readings",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 30,
-      "verse": 11,
-      "page": {
-        "226": 92,
-        "245": 97,
-        "248": 100
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 30,
-      "verse": 16,
-      "page": {
-        "226": 92,
-        "245": 97,
-        "248": 100
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 30, "verse": 11, "page": {"226": 92, "245": 97, "248": 100} },
+    "refEnd"  : { "book": 2, "chapter": 30, "verse": 16, "page": {"226": 92, "245": 97, "248": 100} }
   },
   {
-    "key": "zachor",
-    "group": "four-readings",
+    "key"     : "zachor",
+    "group"   : "four-readings",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 5,
-      "chapter": 25,
-      "verse": 17,
-      "page": {
-        "226": 215,
-        "245": 232,
-        "248": 235
-      }
-    },
-    "refEnd": {
-      "book": 5,
-      "chapter": 25,
-      "verse": 19,
-      "page": {
-        "226": 215,
-        "245": 232,
-        "248": 235
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 5, "chapter": 25, "verse": 17, "page": {"226": 215, "245": 232, "248": 235} },
+    "refEnd"  : { "book": 5, "chapter": 25, "verse": 19, "page": {"226": 215, "245": 232, "248": 235} }
   },
   {
-    "key": "parah",
-    "group": "four-readings",
+    "key"     : "parah",
+    "group"   : "four-readings",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 4,
-      "chapter": 19,
-      "verse": 1,
-      "page": {
-        "226": 165,
-        "245": 177,
-        "248": 180
-      }
-    },
-    "refEnd": {
-      "book": 4,
-      "chapter": 19,
-      "verse": 22,
-      "page": {
-        "226": 166,
-        "245": 178,
-        "248": 181
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 4, "chapter": 19, "verse": 1, "page": {"226": 165, "245": 177, "248": 180} },
+    "refEnd"  : { "book": 4, "chapter": 19, "verse": 22, "page": {"226": 166, "245": 178, "248": 181} }
   },
   {
-    "key": "hachodesh",
-    "group": "four-readings",
+    "key"     : "hachodesh",
+    "group"   : "four-readings",
     "specific": "both",
-    "type": "holyday",
-    "ref": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 1,
-      "page": {
-        "226": 69,
-        "245": 73,
-        "248": 75
-      }
-    },
-    "refEnd": {
-      "book": 2,
-      "chapter": 12,
-      "verse": 20,
-      "page": {
-        "226": 70,
-        "245": 74,
-        "248": 76
-      }
-    }
+    "type"    : "holyday",
+    "ref"     : { "book": 2, "chapter": 12, "verse": 1, "page": {"226": 69, "245": 73, "248": 75} },
+    "refEnd"  : { "book": 2, "chapter": 12, "verse": 20, "page": {"226": 70, "245": 74, "248": 76} }
   }
 ]

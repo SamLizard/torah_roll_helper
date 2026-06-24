@@ -54,7 +54,10 @@
         :disabled="pictureDelay || busy"
         @click="sayCheese"
       ></button>
-      <div v-if="flashAvailable" style="width:40px;height:40px;"></div>
+      <button v-if="canSwitchCamera" class="dcc-flash-btn" @click="switchCamera">
+        <v-icon size="34" color="white">mdi-camera-flip</v-icon>
+      </button>
+      <div v-else style="width:40px;height:40px;"></div>
     </div>
 
     <!-- Video holder — takes all remaining space -->
@@ -67,6 +70,18 @@
           <v-icon v-else size="34" color="white">mdi-flash</v-icon>
         </button>
       </div>
+
+      <!-- Portrait switch-camera button — sits beside the centered shutter,
+           after it in reading order (RTL-aware) -->
+      <button
+        v-if="canSwitchCamera"
+        class="dcc-portrait-switch dcc-flash-btn"
+        :class="isRtl ? 'dcc-portrait-switch--start' : 'dcc-portrait-switch--end'"
+        :aria-label="t('home.dicta.switchCamera')"
+        @click="switchCamera"
+      >
+        <v-icon size="34" color="white">mdi-camera-flip</v-icon>
+      </button>
 
       <!-- Error (replaces video entirely, like Dicta's v-if="error") -->
       <div v-if="mobileError" class="dcc-mobile-error">
@@ -238,6 +253,15 @@
         >
           {{ t('home.dicta.chooseFile') }}
         </v-btn>
+        <v-btn
+          v-if="canSwitchCamera"
+          variant="tonal"
+          prepend-icon="mdi-camera-flip"
+          :disabled="busy"
+          @click="switchCamera"
+        >
+          {{ t('home.dicta.switchCamera') }}
+        </v-btn>
       </div>
     </template>
   </div>
@@ -305,6 +329,19 @@ const desktopError      = ref('');
 const isHttpsError      = ref(false);
 const pictureDelay      = ref(false);
 const confirmPictureSrc = ref<string | null>(null);
+// Which lens we're currently asking for. iOS reliably honours facingMode, so
+// the manual switch button toggles this and re-opens the stream.
+const preferredFacingMode = ref<'environment' | 'user'>('environment');
+// Shown only when the device exposes more than one camera.
+const canSwitchCamera   = ref(false);
+
+// iOS (incl. iPadOS reporting as MacIntel) doesn't expose facingMode through
+// getCapabilities(), which makes deviceId-based camera scoring unreliable and
+// can lock the PWA onto the front camera. On iOS we trust facingMode instead.
+const isIos = typeof navigator !== 'undefined' && (
+  /iP(hone|ad|od)/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Non-reactive camera state (mirrors Dicta's Camera.vue module-level vars)
@@ -367,10 +404,12 @@ async function selectCamera(): Promise<void> {
 
   const constraints: { audio: false; video: Record<string, unknown> } = {
     audio: false,
-    video: { facingMode: 'environment', zoom } as Record<string, unknown>,
+    video: { facingMode: { ideal: preferredFacingMode.value }, zoom } as Record<string, unknown>,
   };
 
-  const savedCamera = localStorage.getItem('savedCamera');
+  // On iOS, facingMode is the only reliable selector — never use a cached
+  // deviceId (it can point at the front camera and ignores facingMode).
+  const savedCamera = isIos ? null : localStorage.getItem('savedCamera');
   if (savedCamera && !savedCamera.startsWith('[')) {
     constraints.video = { deviceId: savedCamera };
   }
@@ -379,7 +418,14 @@ async function selectCamera(): Promise<void> {
   const devicesPromise = navigator.mediaDevices.enumerateDevices();
   track = mediaStream.getVideoTracks()[0] ?? null;
 
+  // Expose the switch button as soon as we know there's more than one lens.
+  void devicesPromise.then((devices) => {
+    canSwitchCamera.value = devices.filter((d) => d.kind === 'videoinput').length > 1;
+  }).catch(() => {});
+
   // ── Score cameras and pick the best one (Dicta's algorithm) ────────────────
+  // Skipped entirely on iOS: getCapabilities() omits facingMode there, so the
+  // scoring loop is unreliable and can latch onto the front camera.
   type CapResult = {
     score: number; hasTorch: boolean; deviceId: string;
     zoom?: { max: number; min: number; step: number };
@@ -388,7 +434,7 @@ async function selectCamera(): Promise<void> {
   const getCapFn = (t2: MediaStreamTrack) =>
     (t2 as MediaStreamTrack & { getCapabilities?(): Record<string, unknown> }).getCapabilities;
 
-  if (track && typeof getCapFn(track) === 'function') {
+  if (!isIos && track && typeof getCapFn(track) === 'function') {
     const processCapabilities = (t2: MediaStreamTrack): CapResult => {
       const cap = new Map(Object.entries(
         (t2 as MediaStreamTrack & { getCapabilities(): Record<string, unknown> }).getCapabilities()
@@ -618,6 +664,15 @@ function toggleFlash(): void {
   }
 }
 
+// Manually flip between the back (environment) and front (user) cameras.
+function switchCamera(): void {
+  preferredFacingMode.value = preferredFacingMode.value === 'environment' ? 'user' : 'environment';
+  // A cached deviceId would override facingMode — clear it so the flip sticks.
+  try { localStorage.removeItem('savedCamera'); } catch { /* ignore */ }
+  flashOn.value = false;
+  void startCamera();
+}
+
 function updatePreviewWidth(): void {
   if (videoHolder.value) previewWidth.value = videoHolder.value.getBoundingClientRect().width;
 }
@@ -779,8 +834,20 @@ onBeforeUnmount(() => {
   z-index: 10;
 }
 
+/* Portrait switch-camera — beside the centered shutter (bottom bar) */
+.dcc-portrait-switch {
+  position: absolute;
+  bottom: 30px;
+  z-index: 21;
+  /* shutter is centered (68px wide); offset this button to its side */
+}
+
+.dcc-portrait-switch--end   { right: calc(50% - 110px); }
+.dcc-portrait-switch--start { left:  calc(50% - 110px); }
+
 @media (orientation: landscape) {
   .dcc-portrait-flash,
+  .dcc-portrait-switch,
   .dcc-portrait-shutter { display: none !important; }
 }
 

@@ -1,7 +1,7 @@
 <template>
-  <div ref="rootRef" data-tutorial="language-selector">
+  <div ref="rootRef" :data-tutorial="appMode ? 'language-selector' : undefined">
     <v-select
-      data-tutorial="language-select"
+      :data-tutorial="appMode ? 'language-select' : undefined"
       v-model:menu="isMenuOpen"
       :items="otherLocales"
       item-title="text"
@@ -18,7 +18,7 @@
       <template #selection="{ item }">
         <v-img :src="`${baseUrl}flags/${item.value}.svg`" width="50" />
         <div class="ms-2">
-          {{ $t("language") }}
+          {{ appMode ? $t("language") : $t("language", 1, { locale: item.value }) }}
         </div>
       </template>
       <template #item="{ item, props }">
@@ -32,12 +32,23 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { trackLanguageChange } from '@/composables/analytics';
 import { LANGUAGE_STORAGE_KEY } from '@/composables/storageKeys';
 import { setLanguageMenuOpen } from '@/composables/tutorialUi';
+
+const props = defineProps<{
+  // When provided, the component is "controlled": it selects this locale and
+  // emits changes instead of switching the whole app language. Used to pick a
+  // message language (e.g. in the share dialog) without affecting the site.
+  modelValue?: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void;
+}>();
 
 const i18n = useI18n();
 const t = i18n.t;
@@ -52,20 +63,40 @@ interface LocaleItem {
   text: string;
 }
 
-const selectedLocale = computed(() => i18n.locale.value);
+const appMode = computed(() => props.modelValue === undefined);
+
+const selectedLocale = computed(() =>
+  appMode.value ? i18n.locale.value : (props.modelValue as string),
+);
 
 const onLocaleChanged = (nextLocale: string | null) => {
-  if (!nextLocale || nextLocale === i18n.locale.value) return;
+  if (!nextLocale || nextLocale === selectedLocale.value) return;
 
-  const previousLocale = i18n.locale.value;
-  i18n.locale.value = nextLocale;
-  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
-  trackLanguageChange(previousLocale, nextLocale);
+  if (!appMode.value) {
+    emit('update:modelValue', nextLocale);
+    return;
+  }
 
-  // Reflect the chosen language in the URL so the current view can be shared
-  // and reopened directly in this language.
-  void router.replace({
-    query: { ...router.currentRoute.value.query, lang: nextLocale },
+  // Close the menu before switching the locale. Otherwise the still-open
+  // overlay briefly repositions to the new side when the text direction flips
+  // (LTR <-> RTL). Defer the locale change until after the close has painted.
+  isMenuOpen.value = false;
+
+  const applyLocale = () => {
+    const previousLocale = i18n.locale.value;
+    i18n.locale.value = nextLocale;
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLocale);
+    trackLanguageChange(previousLocale, nextLocale);
+
+    // Reflect the chosen language in the URL so the current view can be shared
+    // and reopened directly in this language.
+    void router.replace({
+      query: { ...router.currentRoute.value.query, lang: nextLocale },
+    });
+  };
+
+  void nextTick(() => {
+    window.requestAnimationFrame(applyLocale);
   });
 };
 
@@ -98,18 +129,19 @@ const isVisible = (): boolean => {
 };
 
 const otherLocales = computed((): LocaleItem[] => {
-  return i18n.availableLocales.filter((locale) => locale !== i18n.locale.value).map((lang) => ({
+  return i18n.availableLocales.filter((locale) => locale !== selectedLocale.value).map((lang) => ({
     lang: lang,
     text: t("language", 1, { locale: lang }) as string
   }))
 });
 
 watch(isMenuOpen, (isOpen) => {
+  if (!appMode.value) return;
   setLanguageMenuOpen(isOpen);
 });
 
 onUnmounted(() => {
-  if (isMenuOpen.value) {
+  if (appMode.value && isMenuOpen.value) {
     setLanguageMenuOpen(false);
   }
 });

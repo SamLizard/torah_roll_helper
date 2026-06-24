@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getTikkunRouteForTarget, toTikkunUrl } from '../src/composables/tikkunLinks';
+import { getTikkunRouteForTarget, resolveTikkunLink, toTikkunUrl } from '../src/composables/tikkunLinks';
 import type { TikkunLinkTarget } from '../src/composables/tikkunLinks';
 
 const createTarget = (overrides: Partial<TikkunLinkTarget>): TikkunLinkTarget => ({
@@ -146,5 +146,129 @@ describe('tikkun link generation', () => {
     }));
 
     expect(url).toBe('https://tikkun.io/#/h/pesach-1');
+  });
+
+  it('resolves reading links before ref fallback', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'auto',
+      layoutKey: '245',
+      target: createTarget({ key: 'noach' }),
+      ref: { book: 1, chapter: 9, verse: 1 },
+      page: 4,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://tikkun.io/#/p/noach',
+      source: 'reading',
+      providerId: 'tikkun_io',
+      providerFaviconUrl: 'https://tikkun.io/favicon.ico',
+      hasLayoutWarning: false,
+    });
+  });
+
+  it('keeps Auto reading links on tikkun.io even for another active layout', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'auto',
+      layoutKey: '226',
+      target: createTarget({ key: 'noach' }),
+      ref: { book: 1, chapter: 9, verse: 1 },
+      page: 4,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://tikkun.io/#/p/noach',
+      source: 'reading',
+      providerId: 'tikkun_io',
+      hasLayoutWarning: true,
+    });
+  });
+
+  it('uses ref fallback when the provider has no reading route for the target', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'tikkun_io',
+      layoutKey: '245',
+      target: createTarget({ key: 'hachodesh' }),
+      ref: { book: 2, chapter: 12, verse: 1 },
+      page: 73,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://tikkun.io/#/r/2-12-1',
+      source: 'ref',
+      hasLayoutWarning: false,
+    });
+  });
+
+  it('uses tikkun.io as the Auto ref fallback on the 245 layout', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'auto',
+      layoutKey: '245',
+      target: createTarget({ key: 'hachodesh' }),
+      ref: { book: 2, chapter: 12, verse: 1 },
+      page: 73,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://tikkun.io/#/r/2-12-1',
+      source: 'ref',
+      providerId: 'tikkun_io',
+      providerSupportedLayoutKeys: ['245'],
+      selectedLayoutKey: '245',
+      hasLayoutWarning: false,
+    });
+  });
+
+  it('uses Sefaria as the Auto ref fallback outside the 245 layout', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'auto',
+      layoutKey: '226',
+      target: createTarget({ key: 'hachodesh' }),
+      ref: { book: 2, chapter: 12, verse: 1 },
+      page: 67,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://www.sefaria.org/Exodus.12.1',
+      source: 'ref',
+      providerId: 'sefaria',
+      providerFaviconUrl: 'https://www.sefaria.org/favicon.ico',
+      providerSupportedLayoutKeys: null,
+      selectedLayoutKey: '226',
+      hasLayoutWarning: false,
+    });
+  });
+
+  it('uses Sefaria refs directly when Sefaria is explicitly selected', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'sefaria',
+      layoutKey: '245',
+      target: createTarget({ key: 'noach' }),
+      ref: { book: 1, chapter: 9, verse: 1 },
+      page: 4,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://www.sefaria.org/Genesis.9.1',
+      source: 'ref',
+      providerId: 'sefaria',
+      hasLayoutWarning: false,
+    });
+  });
+
+  it('warns when a ref opens in a provider with a different page layout', () => {
+    const link = resolveTikkunLink({
+      providerSelection: 'tikkun_io',
+      layoutKey: '226',
+      ref: { book: 2, chapter: 12, verse: 1 },
+      page: 67,
+    });
+
+    expect(link).toMatchObject({
+      url: 'https://tikkun.io/#/r/2-12-1',
+      source: 'ref',
+      providerSupportedLayoutKeys: ['245'],
+      selectedLayoutKey: '226',
+      hasLayoutWarning: true,
+    });
   });
 });
