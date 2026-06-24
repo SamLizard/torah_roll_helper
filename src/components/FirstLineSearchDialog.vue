@@ -508,7 +508,6 @@ import {
   type FirstLineOcrResult,
   type OcrProgressPayload,
 } from '@/composables/firstLineOcr';
-import { useOnlineStatus } from '@/composables/onlineStatus';
 import { getPageStartRef, getPageTitleKeys } from '@/composables/utils';
 import { resolveTikkunLink } from '@/composables/tikkunLinks';
 import { useOptionsStore } from '@/stores/options';
@@ -550,7 +549,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { smAndDown } = useDisplay();
-const { isOnline } = useOnlineStatus();
 const optionsStore = useOptionsStore();
 const { layoutKey, realDb: torahRealDb, pageFirstLines: torahPageFirstLines, pageTitlesKeys: torahPageTitles } = useTorahData();
 const db = computed(() => torahRealDb.value);
@@ -579,10 +577,8 @@ const isKeyboardLockingNativeInput = computed(() => smAndDown.value && showKeybo
 const preparedPagesByNumber = computed(() => new Map(preparedPages.value.map((page) => [page.pageNumber, page])));
 const isPhoneOcrCameraMode = computed(() => smAndDown.value);
 const shouldHideDialogForPhoneCamera = computed(() => isPhoneOcrCameraMode.value && isOcrCameraOpen.value);
-const isOcrCameraButtonDisabled = computed(() => isOcrProcessing.value || isOcrCameraOpen.value || !isOnline.value);
-const ocrCameraButtonTitle = computed(() => (
-  isOnline.value ? t('firstLineSearch.ocrAction') : t('home.dicta.offlineUnavailable')
-));
+const isOcrCameraButtonDisabled = computed(() => isOcrProcessing.value || isOcrCameraOpen.value);
+const ocrCameraButtonTitle = computed(() => t('firstLineSearch.ocrAction'));
 const ocrCameraInstructions = computed(() => ([
   t('firstLineSearch.ocrCameraInstruction1'),
   t('firstLineSearch.ocrCameraInstruction2'),
@@ -903,8 +899,6 @@ const resetOcrState = () => {
 };
 
 const openOcrCamera = () => {
-  if (!isOnline.value) return;
-
   ocrErrorMessage.value = '';
   isOcrCameraOpen.value = true;
 };
