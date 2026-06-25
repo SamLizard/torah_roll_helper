@@ -107,6 +107,18 @@ const PESACH_CHOL_HAMOED_READING_ID_BY_START: Record<string, string> = {
   'Numbers|9:1': 'pesach-6',
 }
 
+const SUKKOT_CHOL_HAMOED_READING_ID_BY_START: Record<
+  string,
+  { israel: string; diaspora: string }
+> = {
+  'Numbers|29:17': { israel: 'sukkot-2', diaspora: 'sukkot-3' },
+  'Numbers|29:20': { israel: 'sukkot-3', diaspora: 'sukkot-4' },
+  'Numbers|29:23': { israel: 'sukkot-4', diaspora: 'sukkot-5' },
+  'Numbers|29:26': { israel: 'sukkot-5', diaspora: 'sukkot-6' },
+  'Numbers|29:29': { israel: 'sukkot-6', diaspora: 'sukkot-7' },
+  'Numbers|29:32': { israel: 'sukkot-7', diaspora: 'sukkot-7' },
+}
+
 const CHANUKAH_RANGE_BY_ID: Record<string, { b: string; e: string }> = {
   'chanukah-1': { b: '6:22', e: '7:17' },
   'chanukah-2': { b: '7:18', e: '7:23' },
@@ -178,7 +190,7 @@ const collectRange = ({
       }
     }
 
-    for (const occurrence of getPreviousShabbatParashaOccurrences(day, isIsrael)) {
+    for (const occurrence of getPreviousShabbatParashaOccurrences(day, leinings, isIsrael)) {
       const existing = groups.get(occurrence.readingId)
       if (!existing) {
         groups.set(occurrence.readingId, {
@@ -260,7 +272,11 @@ const getTorahOccurrences = (
   return results
 }
 
-const getPreviousShabbatParashaOccurrences = (day: Date, isIsrael: boolean) => {
+const getPreviousShabbatParashaOccurrences = (
+  day: Date,
+  leinings: (Leyning | LeyningWeekday)[],
+  isIsrael: boolean
+) => {
   if (day.getDay() !== 6) return []
 
   const nextShabbat = atNoon(new Date(day))
@@ -271,16 +287,40 @@ const getPreviousShabbatParashaOccurrences = (day: Date, isIsrael: boolean) => {
   )
   if (!nextParshaLeining?.parsha) return []
 
+  const nextParshaReadingId = toCanonicalReadingId(
+    nextParshaLeining,
+    normalizeTitleEn(nextParshaLeining.name.en),
+    isIsrael
+  )
+
   return [
     {
-      readingId: toCanonicalReadingId(
-        nextParshaLeining,
-        normalizeTitleEn(nextParshaLeining.name.en),
-        isIsrael
-      ),
+      readingId: resolveShabbatMinchaReadingId({ leinings, nextParshaReadingId }),
       dateIso: toISODateString(day),
     },
   ]
+}
+
+const resolveShabbatMinchaReadingId = ({
+  leinings,
+  nextParshaReadingId,
+}: {
+  leinings: (Leyning | LeyningWeekday)[]
+  nextParshaReadingId: string
+}) => {
+  if (nextParshaReadingId === 'bereshit' && hasSukkotShabbatCholHamoedReading(leinings)) {
+    return 'vezot_haberakhah'
+  }
+
+  return nextParshaReadingId
+}
+
+const hasSukkotShabbatCholHamoedReading = (leinings: (Leyning | LeyningWeekday)[]) => {
+  return leinings.some((candidate) => (
+    'fullkriyah' in candidate &&
+    candidate.fullkriyah &&
+    normalizeTitleEn(candidate.name.en).startsWith('Sukkot Shabbat Chol ha Moed')
+  ))
 }
 
 const normalizeTitleEn = (title: string) => {
@@ -469,7 +509,12 @@ const resolveHolidayReadingIds = ({
 
   const results = split.hasMain ? [readingId] : []
   if (split.hasMaftir) {
-    results.push(toHolidayMaftirReadingId(readingId, titleEn))
+    results.push(toHolidayMaftirReadingId({
+      readingId,
+      titleEn,
+      maftirAliyah: aliyotMap.M,
+      isIsrael,
+    }))
   }
 
   return results
@@ -638,12 +683,25 @@ const splitHolidayAliyot = ({
   }
 }
 
-const toHolidayMaftirReadingId = (readingId: string, titleEn: string) => {
+const toHolidayMaftirReadingId = ({
+  readingId,
+  titleEn,
+  maftirAliyah,
+  isIsrael,
+}: {
+  readingId: string
+  titleEn: string
+  maftirAliyah: Aliyah | undefined
+  isIsrael: boolean
+}) => {
   if (titleEn.startsWith('Rosh Hashana')) return 'rosh-maftir'
   if (titleEn.startsWith('Yom Kippur')) return 'yom-kippur-maftir'
   if (titleEn.startsWith('Shavuot')) return 'shavuot-maftir'
   if (titleEn.startsWith('Shmini Atzeret') || titleEn.startsWith('Simchat Torah')) {
     return 'sukkot-end-maftir'
+  }
+  if (titleEn.startsWith('Sukkot Shabbat Chol ha Moed')) {
+    return resolveSukkotCholHamoedReadingIdByStart({ maftirAliyah, isIsrael }) ?? 'sukkot-maftir'
   }
   if (titleEn.startsWith('Sukkot')) return 'sukkot-maftir'
   if (
@@ -686,6 +744,22 @@ const resolvePesachCholHamoedReadingId = (aliyotMap: AliyotMap | undefined) => {
   const startKey = toAliyahStartKey(firstAliyah)
   if (!startKey) return null
   return PESACH_CHOL_HAMOED_READING_ID_BY_START[startKey] ?? null
+}
+
+const resolveSukkotCholHamoedReadingIdByStart = ({
+  maftirAliyah,
+  isIsrael,
+}: {
+  maftirAliyah: Aliyah | undefined
+  isIsrael: boolean
+}) => {
+  const startKey = toAliyahStartKey(maftirAliyah)
+  if (!startKey) return null
+
+  const readingIds = SUKKOT_CHOL_HAMOED_READING_ID_BY_START[startKey]
+  if (!readingIds) return null
+
+  return isIsrael ? readingIds.israel : readingIds.diaspora
 }
 
 const resolveSukkotCholHamoedReadingId = ({
