@@ -236,6 +236,7 @@ interface CalendarEntry {
   readingLabel: string | null;
   dateIso: string;
   dateLabel: string;
+  order: number;
   target: TargetItem;
 }
 
@@ -683,6 +684,7 @@ const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => 
     readingLabel,
     dateIso,
     dateLabel: formatCalendarDate(dateIso),
+    order: reading.dateOrders[dateIso] ?? 0,
     target,
   };
 };
@@ -698,11 +700,16 @@ const calendarEntries = computed(() => {
     .map((reading) => toCalendarEntry(reading))
     .filter(isCalendarEntry);
 
-  return mappedEntries.sort((a, b) =>
-    props.side === 'from'
+  return mappedEntries.sort((a, b) => {
+    const dateCompare = props.side === 'from'
       ? b.dateIso.localeCompare(a.dateIso)
-      : a.dateIso.localeCompare(b.dateIso)
-  );
+      : a.dateIso.localeCompare(b.dateIso);
+    if (dateCompare !== 0) return dateCompare;
+
+    return props.side === 'from'
+      ? b.order - a.order
+      : a.order - b.order;
+  });
 });
 
 const nextParashaKey = computed(() => {

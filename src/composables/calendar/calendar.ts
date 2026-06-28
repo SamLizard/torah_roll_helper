@@ -7,6 +7,7 @@ import { slugify } from './tikkun_io_utils';
 export interface MonthlyReadingEntry {
   readingId: string
   dates: string[]
+  dateOrders: Record<string, number>
 }
 
 export interface MonthlyReadings {
@@ -22,6 +23,7 @@ type TorahOccurrence = {
 type Group = {
   readingId: string
   dates: Set<string>
+  dateOrders: Map<string, number>
 }
 
 type AliyotMap = NonNullable<Leyning['fullkriyah']>
@@ -175,39 +177,38 @@ const collectRange = ({
 
   for (const day of eachDate(start, end)) {
     const leinings = getLeyningOnDate(new HDate(day), isIsrael, true)
-    for (const leining of leinings) {
-      for (const occurrence of getTorahOccurrences(day, leining, isIsrael)) {
-        const existing = groups.get(occurrence.readingId)
-        if (!existing) {
-          groups.set(occurrence.readingId, {
-            readingId: occurrence.readingId,
-            dates: new Set([occurrence.dateIso]),
-          })
-          continue
-        }
+    const dayOccurrences: TorahOccurrence[] = []
 
-        existing.dates.add(occurrence.dateIso)
-      }
+    for (const leining of leinings) {
+      dayOccurrences.push(...getTorahOccurrences(day, leining, isIsrael))
     }
 
-    for (const occurrence of getPreviousShabbatParashaOccurrences(day, leinings, isIsrael)) {
+    dayOccurrences.push(...getPreviousShabbatParashaOccurrences(day, leinings, isIsrael))
+
+    dayOccurrences.forEach((occurrence, order) => {
       const existing = groups.get(occurrence.readingId)
       if (!existing) {
         groups.set(occurrence.readingId, {
           readingId: occurrence.readingId,
           dates: new Set([occurrence.dateIso]),
+          dateOrders: new Map([[occurrence.dateIso, order]]),
         })
-        continue
+        return
       }
 
       existing.dates.add(occurrence.dateIso)
-    }
+      const existingOrder = existing.dateOrders.get(occurrence.dateIso)
+      if (existingOrder == null || order < existingOrder) {
+        existing.dateOrders.set(occurrence.dateIso, order)
+      }
+    })
   }
 
   return Array.from(groups.values())
     .map((group) => ({
       readingId: group.readingId,
       dates: Array.from(group.dates).sort(),
+      dateOrders: Object.fromEntries(group.dateOrders),
     }))
     .sort(compareByFirstDate)
 }
@@ -237,6 +238,13 @@ const getTorahOccurrences = (
         dateIso,
       })
 
+      if (isShabbatRoshChodeshAliyah(leining.fullkriyah['7'])) {
+        results.push({
+          readingId: 'rosh-chodesh-special',
+          dateIso,
+        })
+      }
+
       const specialMaftirReadingId = toParshaSpecialMaftirReadingId({
         reason: leining.fullkriyah.M?.reason,
         maftirAliyah: leining.fullkriyah.M,
@@ -244,13 +252,6 @@ const getTorahOccurrences = (
       if (specialMaftirReadingId) {
         results.push({
           readingId: specialMaftirReadingId,
-          dateIso,
-        })
-      }
-
-      if (isShabbatRoshChodeshAliyah(leining.fullkriyah['7'])) {
-        results.push({
-          readingId: 'rosh-chodesh-special',
           dateIso,
         })
       }
@@ -882,7 +883,14 @@ const isShabbatRoshChodeshAliyah = (aliyah: Aliyah | undefined) => {
 const compareByFirstDate = (a: MonthlyReadingEntry, b: MonthlyReadingEntry) => {
   const ad = a.dates[0] ?? ''
   const bd = b.dates[0] ?? ''
-  return ad.localeCompare(bd)
+  const dateCompare = ad.localeCompare(bd)
+  if (dateCompare !== 0) return dateCompare
+
+  return getReadingOrderForDate(a, ad) - getReadingOrderForDate(b, bd)
+}
+
+const getReadingOrderForDate = (reading: MonthlyReadingEntry, dateIso: string) => {
+  return reading.dateOrders[dateIso] ?? 0
 }
 
 const addMonths = (date: Date, months: number) => {

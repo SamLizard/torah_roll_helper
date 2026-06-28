@@ -1876,9 +1876,17 @@ const getTutorialOrderedTargets = (side: 'from' | 'to', preferParasha = false): 
       ? right.dates[right.dates.length - 1] ?? ''
       : right.dates[0] ?? '';
 
-    return side === 'from'
+    const dateCompare = side === 'from'
       ? rightDate.localeCompare(leftDate)
       : leftDate.localeCompare(rightDate);
+    if (dateCompare !== 0) return dateCompare;
+
+    const leftOrder = left.dateOrders[leftDate] ?? 0;
+    const rightOrder = right.dateOrders[rightDate] ?? 0;
+
+    return side === 'from'
+      ? rightOrder - leftOrder
+      : leftOrder - rightOrder;
   });
 
   return sourceReadings

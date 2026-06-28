@@ -23,6 +23,22 @@ const findReading = (
   readingId: string
 ) => readings[range].find((reading) => reading.readingId === readingId);
 
+const readingIdsForDate = (
+  readings: MonthlyReadings,
+  range: keyof MonthlyReadings,
+  dateIso: string,
+  direction: 'forward' | 'backward' = 'forward'
+) => readings[range]
+  .filter((reading) => reading.dates.includes(dateIso))
+  .sort((left, right) => {
+    const leftOrder = left.dateOrders[dateIso] ?? 0;
+    const rightOrder = right.dateOrders[dateIso] ?? 0;
+    return direction === 'forward'
+      ? leftOrder - rightOrder
+      : rightOrder - leftOrder;
+  })
+  .map((reading) => reading.readingId);
+
 describe('monthly readings', () => {
   it('keeps the next parasha on a regular Shabbat for mincha and weekday preparation', () => {
     const readings = generateReadings({ anchorDate: '2025-10-19' });
@@ -63,5 +79,54 @@ describe('monthly readings', () => {
     expect(findReading(readings, 'lastMonth', 'pesach-3')?.dates).toContain('2023-04-09');
     expect(findReading(readings, 'lastMonth', 'pesach-4')?.dates).toContain('2023-04-10');
     expect(findReading(readings, 'lastMonth', 'pesach-6')?.dates).toContain('2023-04-11');
+  });
+
+  it('orders Shabbat Rosh Chodesh Chanukah before Chanukah maftir', () => {
+    const readings = generateReadings({ anchorDate: '2022-12-23' });
+
+    expect(readingIdsForDate(readings, 'nextMonth', '2022-12-24')).toEqual([
+      'miketz',
+      'rosh-chodesh-special',
+      'chanukah-6',
+      'vayigash',
+    ]);
+    expect(readingIdsForDate(readings, 'nextMonth', '2022-12-24', 'backward')).toEqual([
+      'vayigash',
+      'chanukah-6',
+      'rosh-chodesh-special',
+      'miketz',
+    ]);
+  });
+
+  it('keeps the Shabbat Chanukah main reading before Chanukah maftir', () => {
+    const readings = generateReadings({ anchorDate: '2024-12-28' });
+
+    expect(readingIdsForDate(readings, 'nextMonth', '2024-12-28')).toEqual([
+      'miketz',
+      'chanukah-3',
+      'vayigash',
+    ]);
+    expect(readingIdsForDate(readings, 'lastMonth', '2024-12-28', 'backward')).toEqual([
+      'vayigash',
+      'chanukah-3',
+      'miketz',
+    ]);
+  });
+
+  it('orders Shabbat Rosh Chodesh Shekalim before Shekalim maftir', () => {
+    const readings = generateReadings({ anchorDate: '2025-03-01' });
+
+    expect(readingIdsForDate(readings, 'nextMonth', '2025-03-01')).toEqual([
+      'terumah',
+      'rosh-chodesh-special',
+      'shekalim',
+      'tetzaveh',
+    ]);
+    expect(readingIdsForDate(readings, 'lastMonth', '2025-03-01', 'backward')).toEqual([
+      'tetzaveh',
+      'shekalim',
+      'rosh-chodesh-special',
+      'terumah',
+    ]);
   });
 });
