@@ -12,7 +12,6 @@
     "contentShort": "Message court",
     "contentLink": "Lien seul",
     "previewLabel": "Aperçu",
-    "linkLabel": "Lien de partage",
     "nativeShare": "Partager…",
     "copy": "Copier",
     "whatsapp": "WhatsApp",
@@ -20,13 +19,11 @@
     "shareTitle": "Torah Roll Helper",
     "copied": "Copié dans le presse-papiers",
     "copyFailed": "Impossible de copier. Sélectionnez le texte manuellement.",
-    "openFailed": "Impossible d'ouvrir la cible de partage.",
     "nativeFailed": "Le partage a échoué. Essayez une autre option ci-dessous.",
     "message": "📜 Avant chaque lecture de la Torah, votre Gabbaï résout discrètement un problème que la plupart des gens ne voient pas : sur quelle colonne le Sefer Torah est-il ouvert ? Combien faut-il en rouler jusqu'à la prochaine lecture ? Quel Sefer Torah parmi ceux de la synagogue est le plus proche ?\n\nIl existe un outil gratuit qui fait tout cela en quelques secondes.\n\nL'Assistant de Roulement de la Torah identifie la colonne exacte à partir d'une photo du Klaf ou des premiers mots visibles sur la page — puis indique précisément combien de colonnes rouler et dans quelle direction, avec toutes les lectures possibles de l'année déjà intégrées.\n\nAucun compte. Aucune installation. Fonctionne sur tout téléphone. 100% gratuit.\n\n👉 {link}\n\nPartagez ceci dans le groupe WhatsApp de votre synagogue. La plupart des membres fréquentent plusieurs communautés — un seul partage peut toucher bien plus de Gabbaïm que vous ne le pensez. Si vous êtes Gabbaï vous-même, transmettez-le aux Gabbaïm que vous connaissez.",
     "messageShort": "📜 Outil gratuit pour les Gabbaïm — identifiez la colonne du Sefer Torah (photo ou premiers mots de la page), obtenez le sens et le nombre de colonnes à rouler. Toutes les lectures incluses. Sans compte, sans installation.\n\n👉 {link}"
   },
   "seo": {
-    "siteName": "Torah Roll Helper",
     "fallbackTitle": "Torah Roll Helper | Assistant de roulement de la Torah | עוזר גלילת התורה",
     "fallbackDescription": "Assistant gratuit de roulement de la Torah pour aider les Gabbaïm et Ba'alei Kriah à calculer rapidement le sens et le nombre de colonnes à rouler entre deux lectures. Aussi connu sous les noms Torah Roll Helper et עוזר גלילת התורה.",
     "keywords": "Torah roll helper,Torah roll assistant,assistant de roulement de la Torah,עוזר גלילת התורה,assistant Torah,Sefer Torah,Gabbai,Ba'al Koreh,גלילת התורה",
@@ -119,7 +116,6 @@
       "result": {
         "index": "#",
         "reference": "Référence",
-        "sourceSummary": "{source} (+{count})",
         "matches": "correspondances",
         "choose": "Choisir",
         "rank": "Priorité",
@@ -139,7 +135,6 @@
       "input": "Saisir une réf.",
       "firstLine": "Première ligne"
     },
-    "selected": "Sélectionné",
     "noSelection": "Aucune page sélectionnée"
   },
   "howTo": {
@@ -340,7 +335,6 @@
   "targets": {
     "title": "Choisir une lecture",
     "showingAll": "Affichage de la liste complète",
-    "golaLabel": "Mode Diaspora (Gola)",
     "golaBadge": "Gola",
     "israelBadge": "Israël"
   },
@@ -445,8 +439,6 @@
     "ocrPanelHint": "Prenez une photo serrée de la première ligne. Le texte corrigé est inséré dans le champ ci-dessus afin que vous puissiez l'ajuster.",
     "ocrProcessing": "Lecture locale de l'image...",
     "ocrConfidence": "OCR {value}%",
-    "ocrRawText": "Texte OCR brut",
-    "ocrEditableText": "Texte corrigé dans le champ de recherche",
     "ocrNoText": "Aucun texte hébreu exploitable pour le moment.",
     "ocrNoTextDetected": "Aucun texte hébreu exploitable n'a été détecté dans cette photo.",
     "ocrUnexpectedError": "Impossible d'exécuter l'OCR sur cette image. Essayez une autre photo.",
