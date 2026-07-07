@@ -275,7 +275,7 @@
       },
       "step19": {
         "title": "Coutumes communautaires",
-        "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Nossah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé."
+        "description": "Utilisez les paramètres pour basculer entre les modes Israël et Diaspora (Gola), sélectionner votre Nossah, et choisir la mise en page du rouleau (ex: 245 colonnes). Ces options influencent les lectures affichées et la façon dont le roulement est calculé. Vous pouvez également y définir vos préférences."
       },
       "step20": {
         "title": "Navigation",
@@ -294,11 +294,14 @@
     "nusachLabel": "Rite",
     "torahTypeLabel": "Mise en page",
     "tikkunProviderLabel": "Tikkun en ligne",
+    "preferencesLabel": "Préférences",
+    "calendarDateDisplayLabel": "Dates du calendrier",
     "help": {
       "gola": "Activez cette option si vous êtes en dehors d'Israël pour synchroniser les lectures avec le calendrier de la Diaspora.",
       "nusach": "Choisissez la tradition de lecture. Pour l'instant, seul le noussah séfarade est disponible.",
       "torahType": "La plupart des sifrei Torah utilisent la mise en page רמ״ה (245 pages). D'autres formats existent, comme le Témanite (תאג') qui est en 226 pages.",
-      "tikkunProvider": "Choisissez quel tikkun en ligne s'ouvre depuis les aperçus. Auto utilise tikkun.io en 245 et pour les lectures nommées, avec Sefaria pour les références des autres mises en page."
+      "tikkunProvider": "Choisissez quel tikkun en ligne s'ouvre depuis les aperçus. Auto utilise tikkun.io en 245 et pour les lectures nommées, avec Sefaria pour les références des autres mises en page.",
+      "calendarDateDisplay": "Choisissez si les cartes du calendrier affichent les dates grégoriennes ou hébraïques."
     },
     "nusachOptions": {
       "sefaradic": "Séfarade"
@@ -322,6 +325,10 @@
         "description": "Texte de Torah sans mise en page pour les références exactes."
       }
     },
+    "calendarDateDisplayOptions": {
+      "gregorian": "Dates grégoriennes",
+      "hebrew": "Dates hébraïques"
+    },
     "savedSettingsBanner": {
       "defaultText": "Les paramètres sont enregistrés dans ce navigateur.",
       "text": "Enregistré dans ce navigateur : {settings}.",
@@ -329,7 +336,8 @@
       "gola": "mode Diaspora",
       "nusach": "rite {value}",
       "torahType": "mise en page {value}",
-      "tikkunProvider": "tikkun en ligne {value}"
+      "tikkunProvider": "tikkun en ligne {value}",
+      "calendarDateDisplay": "dates du calendrier {value}"
     }
   },
   "targets": {

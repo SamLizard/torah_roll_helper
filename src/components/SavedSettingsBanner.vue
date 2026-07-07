@@ -102,6 +102,12 @@ const savedSettingLabels = computed(() => {
     }));
   }
 
+  if (optionsStore.calendarDateDisplay !== 'gregorian') {
+    labels.push(t('settings.savedSettingsBanner.calendarDateDisplay', {
+      value: getTranslatedText(`settings.calendarDateDisplayOptions.${optionsStore.calendarDateDisplay}`),
+    }));
+  }
+
   return labels;
 });
 
@@ -169,7 +175,13 @@ onUnmounted(() => {
 });
 
 watch(
-  () => [optionsStore.isInGola, optionsStore.nusach, optionsStore.torahType, optionsStore.tikkunProvider],
+  () => [
+    optionsStore.isInGola,
+    optionsStore.nusach,
+    optionsStore.torahType,
+    optionsStore.tikkunProvider,
+    optionsStore.calendarDateDisplay,
+  ],
   () => {
     if (!isStandalone.value) {
       hasSavedOptions.value = true;

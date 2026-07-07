@@ -275,7 +275,7 @@
       },
       "step19": {
         "title": "Community customs",
-        "description": "Use settings to toggle between Israel and Diaspora (Gola) modes, select your Nusach, and choose the scroll layout (e.g., 245 columns). These options affect which readings appear and how the roll is calculated."
+        "description": "Use settings to toggle between Israel and Diaspora (Gola) modes, select your Nusach, and choose the scroll layout (e.g., 245 columns). These options affect which readings appear and how the roll is calculated. You can set here also your preferences."
       },
       "step20": {
         "title": "Navigation",
@@ -294,11 +294,14 @@
     "nusachLabel": "Rite",
     "torahTypeLabel": "Scroll layout",
     "tikkunProviderLabel": "Online tikkun",
+    "preferencesLabel": "Preferences",
+    "calendarDateDisplayLabel": "Calendar dates",
     "help": {
       "gola": "If you are outside Israel, enable Gola mode to synchronize readings with the Diaspora calendar.",
       "nusach": "Choose your reading tradition. Right now, only Sefaradic is available.",
       "torahType": "Most sifrei Torah use the רמ\"ה layout (245 pages). Other layouts exist, like the Teimani (תאג') which is 226 pages.",
-      "tikkunProvider": "Choose which online tikkun opens from page previews. Auto uses tikkun.io on the 245 layout and for named readings, with Sefaria refs on other layouts."
+      "tikkunProvider": "Choose which online tikkun opens from page previews. Auto uses tikkun.io on the 245 layout and for named readings, with Sefaria refs on other layouts.",
+      "calendarDateDisplay": "Choose whether calendar cards show Gregorian dates or Hebrew calendar dates."
     },
     "nusachOptions": {
       "sefaradic": "Sefaradic"
@@ -322,6 +325,10 @@
         "description": "Layout-free Torah text for exact refs."
       }
     },
+    "calendarDateDisplayOptions": {
+      "gregorian": "Gregorian dates",
+      "hebrew": "Hebrew dates"
+    },
     "savedSettingsBanner": {
       "defaultText": "Settings are saved in this browser.",
       "text": "Saved in this browser: {settings}.",
@@ -329,7 +336,8 @@
       "gola": "Gola mode",
       "nusach": "rite {value}",
       "torahType": "scroll layout {value}",
-      "tikkunProvider": "online tikkun {value}"
+      "tikkunProvider": "online tikkun {value}",
+      "calendarDateDisplay": "calendar dates {value}"
     }
   },
   "targets": {

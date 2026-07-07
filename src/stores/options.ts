@@ -6,6 +6,9 @@ import type { TikkunProviderSelection } from '@/composables/tikkunProviders';
 const NUSACH_OPTIONS = ['sefaradic'] as const;
 type NusachOption = (typeof NUSACH_OPTIONS)[number];
 
+const CALENDAR_DATE_DISPLAY_OPTIONS = ['gregorian', 'hebrew'] as const;
+type CalendarDateDisplayOption = (typeof CALENDAR_DATE_DISPLAY_OPTIONS)[number];
+
 const TORAH_TYPE_OPTIONS = [
   { id: 'klaf_245', pageCount: 245 },
   { id: 'klaf_226', pageCount: 226 },
@@ -18,6 +21,7 @@ interface State {
   nusach: NusachOption;
   torahType: TorahTypeOption;
   tikkunProvider: TikkunProviderSelection;
+  calendarDateDisplay: CalendarDateDisplayOption;
   fromPage: number | null;
   toPage: number | null;
 }
@@ -36,6 +40,7 @@ const useOptionsStore = defineStore('options', () => {
   const nusach = ref<State['nusach']>('sefaradic');
   const torahType = ref<State['torahType']>('klaf_245');
   const tikkunProvider = ref<State['tikkunProvider']>('auto');
+  const calendarDateDisplay = ref<State['calendarDateDisplay']>('gregorian');
   const fromPage = ref<State['fromPage']>(null);
   const toPage = ref<State['toPage']>(null);
   const maxTorahPages = computed<number>(() => getTorahPageCount(torahType.value));
@@ -56,6 +61,10 @@ const useOptionsStore = defineStore('options', () => {
     tikkunProvider.value = newProvider;
   };
 
+  const changeCalendarDateDisplay = (newDisplay: State['calendarDateDisplay']): void => {
+    calendarDateDisplay.value = newDisplay;
+  };
+
   const changeFromPage = (newFromPage: State['fromPage']): void => {
     fromPage.value = newFromPage;
   };
@@ -73,18 +82,27 @@ const useOptionsStore = defineStore('options', () => {
     changeTorahType,
     tikkunProvider,
     changeTikkunProvider,
+    calendarDateDisplay,
+    changeCalendarDateDisplay,
     maxTorahPages,
     fromPage,
     changeFromPage,
     toPage,
-    changeToPage
+    changeToPage,
   };
 }, {
   persist: {
     key: OPTIONS_STORAGE_KEY,
-    pick: ['isInGola', 'nusach', 'torahType', 'tikkunProvider'],
+    pick: ['isInGola', 'nusach', 'torahType', 'tikkunProvider', 'calendarDateDisplay'],
   },
 });
 
-export { useOptionsStore, NUSACH_OPTIONS, TORAH_TYPE_OPTIONS, getTorahPageCount, getLayoutKey };
-export type { NusachOption, TorahTypeOption };
+export {
+  useOptionsStore,
+  NUSACH_OPTIONS,
+  TORAH_TYPE_OPTIONS,
+  CALENDAR_DATE_DISPLAY_OPTIONS,
+  getTorahPageCount,
+  getLayoutKey,
+};
+export type { NusachOption, TorahTypeOption, CalendarDateDisplayOption };

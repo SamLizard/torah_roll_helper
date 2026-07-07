@@ -119,6 +119,37 @@
           </v-tooltip>
         </div>
 
+        <v-divider class="my-4" />
+
+        <div class="settings-section-label text-caption text-medium-emphasis font-weight-bold text-uppercase mb-2">
+          {{ $t('settings.preferencesLabel') }}
+        </div>
+
+        <div class="setting-control" data-tutorial="settings-calendar-date-display">
+          <v-select
+            v-model="calendarDateDisplay"
+            :items="calendarDateDisplayOptions"
+            item-title="title"
+            item-value="value"
+            :label="$t('settings.calendarDateDisplayLabel')"
+            variant="outlined"
+            density="comfortable"
+            hide-details="auto"
+            class="grow"
+          />
+          <v-tooltip location="top" :text="$t('settings.help.calendarDateDisplay')">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                icon="mdi-information-outline"
+                variant="text"
+                size="small"
+                class="info-btn"
+              />
+            </template>
+          </v-tooltip>
+        </div>
+
         <template v-if="showInstallGuideEntry">
           <v-divider class="my-4" />
           <v-btn
@@ -155,8 +186,10 @@ import { useInstallPrompt } from '@/composables/installPrompt';
 import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
 import { TIKKUN_PROVIDER_SELECTION_OPTIONS, type TikkunProviderSelection } from '@/composables/tikkunProviders';
 import {
+  CALENDAR_DATE_DISPLAY_OPTIONS,
   NUSACH_OPTIONS,
   TORAH_TYPE_OPTIONS,
+  type CalendarDateDisplayOption,
   type NusachOption,
   type TorahTypeOption,
   useOptionsStore,
@@ -207,6 +240,11 @@ const tikkunProvider = computed<TikkunProviderSelection>({
   set: (value) => optionsStore.changeTikkunProvider(value),
 });
 
+const calendarDateDisplay = computed<CalendarDateDisplayOption>({
+  get: () => optionsStore.calendarDateDisplay,
+  set: (value) => optionsStore.changeCalendarDateDisplay(value),
+});
+
 const nusachOptions = computed(() => {
   return NUSACH_OPTIONS.map((value) => ({
     title: t(`settings.nusachOptions.${value}`),
@@ -227,6 +265,13 @@ const tikkunProviderOptions = computed(() => {
     description: t(option.descriptionKey),
     faviconUrl: option.faviconUrl,
     value: option.id,
+  }));
+});
+
+const calendarDateDisplayOptions = computed(() => {
+  return CALENDAR_DATE_DISPLAY_OPTIONS.map((value) => ({
+    title: t(`settings.calendarDateDisplayOptions.${value}`),
+    value,
   }));
 });
 
@@ -255,6 +300,10 @@ const openInstallGuide = (): void => {
 
 .info-btn {
   margin-top: 10px;
+}
+
+.settings-section-label {
+  letter-spacing: 0;
 }
 
 .provider-selection {

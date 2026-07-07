@@ -213,6 +213,7 @@ import { useMonthlyReadingsStore } from '@/stores/monthlyReadings';
 import { useOnlineStatus } from '@/composables/onlineStatus';
 import { useTorahData, resolvePageForLayout } from '@/composables/torahData';
 import { trackFromToAction } from '@/composables/analytics';
+import { formatCalendarDateLabel } from '@/composables/calendar/dateDisplay';
 import {
   splitPairedParashaReadingId,
   type MonthlyReadingEntry,
@@ -660,13 +661,7 @@ const getRefForMode = (target: TargetItem, mode: TargetRefMode): TorahRef => {
 };
 
 const formatCalendarDate = (dateIso: string) => {
-  const parsedDate = new Date(`${dateIso}T12:00:00`);
-  if (Number.isNaN(parsedDate.getTime())) return dateIso;
-
-  return new Intl.DateTimeFormat(locale.value, {
-    month: 'short',
-    day: 'numeric',
-  }).format(parsedDate);
+  return formatCalendarDateLabel(dateIso, options.calendarDateDisplay, locale.value);
 };
 
 const toCalendarEntry = (reading: MonthlyReadingEntry): CalendarEntry | null => {
