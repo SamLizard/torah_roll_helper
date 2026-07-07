@@ -77,6 +77,12 @@
           </v-tooltip>
         </div>
 
+        <v-divider class="my-4" />
+
+        <div class="settings-section-label text-caption text-medium-emphasis font-weight-bold text-uppercase mb-2">
+          {{ $t('settings.preferencesLabel') }}
+        </div>
+
         <div class="setting-control" data-tutorial="settings-tikkun-provider">
           <v-select
             v-model="tikkunProvider"
@@ -117,12 +123,6 @@
               />
             </template>
           </v-tooltip>
-        </div>
-
-        <v-divider class="my-4" />
-
-        <div class="settings-section-label text-caption text-medium-emphasis font-weight-bold text-uppercase mb-2">
-          {{ $t('settings.preferencesLabel') }}
         </div>
 
         <div class="setting-control" data-tutorial="settings-calendar-date-display">
@@ -177,10 +177,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
-import { trackGolaChoice } from '@/composables/analytics';
+import { trackGolaChoice, trackSettingsClosed } from '@/composables/analytics';
 import { markGolaNoticeSeen } from '@/composables/golaNotice';
 import { useInstallPrompt } from '@/composables/installPrompt';
 import InstallGuideDialog from '@/components/InstallGuideDialog.vue';
@@ -210,6 +210,26 @@ const {
 } = useInstallPrompt();
 const optionsStore = useOptionsStore();
 const installGuideDialog = ref(false);
+
+interface SettingsSnapshot {
+  locationMode: 'gola' | 'israel';
+  nusach: NusachOption;
+  torahType: TorahTypeOption;
+  tikkunProvider: TikkunProviderSelection;
+  calendarDateDisplay: CalendarDateDisplayOption;
+}
+
+type SettingsSnapshotKey = keyof SettingsSnapshot;
+
+const SETTINGS_ANALYTICS_KEYS: Array<{ key: SettingsSnapshotKey; analyticsKey: string }> = [
+  { key: 'locationMode', analyticsKey: 'location-mode' },
+  { key: 'nusach', analyticsKey: 'nusach' },
+  { key: 'torahType', analyticsKey: 'torah-type' },
+  { key: 'tikkunProvider', analyticsKey: 'tikkun-provider' },
+  { key: 'calendarDateDisplay', analyticsKey: 'calendar-date-display' },
+];
+
+const settingsSnapshotOnOpen = ref<SettingsSnapshot | null>(null);
 
 const dialog = computed<boolean>({
   get: () => props.modelValue,
@@ -274,6 +294,45 @@ const calendarDateDisplayOptions = computed(() => {
     value,
   }));
 });
+
+const getSettingsSnapshot = (): SettingsSnapshot => ({
+  locationMode: optionsStore.isInGola ? 'gola' : 'israel',
+  nusach: optionsStore.nusach,
+  torahType: optionsStore.torahType,
+  tikkunProvider: optionsStore.tikkunProvider,
+  calendarDateDisplay: optionsStore.calendarDateDisplay,
+});
+
+const getSettingsChanges = (previousSnapshot: SettingsSnapshot | null, currentSnapshot: SettingsSnapshot) => {
+  if (!previousSnapshot) return [];
+
+  return SETTINGS_ANALYTICS_KEYS
+    .filter(({ key }) => previousSnapshot[key] !== currentSnapshot[key])
+    .map(({ key, analyticsKey }) => ({
+      key: analyticsKey,
+      fromValue: previousSnapshot[key],
+      toValue: currentSnapshot[key],
+    }));
+};
+
+watch(
+  () => props.modelValue,
+  (isOpen, wasOpen) => {
+    if (isOpen) {
+      settingsSnapshotOnOpen.value = getSettingsSnapshot();
+      return;
+    }
+
+    if (wasOpen) {
+      const currentSnapshot = getSettingsSnapshot();
+      trackSettingsClosed({
+        changedSettings: getSettingsChanges(settingsSnapshotOnOpen.value, currentSnapshot),
+      });
+      settingsSnapshotOnOpen.value = null;
+    }
+  },
+  { immediate: true }
+);
 
 const showInstallGuideEntry = computed(() => smAndDown.value && !isStandalone.value);
 

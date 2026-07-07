@@ -28,6 +28,16 @@ interface TrackRollResultDisplayedInput {
   pages: number;
 }
 
+interface TrackSettingsChange {
+  key: string;
+  fromValue: string;
+  toValue: string;
+}
+
+interface TrackSettingsClosedInput {
+  changedSettings: TrackSettingsChange[];
+}
+
 interface TrackTutorialEventInput {
   tutorial: TutorialKind;
   action: TutorialEventAction;
@@ -194,6 +204,37 @@ const trackGolaChoice = (isInGola: boolean) => {
   trackGoatCounterEvent({
     path,
     title,
+    event: true,
+  });
+};
+
+const trackSettingsClosed = ({ changedSettings }: TrackSettingsClosedInput) => {
+  if (!isAnalyticsEnabled()) return;
+  if (changedSettings.length === 0) return;
+
+  const changedSettingSegments = changedSettings.map((change) => {
+    return [
+      toSlug(change.key),
+      toSlug(change.fromValue),
+      'to',
+      toSlug(change.toValue),
+    ].filter((segment) => segment.length > 0).join('-');
+  });
+  const pathSegments = [
+    EVENT_PATH_PREFIX,
+    'settings',
+    'close',
+    'changed',
+    ...changedSettingSegments,
+  ];
+  const titleSegments = [
+    'settings-close',
+    changedSettings.map((change) => `${change.key}:${change.fromValue}->${change.toValue}`).join(','),
+  ];
+
+  trackGoatCounterEvent({
+    path: pathSegments.join('/'),
+    title: titleSegments.join(':'),
     event: true,
   });
 };
@@ -431,6 +472,7 @@ export {
   trackPageView,
   trackShareCompleted,
   trackShareOpened,
+  trackSettingsClosed,
   trackTutorialEvent,
   trackTutorialPromptEvent,
 };
